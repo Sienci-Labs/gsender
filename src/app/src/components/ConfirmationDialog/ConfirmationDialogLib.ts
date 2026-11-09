@@ -21,6 +21,7 @@
  *
  */
 
+import { i18n } from 'app/i18n';
 import pubsub from 'pubsub-js';
 import type { ReactNode } from 'react';
 
@@ -42,13 +43,13 @@ interface ConfirmOptions {
 
 export const Confirm = (options: ConfirmOptions = {}): void => {
     const {
-        title = 'Confirm',
+        title = i18n.t('common:actions.confirm'),
         buttons = [],
-        content = 'Are you sure you want to do this?',
+        content = i18n.t('notifications:confirm.defaultContent'),
         onClose = null,
         onConfirm = null,
-        confirmLabel = 'Confirm',
-        cancelLabel = 'Cancel',
+        confirmLabel = i18n.t('common:actions.confirm'),
+        cancelLabel = i18n.t('common:actions.cancel'),
         show = true,
         hideClose = false,
         hideConfirm,

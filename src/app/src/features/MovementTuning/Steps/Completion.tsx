@@ -12,6 +12,7 @@ import {
 import type { EEPROM } from 'app/definitions/firmware';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toFixedIfNecessary } from 'app/lib/rounding';
 import { toast } from 'sonner';
@@ -35,7 +36,9 @@ const Completion = () => {
 
         controller.command('gcode', [`${eepromKey}=${newStepsPerMM}`, '$$']);
 
-        toast.info('Updated steps-per-mm value', { position: 'bottom-right' });
+        toast.info(i18n.t('notifications:movementTuning.stepsUpdated'), {
+            position: 'bottom-right',
+        });
     };
 
     const eepromKey = getEEPROMSettingKey(selectedAxis);

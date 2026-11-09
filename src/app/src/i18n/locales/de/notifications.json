@@ -1,0 +1,278 @@
+{
+  "confirm": {
+    "defaultContent": "Möchten Sie das wirklich tun?"
+  },
+  "accessories": {
+    "restartController": {
+      "title": "Controller neu starten",
+      "content": "Bitte starten Sie Ihren CNC-Controller manuell neu (aus- und wieder einschalten) und verbinden Sie sich erneut mit gSender, damit diese Einstellungen wirksam werden."
+    }
+  },
+  "atc": {
+    "unimplemented": "Noch nicht implementiert :(",
+    "toolsOutOfRange_one": "Diese Datei verwendet das Werkzeug {{list}}, das Ihre Werkzeugtabelle mit {{size}} Plätzen überschreitet. Ordnen Sie es vor dem Start in der Werkzeug-Zeitleiste neu zu.",
+    "toolsOutOfRange_other": "Diese Datei verwendet die Werkzeuge {{list}}, die Ihre Werkzeugtabelle mit {{size}} Plätzen überschreiten. Ordnen Sie sie vor dem Start in der Werkzeug-Zeitleiste neu zu.",
+    "dialog": {
+      "title": "Der ATC hat einen Dialog angefordert.",
+      "content": "„Weiter“ hebt den Halt auf, „Zurücksetzen“ bricht die Aktion ab.",
+      "resume": "Fortsetzen"
+    }
+  },
+  "connection": {
+    "reconnectFailed": "Erneute Verbindung zu {{port}} nicht möglich – {{reason}}"
+  },
+  "console": {
+    "cleared": "Konsole geleert",
+    "commandsCopied_one": "Letzten {{count}} Befehl in die Zwischenablage kopiert",
+    "commandsCopied_other": "Letzte {{count}} Befehle in die Zwischenablage kopiert",
+    "copyFailed": "Befehle konnten nicht in die Zwischenablage kopiert werden",
+    "webViewUnavailable": "Diese Funktion ist in der Webansicht nicht verfügbar."
+  },
+  "controller": {
+    "alarm": "Alarm {{code}}: {{description}}",
+    "error": "Fehler {{code}}: {{description}}",
+    "commentLabel": "Kommentar:",
+    "resume": "Fortsetzen",
+    "portDisconnected": {
+      "title": "Port getrennt",
+      "contentHoming": "Die Verbindung zur Maschine wurde unterbrochen. Drücken Sie „Fortsetzen“, um sich erneut mit dem zuletzt aktiven Port zu verbinden, eine Referenzfahrt durchzuführen und die Zeile zu wählen, ab der fortgefahren werden soll.",
+      "content": "Die Verbindung zur Maschine wurde unterbrochen. Drücken Sie „Fortsetzen“, um sich erneut mit dem zuletzt aktiven Port zu verbinden. Danach können Sie Ihren Werkstück-Nullpunkt setzen und den Auftrag mit der Funktion „Ab Zeile starten“ fortsetzen. Empfohlene Startzeile: {{line}}"
+    },
+    "toolchangePause": "Werkzeugwechsel-Pause",
+    "toolchangePauseWithComment": "Werkzeugwechsel-Pause – {{comment}}",
+    "confirmToolchange": {
+      "title": "Werkzeugwechsel bestätigen",
+      "content": "Ein Werkzeugwechselbefehl (M6) wurde gefunden – klicken Sie auf „Bestätigen“, um zu bestätigen, dass das Werkzeug gewechselt wurde, und Ihren Code nach dem Werkzeugwechsel auszuführen.",
+      "confirm": "Werkzeugwechsel bestätigen"
+    },
+    "feederPause": {
+      "title": "{{command}}-Pause erkannt",
+      "content": "Drücken Sie „Fortsetzen“, um weiterzumachen.",
+      "stop": "Stopp"
+    },
+    "workflowPause": "Pausenbefehl '{{command}}' in der Datei gefunden – drücken Sie „Auftrag fortsetzen“, um weiterzumachen.",
+    "programPause": {
+      "title": "M0/M1-Pause",
+      "content": "Klicken Sie auf „Fenster schließen“, wenn Sie ein Werkzeug wechseln, verfahren, einen neuen Nullpunkt setzen oder einen anderen Vorgang ausführen möchten, und klicken Sie dann auf die normale Schaltfläche „Auftrag fortsetzen“, um weiterzufräsen, sobald Sie bereit sind.",
+      "confirm": "Auftrag fortsetzen",
+      "cancel": "Fenster schließen"
+    },
+    "rotaryFileLoaded": {
+      "title": "Rotationsdatei geladen",
+      "content": "Der G-Code enthält A-Achsen-Befehle. Bitte aktivieren Sie den Rotationsmodus, wenn Ihre Maschine mit einer Rotationsachse ausgestattet ist.",
+      "confirm": "Rotationsmodus aktivieren"
+    },
+    "fourAxisFileLoaded": {
+      "title": "4-Achsen-Datei geladen",
+      "content": "Der G-Code enthält simultane 4-Achsen-Befehle, die derzeit nicht unterstützt werden und nicht ausgeführt werden können."
+    }
+  },
+  "diagnostics": {
+    "downloaded": "Diagnosedatei erfolgreich heruntergeladen!",
+    "generateFailed": "Diagnosedatei konnte nicht erstellt werden"
+  },
+  "dro": {
+    "machineLimitsMissing": "Maschinengrenzen nicht gefunden – stellen Sie sicher, dass sie in den Einstellungen festgelegt sind",
+    "invalidPositionArgs": "Positionsbewegungen konnten anhand der Eingaben nicht berechnet werden – überprüfen Sie die übergebenen Argumente"
+  },
+  "files": {
+    "closed": "G-Code-Datei geschlossen",
+    "recentLoadFailed": "Fehler beim Laden der zuletzt verwendeten Datei. Sie wurde möglicherweise gelöscht oder in einen anderen Ordner verschoben.",
+    "loadFailed": "Datei kann nicht geladen werden – sie wurde möglicherweise verschoben oder gelöscht."
+  },
+  "gamepad": {
+    "connected": "{{name}} verbunden",
+    "newConnected": "Neues Gamepad verbunden – fügen Sie es in Ihren Einstellungen als Profil hinzu",
+    "disconnected": "Gamepad getrennt",
+    "profileRenamed": "Profilname aktualisiert",
+    "profileExported": "Gamepad-Profil erfolgreich exportiert!",
+    "profileExportFailed": "Gamepad-Profil konnte nicht exportiert werden.",
+    "profileImported": "Gamepad-Profil erfolgreich importiert!",
+    "profileImportFailed": "Gamepad-Profil konnte nicht importiert werden. Bitte überprüfen Sie das Dateiformat.",
+    "profileRemoved": "Gamepad-Profil entfernt",
+    "profileCreated": "Neues Gamepad-Profil erstellt",
+    "actionShortcutUpdated": "Gamepad-Aktionskürzel aktualisiert",
+    "buttonShortcutSet": "Tastenkürzel festgelegt",
+    "deleteProfile": {
+      "title": "Gamepad-Profil löschen",
+      "content": "Möchten Sie dieses Gamepad-Profil wirklich löschen?"
+    }
+  },
+  "gcode": {
+    "copiedToClipboard": "G-Code in die Zwischenablage kopiert",
+    "copied": "Der G-Code wurde in Ihre Zwischenablage kopiert",
+    "copyFailed": "G-Code konnte nicht in die Zwischenablage kopiert werden",
+    "linesCopied_one": "{{count}} Zeile in die Zwischenablage kopiert",
+    "linesCopied_other": "{{count}} Zeilen in die Zwischenablage kopiert",
+    "revertBlockedByJob": "Zurücksetzen nicht möglich, während ein Auftrag läuft",
+    "reverted": "Auf ursprünglichen Inhalt zurückgesetzt",
+    "saveBlockedByJob": "Speichern nicht möglich, während ein Auftrag läuft",
+    "saved": "G-Code erfolgreich gespeichert",
+    "saveFailed": "G-Code konnte nicht gespeichert werden"
+  },
+  "jobControl": {
+    "outlineGenerating": "Umriss-G-Code wird erstellt …",
+    "outlineRunning": "Dateiumriss wird abgefahren",
+    "outlineTimedOut": "Zeitüberschreitung bei der Umrisserstellung. Bitte versuchen Sie es erneut.",
+    "outlineFailed": "Umrisserstellung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "startFromLineRunning": "Befehl „Ab bestimmter Zeile starten“ wird ausgeführt"
+  },
+  "keyboard": {
+    "shortcutUpdated": "Tastenkürzel aktualisiert",
+    "shortcutCleared": "Tastenkürzel entfernt",
+    "exported": "Tastenkürzel erfolgreich exportiert!",
+    "exportFailed": "Tastenkürzel konnten nicht exportiert werden.",
+    "imported": "Tastenkürzel erfolgreich importiert!",
+    "importFailed": "Tastenkürzel konnten nicht importiert werden. Bitte überprüfen Sie das Dateiformat.",
+    "printDocumentFailed": "Druckdokument konnte nicht erstellt werden.",
+    "printFailed": "Tastenkürzel konnten nicht gedruckt werden."
+  },
+  "macros": {
+    "added": "Neues Makro hinzugefügt",
+    "addFailed": "Makro konnte nicht hinzugefügt werden",
+    "deleted": "Makro gelöscht",
+    "updated": "Makro '{{name}}' aktualisiert",
+    "nothingToExport": "Keine Makros zum Exportieren",
+    "imported_one": "{{count}} Makro erfolgreich importiert",
+    "imported_other": "{{count}} Makros erfolgreich importiert",
+    "importedAndUpdated_one": "{{count}} Makro erfolgreich importiert, {{updated}} vorhandene(s) Makro(s) aktualisiert",
+    "importedAndUpdated_other": "{{count}} Makros erfolgreich importiert, {{updated}} vorhandene(s) Makro(s) aktualisiert",
+    "updatedExisting_one": "{{count}} vorhandenes Makro aktualisiert",
+    "updatedExisting_other": "{{count}} vorhandene Makros aktualisiert",
+    "importFailed": "Fehler beim Importieren der Makros",
+    "started": "Makro '{{name}}' wird ausgeführt!",
+    "startedQuoted": "Makro „{{name}}“ wird ausgeführt!",
+    "runFailed": "Makro „{{name}}“ konnte nicht ausgeführt werden",
+    "deleteMacro": {
+      "title": "Makro löschen",
+      "content": "Möchten Sie dieses Makro wirklich löschen?"
+    }
+  },
+  "maintenance": {
+    "timersReset": "Timer erfolgreich zurückgesetzt",
+    "timersResetFailed": "Timer konnten nicht zurückgesetzt werden.",
+    "timersResetFailedDescription": "Bitte setzen Sie sie auf der Statistikseite manuell zurück."
+  },
+  "movementTuning": {
+    "stepsUpdated": "Schritte-pro-mm-Wert aktualisiert"
+  },
+  "navigation": {
+    "unsavedChanges": {
+      "title": "Nicht gespeicherte Änderungen",
+      "content": "Möchten Sie die Seite wirklich verlassen, ohne zu speichern?"
+    }
+  },
+  "pendant": {
+    "quit": {
+      "title": "gSender beenden?",
+      "content": "Möchten Sie gSender wirklich beenden?",
+      "confirm": "Beenden"
+    }
+  },
+  "plugins": {
+    "removed": "{{name}} wurde entfernt.",
+    "removeFailed": "Das Plugin konnte nicht entfernt werden. Bitte versuchen Sie es erneut."
+  },
+  "probe": {
+    "confirmedManually": "Taster manuell bestätigt",
+    "cycleStarted": "Antastzyklus gestartet",
+    "pendantCycleStarted": "Antastzyklus gestartet: {{corner}}, {{diameter}}, {{command}}"
+  },
+  "remoteMode": {
+    "linkCopied": "Link in die Zwischenablage kopiert",
+    "linkCopyFailed": "Beim Kopieren des Links in die Zwischenablage ist ein Fehler aufgetreten. Bitte kopieren Sie ihn manuell.",
+    "invalidPort": "Ungültige Portnummer – muss zwischen 1025 und 65535 liegen",
+    "invalidIp": "Ungültige IP-Adresse – {{ip}} sieht nicht wie eine gültige IPv4-Adresse aus",
+    "settingsUpdated": "Einstellungen der Drahtlossteuerung aktualisiert",
+    "saveSettings": {
+      "title": "Einstellungen für drahtlose CNC speichern",
+      "content": "Möchten Sie diese Einstellungen wirklich speichern? Die Anwendung wird dadurch neu gestartet.",
+      "confirm": "Einstellungen speichern"
+    }
+  },
+  "rotary": {
+    "enabled": "Rotationsmodus aktiviert",
+    "mountingMacroLoaded": "Makro zur Einrichtung der Rotationsachse geladen",
+    "probingRunning": "Antastbefehle für {{name}} werden ausgeführt",
+    "runProbing": {
+      "title": "Antasten: {{name}}",
+      "content": "Klicken Sie auf „Ausführen“, um den Antastzyklus {{name}} zu starten",
+      "confirm": "Ausführen"
+    },
+    "enable": {
+      "title": "Rotationsmodus aktivieren",
+      "intro": "Beim Aktivieren des Rotationsmodus werden folgende Aktionen ausgeführt:",
+      "zeroY": "Die Y-Achse wird an ihrer aktuellen Position genullt",
+      "limitsOff": "Software- und Hardware-Endschalter werden ausgeschaltet, falls sie aktiv sind",
+      "updateFirmwareValues": "Folgende Firmware-Werte werden aktualisiert:",
+      "yTravelResolution": "{{setting}} (Auflösung der Y-Achse)",
+      "yMaximumRate": "{{setting}} (Maximalgeschwindigkeit der Y-Achse)",
+      "checkWiring": "Bitte stellen Sie sicher, dass Sie die Verkabelung für den neuen Aufbau umgesteckt haben.",
+      "swapAxisSettings": "Folgende Einstellungen der A- und Y-Achse werden getauscht:",
+      "travelResolution": "{{y}} und {{a}} (Auflösung)",
+      "maximumRate": "{{y}} und {{a}} (Maximalgeschwindigkeit)",
+      "acceleration": "{{y}} und {{a}} (Beschleunigung)",
+      "travelAmount": "{{y}} und {{a}} (Verfahrweg)"
+    }
+  },
+  "sdCard": {
+    "invalidFileType": "{{fileName}}: Ungültiger Dateityp",
+    "filesRejected": "Einige Dateien wurden abgelehnt:\n{{errors}}",
+    "uploadFailed": "Fehler beim Hochladen der Datei – {{error}}.",
+    "deleteFile": {
+      "title": "Datei löschen",
+      "content": "Möchten Sie {{fileName}} wirklich löschen?"
+    }
+  },
+  "settings": {
+    "restored": "Einstellungen wiederhergestellt",
+    "loadFailed": "Ihre Einstellungen konnten nicht vom gSender-Server geladen werden. Es werden Standardwerte angezeigt, und Änderungen werden erst nach einem Neuladen gespeichert."
+  },
+  "squaring": {
+    "eepromUpdated": "EEPROM-Werte aktualisiert"
+  },
+  "stats": {
+    "deleteAlarmHistory": {
+      "title": "Verlauf löschen",
+      "content": "Möchten Sie den gesamten Alarm-/Fehlerverlauf wirklich löschen?"
+    },
+    "deleteJobHistory": {
+      "title": "Auftragsverlauf löschen",
+      "content": "Möchten Sie den gesamten Auftragsverlauf wirklich löschen?"
+    },
+    "resetAllTasks": {
+      "title": "Alle Aufgaben zurücksetzen",
+      "content": "Möchten Sie die Zeiten aller Wartungsaufgaben wirklich zurücksetzen?"
+    }
+  },
+  "toolchange": {
+    "firstToolchange": {
+      "title": "Erster Werkzeugwechsel erkannt",
+      "detected": "Am Anfang Ihrer Datei wurde ein Werkzeugwechselbefehl erkannt.",
+      "content": "Wenn bereits das richtige Werkzeug eingesetzt ist, müssen Sie nur Ihr erstes Werkzeug antasten. Andernfalls führen Sie die Werkzeugwechselroutine aus, um Ihr erstes Werkzeug einzusetzen und einzurichten.",
+      "confirm": "Vollständige Werkzeugwechselroutine ausführen",
+      "cancel": "Nur Werkzeuglänge antasten"
+    }
+  },
+  "unlock": {
+    "homingNotComplete": {
+      "title": "Referenzfahrt nicht abgeschlossen",
+      "content": "Die letzte Referenzfahrt ist fehlgeschlagen, daher ist die Maschinenposition unbekannt. Führen Sie erneut eine Referenzfahrt durch, bevor Sie fortfahren. Wird ohne erneute Referenzfahrt entsperrt, können Verfahrbewegungen oder ein Auftrag über die Endschalter hinausfahren.",
+      "limitSwitchFault": "ALARM:8 und ALARM:9 bedeuten, dass ein Endschalter nicht gefunden wurde oder nicht freigegeben hat. Erneute Referenzfahrten schlagen daher fehl, bis der Schalter oder seine Verkabelung repariert ist. Um die Maschine bis dahin ohne Referenzfahrt zu verwenden: Wählen Sie „Trotzdem entsperren“, öffnen Sie Konfiguration > Referenzfahrt/Endschalter, deaktivieren Sie {{setting}} und klicken Sie auf „Einstellungen übernehmen“.",
+      "confirm": "Referenzfahrt",
+      "cancel": "Trotzdem entsperren"
+    }
+  },
+  "visualizer": {
+    "moveToHereRotary": "„Hierhin fahren“ ist für Rotationsdateien nicht verfügbar",
+    "mustBeIdleToMove": "Die Maschine muss verbunden und im Leerlauf sein, um zu verfahren",
+    "movingTo": "Fahre zu X{{x}} Y{{y}}",
+    "unsupportedGcode_one": "{{count}} Zeile mit nicht von GRBL unterstütztem G-Code in dieser Datei gefunden. Ihr Auftrag läuft möglicherweise nicht korrekt.",
+    "unsupportedGcode_other": "{{count}} Zeilen mit nicht von GRBL unterstütztem G-Code in dieser Datei gefunden. Ihr Auftrag läuft möglicherweise nicht korrekt.",
+    "grblHalOnlyShortcut": "Nur-grblHAL-Tastenkürzel kann nicht aktiviert werden"
+  },
+  "workspace": {
+    "modeSetDefault": "Arbeitsbereichsmodus auf Standard gesetzt",
+    "modeSetRotary": "Arbeitsbereichsmodus auf Rotation gesetzt"
+  }
+}

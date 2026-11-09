@@ -22,6 +22,7 @@
 - [ ] PR has at least 1 dev reviewer
 - [ ] PR has QA reviewer assigned
 - [ ] Documentation updated (if needed)
+- [ ] New UI text is tagged for translation and `yarn i18n:extract` was run (see TRANSLATING.md)
 
 ## QA Instructions
 <!-- Step-by-step guide for QA to test this feature -->

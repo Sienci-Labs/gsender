@@ -7,6 +7,7 @@ import {
     type LucideIcon,
     Wrench,
 } from 'lucide-react';
+import { tk } from 'app/i18n';
 import { tv } from 'tailwind-variants';
 import type { HelperKind, HelperWeight } from './types';
 
@@ -79,6 +80,9 @@ export const neutral = {
 
 interface KindMeta {
     icon: LucideIcon;
+    // A tk() key, or plain text that stays as-is. "Alarm"/"Error" match the
+    // controller's ALARM:n / error:n codes and the Sienci docs, so they stay
+    // English. Rendered through translateKey().
     label: string;
     defaultWeight: HelperWeight;
     // Higher rank replaces a lower one; lower ranks wait in the queue
@@ -104,28 +108,28 @@ export const KIND_META: Record<HelperKind, KindMeta> = {
     },
     reminder: {
         icon: Bell,
-        label: 'Reminder',
+        label: tk('helper:kinds.reminder'),
         defaultWeight: 'compact',
         rank: 2,
         critical: false,
     },
     maintenance: {
         icon: Wrench,
-        label: 'Maintenance',
+        label: tk('helper:kinds.maintenance'),
         defaultWeight: 'compact',
         rank: 2,
         critical: false,
     },
     info: {
         icon: Info,
-        label: 'Info',
+        label: tk('helper:kinds.info'),
         defaultWeight: 'full',
         rank: 1,
         critical: false,
     },
     tip: {
         icon: Lightbulb,
-        label: 'Tip',
+        label: tk('helper:kinds.tip'),
         defaultWeight: 'minimal',
         rank: 0,
         critical: false,

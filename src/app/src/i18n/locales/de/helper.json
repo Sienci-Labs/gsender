@@ -1,0 +1,230 @@
+{
+  "kinds": {
+    "info": "Info",
+    "reminder": "Erinnerung",
+    "maintenance": "Wartung",
+    "tip": "Tipp"
+  },
+  "message": {
+    "noDescription": "Keine passende Beschreibung gefunden",
+    "legacyResource": "Sienci-Ressourcen",
+    "tryThis": "Versuchen Sie Folgendes",
+    "dontRemind": "Nicht mehr erinnern",
+    "dontShowTips": "Keine Tipps anzeigen",
+    "dismiss": "Ausblenden",
+    "gotIt": "Verstanden",
+    "openGuide": "Anleitung öffnen",
+    "scanToOpen": "Scannen, um auf dem Handy zu öffnen",
+    "scanOnPhone": "Mit dem Handy scannen",
+    "scanCodeToOpen": "Scannen Sie den Code, um diese Anleitung auf Ihrem Handy zu öffnen.",
+    "learnMore": "Mehr erfahren"
+  },
+  "resources": {
+    "alarmCodes": "Alarm- und Fehlercodes",
+    "homing": "Referenzfahrt & Maschinenkoordinaten",
+    "limitAlarms": "Alarm 1 & 2: Hardware- & Software-Endlagen",
+    "probeFail": "Alarm 4 & 5: Antastfehler",
+    "homingFail": "Alarm 6, 8 & 9: Referenzfahrt fehlgeschlagen",
+    "safetyDoor": "Auslösen der Schutztür",
+    "estop": "Alarm 10: Not-Halt",
+    "spindleComms": "Alarm 14 & 19: Spindelkommunikation",
+    "motorFault": "Alarm 17: Motorfehler",
+    "alarm18": "Alarm 18",
+    "alarm20": "Alarm 20"
+  },
+  "alarm": {
+    "homingRequired": {
+      "title": "Referenzfahrt erforderlich",
+      "description": "Mit Ihrer Maschine ist alles in Ordnung. Die Referenzfahrt ist in Ihren Einstellungen aktiviert, daher wartet die Steuerung auf eine Referenzfahrt, bevor sie sich bewegt. Bei der Referenzfahrt werden die Endschalter genutzt, um den Maschinennullpunkt zu finden. So weiß gSender genau, wo sich die Maschine innerhalb ihres Verfahrbereichs befindet, und kann mit Software-Endlagen verhindern, dass sie über das Ende einer Achse hinausfährt.",
+      "steps": {
+        "0": "Stellen Sie sicher, dass nichts dem Portal im Weg ist, und klicken Sie dann auf \"Click to Run Homing\". Die Maschine fährt zu ihren Endschaltern und setzt den Maschinennullpunkt.",
+        "1": "Nach Abschluss der Referenzfahrt können Sie wie gewohnt verfahren und Aufträge ausführen. Eine erneute Referenzfahrt ist nur nötig, nachdem die Steuerung eingeschaltet oder zurückgesetzt wurde.",
+        "2": "Wenn Ihre Maschine keine Endschalter hat, deaktivieren Sie Config ➜ Homing/Limits ➜ Homing cycle enable. Beachten Sie, dass Software-Endlagen nur mit Referenzfahrt funktionieren."
+      }
+    },
+    "1": {
+      "title": "Hardware-Endschalter ausgelöst",
+      "description": "Ein Endschalter wurde ausgelöst, daher hat die Maschine zum Selbstschutz sofort angehalten. Das passiert meist, wenn eine Bewegung die Maschine über ihren physischen Verfahrweg hinausführt. Die genaue Position der Maschine ist daher möglicherweise verloren.",
+      "steps": {
+        "0": "Heben Sie den Alarm auf und führen Sie dann eine Referenzfahrt durch, damit gSender wieder eine bekannte Position hat.",
+        "1": "Prüfen Sie, ob die Verfahrweg-Einstellungen Ihrer Firmware (Config ➜ Homing/Limits) mit den tatsächlichen Abmessungen Ihrer Maschine übereinstimmen.",
+        "2": "Wenn dies beim Tippbetrieb wiederholt auftritt, verwenden Sie kleinere Schrittweiten. Beim Planfräsen können Sie die Hardware-Endschalter vorübergehend unter Config ➜ Homing/Limits deaktivieren."
+      }
+    },
+    "2": {
+      "title": "Software-Endlage erreicht",
+      "description": "Die angeforderte Bewegung hätte die Maschine über die in der Firmware festgelegten Verfahrgrenzen hinausgeführt. Die Maschinenposition bleibt erhalten, Sie können also gefahrlos entsperren und fortfahren.",
+      "steps": {
+        "0": "Entsperren Sie den Alarm – die Maschinenposition geht nicht verloren.",
+        "1": "Prüfen Sie, ob Nullpunkt und Werkstückposition Ihres Auftrags mit Ihrem physischen Nullpunkt übereinstimmen und ob die Einheiten der Datei (mm/in) zu Ihrer Maschine passen.",
+        "2": "Prüfen Sie, ob die Verfahrweg-Einstellungen Ihrer Firmware (Config ➜ Homing/Limits) mit den tatsächlichen Abmessungen Ihrer Maschine übereinstimmen."
+      }
+    },
+    "probeFail": {
+      "steps": {
+        "0": "Beginnen Sie das Antasten etwa 1/2\" (5mm) über der Tastplatte, positioniert über dem inneren Quadrat (AutoZero-Platten) bzw. dem Logo (Standardplatten).",
+        "1": "Wenn der Taster schon beim Start des Zyklus als ausgelöst gilt, obwohl ihn nichts berührt, ist der Tastereingang wahrscheinlich invertiert: Schalten Sie unter Config ➜ Probe \"Invert Probe Inputs ($6)\" um, übernehmen Sie die Einstellungen und schalten Sie die Steuerung aus und wieder ein."
+      }
+    },
+    "4": {
+      "title": "Antastfehler – bereits ausgelöst",
+      "description": "Der Tasterkreis war bereits ausgelöst, bevor der Antastzyklus überhaupt begann. Daher kann gSender nicht erkennen, wann das Werkzeug die Platte tatsächlich berührt."
+    },
+    "5": {
+      "title": "Antastfehler – kein Kontakt erkannt",
+      "description": "Der Taster hat innerhalb des erwarteten Verfahrwegs keinen Kontakt mit der Tastplatte erkannt."
+    },
+    "homingFail": {
+      "steps": {
+        "0": "Prüfen Sie, ob die Kupplungen an jeder Achse fest mit den Motorwellen und den Kugelgewindetrieben/Gewindespindeln verbunden sind.",
+        "1": "Stellen Sie sicher, dass jeder Endschalter fest montiert ist und vollständig an seinem Anschlag anliegt.",
+        "2": "Prüfen Sie unter Config ➜ Homing/Limits, ob Ihr Maschinenprofil zu Ihrem CNC-Modell passt, und setzen Sie gelb markierte (vom Standard abweichende) Referenzfahrt-Einstellungen mit der runden Zurücksetzen-Schaltfläche zurück.",
+        "3": "Übernehmen Sie die Einstellungen und schalten Sie die Steuerung aus und wieder ein."
+      }
+    },
+    "6": {
+      "title": "Referenzfahrt fehlgeschlagen – Zyklus zurückgesetzt",
+      "description": "Der laufende Referenzfahrtzyklus wurde zurückgesetzt, bevor er abgeschlossen werden konnte."
+    },
+    "7": {
+      "title": "Referenzfahrt fehlgeschlagen – Schutztür offen",
+      "description": "Die Steuerung meldet die Schutztür als offen und hat daher den Referenzfahrtzyklus gestoppt. Bei SLB/SLB-EXT-Steuerungen kann das auch passieren, wenn am DOOR-Eingang nichts angeschlossen ist, falls die Türeinstellung invertiert wurde.",
+      "steps": {
+        "0": "Wenn am DOOR-Eingang nichts angeschlossen ist, überbrücken Sie die beiden Tür-Pins mit einer Drahtbrücke, um eine geschlossene Tür zu simulieren.",
+        "1": "Geben Sie $RST=$ in die Konsole ein und führen Sie es aus, um die invertierte Einstellung zurückzusetzen.",
+        "2": "Schalten Sie die Steuerung aus und wieder ein."
+      }
+    },
+    "8": {
+      "title": "Referenzfahrt fehlgeschlagen – Freifahren hat Schalter nicht gelöst",
+      "description": "Nach der Referenzfahrt war die Freifahrbewegung nicht weit genug, um den Endschalter freizugeben."
+    },
+    "9": {
+      "title": "Referenzfahrt fehlgeschlagen – Endschalter nicht gefunden",
+      "description": "Die Maschine konnte innerhalb der erwarteten Suchstrecke keinen Endschalter finden."
+    },
+    "10": {
+      "title": "Not-Halt aktiv",
+      "description": "Die Steuerung erkennt das Not-Halt-Signal als aktiv und bleibt daher gesperrt, bis der Not-Halt-Kreis frei ist.",
+      "steps": {
+        "0": "Drücken Sie den Not-Halt-Taster hinein, drehen Sie ihn dann im Uhrzeigersinn, um ihn zu entriegeln, und klicken Sie auf \"Click to Unlock Machine\". Tun Sie dies bei jedem Verbinden.",
+        "1": "Wenn der Alarm bestehen bleibt, prüfen Sie die Konsole auf Motorfehler-Warnungen und ob die blaue Relais-Leuchte am SLB-EXT nach dem Entriegeln des Not-Halts aufleuchtet – falls nicht, hält möglicherweise ein Motorkurzschluss ihn ausgelöst.",
+        "2": "Überbrücken Sie die Not-Halt-Bypass-Pins auf der Steuerplatine: Wenn die rote HALT-LED erlischt, ist die Platine in Ordnung und der Not-Halt-Taster selbst muss ersetzt werden.",
+        "3": "Prüfen Sie die Not-Halt-Verkabelung und beide roten LEDs am Taster – lose Verbindungen oder LEDs, die nicht richtig leuchten oder erlöschen, bedeuten, dass der Taster ersetzt werden sollte."
+      }
+    },
+    "spindleComms": {
+      "title": "Zeitüberschreitung bei Spindelkommunikation",
+      "description": "Die Steuerung hat die Verbindung zum Frequenzumrichter (VFD) der Spindel verloren. Dies erscheint als Alarm 14 bei älterer Firmware oder als Alarm 19 bei neuerer Firmware, AltMill 4x8, SLB Lite und SLB-EXT V2.0.",
+      "steps": {
+        "0": "Schalten Sie zuerst die Spindel/den VFD ein und dann die Steuerung – so können sich beide korrekt verbinden.",
+        "1": "Prüfen Sie die RS485-Kommunikations-LEDs: RX und TX sollten beide blinken. Wenn nur eine (oder keine) blinkt, prüfen Sie Kabel und Anschlüsse.",
+        "2": "Führen Sie die AltMill- bzw. LongMill-Einrichtungsdatei über gSender aus, um die EEPROM-Werte des VFD auf Werkseinstellungen zurückzusetzen.",
+        "3": "Stellen Sie sicher, dass das RS485-Kabel im richtigen Anschluss über dem Netzschalter steckt, mit dem roten Draht an RS485- und dem schwarzen an RS485+ am VFD.",
+        "4": "Vergleichen Sie die VFD-Funktionscodes mit der Parametertabelle, insbesondere die Kommunikationsadresse (F163) und den Modus (F165)."
+      }
+    },
+    "17": {
+      "title": "Motorfehler",
+      "description": "Ein Closed-Loop-Schrittmotor hat angehalten – meist durch Blockieren beim Start, bei der Referenzfahrt oder beim Tippbetrieb, mechanisches Klemmen, ein Verkabelungsproblem oder ein Endschalterproblem. Prüfen Sie die Konsole auf eine \"Motor Error\"-Warnung und achten Sie auf eine blinkende rote LED am Motor oder eine leuchtende Stall-Anzeige (STL) auf der Steuerplatine, um die betroffene Achse zu erkennen.",
+      "steps": {
+        "0": "Deaktivieren Sie die Hardware-Endschalter und prüfen Sie die Endschalter-Sensoren – verwenden Sie an der Z-Achse nicht den integrierten Anschlag; stellen Sie die Sensoren so ein, dass die rote Anzeige leuchtet, und drehen Sie sie dann etwa eine Vierteldrehung zurück.",
+        "1": "Prüfen Sie bei ausgeschalteter Steuerung den festen Sitz der Motorkupplungen und drehen Sie jede Kugelumlaufspindel von Hand – sie sollte sich frei drehen, ohne Klemmen in den Linearführungen oder im Spindellager.",
+        "2": "Prüfen Sie die Verkabelung der Motorkabel (achten Sie auf blinkende bzw. dauerhafte/fehlende LED). Bleibt die blaue Relais-Leuchte der Steuerung beim Start aus, stecken Sie die Motoren einzeln ab, um den defekten zu finden."
+      }
+    },
+    "18": {
+      "title": "Referenzfahrt fehlgeschlagen – Referenzfahrt-Durchgänge falsch konfiguriert",
+      "description": "Der Referenzfahrtzyklus konnte aufgrund der Konfiguration der Achs-Durchgänge nicht abgeschlossen werden.",
+      "steps": {
+        "0": "Prüfen Sie unter Config ➜ Homing/Limits, ob Ihr Maschinenprofil zu Ihrem CNC-Modell passt.",
+        "1": "Überprüfen Sie die vier Einstellungen für die Achs-Durchgänge der Referenzfahrt ($44-$47) – belassen Sie diese auf Standard, sofern Sie keine eigenen Endschalter verwenden.",
+        "2": "Setzen Sie gelb markierte Einstellungen mit der runden Zurücksetzen-Schaltfläche auf den Standard zurück.",
+        "3": "Übernehmen Sie die Einstellungen und schalten Sie die Steuerung aus und wieder ein."
+      }
+    },
+    "20": {
+      "title": "Kommunikation mit I/O-Erweiterung fehlgeschlagen",
+      "description": "Die Steuerung kann nicht mit der I/O-Erweiterung am ATC-Backpack kommunizieren (die vormontierte Komponente an einer ATC-Spindel).",
+      "steps": {
+        "0": "Prüfen Sie, ob das ATC-Backpack richtig eingesteckt ist und fest sitzt.",
+        "1": "Untersuchen Sie das Backpack auf physische Schäden oder Anzeichen eines Defekts.",
+        "2": "Wenn die Verbindung sicher und unbeschädigt aussieht, wenden Sie sich für weitere Fehlersuche oder Ersatz an den Sienci Labs Support (sienci.com/contact-us)."
+      }
+    }
+  },
+  "wizard": {
+    "next": "Weiter",
+    "complete": "Fertig",
+    "restore": "Assistent wiederherstellen",
+    "minimise": "Assistent minimieren",
+    "cancel": {
+      "label": "Assistent abbrechen",
+      "title": "Werkzeugwechsel-Assistent abbrechen",
+      "content": "Möchten Sie den Werkzeugwechsel-Assistenten wirklich abbrechen? Alle Schritte gehen verloren."
+    },
+    "step": "Schritt {{number}}",
+    "firstRunOnly": "Nur beim ersten Durchlauf",
+    "oneTimeSetup": "<bold>Einmalige Einrichtung:</bold> misst das erste Werkzeug, damit nachfolgende Werkzeuge damit verglichen werden können.",
+    "runGcode": "G-Code ausführen",
+    "or": "oder",
+    "running": "Läuft…",
+    "run": "Ausführen",
+    "installNewTool": "Neues Werkzeug einsetzen",
+    "doNotInterrupt": "Unterbrechen Sie die Maschine in dieser Phase nicht",
+    "pendingToolchange": {
+      "eyebrow": "Werkzeugwechsel ausstehend",
+      "title": "Warten auf Abschluss der Fräsbewegungen",
+      "description": "Der Werkzeugwechsel wird automatisch fortgesetzt, sobald alle ausstehenden Fräsbewegungen abgeschlossen sind."
+    },
+    "resumingJob": {
+      "eyebrow": "Auftrag wird fortgesetzt",
+      "title": "Auftrag wird fortgesetzt",
+      "description": "Die Maschine muss wieder in Position fahren und die Spindel eventuell wieder auf Drehzahl bringen. Der Auftrag wird danach automatisch fortgesetzt."
+    }
+  },
+  "toggle": {
+    "label": "Hilfe-Assistent"
+  },
+  "keyboardMap": {
+    "title": "Aktive Tastenkürzel",
+    "subtitle": "Dynamische Übersicht der aktuell verfügbaren Tastenkürzel",
+    "close": "Tastenkürzel-Übersicht schließen"
+  },
+  "announcer": {
+    "statusChanged": "Maschinenstatus geändert zu {{state}}",
+    "progress": "Auftragsfortschritt: {{percent}}%",
+    "complete": "Auftrag abgeschlossen: 100%",
+    "summaryTitle": "Auftragsübersicht",
+    "time": {
+      "seconds_one": "{{count}} Sekunde",
+      "seconds_other": "{{count}} Sekunden",
+      "minutes_one": "{{count}} Minute",
+      "minutes_other": "{{count}} Minuten",
+      "hours_one": "{{count}} Stunde",
+      "hours_other": "{{count}} Stunden",
+      "and": "{{first}} und {{second}}"
+    },
+    "summary": {
+      "fileLoaded": "Datei geladen: {{name}}.",
+      "dimensions": "Abmessungen: {{x}} breit, {{y}} tief und {{z}} hoch, in {{units}}.",
+      "xRange": "X reicht von {{min}} bis {{max}}.",
+      "yRange": "Y reicht von {{min}} bis {{max}}.",
+      "minZ": "Minimale Z-Höhe ist {{z}} {{units}}.",
+      "estimatedTime": "Geschätzte Laufzeit: {{time}}.",
+      "tools_one": "Verwendet {{count}} Werkzeug: {{tools}}.",
+      "tools_other": "Verwendet {{count}} Werkzeuge: {{tools}}.",
+      "metadata": "Auftrags-Metadaten: {{metadata}}.",
+      "programStops_one": "Enthält {{count}} Programmhalt (M0/M1).",
+      "programStops_other": "Enthält {{count}} Programmhalte (M0/M1).",
+      "coolant": "Datei fordert Kühlmittel an (M7/M8).",
+      "spindleSpeed": "Spindeldrehzahl: {{speed}} RPM.",
+      "spindleSpeedRange": "Spindeldrehzahlbereich: {{min}} bis {{max}} RPM.",
+      "feedrate": "Vorschub: {{feed}} {{units}}/min.",
+      "feedrateRange": "Vorschubbereich: {{min}} bis {{max}} {{units}}/min.",
+      "axes": "Aktive Achsen: {{axes}}.",
+      "invalidGcode_one": "WARNUNG: {{count}} ungültige G-Code-Zeile erkannt.",
+      "invalidGcode_other": "WARNUNG: {{count}} ungültige G-Code-Zeilen erkannt."
+    }
+  }
+}

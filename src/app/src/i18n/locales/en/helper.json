@@ -1,0 +1,230 @@
+{
+  "kinds": {
+    "info": "Info",
+    "reminder": "Reminder",
+    "maintenance": "Maintenance",
+    "tip": "Tip"
+  },
+  "message": {
+    "noDescription": "No matching description found",
+    "legacyResource": "Sienci resources",
+    "tryThis": "Try this",
+    "dontRemind": "Don’t remind me again",
+    "dontShowTips": "Don’t show tips",
+    "dismiss": "Dismiss",
+    "gotIt": "Got it",
+    "openGuide": "Open guide",
+    "scanToOpen": "Scan to open on your phone",
+    "scanOnPhone": "Scan on phone",
+    "scanCodeToOpen": "Scan the code to open this guide on your phone.",
+    "learnMore": "Learn more"
+  },
+  "resources": {
+    "alarmCodes": "Alarm & error codes",
+    "homing": "Homing & machine coordinates",
+    "limitAlarms": "Alarm 1 & 2: Hard & soft limits",
+    "probeFail": "Alarm 4 & 5: Probe fail",
+    "homingFail": "Alarm 6, 8 & 9: Homing fail",
+    "safetyDoor": "Safety door triggering",
+    "estop": "Alarm 10: E-stop",
+    "spindleComms": "Alarm 14 & 19: Spindle communication",
+    "motorFault": "Alarm 17: Motor fault",
+    "alarm18": "Alarm 18",
+    "alarm20": "Alarm 20"
+  },
+  "alarm": {
+    "homingRequired": {
+      "title": "Homing required",
+      "description": "Nothing is wrong with your machine. Homing is turned on in your settings, so the controller waits for you to home before it will move. Homing uses your limit switches to find machine home, so gSender knows exactly where the machine is within its travel limits and can use soft limits to stop it from running past the end of an axis.",
+      "steps": {
+        "0": "Make sure nothing is in the way of the gantry, then click \"Click to Run Homing\". The machine moves to its limit switches and sets machine home.",
+        "1": "Once homing finishes, jog and run jobs as normal. You only need to home again after the controller is powered on or reset.",
+        "2": "If your machine has no limit switches, turn off Config ➜ Homing/Limits ➜ Homing cycle enable. Note that soft limits need homing to work."
+      }
+    },
+    "1": {
+      "title": "Hard limit triggered",
+      "description": "A limit switch was triggered, so the machine stopped immediately to protect itself. This usually happens when a move takes the machine past its physical travel, so the machine's exact position may now be lost.",
+      "steps": {
+        "0": "Clear the alarm, then home the machine so gSender can re-establish a known position.",
+        "1": "Check that your firmware's travel settings (Config ➜ Homing/Limits) match your machine's actual dimensions.",
+        "2": "If this keeps happening during jogging, try smaller jog increments. While surfacing, you can temporarily disable hard limits in Config ➜ Homing/Limits."
+      }
+    },
+    "2": {
+      "title": "Soft limit triggered",
+      "description": "The requested move would have taken the machine past the travel limits set in its firmware. Machine position is retained, so it's safe to unlock and continue.",
+      "steps": {
+        "0": "Unlock the alarm — machine position is not lost.",
+        "1": "Check that your job's origin and stock placement match your physical zero point, and that the file's units (mm/in) match your machine.",
+        "2": "Verify your firmware's travel settings (Config ➜ Homing/Limits) match your machine's actual dimensions."
+      }
+    },
+    "probeFail": {
+      "steps": {
+        "0": "Start probing from about 1/2\" (5mm) above the touch plate, positioned over the inner square (AutoZero plates) or the logo (standard plates).",
+        "1": "If the probe reads as triggered the instant the cycle starts, even with nothing touching it, the probe input is likely inverted: in Config ➜ Probe, toggle \"Invert Probe Inputs ($6)\", apply settings, then power cycle the controller."
+      }
+    },
+    "4": {
+      "title": "Probe fail — already triggered",
+      "description": "The probe circuit read as triggered before the probing cycle even started, so gSender can't tell when the tool actually touches the plate."
+    },
+    "5": {
+      "title": "Probe fail — no contact detected",
+      "description": "The probe didn't detect contact with the touch plate within the expected travel distance."
+    },
+    "homingFail": {
+      "steps": {
+        "0": "Check that couplers are tightly attached to both the motor shafts and the ballscrews/leadscrews on every axis.",
+        "1": "Make sure each limit switch is firmly mounted and fully seated against its bump stop.",
+        "2": "In Config ➜ Homing/Limits, confirm your machine profile matches your CNC model, and reset any yellow-highlighted (non-default) homing settings with the circular reset button.",
+        "3": "Apply settings and power cycle the controller."
+      }
+    },
+    "6": {
+      "title": "Homing fail — cycle reset",
+      "description": "The active homing cycle was reset before it could finish."
+    },
+    "7": {
+      "title": "Homing fail — safety door open",
+      "description": "The controller thinks the safety door is open, so it stopped the homing cycle. On SLB/SLB-EXT controllers this can happen even with nothing plugged into the DOOR input, if the door setting got inverted.",
+      "steps": {
+        "0": "If nothing is connected to the DOOR input, bridge the two door pins with a jumper wire to simulate a closed door.",
+        "1": "Enter $RST=$ into the console and run it to reset the inverted setting.",
+        "2": "Power cycle the controller."
+      }
+    },
+    "8": {
+      "title": "Homing fail — pull-off did not clear switch",
+      "description": "After homing, the pull-off move didn't travel far enough to release the limit switch."
+    },
+    "9": {
+      "title": "Homing fail — limit switch not found",
+      "description": "The machine couldn't find a limit switch within the expected search distance."
+    },
+    "10": {
+      "title": "E-stop engaged",
+      "description": "The controller sees the E-stop signal as active, so it stays locked until the E-stop circuit is clear.",
+      "steps": {
+        "0": "Press the E-stop button in, then twist it clockwise to release it, and click \"Click to Unlock Machine\". Do this every time you connect.",
+        "1": "If the alarm persists, check the Console for motor error warnings, and confirm the blue relay light on the SLB-EXT turns on after the E-stop releases — if it doesn't, a motor short may be holding it tripped.",
+        "2": "Short the E-stop bypass pins on the control board: if the red HALT LED goes out, the board is fine and the E-stop button itself needs replacing.",
+        "3": "Check the E-stop wiring and both red LEDs on the button — loose connections or LEDs that don't light or clear correctly mean the button should be replaced."
+      }
+    },
+    "spindleComms": {
+      "title": "Spindle communication timeout",
+      "description": "The controller lost communication with the spindle VFD. This shows as alarm 14 on older firmware, or alarm 19 on newer firmware, AltMill 4x8, SLB Lite, and SLB-EXT V2.0.",
+      "steps": {
+        "0": "Power on the spindle/VFD first, then the controller — this lets the two handshake correctly.",
+        "1": "Check the RS485 communication LEDs: both RX and TX should flash. If only one (or neither) does, check the cable and connections.",
+        "2": "Run the AltMill or LongMill setup file through gSender to restore the VFD's EEPROM values to factory defaults.",
+        "3": "Confirm the RS485 cable is in the correct port above the power switch, red wire to RS485- and black to RS485+ at the VFD.",
+        "4": "Check the VFD function codes against the parameter table, especially the communication address (F163) and mode (F165)."
+      }
+    },
+    "17": {
+      "title": "Motor fault",
+      "description": "A closed-loop stepper motor has halted — usually from stalling during startup, homing, or jogging, mechanical binding, a wiring issue, or a limit switch problem. Check the console for a \"Motor Error\" warning, and look for a flashing red LED on the motor or a lit stall (STL) light on the control board to see which axis is affected.",
+      "steps": {
+        "0": "Disable hard limits and check limit switch sensors — don't use the integrated bump stop on the Z-axis; adjust sensors so the red indicator lights, then back off about 1/4 turn.",
+        "1": "With the controller off, check motor coupler tightness and manually rotate each ball screw — it should turn freely, with no binding in the linear guides or ball screw bearing.",
+        "2": "Check motor cable wiring (watch for a flashing vs. solid/no LED), and if the controller's blue relay light stays off at startup, unplug motors one at a time to isolate the faulty one."
+      }
+    },
+    "18": {
+      "title": "Homing fail — homing passes misconfigured",
+      "description": "The homing cycle couldn't complete because of how the axis homing passes are configured.",
+      "steps": {
+        "0": "In Config ➜ Homing/Limits, confirm your machine profile matches your CNC model.",
+        "1": "Review the four axis homing pass settings ($44-$47) — leave these at default unless you're using custom limit switches.",
+        "2": "Reset any settings highlighted in yellow back to default with the circular reset button.",
+        "3": "Apply settings and power cycle the controller."
+      }
+    },
+    "20": {
+      "title": "I/O expander communication failed",
+      "description": "The controller can't communicate with the I/O expander on the ATC backpack (the pre-assembled component on an ATC spindle).",
+      "steps": {
+        "0": "Check that the ATC backpack is plugged in correctly and fully seated.",
+        "1": "Inspect the backpack for physical damage or signs of failure.",
+        "2": "If the connection looks secure and undamaged, contact Sienci Labs support (sienci.com/contact-us) for further troubleshooting or a replacement."
+      }
+    }
+  },
+  "wizard": {
+    "next": "Next",
+    "complete": "Complete",
+    "restore": "Restore wizard",
+    "minimise": "Minimise wizard",
+    "cancel": {
+      "label": "Cancel wizard",
+      "title": "Cancel Toolchange Wizard",
+      "content": "Are you sure you want to cancel the toolchange wizard? All steps will be lost."
+    },
+    "step": "Step {{number}}",
+    "firstRunOnly": "First run only",
+    "oneTimeSetup": "<bold>One-time setup:</bold> measures the initial tool so subsequent tools can be compared against it.",
+    "runGcode": "Run G-Code",
+    "or": "or",
+    "running": "Running…",
+    "run": "Run",
+    "installNewTool": "Install New Tool",
+    "doNotInterrupt": "Do not interrupt the machine during this phase",
+    "pendingToolchange": {
+      "eyebrow": "Toolchange pending",
+      "title": "Waiting for cutting motions to finish",
+      "description": "The toolchange process will resume automatically once all pending cutting motions are complete."
+    },
+    "resumingJob": {
+      "eyebrow": "Resuming Job",
+      "title": "Job resuming",
+      "description": "The machine needs to move back into position and may need to spin the spindle back up to speed. The job will continue automatically once this is complete."
+    }
+  },
+  "toggle": {
+    "label": "Help Assistant"
+  },
+  "keyboardMap": {
+    "title": "Active Keyboard Shortcuts",
+    "subtitle": "Dynamic map of currently available shortcuts",
+    "close": "Close keyboard map"
+  },
+  "announcer": {
+    "statusChanged": "Machine status changed to {{state}}",
+    "progress": "Job progress: {{percent}}%",
+    "complete": "Job complete: 100%",
+    "summaryTitle": "Job Summary",
+    "time": {
+      "seconds_one": "{{count}} second",
+      "seconds_other": "{{count}} seconds",
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "and": "{{first}} and {{second}}"
+    },
+    "summary": {
+      "fileLoaded": "File loaded: {{name}}.",
+      "dimensions": "Dimensions: {{x}} wide, {{y}} deep, and {{z}} high {{units}}.",
+      "xRange": "X ranges from {{min}} to {{max}}.",
+      "yRange": "Y ranges from {{min}} to {{max}}.",
+      "minZ": "Minimum Z height is {{z}} {{units}}.",
+      "estimatedTime": "Estimated completion time: {{time}}.",
+      "tools_one": "Uses {{count}} tool: {{tools}}.",
+      "tools_other": "Uses {{count}} tools: {{tools}}.",
+      "metadata": "Job metadata: {{metadata}}.",
+      "programStops_one": "Contains {{count}} program stop (M0/M1).",
+      "programStops_other": "Contains {{count}} program stops (M0/M1).",
+      "coolant": "File requests coolant (M7/M8).",
+      "spindleSpeed": "Spindle speed: {{speed}} RPM.",
+      "spindleSpeedRange": "Spindle speed range: {{min}} to {{max}} RPM.",
+      "feedrate": "Feedrate: {{feed}} {{units}}/min.",
+      "feedrateRange": "Feedrate range: {{min}} to {{max}} {{units}}/min.",
+      "axes": "Active axes: {{axes}}.",
+      "invalidGcode_one": "WARNING: {{count}} invalid G-code line detected.",
+      "invalidGcode_other": "WARNING: {{count}} invalid G-code lines detected."
+    }
+  }
+}

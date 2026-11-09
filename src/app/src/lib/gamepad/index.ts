@@ -1,3 +1,4 @@
+import { i18n } from 'app/i18n';
 import type { ShuttleEvent } from 'app/lib/definitions/shortcuts';
 import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
 
@@ -327,14 +328,18 @@ class GamepadManager {
             );
 
             const toastMessage = foundGamepad
-                ? `${foundGamepad.name} Connected`
-                : 'New gamepad connected, add it as a profile in your preferences';
+                ? i18n.t('notifications:gamepad.connected', {
+                      name: foundGamepad.name,
+                  })
+                : i18n.t('notifications:gamepad.newConnected');
 
             toast.info(toastMessage, { position: 'bottom-right' });
         };
 
         GamepadManager.disconnectedListener = () => {
-            toast.info('Gamepad disconnected', { position: 'bottom-right' });
+            toast.info(i18n.t('notifications:gamepad.disconnected'), {
+                position: 'bottom-right',
+            });
         };
 
         GamepadManager.buttonListener = (event: GamepadDetail) => {

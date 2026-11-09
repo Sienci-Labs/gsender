@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "apply": "Applica",
+    "back": "Indietro",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "confirm": "Conferma",
+    "continue": "Continua",
+    "delete": "Elimina",
+    "no": "No",
+    "ok": "OK",
+    "reset": "Ripristina",
+    "save": "Salva",
+    "yes": "Sì"
+  },
+  "language": {
+    "label": "Lingua",
+    "description": "Lingua dell'interfaccia di gSender. I testi provenienti dal firmware del controller restano in inglese.",
+    "systemDefault": "Predefinita di sistema"
+  },
+  "nav": {
+    "carve": "Lavorazione",
+    "stats": "Statistiche",
+    "tools": "Strumenti",
+    "config": "Configurazione",
+    "mainNavigation": "Navigazione principale"
+  }
+}

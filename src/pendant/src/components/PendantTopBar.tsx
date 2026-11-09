@@ -13,6 +13,7 @@ import {
 } from 'app/constants';
 import { cancelJog } from 'app/features/Jogging/utils/Jogging';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
 import {
@@ -343,10 +344,10 @@ function useLogoHoldToQuit() {
             stopProgressLoop();
             setProgress(0);
             Confirm({
-                title: 'Quit gSender?',
-                content: 'Are you sure you want to quit gSender?',
-                confirmLabel: 'Quit',
-                cancelLabel: 'Cancel',
+                title: i18n.t('notifications:pendant.quit.title'),
+                content: i18n.t('notifications:pendant.quit.content'),
+                confirmLabel: i18n.t('notifications:pendant.quit.confirm'),
+                cancelLabel: i18n.t('common:actions.cancel'),
                 onConfirm: () => quitApp(),
             });
         },

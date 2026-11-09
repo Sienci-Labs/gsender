@@ -21,6 +21,7 @@
  *
  */
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { i18n } from 'app/i18n';
 
 interface FirstToolchangePromptOptions {
     comment: string;
@@ -38,26 +39,31 @@ export const showFirstToolchangePrompt = ({
         const promptContent = (
             <div>
                 <p>
-                    A toolchange command was detected at the start of your file.
+                    {i18n.t(
+                        'notifications:toolchange.firstToolchange.detected',
+                    )}
                 </p>
                 <p>
-                    If you already have the correct tool installed, you only
-                    need to probe your initial tool. Otherwise, run the
-                    toolchange routine to install and set up your initial tool.
+                    {i18n.t('notifications:toolchange.firstToolchange.content')}
                 </p>
                 {comment && (
                     <p>
-                        Comment: <b>{comment}</b>
+                        {i18n.t('notifications:controller.commentLabel')}{' '}
+                        <b>{comment}</b>
                     </p>
                 )}
             </div>
         );
 
         Confirm({
-            title: 'First Tool Change Detected',
+            title: i18n.t('notifications:toolchange.firstToolchange.title'),
             content: promptContent,
-            confirmLabel: 'Run Full Toolchange Routine',
-            cancelLabel: 'Only Probe Tool Length',
+            confirmLabel: i18n.t(
+                'notifications:toolchange.firstToolchange.confirm',
+            ),
+            cancelLabel: i18n.t(
+                'notifications:toolchange.firstToolchange.cancel',
+            ),
             onConfirm: () => resolve(true),
             onClose: () => resolve(false),
         });

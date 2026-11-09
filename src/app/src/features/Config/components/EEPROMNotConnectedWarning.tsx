@@ -1,6 +1,8 @@
+import { useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 
 export function EEPROMNotConnectedWarning({ connected }) {
+    const { t } = useAppTranslation();
     return (
         <div
             className={cn(
@@ -20,10 +22,12 @@ export function EEPROMNotConnectedWarning({ connected }) {
             >
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
-            <span className="sr-only">Disconnected</span>
+            <span className="sr-only">{t('config:page.disconnected')}</span>
             <div>
-                <span className="font-medium">Disconnected!</span> Some settings
-                may not appear unless connected to a machine.
+                <span className="font-medium">
+                    {t('config:page.disconnectedTitle')}
+                </span>{' '}
+                {t('config:page.disconnectedMessage')}
             </div>
         </div>
     );

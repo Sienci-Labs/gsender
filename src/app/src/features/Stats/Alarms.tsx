@@ -6,6 +6,7 @@ import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 import { Diagnostic } from 'app/features/Stats/components/Diagnostic.tsx';
 import { StatCard } from 'app/features/Stats/components/StatCard';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { i18n } from 'app/i18n';
 import { useContext } from 'react';
 import { FaTrash } from 'react-icons/fa';
 
@@ -13,10 +14,10 @@ export function Alarms() {
     const { setAlarms } = useContext(StatContext);
     function deleteAlarms() {
         Confirm({
-            title: 'Delete History',
-            content: 'Are you sure you want to delete all alarm/error history?',
-            confirmLabel: 'Confirm',
-            cancelLabel: 'Cancel',
+            title: i18n.t('notifications:stats.deleteAlarmHistory.title'),
+            content: i18n.t('notifications:stats.deleteAlarmHistory.content'),
+            confirmLabel: i18n.t('common:actions.confirm'),
+            cancelLabel: i18n.t('common:actions.cancel'),
             onConfirm: async () => {
                 await api.alarmList.clearAll();
                 setAlarms([]);

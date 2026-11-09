@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import Button from 'app/components/Button';
 import {
@@ -103,6 +104,7 @@ function ContentSlot({ content }: { content: ReactNode }) {
 }
 
 const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
+    const { t } = useAppTranslation();
     const focusTrapping = useFocusTrapping();
     const contentRef = useRef<HTMLDivElement>(null);
     const [checked, setChecked] = useState<Record<string, boolean>>({});
@@ -292,7 +294,7 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
                                 setDontRemind(value === true)
                             }
                         />
-                        Don’t remind me again
+                        {t('helper:message.dontRemind')}
                     </label>
                 )}
                 <div className="flex-1" />
@@ -304,7 +306,9 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
                     onClick={() => runAction(payload.secondaryAction)}
                 >
                     {payload.secondaryAction?.label ??
-                        (payload.primaryAction ? 'Cancel' : 'Dismiss')}
+                        (payload.primaryAction
+                            ? t('common:actions.cancel')
+                            : t('helper:message.dismiss'))}
                 </Button>
                 {primaryButton}
             </div>
@@ -319,8 +323,8 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
             secondary = {
                 label:
                     kind === 'tip'
-                        ? 'Don’t show tips'
-                        : 'Don’t remind me again',
+                        ? t('helper:message.dontShowTips')
+                        : t('helper:message.dontRemind'),
                 onClick: dismissPermanently,
             };
         }
@@ -352,7 +356,8 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
                         data-helper-focus="primary"
                         onClick={() => runAction(payload.primaryAction)}
                     >
-                        {payload.primaryAction?.label ?? 'Got it'}
+                        {payload.primaryAction?.label ??
+                            t('helper:message.gotIt')}
                     </Button>
                 </div>
             </>

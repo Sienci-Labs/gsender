@@ -11,6 +11,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { METRIC_UNITS } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -56,7 +57,9 @@ const ResultsStep = () => {
 
             controller.command('gcode', [`$100=${$100}`, `$101=${$101}`, '$$']);
 
-            toast.info('Updated EEPROM values', { position: 'bottom-right' });
+            toast.info(i18n.t('notifications:squaring.eepromUpdated'), {
+                position: 'bottom-right',
+            });
         } catch (error) {
             console.error('Failed to update EEPROM:', error);
         } finally {

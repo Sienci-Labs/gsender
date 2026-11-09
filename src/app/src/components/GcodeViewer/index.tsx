@@ -1,4 +1,5 @@
 import Button from 'app/components/Button';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import throttle from 'lodash/throttle';
 import uniqueId from 'lodash/uniqueId';
@@ -15,7 +16,7 @@ const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode, className = '' }) => {
         async () => {
             await navigator.clipboard?.writeText(gcode);
 
-            toast.info('Copied G-code to Clipboard', {
+            toast.info(i18n.t('notifications:gcode.copiedToClipboard'), {
                 position: 'bottom-right',
             });
         },

@@ -8,6 +8,7 @@ import {
     getRackConfig,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { setLastWorkerGeometry } from 'app/features/Visualizer/lastWorkerGeometry';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
@@ -141,7 +142,11 @@ const handleGeometryReady = (data) => {
     if (outOfRangeTools.length > 0) {
         const list = outOfRangeTools.map((n) => `T${n}`).join(', ');
         toast.warning(
-            `This file uses tool${outOfRangeTools.length > 1 ? 's' : ''} ${list} which exceed${outOfRangeTools.length === 1 ? 's' : ''} your ${toolTableSize}-slot tool table. Remap in the Tool Timeline before running.`,
+            i18n.t('notifications:atc.toolsOutOfRange', {
+                count: outOfRangeTools.length,
+                list,
+                size: toolTableSize,
+            }),
         );
     }
 

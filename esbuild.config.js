@@ -116,7 +116,7 @@ function createHexFilePlugin(target) {
 }
 
 function copyStaticFiles(target) {
-    const serverDirs = ['i18n', 'views'];
+    const serverDirs = ['views'];
     const isDev = target === 'development';
 
     const baseDir = isDev
@@ -195,7 +195,7 @@ function copyPendantPreloadFile(target) {
 }
 
 function copyStaticFilesPendant() {
-    const serverDirs = ['i18n', 'views'];
+    const serverDirs = ['views'];
     const baseDir = path.join(__dirname, 'dist/gsender-pendant');
     const serverOutputDir = path.join(__dirname, 'dist/gsender-pendant/server');
 

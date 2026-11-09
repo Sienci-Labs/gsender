@@ -6,6 +6,7 @@ import {
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
 import { Input } from 'app/components/shadcn/Input';
+import { i18n } from 'app/i18n';
 import GamepadManager from 'app/lib/gamepad';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -116,7 +117,9 @@ const ProfileModal = () => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
-        toast.info('Created New Gamepad Profile', { position: 'bottom-right' });
+        toast.info(i18n.t('notifications:gamepad.profileCreated'), {
+            position: 'bottom-right',
+        });
 
         closeModal();
     };

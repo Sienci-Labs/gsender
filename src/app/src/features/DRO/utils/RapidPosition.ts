@@ -1,3 +1,4 @@
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import prefStore from 'app/store';
 import reduxStore from 'app/store/redux';
@@ -129,10 +130,9 @@ const getPositionMovements = (
     }
 
     if (!xLimit || !yLimit) {
-        toast.error(
-            "Unable to find machine limits - make sure they're set in preferences",
-            { position: 'bottom-right' },
-        );
+        toast.error(i18n.t('notifications:dro.machineLimitsMissing'), {
+            position: 'bottom-right',
+        });
         return [null, null];
     }
 
@@ -236,10 +236,9 @@ export const getMovementGCode = (
     );
 
     if (xMovement === null || yMovement === null) {
-        toast.error(
-            'Unable to calculate position movements based on inputs - check arguments passed',
-            { position: 'bottom-right' },
-        );
+        toast.error(i18n.t('notifications:dro.invalidPositionArgs'), {
+            position: 'bottom-right',
+        });
         return [];
     }
     gcode.push(`G53 G21 G0 X${xMovement} Y${yMovement}`);

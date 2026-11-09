@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { FaHatWizard } from 'react-icons/fa';
 import { Link } from 'react-router';
 
@@ -19,5 +20,8 @@ export function ToolLink({ link, label }: ToolLinkProps) {
 }
 
 export function SquaringToolWizard() {
-    return <ToolLink link="/tools/squaring" label="Square XY" />;
+    const { t } = useAppTranslation();
+    return (
+        <ToolLink link="/tools/squaring" label={t('config:wizards.squareXY')} />
+    );
 }

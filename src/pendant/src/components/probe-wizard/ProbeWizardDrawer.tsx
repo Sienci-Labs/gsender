@@ -1,5 +1,6 @@
 import { Actions, ProbeCommand, State } from 'app/features/Probe/definitions';
 import ProbeDiameter from 'app/features/Probe/ProbeDiameter';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import { clsx } from 'clsx';
 import { ChevronLeft, Move3D, Play, Repeat, Ruler } from 'lucide-react';
@@ -82,7 +83,11 @@ export default function ProbeWizardDrawer({
         onRunComplete(direction, toolDiameter);
         const cornerLabel = CORNER_LABELS[direction] ?? 'Unknown';
         toast.info(
-            `Probing cycle started: ${cornerLabel}, ${formatDiameter(toolDiameter, units, state.probeType)}, ${probeCmd?.id ?? ''}`,
+            i18n.t('notifications:probe.pendantCycleStarted', {
+                corner: cornerLabel,
+                diameter: formatDiameter(toolDiameter, units, state.probeType),
+                command: probeCmd?.id ?? '',
+            }),
             { position: 'bottom-right' },
         );
         onStepChange(0);

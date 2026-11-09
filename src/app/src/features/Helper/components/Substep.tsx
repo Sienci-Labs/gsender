@@ -21,6 +21,7 @@
  *
  */
 
+import { TransKey } from 'app/i18n';
 import { Info } from 'lucide-react';
 import type React from 'react';
 import Actions from './Actions';
@@ -65,9 +66,12 @@ const Substep = ({ step, index, stepIndex, firstRunOnly }: SubstepProps) => {
                         className="shrink-0 mt-0.5 text-orange-500 dark:text-orange-400"
                     />
                     <span className="text-sm text-orange-800 dark:text-orange-300">
-                        <span className="font-semibold">One-time setup:</span>{' '}
-                        measures the initial tool so subsequent tools can be
-                        compared against it.
+                        <TransKey
+                            i18nKey="helper:wizard.oneTimeSetup"
+                            components={{
+                                bold: <span className="font-semibold" />,
+                            }}
+                        />
                     </span>
                 </div>
             )}

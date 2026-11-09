@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "apply": "Übernehmen",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "continue": "Weiter",
+    "delete": "Löschen",
+    "no": "Nein",
+    "ok": "OK",
+    "reset": "Zurücksetzen",
+    "save": "Speichern",
+    "yes": "Ja"
+  },
+  "language": {
+    "label": "Sprache",
+    "description": "Sprache der gSender-Oberfläche. Texte aus der Firmware Ihrer Steuerung bleiben auf Englisch.",
+    "systemDefault": "Systemstandard"
+  },
+  "nav": {
+    "carve": "Fräsen",
+    "stats": "Statistik",
+    "tools": "Werkzeuge",
+    "config": "Einstellungen",
+    "mainNavigation": "Hauptnavigation"
+  }
+}

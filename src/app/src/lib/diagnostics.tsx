@@ -35,6 +35,7 @@ import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';
 import { SettingsMenu } from 'app/features/Config/assets/SettingsMenu.ts';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
+import { i18n } from 'app/i18n';
 import get from 'lodash/get';
 import { toast } from 'app/lib/toaster';
 import {
@@ -1579,10 +1580,10 @@ function generateSupportFile() {
                 );
 
                 setProgress('');
-                toast.success('Diagnostic file downloaded successfully!');
+                toast.success(i18n.t('notifications:diagnostics.downloaded'));
             } catch (error) {
                 console.error('Error generating diagnostic file:', error);
-                toast.error('Failed to generate diagnostic file');
+                toast.error(i18n.t('notifications:diagnostics.generateFailed'));
             } finally {
                 setIsGenerating(false);
                 setProgress('');

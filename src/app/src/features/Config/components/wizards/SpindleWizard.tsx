@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { Button } from 'app/components/Button';
 import autoSpinIcon from 'app/features/Config/assets/images/autospin.svg';
 import controller from 'app/lib/controller.ts';
@@ -16,16 +17,18 @@ function stopSpindle() {
 }
 
 function AutoSpinIcon() {
+    const { t } = useAppTranslation();
     return (
         <img
             src={autoSpinIcon}
-            alt="AutoSpin Icon"
+            alt={t('config:wizards.autoSpinIcon')}
             className="h-7 w-7 text-blue-600 dark:text-blue-400 fill-blue-500"
         />
     );
 }
 
 export function SpindleWizard() {
+    const { t } = useAppTranslation();
     const connected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -34,13 +37,13 @@ export function SpindleWizard() {
     return (
         <div className="flex flex-row gap-2 items-center">
             <Button variant="primary" onClick={startSpindle}>
-                For
+                {t('config:wizards.spindleForward')}
             </Button>
             <Button variant="primary" onClick={startSpindleCCW}>
-                Rev
+                {t('config:wizards.spindleReverse')}
             </Button>
             <Button variant="primary" onClick={stopSpindle}>
-                Stop
+                {t('config:wizards.spindleStop')}
             </Button>
             |
             <Button
@@ -51,7 +54,7 @@ export function SpindleWizard() {
                 disabled={!connected}
             >
                 <AutoSpinIcon />
-                Setup AutoSpin
+                {t('config:wizards.setupAutoSpin')}
             </Button>
         </div>
     );

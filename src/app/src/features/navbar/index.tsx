@@ -1,4 +1,5 @@
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { i18n, useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import { FaTasks } from 'react-icons/fa';
@@ -12,6 +13,7 @@ import { NavbarLink } from './components/NavbarLink.tsx';
 
 export const NavBar = () => {
     const { settingsAreDirty, setSettingsAreDirty } = useSettings();
+    const { t } = useAppTranslation();
     const location = useLocation();
     const navigate = useNavigate();
     const blocker = new Blocker();
@@ -37,12 +39,14 @@ export const NavBar = () => {
                 navigate(href);
             });
             Confirm({
-                title: 'Unsaved Changes',
-                content: 'Are you sure you want to leave without saving?',
+                title: i18n.t('notifications:navigation.unsavedChanges.title'),
+                content: i18n.t(
+                    'notifications:navigation.unsavedChanges.content',
+                ),
                 onClose: reset,
                 onConfirm: proceed,
-                confirmLabel: 'Yes',
-                cancelLabel: 'No',
+                confirmLabel: i18n.t('common:actions.yes'),
+                cancelLabel: i18n.t('common:actions.no'),
             });
         } else {
             navigate(href);
@@ -59,26 +63,26 @@ export const NavBar = () => {
                 <NavbarLink
                     href="/"
                     svg={Carve}
-                    label="Carve"
+                    label={t('common:nav.carve')}
                     onClick={(e) => checkIfNeedsBlock(e, '/')}
                 />
                 <NavbarLink
                     href="stats"
                     icon={IoSpeedometerOutline}
-                    label="Stats"
+                    label={t('common:nav.stats')}
                     onClick={(e) => checkIfNeedsBlock(e, 'stats')}
                 />
                 <NavbarLink
                     href="tools"
                     icon={RiToolsFill}
-                    label="Tools"
+                    label={t('common:nav.tools')}
                     onClick={(e) => checkIfNeedsBlock(e, 'tools')}
                 />
 
                 <NavbarLink
                     href="configuration"
                     icon={FaTasks}
-                    label="Config"
+                    label={t('common:nav.config')}
                 />
             </div>
         </>

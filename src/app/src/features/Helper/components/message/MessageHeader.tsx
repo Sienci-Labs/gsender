@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import cx from 'classnames';
 import { X } from 'lucide-react';
@@ -11,9 +12,10 @@ interface Props {
 }
 
 function CloseButton() {
+    const { t } = useAppTranslation();
     return (
         <DialogPrimitive.Close
-            aria-label="Close"
+            aria-label={t('common:actions.close')}
             data-helper-focus="close"
             className={cx(
                 'ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-md hover:bg-black/5 dark:hover:bg-overlay-hover',

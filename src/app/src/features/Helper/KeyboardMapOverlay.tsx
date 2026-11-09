@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import {
     CARVING_CATEGORY,
     COOLANT_CATEGORY,
@@ -21,6 +22,7 @@ import { useDispatch } from 'react-redux';
 
 export const KeyboardMapOverlay: React.FC = () => {
     const dispatch = useDispatch();
+    const { t } = useAppTranslation();
     const { showKeyboardMap } = useTypedSelector(
         (state: RootState) => state.preferences.accessibility,
     );
@@ -61,10 +63,10 @@ export const KeyboardMapOverlay: React.FC = () => {
                 <div className="col-span-3 flex justify-between items-center border-b border-white/20 pb-4 mb-2">
                     <div>
                         <h2 className="text-2xl font-bold">
-                            Active Keyboard Shortcuts
+                            {t('helper:keyboardMap.title')}
                         </h2>
                         <p className="text-sm text-white/60">
-                            Dynamic map of currently available shortcuts
+                            {t('helper:keyboardMap.subtitle')}
                         </p>
                     </div>
                     <button
@@ -75,7 +77,7 @@ export const KeyboardMapOverlay: React.FC = () => {
                             pubsub.publish('repopulate');
                         }}
                         className="text-white/60 hover:text-white hover:bg-white/10 rounded-lg p-1.5 transition-colors"
-                        aria-label="Close keyboard map"
+                        aria-label={t('helper:keyboardMap.close')}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

@@ -20,6 +20,7 @@ import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/
 import { SelectSettingInput } from 'app/features/Config/components/SettingInputs/SelectSettingInput.tsx';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -60,7 +61,7 @@ function returnSettingControl(
             return (
                 <SelectSettingInput
                     options={setting.options}
-                    labels={setting.labels}
+                    labels={setting.labels?.map(translateKey)}
                     index={index}
                     value={value as string}
                     onChange={(v) => handler(isNumericOptions ? Number(v) : v)}
@@ -83,6 +84,7 @@ function returnSettingControl(
             return (
                 <RadioSettingInput
                     options={setting.options}
+                    labels={setting.labels?.map(translateKey)}
                     index={index}
                     value={value as string}
                     onChange={handler}
@@ -165,6 +167,7 @@ export const SettingRow = React.memo(function SettingRow({
         isFirmwareCurrent,
         getPendingOrStore,
     } = useSettings();
+    const { t } = useAppTranslation();
 
     const displaySetting = { ...setting };
     const hybridShouldUseEEPROM =
@@ -212,7 +215,7 @@ export const SettingRow = React.memo(function SettingRow({
             return updated;
         });
         controller.command('gcode', [`${setting}=${value}`, '$$']);
-        toast.success(`Restored ${setting} to default value of ${value}`, {
+        toast.success(t('config:row.restored', { setting, value }), {
             position: 'bottom-right',
         });
     }
@@ -239,7 +242,9 @@ export const SettingRow = React.memo(function SettingRow({
                         return updated;
                     });
                 } else {
-                    toast.error(`No default found for ${effectiveEID}.`);
+                    toast.error(
+                        t('config:row.noDefault', { setting: effectiveEID }),
+                    );
                 }
             }
         }
@@ -269,19 +274,15 @@ export const SettingRow = React.memo(function SettingRow({
         if (setting.key === 'workspace.userPluginsDir' && setting.value) {
             return (
                 <div className="flex flex-col gap-2 text-left">
-                    <p>Resetting this will stop gSender from scanning:</p>
+                    <p>{t('config:row.resetPluginsDirIntro')}</p>
                     <p className="w-full break-all rounded-md ring-1 ring-gray-300 dark:ring-outline bg-gray-50 dark:bg-surface-sunken font-mono text-xs p-2">
                         {setting.value}
                     </p>
-                    <p>
-                        Plugins imported there will disappear from the Plugin
-                        Manager until you set this back. Are you sure you want
-                        to reset this value to default?
-                    </p>
+                    <p>{t('config:row.resetPluginsDirWarning')}</p>
                 </div>
             );
         }
-        return 'Are you sure you want to reset this value to default?';
+        return t('config:row.resetConfirm');
     }
 
     // if EEPROM or Hybrid and not connected, show nothing
@@ -331,21 +332,21 @@ export const SettingRow = React.memo(function SettingRow({
             )}
         >
             <span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-content-muted flex items-center justify-between sm:block ">
-                <span>{setting.label}</span>
+                <span>{translateKey(setting.label)}</span>
                 <span className="sm:hidden flex flex-row gap-2">
                     {!isDefault && (
-                        <Tooltip content="Reset to default value">
+                        <Tooltip content={t('config:row.resetTooltip')}>
                             <button
                                 className="text-3xl"
                                 title=""
                                 onClick={() => {
                                     Confirm({
-                                        title: 'Reset setting',
+                                        title: t('config:row.resetTitle'),
                                         content:
                                             getResetConfirmContent(
                                                 populatedValue,
                                             ),
-                                        confirmLabel: 'Yes',
+                                        confirmLabel: t('common:actions.yes'),
                                         onConfirm: () => {
                                             handleProgramSettingReset(
                                                 populatedValue,
@@ -362,7 +363,7 @@ export const SettingRow = React.memo(function SettingRow({
                 </span>
             </span>
             <span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-600 dark:text-content-secondary text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
-                {setting.description
+                {translateKey(setting.description)
                     .split('\n')
                     .map((line: string, index: number) => (
                         <p key={index}>{line}</p>
@@ -381,16 +382,16 @@ export const SettingRow = React.memo(function SettingRow({
             </span>
             <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 justify-end">
                 {!isDefault && (
-                    <Tooltip content="Reset to default value">
+                    <Tooltip content={t('config:row.resetTooltip')}>
                         <button
                             className="text-3xl"
                             title=""
                             onClick={() => {
                                 Confirm({
-                                    title: 'Reset setting',
+                                    title: t('config:row.resetTitle'),
                                     content:
                                         getResetConfirmContent(populatedValue),
-                                    confirmLabel: 'Yes',
+                                    confirmLabel: t('common:actions.yes'),
                                     onConfirm: () => {
                                         handleProgramSettingReset(
                                             populatedValue,

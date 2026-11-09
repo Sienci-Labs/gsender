@@ -13,6 +13,7 @@ import {
     type Job,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
+import { i18n } from 'app/i18n';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { useContext } from 'react';
@@ -97,10 +98,10 @@ export function Jobs() {
 
     function onClearJobHistory() {
         Confirm({
-            title: 'Delete Job History',
-            content: 'Are you sure you want to delete all job history?',
-            confirmLabel: 'Confirm',
-            cancelLabel: 'Cancel',
+            title: i18n.t('notifications:stats.deleteJobHistory.title'),
+            content: i18n.t('notifications:stats.deleteJobHistory.content'),
+            confirmLabel: i18n.t('common:actions.confirm'),
+            cancelLabel: i18n.t('common:actions.cancel'),
             onConfirm: async () => {
                 await clearJobHistory?.();
             },

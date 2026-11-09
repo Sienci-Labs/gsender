@@ -16,6 +16,7 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -181,7 +182,7 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
             VISUALIZER_PRIMARY,
         );
 
-        toast.info('Loaded rotary mounting setup macro', {
+        toast.info(i18n.t('notifications:rotary.mountingMacroLoaded'), {
             position: 'bottom-right',
         });
 

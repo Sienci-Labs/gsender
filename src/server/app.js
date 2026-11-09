@@ -36,12 +36,6 @@ import fs from "fs";
 import multer from "multer";
 import path from "path";
 import "hogan.js";
-import i18next from "i18next";
-import Backend from "i18next-fs-backend";
-import {
-	handle as i18nextHandle,
-	LanguageDetector as i18nextLanguageDetector,
-} from "i18next-http-middleware";
 import _get from "lodash/get";
 //import jwt from 'jsonwebtoken';
 import methodOverride from "method-override";
@@ -108,9 +102,6 @@ const appMain = () => {
 
 	// Cors
 	app.use(cors());
-
-	// Setup i18n (i18next)
-	i18next.use(Backend).use(i18nextLanguageDetector).init(settings.i18next);
 
 	app.use(async (req, res, next) => {
 		try {
@@ -257,8 +248,6 @@ const appMain = () => {
 			);
 		});
 	});
-
-	app.use(i18nextHandle(i18next, {}));
 
 	{
 		// Secure API Access

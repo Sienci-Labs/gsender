@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/suspicious/noExplicitAny: <todo: we need to add a context bridge to expose the ipcrenderer> */
+import { useAppTranslation } from 'app/i18n';
 import Button from 'app/components/Button';
 import isElectron from 'is-electron';
 import { useEffect, useRef, useState } from 'react';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const PathSelection = ({ value, index, onChange }: Props) => {
+    const { t } = useAppTranslation();
     const [waiting, setWaiting] = useState(false); // only recieve dialog data if we sent a request
     const waitingRef = useRef(waiting);
     waitingRef.current = waiting;
@@ -57,7 +59,7 @@ const PathSelection = ({ value, index, onChange }: Props) => {
                 id={`${index}`}
                 onClick={handleClickLoadFile}
                 icon={<FaFolderOpen className="w-5 h-5" />}
-                text="Choose Folder"
+                text={t('config:inputs.chooseFolder')}
                 variant="secondary"
             />
             <div className="break-words w-full">{value}</div>

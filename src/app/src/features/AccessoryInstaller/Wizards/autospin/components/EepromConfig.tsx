@@ -2,6 +2,7 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import { StepActionButton } from 'app/components/Wizard/StepActionButton.tsx';
 import { GRBLHAL } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import type { RootState } from 'app/store/redux';
 import delay from 'lodash/delay';
@@ -84,10 +85,13 @@ export function EepromConfig({ onComplete }: Props) {
 
         delay(() => {
             Confirm({
-                title: 'Restart your Controller',
-                content:
-                    'Please manually restart your CNC controller (power cycle) and reconnect to gSender for these settings to take effect.',
-                confirmLabel: 'OK',
+                title: i18n.t(
+                    'notifications:accessories.restartController.title',
+                ),
+                content: i18n.t(
+                    'notifications:accessories.restartController.content',
+                ),
+                confirmLabel: i18n.t('common:actions.ok'),
                 hideClose: true,
             });
             setHasApplied(true);

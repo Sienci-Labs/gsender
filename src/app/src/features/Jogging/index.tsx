@@ -30,6 +30,7 @@ import {
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
@@ -820,7 +821,9 @@ export function Jogging({ hideRotary = false }) {
             store.replace('workspace.mode', nextWorkspaceMode);
 
             toast.info(
-                `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`,
+                nextWorkspaceMode === WORKSPACE_MODE.ROTARY
+                    ? i18n.t('notifications:workspace.modeSetRotary')
+                    : i18n.t('notifications:workspace.modeSetDefault'),
                 { position: 'bottom-right' },
             );
         },

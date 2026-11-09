@@ -14,6 +14,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { Badge } from 'app/components/shadcn/Badge';
 import { Tooltip } from 'app/components/Tooltip';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import isElectron from 'is-electron';
 import { Trash2 } from 'lucide-react';
@@ -70,7 +71,11 @@ const PluginManager = () => {
         setRemoving(true);
         try {
             await api.plugins.uninstall(pendingRemoval.id);
-            toast.success(`${pendingRemoval.name} was removed.`);
+            toast.success(
+                i18n.t('notifications:plugins.removed', {
+                    name: pendingRemoval.name,
+                }),
+            );
             setRestartRequired(true);
             setPendingRemoval(null);
             await refresh();
@@ -78,7 +83,7 @@ const PluginManager = () => {
             const message =
                 (err as { response?: { data?: { error?: string } } })?.response
                     ?.data?.error ??
-                'Could not remove the plugin. Please try again.';
+                i18n.t('notifications:plugins.removeFailed');
             toast.error(message, { position: 'bottom-right' });
         } finally {
             setRemoving(false);

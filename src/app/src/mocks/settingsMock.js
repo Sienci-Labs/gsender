@@ -7,6 +7,5 @@ module.exports = {
         webroot: '/',
         log: { level: 'warn' },
         analytics: { trackingId: '' },
-        i18next: {},
     },
 };

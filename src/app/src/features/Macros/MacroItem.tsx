@@ -6,6 +6,7 @@ import {
     DropdownMenuTrigger,
 } from 'app/components/shadcn/Dropdown';
 import Tooltip from 'app/components/Tooltip';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import cn from 'classnames';
 import cx from 'classnames';
@@ -77,9 +78,12 @@ const MacroItem = ({
         }
 
         onRun(macro);
-        toast.info(`Started running macro '${macro.name}'!`, {
-            position: 'bottom-right',
-        });
+        toast.info(
+            i18n.t('notifications:macros.started', { name: macro.name }),
+            {
+                position: 'bottom-right',
+            },
+        );
     };
 
     const hasDescription = macro.description.trim() !== '';

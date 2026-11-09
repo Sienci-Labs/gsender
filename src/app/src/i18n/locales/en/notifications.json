@@ -1,0 +1,278 @@
+{
+  "confirm": {
+    "defaultContent": "Are you sure you want to do this?"
+  },
+  "accessories": {
+    "restartController": {
+      "title": "Restart your Controller",
+      "content": "Please manually restart your CNC controller (power cycle) and reconnect to gSender for these settings to take effect."
+    }
+  },
+  "atc": {
+    "unimplemented": "Unimplemented :(",
+    "toolsOutOfRange_one": "This file uses tool {{list}} which exceeds your {{size}}-slot tool table. Remap in the Tool Timeline before running.",
+    "toolsOutOfRange_other": "This file uses tools {{list}} which exceed your {{size}}-slot tool table. Remap in the Tool Timeline before running.",
+    "dialog": {
+      "title": "ATC requested a dialog.",
+      "content": "Continue to unhold, Reset to stop action.",
+      "resume": "Resume"
+    }
+  },
+  "connection": {
+    "reconnectFailed": "Unable to reconnect to {{port}} - {{reason}}"
+  },
+  "console": {
+    "cleared": "Console cleared",
+    "commandsCopied_one": "Copied last {{count}} commands to clipboard",
+    "commandsCopied_other": "Copied last {{count}} commands to clipboard",
+    "copyFailed": "Failed to copy commands to clipboard",
+    "webViewUnavailable": "This functionality is not available on web view."
+  },
+  "controller": {
+    "alarm": "Alarm {{code}}: {{description}}",
+    "error": "Error {{code}}: {{description}}",
+    "commentLabel": "Comment:",
+    "resume": "Resume",
+    "portDisconnected": {
+      "title": "Port Disconnected",
+      "contentHoming": "The machine connection has been disrupted. To attempt to reconnect to the last active port, home, and choose which line to continue from, press Resume.",
+      "content": "The machine connection has been disrupted. To attempt to reconnect to the last active port, press Resume. After that, you can set your Workspace 0 and use the Start From Line function to continue the job. Suggested line to start from: {{line}}"
+    },
+    "toolchangePause": "Toolchange pause",
+    "toolchangePauseWithComment": "Toolchange pause - {{comment}}",
+    "confirmToolchange": {
+      "title": "Confirm Toolchange",
+      "content": "A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.",
+      "confirm": "Confirm toolchange"
+    },
+    "feederPause": {
+      "title": "{{command}} pause detected",
+      "content": "Press Resume to continue.",
+      "stop": "Stop"
+    },
+    "workflowPause": "'{{command}}' pause command found in file - press \"Resume Job\" to continue running.",
+    "programPause": {
+      "title": "M0/M1 Pause",
+      "content": "Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.",
+      "confirm": "Resume Job",
+      "cancel": "Close Window"
+    },
+    "rotaryFileLoaded": {
+      "title": "Rotary File Loaded",
+      "content": "G-Code contains A-axis command, please enable Rotary mode if your machine is equipped with a rotary axis unit.",
+      "confirm": "Enable Rotary Mode"
+    },
+    "fourAxisFileLoaded": {
+      "title": "4 Axis File Loaded",
+      "content": "G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run."
+    }
+  },
+  "diagnostics": {
+    "downloaded": "Diagnostic file downloaded successfully!",
+    "generateFailed": "Failed to generate diagnostic file"
+  },
+  "dro": {
+    "machineLimitsMissing": "Unable to find machine limits - make sure they're set in preferences",
+    "invalidPositionArgs": "Unable to calculate position movements based on inputs - check arguments passed"
+  },
+  "files": {
+    "closed": "G-code File Closed",
+    "recentLoadFailed": "Error loading recent file, it may have been deleted or moved to a different folder.",
+    "loadFailed": "Unable to load file - file may have been moved or deleted."
+  },
+  "gamepad": {
+    "connected": "{{name}} Connected",
+    "newConnected": "New gamepad connected, add it as a profile in your preferences",
+    "disconnected": "Gamepad disconnected",
+    "profileRenamed": "Updated Profile Name",
+    "profileExported": "Gamepad profile exported successfully!",
+    "profileExportFailed": "Failed to export gamepad profile.",
+    "profileImported": "Gamepad profile imported successfully!",
+    "profileImportFailed": "Failed to import gamepad profile. Please check the file format.",
+    "profileRemoved": "Removed Gamepad Profile",
+    "profileCreated": "Created New Gamepad Profile",
+    "actionShortcutUpdated": "Updated Gamepad Action Shortcut",
+    "buttonShortcutSet": "Button Shortcut Set",
+    "deleteProfile": {
+      "title": "Delete Gamepad Profile",
+      "content": "Are you sure you want to delete this gamepad profile?"
+    }
+  },
+  "gcode": {
+    "copiedToClipboard": "Copied G-code to Clipboard",
+    "copied": "G-code has been copied to your clipboard",
+    "copyFailed": "Could not copy G-code to clipboard",
+    "linesCopied_one": "{{count}} line(s) copied to clipboard",
+    "linesCopied_other": "{{count}} line(s) copied to clipboard",
+    "revertBlockedByJob": "Cannot revert while job is running",
+    "reverted": "Reverted to original content",
+    "saveBlockedByJob": "Cannot save while job is running",
+    "saved": "G-code saved successfully",
+    "saveFailed": "Failed to save G-code"
+  },
+  "jobControl": {
+    "outlineGenerating": "Generating outline g-code...",
+    "outlineRunning": "Running file outline",
+    "outlineTimedOut": "Outline generation timed out. Please try again.",
+    "outlineFailed": "Outline generation failed. Please try again.",
+    "startFromLineRunning": "Running Start From Specific Line Command"
+  },
+  "keyboard": {
+    "shortcutUpdated": "Shortcut Updated",
+    "shortcutCleared": "Shortcut Cleared",
+    "exported": "Shortcuts exported successfully!",
+    "exportFailed": "Failed to export shortcuts.",
+    "imported": "Shortcuts imported successfully!",
+    "importFailed": "Failed to import shortcuts. Please check the file format.",
+    "printDocumentFailed": "Unable to create print document.",
+    "printFailed": "Failed to print shortcuts."
+  },
+  "macros": {
+    "added": "Added New Macro",
+    "addFailed": "Failed to add macro",
+    "deleted": "Deleted Macro",
+    "updated": "Updated macro '{{name}}'",
+    "nothingToExport": "No Macros to Export",
+    "imported_one": "Successfully imported {{count}} macro(s)",
+    "imported_other": "Successfully imported {{count}} macro(s)",
+    "importedAndUpdated_one": "Successfully imported {{count}} macro(s), updated {{updated}} existing macro(s)",
+    "importedAndUpdated_other": "Successfully imported {{count}} macro(s), updated {{updated}} existing macro(s)",
+    "updatedExisting_one": "Updated {{count}} existing macro(s)",
+    "updatedExisting_other": "Updated {{count}} existing macro(s)",
+    "importFailed": "Error Importing Macros",
+    "started": "Started running macro '{{name}}'!",
+    "startedQuoted": "Started running macro \"{{name}}\"!",
+    "runFailed": "Failed to run macro \"{{name}}\"",
+    "deleteMacro": {
+      "title": "Delete Macro",
+      "content": "Are you sure you want to delete this macro?"
+    }
+  },
+  "maintenance": {
+    "timersReset": "Reset Timers successfully",
+    "timersResetFailed": "Failed to Reset Timers.",
+    "timersResetFailedDescription": "Please go to the Stats Page to reset them manually."
+  },
+  "movementTuning": {
+    "stepsUpdated": "Updated steps-per-mm value"
+  },
+  "navigation": {
+    "unsavedChanges": {
+      "title": "Unsaved Changes",
+      "content": "Are you sure you want to leave without saving?"
+    }
+  },
+  "pendant": {
+    "quit": {
+      "title": "Quit gSender?",
+      "content": "Are you sure you want to quit gSender?",
+      "confirm": "Quit"
+    }
+  },
+  "plugins": {
+    "removed": "{{name}} was removed.",
+    "removeFailed": "Could not remove the plugin. Please try again."
+  },
+  "probe": {
+    "confirmedManually": "Probe Confirmed Manually",
+    "cycleStarted": "Initiated probing cycle",
+    "pendantCycleStarted": "Probing cycle started: {{corner}}, {{diameter}}, {{command}}"
+  },
+  "remoteMode": {
+    "linkCopied": "Copied link to clipboard",
+    "linkCopyFailed": "There was an error copying the link to the clipboard, please copy it manually.",
+    "invalidPort": "Invalid Port Number - Must be between 1025 and 65535",
+    "invalidIp": "Invalid IP Address - {{ip}} does not look like a valid V4 IP address",
+    "settingsUpdated": "Updated Wireless Control Settings",
+    "saveSettings": {
+      "title": "Save Wireless CNC Settings",
+      "content": "Are you sure you want to save these settings?  This will restart the application.",
+      "confirm": "Save Settings"
+    }
+  },
+  "rotary": {
+    "enabled": "Rotary Mode Enabled",
+    "mountingMacroLoaded": "Loaded rotary mounting setup macro",
+    "probingRunning": "Running {{name}} probing commands",
+    "runProbing": {
+      "title": "{{name}} probing",
+      "content": "Click 'Run' to start the {{name}} probing cycle",
+      "confirm": "Run"
+    },
+    "enable": {
+      "title": "Enable Rotary Mode",
+      "intro": "Enabling rotary mode will perform the following actions:",
+      "zeroY": "Zero the Y-Axis in it's current position",
+      "limitsOff": "Turn soft and hard limits off, if they are on",
+      "updateFirmwareValues": "Update the following firmware values:",
+      "yTravelResolution": "{{setting}} (Y-Axis travel resolution)",
+      "yMaximumRate": "{{setting}} (Y-Axis maximum rate)",
+      "checkWiring": "Please make sure you have switched over your wiring for the new setup.",
+      "swapAxisSettings": "Switch these A and Y axis settings:",
+      "travelResolution": "{{y}} and {{a}} (travel resolution)",
+      "maximumRate": "{{y}} and {{a}} (maximum rate)",
+      "acceleration": "{{y}} and {{a}} (acceleration)",
+      "travelAmount": "{{y}} and {{a}} (travel amount)"
+    }
+  },
+  "sdCard": {
+    "invalidFileType": "{{fileName}}: Invalid file type",
+    "filesRejected": "Some files were rejected:\n{{errors}}",
+    "uploadFailed": "Error uploading file - {{error}}.",
+    "deleteFile": {
+      "title": "Delete File",
+      "content": "Are you sure you want to delete {{fileName}}?"
+    }
+  },
+  "settings": {
+    "restored": "Settings restored",
+    "loadFailed": "Could not load your settings from the gSender server. Defaults are shown and changes will not be saved until you reload."
+  },
+  "squaring": {
+    "eepromUpdated": "Updated EEPROM values"
+  },
+  "stats": {
+    "deleteAlarmHistory": {
+      "title": "Delete History",
+      "content": "Are you sure you want to delete all alarm/error history?"
+    },
+    "deleteJobHistory": {
+      "title": "Delete Job History",
+      "content": "Are you sure you want to delete all job history?"
+    },
+    "resetAllTasks": {
+      "title": "Reset All Tasks",
+      "content": "Are you sure you want to reset the times for every Maintenance Task?"
+    }
+  },
+  "toolchange": {
+    "firstToolchange": {
+      "title": "First Tool Change Detected",
+      "detected": "A toolchange command was detected at the start of your file.",
+      "content": "If you already have the correct tool installed, you only need to probe your initial tool. Otherwise, run the toolchange routine to install and set up your initial tool.",
+      "confirm": "Run Full Toolchange Routine",
+      "cancel": "Only Probe Tool Length"
+    }
+  },
+  "unlock": {
+    "homingNotComplete": {
+      "title": "Homing Not Complete",
+      "content": "The last homing cycle failed, so the machine position is unknown. Re-home the machine before continuing. Unlocking without re-homing may let jogging or a job run past the limit switches.",
+      "limitSwitchFault": "ALARM:8 and ALARM:9 mean a limit switch was not found or would not release, so re-homing will keep failing until the switch or its wiring is fixed. To use the machine without homing until then: choose Unlock Anyway, open Config > Homing/Limits, turn off {{setting}} and click Apply Settings.",
+      "confirm": "Rehome",
+      "cancel": "Unlock Anyway"
+    }
+  },
+  "visualizer": {
+    "moveToHereRotary": "Move To Here isn't available for rotary files",
+    "mustBeIdleToMove": "Machine must be connected and idle to move",
+    "movingTo": "Moving to X{{x}} Y{{y}}",
+    "unsupportedGcode_one": "Found {{count}} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.",
+    "unsupportedGcode_other": "Found {{count}} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.",
+    "grblHalOnlyShortcut": "Unable to activate GrblHAL ONLY shortcut"
+  },
+  "workspace": {
+    "modeSetDefault": "Workspace Mode set to Default",
+    "modeSetRotary": "Workspace Mode set to Rotary"
+  }
+}

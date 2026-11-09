@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client';
-import { initStore } from './store';
+import { initI18n, watchLanguagePreference } from './i18n';
+import store, { initStore } from './store';
 
 import './sentry-config';
 import './index.css';
@@ -10,6 +11,8 @@ async function bootstrap() {
     const container = document.getElementById('app') as HTMLElement;
 
     await initStore();
+    await initI18n(store.get('workspace.language', 'system'));
+    watchLanguagePreference(store);
 
     const [{ default: App }, { default: PostHogConfig }] = await Promise.all([
         import('./App'),

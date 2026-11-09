@@ -1,6 +1,7 @@
 import { setApiBaseURL } from 'app/api';
 import controller from 'app/lib/controller';
-import { initStore } from 'app/store';
+import { initI18n, watchLanguagePreference } from 'app/i18n';
+import store, { initStore } from 'app/store';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { getHost } from './electron-bridge';
@@ -18,6 +19,8 @@ async function bootstrap() {
 
     // Modules below read the store at import time, so load settings first.
     await initStore();
+    await initI18n(store.get('workspace.language', 'system'));
+    watchLanguagePreference(store);
 
     const [
         { Provider: ReduxProvider },

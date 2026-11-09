@@ -1,4 +1,5 @@
 import { Button } from 'app/components/Button';
+import { i18n } from 'app/i18n';
 import GamepadManager from 'app/lib/gamepad';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -78,7 +79,9 @@ const Profile = ({ data }) => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
 
-        toast.info('Updated Profile Name', { position: 'bottom-right' });
+        toast.info(i18n.t('notifications:gamepad.profileRenamed'), {
+            position: 'bottom-right',
+        });
     };
 
     const handleExportProfile = () => {
@@ -100,13 +103,13 @@ const Profile = ({ data }) => {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
 
-            toast.success('Gamepad profile exported successfully!', {
+            toast.success(i18n.t('notifications:gamepad.profileExported'), {
                 duration: 3000,
                 position: 'bottom-right',
             });
         } catch (error) {
             console.error('Export error:', error);
-            toast.error('Failed to export gamepad profile.', {
+            toast.error(i18n.t('notifications:gamepad.profileExportFailed'), {
                 position: 'bottom-right',
             });
         }
@@ -159,14 +162,17 @@ const Profile = ({ data }) => {
 
                     dispatch(setGamepadProfileList(updatedProfiles));
 
-                    toast.success('Gamepad profile imported successfully!', {
-                        duration: 3000,
-                        position: 'bottom-right',
-                    });
+                    toast.success(
+                        i18n.t('notifications:gamepad.profileImported'),
+                        {
+                            duration: 3000,
+                            position: 'bottom-right',
+                        },
+                    );
                 } catch (error) {
                     console.error('Import error:', error);
                     toast.error(
-                        'Failed to import gamepad profile. Please check the file format.',
+                        i18n.t('notifications:gamepad.profileImportFailed'),
                         {
                             position: 'bottom-right',
                         },

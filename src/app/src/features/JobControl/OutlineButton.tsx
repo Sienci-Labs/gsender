@@ -1,6 +1,7 @@
 import { usePostHog } from '@posthog/react';
 import { Button } from 'app/components/shadcn/Button';
 import { LASER_MODE } from 'app/constants';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
@@ -44,7 +45,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                 maxRuntime = setTimeout(() => {
                     outlineWorker.terminate();
                     toast.error(
-                        'Outline generation timed out. Please try again.',
+                        i18n.t('notifications:jobControl.outlineTimedOut'),
                     );
                     outlineRunning = false;
                 }, 15000);
@@ -61,7 +62,9 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                     clearTimeout(maxRuntime);
                     outlineWorker.terminate();
                     console.error('Outline worker failed', event);
-                    toast.error('Outline generation failed. Please try again.');
+                    toast.error(
+                        i18n.t('notifications:jobControl.outlineFailed'),
+                    );
                     outlineRunning = false;
                 };
                 outlineWorker.onerror = onWorkerError;

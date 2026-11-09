@@ -1,3 +1,4 @@
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import pubsub from 'pubsub-js';
 import api from '../api';
@@ -15,7 +16,9 @@ const restoreSettings = (state: object, isSync?: boolean): void => {
     store.restoreState(state, () => {
         setTimeout(() => {
             pubsub.publish('repopulate');
-            toast.success('Settings restored', { position: 'bottom-right' });
+            toast.success(i18n.t('notifications:settings.restored'), {
+                position: 'bottom-right',
+            });
         }, 50);
     });
 };

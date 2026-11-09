@@ -21,6 +21,7 @@ import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigra
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils.ts';
 import store from 'app/store';
 import { RootState } from 'app/store/redux';
@@ -85,7 +86,7 @@ function restoreEEPROMDefaults(
 
     controller.command('gcode', values);
 
-    toast.success('Restored default settings for your machine.', {
+    toast.success(i18n.t('config:restoreDefaults.restored'), {
         position: 'bottom-right',
     });
 }
@@ -95,6 +96,7 @@ export function RestoreDefaultDialog({
 }: {
     canRestoreDefaults?: boolean;
 }) {
+    const { t } = useAppTranslation();
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -130,7 +132,7 @@ export function RestoreDefaultDialog({
                             <AlertDialogTrigger asChild>
                                 <ActionButton
                                     icon={<GrRevert />}
-                                    label="Defaults"
+                                    label={t('config:restoreDefaults.button')}
                                     disabled={
                                         !isConnected || !canRestoreDefaults
                                     }
@@ -139,16 +141,20 @@ export function RestoreDefaultDialog({
                             <AlertDialogContent className="bg-white">
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                        Restore Defaults
+                                        {t('config:restoreDefaults.title')}
                                     </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        Are you sure you want to restore your{' '}
-                                        <b>{machineName}</b> back to its default
-                                        state?
+                                        <TransKey
+                                            i18nKey="config:restoreDefaults.confirm"
+                                            values={{ machineName }}
+                                            components={{ 1: <b /> }}
+                                        />
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter className={'flex flex-col'}>
-                                    <AlertDialogCancel>No</AlertDialogCancel>
+                                    <AlertDialogCancel>
+                                        {t('common:actions.no')}
+                                    </AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={() => {
                                             restoreEEPROMDefaults(
@@ -161,7 +167,7 @@ export function RestoreDefaultDialog({
                                             );
                                         }}
                                     >
-                                        Restore Defaults
+                                        {t('config:restoreDefaults.action')}
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -169,8 +175,7 @@ export function RestoreDefaultDialog({
                     </div>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                    Make sure you click to apply your defaults to your
-                    controller
+                    {t('config:restoreDefaults.tooltip')}
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

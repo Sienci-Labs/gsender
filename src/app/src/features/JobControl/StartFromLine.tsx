@@ -13,6 +13,7 @@ import { IMPERIAL_UNITS, METRIC_UNITS } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import { convertToImperial } from 'app/lib/units';
@@ -100,7 +101,7 @@ const StartFromLine = ({
         reduxStore.dispatch(
             updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
         );
-        toast.info('Running Start From Specific Line Command', {
+        toast.info(i18n.t('notifications:jobControl.startFromLineRunning'), {
             position: 'bottom-right',
         });
 

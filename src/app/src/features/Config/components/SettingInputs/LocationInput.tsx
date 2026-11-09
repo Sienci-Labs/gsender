@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import Button from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { isBitSetInNumber } from 'app/features/DRO/utils/RapidPosition';
@@ -22,6 +23,7 @@ export function LocationInput({
     onChange,
     unit,
 }: LocationInputProps) {
+    const { t } = useAppTranslation();
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
@@ -106,7 +108,7 @@ export function LocationInput({
                     disabled={!isConnected}
                 >
                     <FiTarget />
-                    Grab
+                    {t('config:inputs.locationGrab')}
                 </Button>
                 <Button
                     disabled={!isConnected}
@@ -116,7 +118,7 @@ export function LocationInput({
                 >
                     {' '}
                     <FaChartLine />
-                    Go To
+                    {t('config:inputs.locationGoTo')}
                 </Button>
             </div>
         </div>

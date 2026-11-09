@@ -17,6 +17,7 @@ import {
     resolveGrblCoreDefaults,
     translateGrblCoreKey,
 } from 'app/features/Config/utils/grblCoreMigration.ts';
+import { toEnglish } from 'app/i18n';
 import { convertToImperial } from 'app/lib/units';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
@@ -108,7 +109,8 @@ function settingDescription(
     description: gSenderSetting['description'],
 ): string {
     if (typeof description === 'string') {
-        return description;
+        // Support reports stay in English whatever the UI language is.
+        return toEnglish(description);
     }
     if (Array.isArray(description)) {
         return description
@@ -265,8 +267,8 @@ function lookupEepromMeta(
         | undefined;
 
     return {
-        label: live?.description || stat?.description || resolvedId,
-        details: filterNewlines(live?.details || stat?.details || ''),
+        label: live?.description || toEnglish(stat?.description) || resolvedId,
+        details: filterNewlines(live?.details || toEnglish(stat?.details)),
         unit: live?.unit || live?.unitString || stat?.units || '',
         dataType: live?.dataType !== undefined ? live.dataType : stat?.dataType,
         format: live?.format ?? null,
@@ -423,7 +425,7 @@ function buildAppRow(
 ): ConfigReportRow | null {
     if (setting.type === 'wizard') {
         return {
-            label: setting.label || 'Tool',
+            label: toEnglish(setting.label) || 'Tool',
             description: settingDescription(setting.description),
             value: '',
             changed: false,
@@ -434,7 +436,7 @@ function buildAppRow(
         const record = source.events?.[setting.eventType || ''];
         const formatted = formatEvent(record);
         return {
-            label: setting.label || setting.eventType || 'Event',
+            label: toEnglish(setting.label) || setting.eventType || 'Event',
             description: settingDescription(setting.description),
             value: formatted.value,
             changed: false,
@@ -497,7 +499,7 @@ function buildAppRow(
         !isEqual(rawValue, defaultValue);
 
     return {
-        label: setting.label || setting.key || 'Setting',
+        label: toEnglish(setting.label) || setting.key || 'Setting',
         description: settingDescription(setting.description),
         value,
         changed,
@@ -526,7 +528,7 @@ function buildEepromRow(
     const description = meta.details ? `${meta.details} ${idNote}` : idNote;
 
     return {
-        label: meta.label || setting.label || resolvedId,
+        label: meta.label || toEnglish(setting.label) || resolvedId,
         description,
         value: formatted.value,
         changed: eepromChanged(currentValue, defaultValue, dataType),
@@ -574,7 +576,7 @@ export function buildConfigSettingsReport(
                 return;
             }
             subsections.push({
-                label: subsection.label || '',
+                label: toEnglish(subsection.label),
                 rows,
             });
         });
@@ -584,8 +586,8 @@ export function buildConfigSettingsReport(
         }
 
         sections.push({
-            id: slugify(section.label),
-            label: section.label,
+            id: slugify(toEnglish(section.label)),
+            label: toEnglish(section.label),
             subsections,
         });
     });

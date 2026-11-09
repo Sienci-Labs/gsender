@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { buttonStyle } from 'app/components/Button';
 import cx from 'classnames';
 import { ExternalLink } from 'lucide-react';
@@ -48,6 +49,7 @@ function OpenGuideButton({
     url: string;
     fullWidth?: boolean;
 }) {
+    const { t } = useAppTranslation();
     return (
         <a
             href={url}
@@ -62,13 +64,14 @@ function OpenGuideButton({
                 ),
             })}
         >
-            Open guide
+            {t('helper:message.openGuide')}
             <ExternalLink size={15} />
         </a>
     );
 }
 
 export function ResourceBlock({ resource, variant, className }: Props) {
+    const { t } = useAppTranslation();
     const { url, label, link = true, qr = true } = resource;
 
     if (!link && !qr) {
@@ -95,7 +98,7 @@ export function ResourceBlock({ resource, variant, className }: Props) {
                         <span
                             className={cx('text-center text-xs', neutral.muted)}
                         >
-                            Scan to open on your phone
+                            {t('helper:message.scanToOpen')}
                         </span>
                     </div>
                 )}
@@ -134,7 +137,7 @@ export function ResourceBlock({ resource, variant, className }: Props) {
                     <div className="flex shrink-0 flex-col items-center gap-1.5">
                         <QrTile url={url} className="w-[120px]" />
                         <span className={cx('text-xs', neutral.muted)}>
-                            Scan on phone
+                            {t('helper:message.scanOnPhone')}
                         </span>
                     </div>
                 )}
@@ -145,7 +148,7 @@ export function ResourceBlock({ resource, variant, className }: Props) {
                             neutral.muted,
                         )}
                     >
-                        Learn more
+                        {t('helper:message.learnMore')}
                     </span>
                     <span className={cx('text-base font-bold', neutral.title)}>
                         {label}
@@ -159,7 +162,7 @@ export function ResourceBlock({ resource, variant, className }: Props) {
                         </>
                     ) : (
                         <span className={cx('text-sm', neutral.muted)}>
-                            Scan the code to open this guide on your phone.
+                            {t('helper:message.scanCodeToOpen')}
                         </span>
                     )}
                 </div>
@@ -191,12 +194,12 @@ export function ResourceBlock({ resource, variant, className }: Props) {
                             neutral.link,
                         )}
                     >
-                        Open guide
+                        {t('helper:message.openGuide')}
                         <ExternalLink size={13} />
                     </a>
                 ) : (
                     <span className={cx('text-sm', neutral.muted)}>
-                        Scan the code to open this guide on your phone.
+                        {t('helper:message.scanCodeToOpen')}
                     </span>
                 )}
             </div>

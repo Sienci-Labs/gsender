@@ -1,4 +1,5 @@
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import { getUnitModal } from 'app/lib/toolChangeUtils';
@@ -134,13 +135,16 @@ export const getYAxisAlignmentProbing = () => {
 
 export const runProbing = (name = 'rotary', commands: string) => {
     Confirm({
-        title: `${name} probing`,
-        content: `Click 'Run' to start the ${name} probing cycle`,
-        confirmLabel: `Run`,
+        title: i18n.t('notifications:rotary.runProbing.title', { name }),
+        content: i18n.t('notifications:rotary.runProbing.content', { name }),
+        confirmLabel: i18n.t('notifications:rotary.runProbing.confirm'),
         onConfirm: () => {
-            toast.info(`Running ${name} probing commands`, {
-                position: 'bottom-right',
-            });
+            toast.info(
+                i18n.t('notifications:rotary.probingRunning', { name }),
+                {
+                    position: 'bottom-right',
+                },
+            );
             const unitModal = getUnitModal();
 
             controller.command('gcode:safe', commands, unitModal);

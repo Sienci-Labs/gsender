@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
+import { i18n } from 'app/i18n';
 import MacroItem from './MacroItem';
 
 type Macro = {
@@ -70,16 +71,16 @@ const SortableMacroItem = ({
 
     const onDeleteClick = () => {
         Confirm({
-            title: 'Delete Macro',
+            title: i18n.t('notifications:macros.deleteMacro.title'),
             content: (
                 <>
-                    <p>Are you sure you want to delete this macro?</p>
+                    <p>{i18n.t('notifications:macros.deleteMacro.content')}</p>
                     <p>
                         <strong>{macro.name}</strong>
                     </p>
                 </>
             ),
-            confirmLabel: 'Delete',
+            confirmLabel: i18n.t('common:actions.delete'),
             onConfirm: handleDeleteMacro,
         });
     };

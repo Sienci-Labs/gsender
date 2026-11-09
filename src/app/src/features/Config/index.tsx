@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import {
     Tabs,
     TabsContent,
@@ -34,6 +35,7 @@ import {
 } from './utils/scrollMemory';
 
 export function Config() {
+    const { t } = useAppTranslation();
     const dispatch = useDispatch();
     // const [activeSection, setActiveSection] = React.useState<number>(0);
     // const [showFlashDialog, setShowFlashDialog] = React.useState(false);
@@ -220,7 +222,7 @@ export function Config() {
                             className="w-full dark:text-content-primary"
                             onClick={() => setActiveTab('config')}
                         >
-                            All Config
+                            {t('config:page.allConfigTab')}
                         </TabsTrigger>
                         <TabsTrigger
                             value="eeprom"

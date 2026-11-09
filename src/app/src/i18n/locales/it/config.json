@@ -1,0 +1,1233 @@
+{
+  "basics": {
+    "title": "Generale",
+    "carveScreenUnits": {
+      "label": "Unità della schermata Lavorazione",
+      "description": "Quali unità si preferisce visualizzare nella schermata Lavorazione? La configurazione resta sempre in unità metriche, poiché tutti i firmware CNC più comuni richiedono valori metrici in ingresso."
+    },
+    "reconnectAutomatically": {
+      "label": "Riconnessione automatica",
+      "description": "Riconnette automaticamente all'ultima macchina utilizzata all'apertura di gSender."
+    },
+    "firmwareFallback": {
+      "label": "Firmware di riserva",
+      "description": "Il firmware che gSender utilizzerà se il rilevamento automatico non riesce."
+    },
+    "baudRate": {
+      "label": "Baud rate",
+      "description": "Deve corrispondere al valore utilizzato dalla CNC. (Velocità di trasmissione seriale, predefinito 115200)"
+    },
+    "safeHeight": {
+      "label": "Altezza di sicurezza",
+      "description": "Distanza di risalita dell'asse Z prima di spostarsi in X/Y/A con i comandi \"Vai a\". (Non si applica a file, movimenti agli angoli o parcheggio; se l'homing è abilitato, questo valore diventa un offset dalla sommità dell'asse Z, predefinito 0)"
+    },
+    "checkFileOnLoad": {
+      "label": "Verifica file al caricamento",
+      "description": "Esegue la modalità di verifica ($C) ogni volta che viene caricato un nuovo file G-code."
+    },
+    "outlineStyle": {
+      "label": "Stile del contorno",
+      "description": "Scegliere come tracciare il contorno dei file. (Dettagliato richiede più tempo e segue il percorso più fedelmente, Quadrato traccia un semplice riquadro di ingombro, Quadrato senza rapidi fa lo stesso ma ignora i movimenti rapidi/G0, predefinito Dettagliato)"
+    },
+    "outlineSpeed": {
+      "label": "Velocità del contorno",
+      "description": "Imposta la velocità di avanzamento usata per il contorno. (Valori più bassi offrono movimenti più controllati; il valore predefinito 0 esegue il contorno alla velocità massima/G0)"
+    },
+    "revertWorkspace": {
+      "label": "Ripristina area di lavoro",
+      "description": "Consente ai comandi G-code di \"fine lavoro\" come M2 e M30 di riportare l'area di lavoro della CNC a G54 al termine di ogni lavoro."
+    },
+    "powerSaving": {
+      "label": "Risparmio energetico",
+      "description": "Consente lo spegnimento/sospensione dello schermo."
+    },
+    "promptOnExit": {
+      "label": "Conferma all'uscita",
+      "description": "Mostra una finestra di conferma alla chiusura del programma."
+    },
+    "allowGcamToSendFiles": {
+      "label": "Consenti a gCAM di inviare file",
+      "description": "Consente a gCAM in esecuzione su questo computer di caricare programmi direttamente in gSender tramite \"Invia a gSender\". I file vengono rifiutati mentre è in corso un lavoro."
+    },
+    "runSettingsBackup": {
+      "label": "Backup delle impostazioni",
+      "description": "Scegliere con quale frequenza gSender esegue il backup delle impostazioni. Utile nel caso in cui sia necessario ripristinarle in futuro."
+    },
+    "settingsBackupLocation": {
+      "label": "Percorso di backup delle impostazioni",
+      "description": "Scegliere il percorso in cui salvare il backup delle impostazioni. Predefinito: la cartella appData del sistema operativo."
+    },
+    "importedPluginsLocation": {
+      "label": "Percorso dei plugin importati",
+      "description": "Scegliere il percorso in cui importare i plugin. Predefinito: la cartella userData del sistema operativo.",
+      "restart": "Riavviare gSender per caricare i plugin dal nuovo percorso.",
+      "restartAbandoned": "Riavviare gSender per caricare i plugin dal nuovo percorso. I plugin in \"{{previousUserPluginsDir}}\" non verranno più analizzati finché questa impostazione non sarà ripristinata.",
+      "updateFailed": "Impossibile aggiornare il percorso dei plugin. Riprovare."
+    },
+    "collectUsageData": {
+      "label": "Raccogli dati di utilizzo",
+      "description": "Queste informazioni vengono raccolte in forma anonima per aiutarci a migliorare gSender osservando come viene utilizzato."
+    },
+    "uiOptionsGroup": "Opzioni interfaccia",
+    "darkMode": {
+      "label": "Modalità scura",
+      "description": "Cambia i colori dell'applicazione per ridurre l'affaticamento visivo, migliorare il contrasto o semplicemente per divertimento!"
+    },
+    "usePendantViewAsDefault": {
+      "label": "Usa la vista pendant come interfaccia predefinita",
+      "description": "Avvia direttamente l'interfaccia pendant ottimizzata per il touch in modalità kiosk a schermo intero, anziché l'interfaccia desktop standard. Richiede il riavvio dell'applicazione per avere effetto.",
+      "restartTitle": "Riavvio necessario",
+      "restartToPendant": "gSender deve essere riavviato per passare alla vista pendant.",
+      "restartToDesktop": "gSender deve essere riavviato per tornare alla vista desktop.",
+      "restartNow": "Riavvia ora",
+      "restartLater": "Più tardi"
+    },
+    "droZeros": {
+      "label": "Decimali DRO",
+      "description": "Imposta il numero di cifre decimali visualizzate, da 1 a 4. (Il valore predefinito 0 mostra 2 decimali per mm e 3 per pollici)"
+    },
+    "visualizerOptionsGroup": "Opzioni del visualizzatore",
+    "visualizerTheme": {
+      "label": "Tema del visualizzatore",
+      "description": "Controllo indipendente dei colori del visualizzatore."
+    },
+    "cameraProjection": {
+      "label": "Proiezione della camera",
+      "description": "Prospettica (predefinita) mostra la profondità come una normale vista da fotocamera. Ortografica elimina questa distorsione di profondità mantenendo parallele le linee parallele — utile per allineare con precisione i percorsi utensile."
+    },
+    "showBoundingBox": {
+      "label": "Mostra riquadro di ingombro",
+      "description": "Disegna un riquadro wireframe attorno all'estensione del file G-code caricato."
+    },
+    "showBoundingBoxLabels": {
+      "label": "Mostra quote del riquadro di ingombro",
+      "description": "Mostra le quote X/Y/Z sul riquadro di ingombro."
+    },
+    "showMachineBedIndicator": {
+      "label": "Mostra indicatore del piano macchina",
+      "description": "Disegna il contorno dell'area di lavoro della macchina al termine dell'homing."
+    },
+    "trimGridToMachineBed": {
+      "label": "Adatta la griglia al piano macchina",
+      "description": "Quando l'indicatore del piano macchina è visibile, la griglia di sfondo viene ritagliata appena oltre i bordi del piano anziché formare un quadrato fisso."
+    },
+    "hideProcessedLines": {
+      "label": "Nascondi linee elaborate",
+      "description": "Nasconde nel visualizzatore le linee G-code già elaborate."
+    },
+    "showPlannedLines": {
+      "label": "Mostra linee pianificate",
+      "description": "Durante l'esecuzione di un lavoro, evidenzia il percorso utensile tra la fresa e l'ultima linea inviata al controller."
+    },
+    "animatePlannedLines": {
+      "label": "Anima linee pianificate",
+      "description": "Un impulso scorre lungo le linee pianificate nell'ordine in cui verranno lavorate."
+    },
+    "lightweightOptions": {
+      "label": "Opzioni alleggerite",
+      "description": "Attivarle con la piuma quando file di grandi dimensioni rallentano il computer. (Leggero disattiva la vista 3D del file, Tutto disattiva il visualizzatore)"
+    },
+    "followToolDuringRuntime": {
+      "label": "Segui l'utensile durante l'esecuzione",
+      "description": "Durante l'esecuzione di un lavoro, la camera segue l'utensile in X/Y mantenendo lo stesso angolo di visuale e la stessa altezza."
+    },
+    "portraitMacroBar": {
+      "label": "Barra macro in verticale",
+      "description": "Mostra una barra macro ad accesso rapido nella parte inferiore dello schermo in modalità verticale."
+    },
+    "joggingPresetsGroup": "Preimpostazioni di jog",
+    "rapid": {
+      "label": "Rapido"
+    },
+    "normal": {
+      "label": "Normale",
+      "description": "Imposta le distanze e le velocità di movimento usate per ciascuna preimpostazione di movimento manuale (jog)."
+    },
+    "precise": {
+      "label": "Preciso"
+    },
+    "continuousJogDelay": {
+      "label": "Ritardo del jog continuo",
+      "description": "Una pressione o un clic singolo esegue un singolo movimento; tenendo premuto per questo intervallo si avvia il jog continuo. Alcuni potrebbero preferire un ritardo più lungo, ad esempio 700. (Predefinito 250)"
+    },
+    "notificationsGroup": "Notifiche",
+    "warnIfBadFile": {
+      "label": "Avvisa se il file non è valido",
+      "description": "Avvisa se vengono trovati comandi non validi all'apertura di un file."
+    },
+    "warnOnBadLine": {
+      "label": "Avvisa su linea non valida",
+      "description": "Avvisa se vengono trovati comandi non validi durante l'esecuzione di un lavoro."
+    },
+    "warnWhenSettingZero": {
+      "label": "Avvisa all'impostazione dello zero",
+      "description": "Utile se capita di impostare lo zero per errore."
+    },
+    "warnIfBeyondSoftLimits": {
+      "label": "Avvisa se oltre i limiti software",
+      "description": "Avvisa se il file supera i limiti della macchina in base al punto zero attuale. (Homing e limiti software devono essere abilitati)"
+    },
+    "jobEndNotifications": {
+      "label": "Notifiche di fine lavoro",
+      "description": "Mostra un riepilogo della lavorazione al termine di ogni lavoro."
+    },
+    "maintenanceNotifications": {
+      "label": "Notifiche di manutenzione",
+      "description": "Mostra le attività di manutenzione in scadenza al termine di ogni lavoro."
+    },
+    "popUpNotificationDuration": {
+      "label": "Durata delle notifiche pop-up",
+      "description": "Per quanto tempo le notifiche restano visibili, in millisecondi, prima di chiudersi automaticamente. (-1 le mantiene visibili fino alla chiusura manuale, -2 le disattiva, il valore predefinito 0 mantiene la durata standard)"
+    },
+    "shortcutsGroup": "Scorciatoie",
+    "keyboard": {
+      "label": "Tastiera",
+      "description": "Controllare la CNC e navigare in gSender con combinazioni di tasti personalizzate su qualsiasi tastiera, tastierino numerico o macro pad."
+    },
+    "gamepad": {
+      "label": "Gamepad",
+      "description": "Eseguire jog, impostare gli zeri, avviare lavori e altro con i gamepad più comuni. Creare un profilo personalizzato o usarne uno predefinito."
+    }
+  },
+  "customizeUi": {
+    "title": "Personalizza interfaccia"
+  },
+  "motors": {
+    "title": "Motori",
+    "squareUpCncRails": {
+      "label": "Squadratura delle guide CNC",
+      "description": "Guide non allineate possono rendere storti i tagli a 90 gradi; la procedura guidata aiuterà a correggere il problema."
+    },
+    "xAxisGroup": "Asse X",
+    "yAxisGroup": "Asse Y",
+    "zAxisGroup": "Asse Z"
+  },
+  "probe": {
+    "title": "Sonda",
+    "touchPlateType": {
+      "label": "Tipo di piastra di tastatura",
+      "description": "Selezionare la piastra di tastatura utilizzata con la macchina. (Predefinito Blocco standard)"
+    },
+    "showTouchPlateSwitcher": {
+      "label": "Mostra selettore piastra",
+      "description": "Mostra un pulsante nella scheda Sonda per passare da un tipo di piastra di tastatura all'altro."
+    },
+    "tipDiameter": {
+      "label": "Diametro della punta",
+      "description": "Diametro della punta della sonda nel punto in cui tocca il materiale. (Predefinito 2)"
+    },
+    "blockThickness": {
+      "label": "Spessore del blocco",
+      "description": "Spessore della piastra nel punto toccato dalla fresa durante la tastatura dell'asse Z con la piastra Blocco standard. (Predefinito 15)"
+    },
+    "autozeroThickness": {
+      "label": "Spessore AutoZero",
+      "description": "Spessore della piastra nel punto toccato dalla fresa durante la tastatura dell'asse Z con la piastra AutoZero. (Predefinito 5)"
+    },
+    "puckThickness": {
+      "label": "Spessore del disco",
+      "description": "Spessore della piastra nel punto toccato dalla fresa durante la tastatura dell'asse Z con la piastra Z Probe. (Predefinito 15)"
+    },
+    "zOffset": {
+      "label": "Offset Z",
+      "description": "Regolare per migliorare la precisione dell'azzeramento Z della sonda. (Predefinito 0)"
+    },
+    "bitzeroThicknessXyz": {
+      "label": "Spessore BitZero (XYZ)",
+      "description": "Spessore della piastra per la tastatura XYZ nel punto in cui la fresa tocca la superficie ribassata all'interno del foro. (Predefinito 13)"
+    },
+    "bitzeroThicknessZOnly": {
+      "label": "Spessore BitZero (solo Z)",
+      "description": "Spessore della piastra per la tastatura solo Z, con la sonda appoggiata in piano sulla superficie. (Predefinito 15.5)"
+    },
+    "xyThickness": {
+      "label": "Spessore XY",
+      "description": "Spessore della piastra nel punto toccato dalla fresa durante la tastatura degli assi X/Y. (Predefinito 10)"
+    },
+    "xyRetract": {
+      "label": "Ritrazione XY",
+      "description": "Distanza aggiuntiva di allontanamento dalla superficie durante la tastatura. (Predefinito 10)"
+    },
+    "zProbeDistance": {
+      "label": "Distanza di tastatura Z",
+      "description": "Movimento in Z prima di interrompere la tastatura. (Ridurre questo valore se durante la tastatura si verifica l'allarme 2 di limite software, predefinito 30)"
+    },
+    "fastFind": {
+      "label": "Ricerca rapida",
+      "description": "Velocità della sonda prima del primo contatto. (Predefinito 150)"
+    },
+    "slowFind": {
+      "label": "Ricerca lenta",
+      "description": "Velocità del secondo contatto, più preciso. (Predefinito 75)"
+    },
+    "retraction": {
+      "label": "Ritrazione",
+      "description": "Distanza di allontanamento della fresa dopo un contatto riuscito. (Predefinito 2)"
+    },
+    "probeMovementSpeed": {
+      "label": "Velocità di movimento della sonda",
+      "description": "Velocità di avanzamento per i movimenti di ritrazione/riposizionamento durante la tastatura. Se 0, questi movimenti usano il rapido (G0). Se impostata, usano invece un movimento di avanzamento controllato (G1) a questa velocità. (Predefinito 0)"
+    },
+    "finalZRetract": {
+      "label": "Ritrazione Z finale",
+      "description": "Distanza di allontanamento sull'asse Z al termine della procedura. (Predefinito 2)"
+    },
+    "finalZRetract2": {
+      "label": "Ritrazione Z finale",
+      "description": "Distanza di allontanamento sull'asse Z al termine della procedura. (Predefinito 1)"
+    },
+    "connectionTest": {
+      "label": "Test di connessione",
+      "description": "Controllo di sicurezza per verificare che la sonda sia collegata correttamente."
+    }
+  },
+  "actionButtons": {
+    "title": "Pulsanti azione"
+  },
+  "homingLimits": {
+    "title": "Homing/Limiti",
+    "stopJoggingPastLimits": {
+      "label": "Blocca jog oltre i limiti",
+      "description": "Impedisce il jog in una direzione in cui un finecorsa è già stato attivato."
+    },
+    "homingBehaviourGroup": "Comportamento dell'homing",
+    "parkingGroup": "Parcheggio",
+    "parkLocation": {
+      "label": "Posizione di parcheggio",
+      "description": "Il pulsante P nella pagina Lavorazione porterà sempre a questa comoda posizione di parcheggio. (L'homing deve essere abilitato)"
+    }
+  },
+  "spindleLaser": {
+    "title": "Mandrino/Laser",
+    "spindleLaserControls": {
+      "label": "Controlli mandrino/laser",
+      "description": "Mostra la scheda Mandrino/Laser e le funzioni correlate nella pagina Lavorazione."
+    },
+    "insertDwellForSpindleCommands": {
+      "label": "Inserisci pausa per i comandi mandrino",
+      "description": "Aggiunge un ritardo per dare al mandrino il tempo di raggiungere la velocità. Verrà inserito un comando G4 a ogni M3/M4 nel file; non è necessario se il firmware gestisce già l'attesa della velocità del mandrino. (Predefinito 0)"
+    },
+    "minimumSpindleSpeed": {
+      "label": "Velocità minima del mandrino",
+      "description": "Impostare in base alla velocità minima del mandrino. ($31, predefinito 10000)"
+    },
+    "maximumSpindleSpeed": {
+      "label": "Velocità massima del mandrino",
+      "description": "Impostare in base alla velocità massima del mandrino. ($30, predefinito 30000)"
+    },
+    "spindlePwmGroup": "PWM mandrino",
+    "spindleModbusGroup": "Modbus mandrino",
+    "laserGroup": "Laser",
+    "minimumLaserPower": {
+      "label": "Potenza laser minima",
+      "description": "Impostare in base al valore S minimo del software CAM per laser. ($731, predefinito 0)"
+    },
+    "maximumLaserPower": {
+      "label": "Potenza laser massima",
+      "description": "Impostare in base al valore S massimo del software CAM per laser. ($730, predefinito 255.000)"
+    },
+    "laserOnDuringOutline": {
+      "label": "Laser acceso durante il contorno",
+      "description": "Accende il laser alla potenza minima per vedere meglio la posizione del lavoro."
+    },
+    "laserXOffset": {
+      "label": "Offset X del laser",
+      "description": "Offset sull'asse X rispetto al mandrino. (Segnare con una fresa a V, quindi spostare il laser fino a raggiungere il segno, $741, predefinito 0)"
+    },
+    "laserYOffset": {
+      "label": "Offset Y del laser",
+      "description": "Offset sull'asse Y rispetto al mandrino. (Segnare con una fresa a V, quindi spostare il laser fino a raggiungere il segno, $742, predefinito 0)"
+    }
+  },
+  "accessoryOutputs": {
+    "title": "Uscite accessori",
+    "coolantControls": {
+      "label": "Controlli refrigerante",
+      "description": "Mostra la scheda Refrigerante e le funzioni correlate nella pagina Lavorazione."
+    }
+  },
+  "rotary": {
+    "title": "Rotativo",
+    "rotaryControls": {
+      "label": "Controlli rotativo",
+      "description": "Mostra la scheda Rotativo e le funzioni correlate nella pagina Lavorazione."
+    },
+    "resolution": {
+      "label": "Risoluzione",
+      "description": "Risoluzione di spostamento in passi per grado. ($103, predefinito 19.75308642)"
+    },
+    "maxSpeed": {
+      "label": "Velocità max",
+      "description": "Velocità massima dell'asse, usata anche per i rapidi G0. ($113, predefinito 8000)"
+    },
+    "forceSoftLimits": {
+      "label": "Forza limiti software",
+      "description": "Abilita i limiti software al passaggio in modalità rotativa. (Solo Grbl)"
+    },
+    "forceHardLimits": {
+      "label": "Forza limiti hardware",
+      "description": "Abilita i limiti hardware al passaggio in modalità rotativa. (Solo Grbl)"
+    },
+    "visualizeNonCenterZeros": {
+      "label": "Visualizza zeri non centrati",
+      "description": "Per i file rotativi non azzerati sul punto centrale, applica un offset quando nel file viene trovato un diametro del cilindro."
+    },
+    "useAAxisForGrbl": {
+      "label": "Usa asse A per Grbl",
+      "description": "Abilita l'invio di controlli e comandi dell'asse A per dispositivi con Grbl a 4 assi modificato, anziché convertire A in Y. (Solo Grbl)"
+    }
+  },
+  "automations": {
+    "title": "Automazioni",
+    "fileStart": {
+      "label": "Avvio file",
+      "description": "Viene eseguito all'avvio di un lavoro, prima del file stesso."
+    },
+    "filePause": {
+      "label": "Pausa file",
+      "description": "Per arrestare gli accessori o spostare la macchina quando si mette in pausa un lavoro."
+    },
+    "fileResume": {
+      "label": "Ripresa file",
+      "description": "Assicura che quanto impostato per Pausa file venga annullato alla ripresa."
+    },
+    "fileStopEnd": {
+      "label": "Arresto/fine file",
+      "description": "Una sicurezza generale per garantire che i lavori arrestati o terminati spengano sempre tutto in sicurezza."
+    }
+  },
+  "toolChanging": {
+    "title": "Cambio utensile",
+    "enableAtcControls": {
+      "label": "Abilita controlli ATC",
+      "description": "Abilita controlli ATC"
+    },
+    "passthrough": {
+      "label": "Pass-through",
+      "description": "Invia le linee di cambio utensile così come sono, presupponendo che la CNC sia in grado di gestire correttamente i comandi M6 e T."
+    },
+    "gsenderStrategy": {
+      "label": "Strategia gSender",
+      "description": "La procedura guidata Standard accompagna nei passaggi per installare manualmente un nuovo utensile e riprendere la lavorazione.\n\nFlessibile è simile ma usa una piastra di tastatura come sensore di lunghezza utensile.\n\nFisso è anch'esso guidato ma completamente automatizzato: la macchina si sposta e misura gli utensili autonomamente. Richiede homing e TLS.\n\nCodice è per configurazioni completamente personalizzate."
+    },
+    "skipDialog": {
+      "label": "Salta finestra di dialogo",
+      "description": "Nessuna richiesta alla pausa e nessuna pausa tra i blocchi di codice."
+    },
+    "fixedSensorLocation": {
+      "label": "Posizione del sensore fisso",
+      "description": "La posizione di partenza per la tastatura. Per non rompere le frese, impostarla usando un utensile lungo con spazio aggiuntivo in Z sopra il sensore. (Z deve essere negativo)"
+    },
+    "firstToolBehaviour": {
+      "label": "Comportamento primo utensile",
+      "description": "Controlla la gestione del primo cambio utensile. Molti programmi CAM aggiungono un comando di cambio utensile iniziale anche quando l'utensile è già montato.\n\n\"Esegui sempre la procedura completa\" esegue l'intero processo di cambio utensile.\n\n\"Chiedi per il primo utensile\" chiede se eseguire la procedura completa o solo tastare la lunghezza dell'utensile attuale.\n\n\"Tasta sempre solo la lunghezza\" salta il cambio utensile e misura soltanto l'utensile attuale."
+    },
+    "setToolChangeLocation": {
+      "label": "Imposta posizione di cambio utensile",
+      "description": "Sposta la CNC in una posizione più comoda per i cambi utensile manuali, anziché richiedere il cambio sopra il sensore."
+    },
+    "manualToolChangeLocation": {
+      "label": "Posizione cambio utensile manuale",
+      "description": "La posizione in cui spostarsi durante il cambio utensile manuale."
+    },
+    "beforeToolChange": {
+      "label": "Prima del cambio utensile",
+      "description": "Con la strategia Codice, questo codice viene eseguito non appena viene incontrato un comando M6."
+    },
+    "afterToolChange": {
+      "label": "Dopo il cambio utensile",
+      "description": "Con la strategia Codice, questo codice viene eseguito al termine del cambio utensile."
+    },
+    "keepoutGroup": "Zona di esclusione",
+    "warnOnHome": {
+      "label": "Avvisa all'homing",
+      "description": "Avvisa durante l'homing che la zona di esclusione è disabilitata e che sono possibili collisioni a seconda del ciclo di homing."
+    }
+  },
+  "ethernet": {
+    "title": "Ethernet",
+    "connectToIp": {
+      "label": "Connetti all'IP",
+      "description": "Indirizzo IP usato per connettersi alle CNC tramite Ethernet e per altre scansioni di rete. (Predefinito 192.168.5.1)"
+    },
+    "ethernetPort": {
+      "label": "Porta Ethernet",
+      "description": "La porta esposta dal controller per la connettività Ethernet. (Usata nei tentativi di connessione tramite Ethernet, predefinito 23)"
+    }
+  },
+  "statusLights": {
+    "title": "Luci di stato"
+  },
+  "advancedMotors": {
+    "title": "Motori avanzati"
+  },
+  "moreSettings": {
+    "title": "Altre impostazioni"
+  },
+  "accessibility": {
+    "title": "Accessibilità",
+    "announcementsGroup": "Annunci",
+    "machineStatus": {
+      "label": "Stato macchina",
+      "description": "Annuncia automaticamente i cambiamenti di stato della macchina tramite gli screen reader. (Inattiva, In esecuzione, Allarme, ecc.)"
+    },
+    "jobProgress": {
+      "label": "Avanzamento lavoro",
+      "description": "Annuncia periodicamente la percentuale di completamento del lavoro."
+    },
+    "progressIncrement": {
+      "label": "Incremento avanzamento",
+      "description": "L'incremento percentuale con cui annunciare l'avanzamento del lavoro. (Predefinito 10%)"
+    },
+    "audioCuesGroup": "Segnali acustici",
+    "enableAudioCues": {
+      "label": "Abilita segnali acustici",
+      "description": "Riproduce brevi suoni per specifici eventi della macchina."
+    },
+    "jobCompleteSound": {
+      "label": "Suono di lavoro completato",
+      "description": "Riproduce un suono al termine di un lavoro."
+    },
+    "alarmSound": {
+      "label": "Suono di allarme",
+      "description": "Riproduce un suono quando la macchina entra in stato di allarme."
+    },
+    "toolChangeSound": {
+      "label": "Suono di cambio utensile",
+      "description": "Riproduce un suono quando è richiesto un cambio utensile."
+    },
+    "probeSuccessSound": {
+      "label": "Suono di tastatura riuscita",
+      "description": "Riproduce un suono dopo una tastatura riuscita."
+    },
+    "navigationAndVisualsGroup": "Navigazione e aspetto",
+    "focusRings": {
+      "label": "Indicatori di focus",
+      "description": "Mostra un contorno ad alto contrasto attorno all'elemento attivo per una migliore visibilità durante la navigazione da tastiera."
+    },
+    "focusTrapping": {
+      "label": "Blocco del focus",
+      "description": "Mantiene il focus della tastiera all'interno di finestre modali e di dialogo quando sono aperte."
+    },
+    "reducedMotion": {
+      "label": "Movimento ridotto",
+      "description": "Riduce al minimo animazioni e transizioni dell'interfaccia per una migliore visibilità e accessibilità."
+    },
+    "spindleSpeedInputType": {
+      "label": "Tipo di input velocità mandrino",
+      "description": "Scegliere tra un cursore e un campo numerico per regolare la velocità del mandrino."
+    },
+    "appDisplayScale": {
+      "label": "Scala di visualizzazione",
+      "description": "Sostituisce la scala di visualizzazione dell'applicazione indipendentemente dalle impostazioni DPI del sistema operativo."
+    },
+    "visualizerGroup": "Visualizzatore",
+    "keyboardControl": {
+      "label": "Controllo da tastiera",
+      "description": "Consente di ruotare, spostare e zoomare il visualizzatore 3D con i tasti freccia e le scorciatoie."
+    },
+    "jobSummary": {
+      "label": "Riepilogo lavoro",
+      "description": "Fornisce agli screen reader un riepilogo testuale del file G-code caricato."
+    },
+    "showSummaryVisually": {
+      "label": "Mostra riepilogo a schermo",
+      "description": "Visualizza il testo del riepilogo G-code sopra il visualizzatore."
+    },
+    "keyboardMapGroup": "Mappa tastiera",
+    "showKeyboardShortcutMap": {
+      "label": "Mostra mappa delle scorciatoie",
+      "description": "Mostra un overlay con le scorciatoie da tastiera attive."
+    }
+  },
+  "options": {
+    "outline": {
+      "detailed": "Dettagliato",
+      "square": "Quadrato",
+      "rapidlessSquare": "Quadrato senza rapidi"
+    },
+    "backupFrequency": {
+      "onUpdate": "All'aggiornamento",
+      "daily": "Giornaliero",
+      "weekly": "Settimanale",
+      "monthly": "Mensile"
+    },
+    "projection": {
+      "perspective": "Prospettica",
+      "orthographic": "Ortografica"
+    },
+    "lightweight": {
+      "light": "Leggero",
+      "everything": "Tutto"
+    },
+    "toolChangeStrategy": {
+      "ignore": "Ignora",
+      "pause": "Pausa",
+      "standardRezero": "Riazzeramento standard",
+      "flexibleRezero": "Riazzeramento flessibile",
+      "fixedToolSensor": "Sensore utensile fisso",
+      "code": "Codice"
+    },
+    "firstToolBehaviour": {
+      "alwaysRunFullWizard": "Esegui sempre la procedura completa",
+      "promptForFirstTool": "Chiedi per il primo utensile",
+      "alwaysProbeLengthOnly": "Tasta sempre solo la lunghezza"
+    },
+    "spindleInputType": {
+      "slider": "Cursore",
+      "number": "Numero"
+    }
+  },
+  "row": {
+    "resetTooltip": "Ripristina valore predefinito",
+    "resetTitle": "Ripristina impostazione",
+    "resetConfirm": "Ripristinare questo valore a quello predefinito?",
+    "resetPluginsDirIntro": "Il ripristino impedirà a gSender di analizzare:",
+    "resetPluginsDirWarning": "I plugin importati in quel percorso scompariranno dal Gestore plugin finché questa impostazione non sarà ripristinata. Ripristinare questo valore a quello predefinito?",
+    "restored": "{{setting}} ripristinato al valore predefinito {{value}}",
+    "noDefault": "Nessun valore predefinito trovato per {{setting}}."
+  },
+  "page": {
+    "allConfigTab": "Tutta la configurazione",
+    "searchLabel": "Cerca",
+    "searchPlaceholder": "Cerca nella configurazione",
+    "searchClear": "Cancella",
+    "viewModified": "Mostra modificate",
+    "modified": "Modificata",
+    "viewModifiedAria": "Mostra solo le impostazioni modificate",
+    "disconnected": "Disconnesso",
+    "disconnectedTitle": "Disconnesso!",
+    "disconnectedMessage": "Alcune impostazioni potrebbero non essere visibili senza connessione a una macchina.",
+    "emptySection": "Verificare il filtro di ricerca o connettersi alla macchina per visualizzare altre opzioni."
+  },
+  "preferences": {
+    "legend": "Preferenze di gSender",
+    "import": "Importa",
+    "export": "Esporta",
+    "importTitle": "Importa impostazioni",
+    "importConfirm": "Tutte le impostazioni attuali verranno sostituite. Importare le impostazioni in gSender?",
+    "importAction": "Importa impostazioni",
+    "restoreTitle": "Ripristina impostazioni",
+    "restoreConfirm": "Tutte le impostazioni attuali verranno rimosse. Ripristinare le impostazioni predefinite di gSender?",
+    "restoreAction": "Ripristina impostazioni",
+    "importFailed": "Impossibile importare le impostazioni. Verificare il formato del file.",
+    "settingsUpdated_one": "{{count}} impostazione aggiornata.",
+    "settingsUpdated_other": "{{count}} impostazioni aggiornate.",
+    "settingsUpdated_many": "{{count}} impostazioni aggiornate."
+  },
+  "profileBar": {
+    "flash": "Flash",
+    "import": "Importa",
+    "export": "Esporta",
+    "apply": "Applica",
+    "applySettings": "Applica impostazioni",
+    "eepromImported": "Impostazioni EEPROM importate",
+    "importFailed": "Impossibile importare le impostazioni. Verificare il formato del file.",
+    "importUnable": "Impossibile importare le impostazioni",
+    "eepromUpdated_one": "{{count}} valore EEPROM aggiornato.",
+    "eepromUpdated_other": "{{count}} valori EEPROM aggiornati.",
+    "eepromUpdated_many": "{{count}} valori EEPROM aggiornati."
+  },
+  "restoreDefaults": {
+    "button": "Predefiniti",
+    "title": "Ripristina predefiniti",
+    "confirm": "Riportare <1>{{machineName}}</1> allo stato predefinito?",
+    "action": "Ripristina predefiniti",
+    "tooltip": "Ricordarsi di fare clic per applicare i valori predefiniti al controller",
+    "restored": "Impostazioni predefinite della macchina ripristinate."
+  },
+  "flash": {
+    "title": "Flash del firmware",
+    "intro": "Questa funzione consente di eseguire il flash del firmware su un dispositivo SLB o basato su Arduino compatibile.",
+    "port": "Porta",
+    "recognizedPorts": "Porte riconosciute",
+    "unrecognizedPorts": "Porte non riconosciute",
+    "controllerType": "Tipo di controller",
+    "selectBoardType": "Selezionare il tipo di scheda",
+    "firmwareFile": "File del firmware",
+    "warning": "Questa operazione disconnetterà la macchina e potrebbe richiedere alcuni minuti.",
+    "continuePrompt": "Continuare?",
+    "noPort": "Nessuna porta specificata - connettersi al dispositivo per determinare cosa verrà flashato.",
+    "logTitle": "Log del flash",
+    "logWaiting": "In attesa dei log...",
+    "completed": "Flash completato, riconnettersi al dispositivo.",
+    "logType": {
+      "info": "Info",
+      "success": "Riuscito",
+      "warning": "Avviso",
+      "error": "Errore"
+    }
+  },
+  "eepromRow": {
+    "resetTitle": "Ripristina singolo valore EEPROM",
+    "machineSetting": "Impostazione macchina",
+    "settingDefault": "({{setting}}, predefinito {{value}})"
+  },
+  "wizards": {
+    "configureGamepad": "Configura gamepad",
+    "configureKeyboard": "Configura tastiera",
+    "squareXY": "Squadratura XY",
+    "tuneCorrection": "Regola correzione",
+    "jogMinus": "Jog {{axis}}-",
+    "jogPlus": "Jog {{axis}}+",
+    "laserOn": "Laser acceso",
+    "laserOff": "Laser spento",
+    "spindleForward": "Orario",
+    "spindleReverse": "Antiorario",
+    "spindleStop": "Stop",
+    "setupAutoSpin": "Configura AutoSpin",
+    "autoSpinIcon": "Icona AutoSpin",
+    "probePin": "Sonda/TLS:",
+    "configureAtci": "Configura Sienci ATCi",
+    "atciRequiresGrblHal": "ATCi è supportato solo da schede con grblHAL.",
+    "atciMinVersion": "ATCi è supportato solo da grblHAL versione {{version}} o successiva.",
+    "atciRestartTitle": "ATCi - Riavviare il controller",
+    "atciRestartMessage": "Riavviare manualmente il controller CNC (spegnere e riaccendere) e riconnettersi a gSender affinché queste impostazioni abbiano effetto."
+  },
+  "inputs": {
+    "eventEditTitle": "Modifica evento",
+    "eventDialogDescription": "Inserire i comandi G-code da eseguire per questo evento.",
+    "eventEnabled": "Abilitato:",
+    "eventNoCommands": "; Nessun comando impostato",
+    "eventEdit": "Modifica evento",
+    "eventFetchFailed": "Impossibile recuperare i dati dell'evento {{eventType}}",
+    "eventSaveFailed": "Impossibile salvare i comandi dell'evento",
+    "locationGrab": "Acquisisci",
+    "locationGoTo": "Vai a",
+    "jogSpeed": "Velocità:",
+    "chooseFolder": "Scegli cartella",
+    "bit": "Bit {{bit}}: {{label}}"
+  },
+  "firmware": {
+    "grbl": {
+      "0": {
+        "description": "Durata impulso di passo",
+        "details": "Imposta la durata di ciascun impulso di passo. Minimo 3 μs."
+      },
+      "1": {
+        "description": "Ritardo di inattività dei passi",
+        "details": "Imposta un breve ritardo di mantenimento all'arresto per lasciare stabilizzare la dinamica prima di disabilitare i motori passo-passo. Il valore 255 mantiene i motori abilitati senza ritardo."
+      },
+      "2": {
+        "description": "Inversione impulso di passo",
+        "details": "Inverte il segnale di passo. Impostare il bit dell'asse da invertire (00000ZYX)."
+      },
+      "3": {
+        "description": "Inversione direzione di passo",
+        "details": "Inverte il segnale di direzione. Impostare il bit dell'asse da invertire (00000ZYX)."
+      },
+      "4": {
+        "description": "Inverti pin di abilitazione passo",
+        "details": "Inverte il segnale del pin di abilitazione del driver del motore passo-passo."
+      },
+      "5": {
+        "description": "Inverti pin dei finecorsa",
+        "details": "Inverte tutti i pin di ingresso dei finecorsa."
+      },
+      "6": {
+        "description": "Inverti pin della sonda",
+        "details": "Inverte il segnale del pin di ingresso della sonda."
+      },
+      "10": {
+        "description": "Opzioni del report di stato",
+        "details": "Modifica i dati inclusi nei report di stato."
+      },
+      "11": {
+        "description": "Deviazione di giunzione",
+        "details": "Imposta la velocità con cui Grbl attraversa movimenti consecutivi. Un valore più basso lo rallenta."
+      },
+      "12": {
+        "description": "Tolleranza degli archi",
+        "details": "Imposta la precisione di tracciamento degli archi G2 e G3 in base all'errore radiale. Attenzione: un valore molto piccolo può influire sulle prestazioni."
+      },
+      "13": {
+        "description": "Report in pollici",
+        "details": "Abilita le unità in pollici per la restituzione di qualsiasi valore di posizione e velocità che non sia un valore di impostazione."
+      },
+      "20": {
+        "description": "Abilitazione limiti software",
+        "details": "Abilita il controllo dei limiti software entro la corsa della macchina e genera un allarme in caso di superamento. Richiede l'homing."
+      },
+      "21": {
+        "description": "Abilitazione limiti hardware",
+        "details": "Abilita i limiti hardware. Arresta immediatamente il movimento e genera un allarme quando un finecorsa viene attivato."
+      },
+      "22": {
+        "description": "Abilitazione ciclo di homing",
+        "details": "Abilita il ciclo di homing. Richiede finecorsa su tutti gli assi."
+      },
+      "23": {
+        "description": "Inversione direzione di homing",
+        "details": "L'homing cerca un finecorsa in direzione positiva. Impostare il bit dell'asse (00000ZYX) per cercare in direzione negativa."
+      },
+      "24": {
+        "description": "Velocità di avanzamento di localizzazione homing",
+        "details": "Velocità di avanzamento per avvicinarsi lentamente al finecorsa e determinarne con precisione la posizione."
+      },
+      "25": {
+        "description": "Velocità di ricerca homing",
+        "details": "Velocità di ricerca per trovare rapidamente il finecorsa prima della fase di localizzazione più lenta."
+      },
+      "26": {
+        "description": "Ritardo antirimbalzo finecorsa di homing",
+        "details": "Imposta un breve ritardo tra le fasi del ciclo di homing per consentire l'antirimbalzo del finecorsa."
+      },
+      "27": {
+        "description": "Distanza di disimpegno finecorsa di homing",
+        "details": "Distanza di ritrazione dopo l'attivazione del finecorsa per disimpegnarlo. L'homing fallisce se il finecorsa non viene liberato."
+      },
+      "30": {
+        "description": "Velocità massima del mandrino",
+        "details": "Velocità massima del mandrino. Imposta il PWM al 100% del duty cycle."
+      },
+      "31": {
+        "description": "Velocità minima del mandrino",
+        "details": "Velocità minima del mandrino. Imposta il PWM allo 0.4% o al duty cycle minimo."
+      },
+      "32": {
+        "description": "Modalità laser abilitata come mandrino",
+        "details": "Converte i comandi del mandrino in modalità laser. I comandi G1/2/3 consecutivi non si arrestano quando cambia la velocità del mandrino."
+      },
+      "100": {
+        "description": "Risoluzione di spostamento asse X",
+        "details": "Risoluzione di spostamento dell'asse X in passi per millimetro."
+      },
+      "101": {
+        "description": "Risoluzione di spostamento asse Y",
+        "details": "Risoluzione di spostamento dell'asse Y in passi per millimetro."
+      },
+      "102": {
+        "description": "Risoluzione di spostamento asse Z",
+        "details": "Risoluzione di spostamento dell'asse Z in passi per millimetro."
+      },
+      "110": {
+        "description": "Velocità massima asse X",
+        "details": "Velocità massima dell'asse X. Usata come velocità di rapido G0."
+      },
+      "111": {
+        "description": "Velocità massima asse Y",
+        "details": "Velocità massima dell'asse Y. Usata come velocità di rapido G0."
+      },
+      "112": {
+        "description": "Velocità massima asse Z",
+        "details": "Velocità massima dell'asse Z. Usata come velocità di rapido G0."
+      },
+      "120": {
+        "description": "Accelerazione asse X",
+        "details": "Accelerazione dell'asse X. Usata nella pianificazione del movimento per non superare la coppia del motore e perdere passi."
+      },
+      "121": {
+        "description": "Accelerazione asse Y",
+        "details": "Accelerazione dell'asse Y. Usata nella pianificazione del movimento per non superare la coppia del motore e perdere passi."
+      },
+      "122": {
+        "description": "Accelerazione asse Z",
+        "details": "Accelerazione dell'asse Z. Usata nella pianificazione del movimento per non superare la coppia del motore e perdere passi."
+      },
+      "130": {
+        "description": "Corsa massima asse X",
+        "details": "Distanza di corsa massima dell'asse X dal finecorsa di homing. Determina lo spazio macchina valido per i limiti software e le distanze di ricerca dell'homing."
+      },
+      "131": {
+        "description": "Corsa massima asse Y",
+        "details": "Distanza di corsa massima dell'asse Y dal finecorsa di homing. Determina lo spazio macchina valido per i limiti software e le distanze di ricerca dell'homing."
+      },
+      "132": {
+        "description": "Corsa massima asse Z",
+        "details": "Distanza di corsa massima dell'asse Z dal finecorsa di homing. Determina lo spazio macchina valido per i limiti software e le distanze di ricerca dell'homing."
+      }
+    },
+    "grblhal": {
+      "0": {
+        "description": "Durata impulso di passo",
+        "details": "Imposta la durata di ciascun impulso di passo. Minimo 3 μs."
+      },
+      "1": {
+        "description": "Ritardo di inattività dei passi",
+        "details": "Imposta un breve ritardo di mantenimento all'arresto per lasciare stabilizzare la dinamica prima di disabilitare i motori passo-passo. Il valore 255 mantiene i motori abilitati senza ritardo."
+      },
+      "2": {
+        "description": "Inversione impulso di passo",
+        "details": "Inverte il segnale di passo. Impostare il bit dell'asse da invertire (00000ZYX)."
+      },
+      "3": {
+        "description": "Inversione direzione di passo",
+        "details": "Inverte il segnale di direzione. Impostare il bit dell'asse da invertire (00000ZYX)."
+      },
+      "4": {
+        "description": "Inverti pin di abilitazione passo",
+        "details": "Inverte il segnale del pin di abilitazione del driver del motore passo-passo."
+      },
+      "5": {
+        "description": "Inverti pin dei finecorsa",
+        "details": "Inverte tutti i pin di ingresso dei finecorsa."
+      },
+      "6": {
+        "description": "Inverti pin della sonda",
+        "details": "Inverte il segnale del pin di ingresso della sonda."
+      },
+      "10": {
+        "description": "Opzioni del report di stato",
+        "details": "Modifica i dati inclusi nei report di stato."
+      },
+      "11": {
+        "description": "Deviazione di giunzione",
+        "details": "Imposta la velocità con cui Grbl attraversa movimenti consecutivi. Un valore più basso lo rallenta."
+      },
+      "12": {
+        "description": "Tolleranza degli archi",
+        "details": "Imposta la precisione di tracciamento degli archi G2 e G3 in base all'errore radiale. Attenzione: un valore molto piccolo può influire sulle prestazioni."
+      },
+      "13": {
+        "description": "Report in pollici",
+        "details": "Abilita le unità in pollici per la restituzione di qualsiasi valore di posizione e velocità che non sia un valore di impostazione."
+      },
+      "20": {
+        "description": "Abilitazione limiti software",
+        "details": "Abilita il controllo dei limiti software entro la corsa della macchina e genera un allarme in caso di superamento. Richiede l'homing."
+      },
+      "21": {
+        "description": "Abilitazione limiti hardware",
+        "details": "Abilita i limiti hardware. Arresta immediatamente il movimento e genera un allarme quando un finecorsa viene attivato.",
+        "bits": {
+          "0": "Abilita limiti hardware",
+          "1": "Abilita modalità rigorosa con limiti hardware abilitati"
+        }
+      },
+      "22": {
+        "description": "Abilitazione ciclo di homing",
+        "details": "Abilita il ciclo di homing. Richiede finecorsa su tutti gli assi.",
+        "bits": {
+          "0": "Abilita homing.",
+          "1": "Abilita comandi di homing per singolo asse.",
+          "2": "Homing obbligatorio all'avvio.",
+          "3": "Imposta l'origine macchina a 0.",
+          "4": "Due finecorsa condividono un pin di ingresso.",
+          "5": "Consenti l'homing manuale degli assi non sottoposti a homing automatico.",
+          "6": "Ignora i blocchi, consenti al reset di cancellare l'allarme di homing obbligatorio all'avvio.",
+          "7": "Mantieni lo stato di homing al reset, se possibile."
+        }
+      },
+      "23": {
+        "description": "Inversione direzione di homing",
+        "details": "L'homing cerca un finecorsa in direzione positiva. Impostare il bit dell'asse (00000ZYX) per cercare in direzione negativa."
+      },
+      "24": {
+        "description": "Velocità di avanzamento di localizzazione homing",
+        "details": "Velocità di avanzamento per avvicinarsi lentamente al finecorsa e determinarne con precisione la posizione."
+      },
+      "25": {
+        "description": "Velocità di ricerca homing",
+        "details": "Velocità di ricerca per trovare rapidamente il finecorsa prima della fase di localizzazione più lenta."
+      },
+      "26": {
+        "description": "Ritardo antirimbalzo finecorsa di homing",
+        "details": "Imposta un breve ritardo tra le fasi del ciclo di homing per consentire l'antirimbalzo del finecorsa."
+      },
+      "27": {
+        "description": "Distanza di disimpegno finecorsa di homing",
+        "details": "Distanza di ritrazione dopo l'attivazione del finecorsa per disimpegnarlo. L'homing fallisce se il finecorsa non viene liberato."
+      },
+      "28": {
+        "description": "Distanza di ritrazione G73",
+        "details": "Specifica la distanza di ritrazione G73 in mm."
+      },
+      "29": {
+        "description": "Ritardo impulso di passo",
+        "details": "Ritardo dell'impulso del motore passo-passo in microsecondi."
+      },
+      "30": {
+        "description": "Velocità massima del mandrino",
+        "details": "Velocità massima del mandrino. Imposta il PWM al 100% del duty cycle."
+      },
+      "31": {
+        "description": "Modalità mandrino",
+        "details": "Specifica la modalità Mandrino/Laser/Tornio"
+      },
+      "32": {
+        "description": "Modalità laser abilitata come mandrino",
+        "details": "Converte i comandi del mandrino in modalità laser. I comandi G1/2/3 consecutivi non si arrestano quando cambia la velocità del mandrino."
+      },
+      "33": {
+        "description": "Frequenza mandrino",
+        "details": "Frequenza PWM del mandrino in Hz"
+      },
+      "34": {
+        "description": "Duty cycle mandrino",
+        "details": "Duty cycle PWM del mandrino spento, in percentuale"
+      },
+      "35": {
+        "description": "Velocità minima del mandrino",
+        "details": "Velocità minima del mandrino. Imposta il PWM allo 0.4% o al duty cycle minimo."
+      },
+      "36": {
+        "description": "Velocità massima del mandrino",
+        "details": "Velocità massima del mandrino."
+      },
+      "37": {
+        "description": "Motori passo-passo disalimentati",
+        "details": "Definisce quali motori passo-passo devono essere disalimentati al termine del movimento."
+      },
+      "38": {
+        "description": "Impulsi encoder",
+        "details": "Impulsi per giro dell'encoder del mandrino."
+      },
+      "39": {
+        "description": "Caratteri di comando stampabili",
+        "details": "Abilita i caratteri stampabili per i comandi in tempo reale."
+      },
+      "40": {
+        "description": "Limiti software nel jog",
+        "details": "Abilita i limiti software per il movimento manuale (jog). Se abilitato, le destinazioni del jog vengono limitate alla corsa della macchina per gli assi già sottoposti a homing."
+      },
+      "43": {
+        "description": "Cicli di localizzazione homing",
+        "details": "Numero di cicli di localizzazione dell'homing."
+      },
+      "44": {
+        "description": "Maschera assi",
+        "details": "Priorità degli assi per l'homing, il numero più basso viene eseguito per primo; il numero di impostazioni disponibili è pari al numero di assi supportati. Sostituisce #define HOMING_CYCLE_0 ecc."
+      },
+      "45": {
+        "description": "Maschera assi",
+        "details": "Priorità degli assi per l'homing, il numero più basso viene eseguito per primo; il numero di impostazioni disponibili è pari al numero di assi supportati. Sostituisce #define HOMING_CYCLE_0 ecc."
+      },
+      "46": {
+        "description": "Maschera assi",
+        "details": "Priorità degli assi per l'homing, il numero più basso viene eseguito per primo; il numero di impostazioni disponibili è pari al numero di assi supportati. Sostituisce #define HOMING_CYCLE_0 ecc."
+      },
+      "47": {
+        "description": "Maschera assi",
+        "details": "Priorità degli assi per l'homing, il numero più basso viene eseguito per primo; il numero di impostazioni disponibili è pari al numero di assi supportati. Sostituisce #define HOMING_CYCLE_0 ecc."
+      },
+      "48": {
+        "description": "Maschera assi",
+        "details": "Priorità degli assi per l'homing, il numero più basso viene eseguito per primo; il numero di impostazioni disponibili è pari al numero di assi supportati. Sostituisce #define HOMING_CYCLE_0 ecc."
+      },
+      "49": {
+        "description": "Maschera assi",
+        "details": "Priorità degli assi per l'homing, il numero più basso viene eseguito per primo; il numero di impostazioni disponibili è pari al numero di assi supportati. Sostituisce #define HOMING_CYCLE_0 ecc."
+      },
+      "50": {
+        "description": "Velocità jog a passi",
+        "details": "Velocità del jog a passi in mm/min. Usata da driver/sender"
+      },
+      "51": {
+        "description": "Velocità jog lento",
+        "details": "Velocità del jog lento in mm/min. Usata da driver/sender"
+      },
+      "52": {
+        "description": "Velocità jog veloce",
+        "details": "Velocità del jog veloce in mm/min. Usata da driver/sender"
+      },
+      "53": {
+        "description": "Distanza jog a passi",
+        "details": "Distanza del jog a passi in mm. Usata da driver/sender"
+      },
+      "54": {
+        "description": "Distanza jog lento",
+        "details": "Distanza del jog lento in mm. Usata da driver/sender"
+      },
+      "55": {
+        "description": "Distanza jog veloce",
+        "details": "Distanza del jog veloce in mm. Usata da driver/sender"
+      },
+      "60": {
+        "description": "Ripristina override predefiniti",
+        "details": "Ripristina gli override predefiniti al termine del programma."
+      },
+      "61": {
+        "description": "Ignora segnale porta di sicurezza",
+        "details": "Ignora il segnale della porta di sicurezza quando inattiva. Se attivo, viene spento solo il mandrino (laser). Può essere utile se è necessario posizionare una testa laser con il coperchio aperto."
+      },
+      "62": {
+        "description": "Funzione sleep",
+        "details": "Abilita la funzione sleep."
+      },
+      "63": {
+        "description": "Disabilita laser in hold",
+        "details": "Disabilita il laser durante lo stato di hold."
+      },
+      "64": {
+        "description": "Allarme all'avvio",
+        "details": "Forza Grbl a entrare in modalità allarme all'avvio."
+      },
+      "65": {
+        "description": "Consenti override avanzamento",
+        "details": "Consente l'override della velocità di avanzamento durante la tastatura."
+      },
+      "70": {
+        "description": "Servizio di rete",
+        "details": "Specifica il servizio di rete."
+      },
+      "71": {
+        "description": "Dispositivo Bluetooth",
+        "details": "Nome del dispositivo Bluetooth."
+      },
+      "72": {
+        "description": "Servizio Bluetooth",
+        "details": "Nome del servizio Bluetooth."
+      },
+      "73": {
+        "description": "Modalità Wi-Fi",
+        "details": "Modalità Wi-Fi."
+      },
+      "74": {
+        "description": "SSID Wi-Fi STA",
+        "details": "SSID Wi-Fi STA (stazione)."
+      },
+      "75": {
+        "description": "Password Wi-Fi STA",
+        "details": "Password Wi-Fi STA (stazione)."
+      },
+      "76": {
+        "description": "SSID Wi-Fi AP",
+        "details": "SSID Wi-Fi AP (access point)."
+      },
+      "77": {
+        "description": "Password Wi-Fi AP",
+        "details": "Password Wi-Fi AP (access point)."
+      },
+      "78": {
+        "description": "Paese Wi-Fi",
+        "details": "Paese Wi-Fi AP (access point)."
+      },
+      "79": {
+        "description": "Password canale Wi-Fi AP",
+        "details": "Password del canale Wi-Fi AP (access point)."
+      },
+      "80": {
+        "description": "Guadagno proporzionale regolatore PID mandrino",
+        "details": "Guadagno proporzionale del regolatore PID del mandrino."
+      },
+      "81": {
+        "description": "Guadagno integrale regolatore PID mandrino",
+        "details": "Guadagno integrale del regolatore PID del mandrino."
+      },
+      "82": {
+        "description": "Guadagno derivativo regolatore PID mandrino",
+        "details": "Guadagno derivativo del regolatore PID del mandrino."
+      },
+      "84": {
+        "description": "Errore massimo di uscita PID mandrino",
+        "details": "Errore massimo di uscita del PID del mandrino."
+      },
+      "85": {
+        "description": "Errore massimo di uscita PID mandrino",
+        "details": "Errore integrale massimo del regolatore PID del mandrino."
+      },
+      "90": {
+        "description": "Guadagno proporzionale regolatore PID movimento sincronizzato al mandrino",
+        "details": "Guadagno proporzionale del regolatore PID del movimento sincronizzato al mandrino."
+      },
+      "91": {
+        "description": "Guadagno integrale regolatore PID movimento sincronizzato al mandrino",
+        "details": "Guadagno integrale del regolatore PID del movimento sincronizzato al mandrino."
+      },
+      "92": {
+        "description": "Guadagno derivativo regolatore PID movimento sincronizzato al mandrino",
+        "details": "Guadagno derivativo del regolatore PID del movimento sincronizzato al mandrino."
+      },
+      "100": {
+        "description": "Risoluzione di spostamento asse X",
+        "details": "Risoluzione di spostamento dell'asse X in passi per millimetro."
+      },
+      "101": {
+        "description": "Risoluzione di spostamento asse Y",
+        "details": "Risoluzione di spostamento dell'asse Y in passi per millimetro."
+      },
+      "102": {
+        "description": "Risoluzione di spostamento asse Z",
+        "details": "Risoluzione di spostamento dell'asse Z in passi per millimetro."
+      },
+      "110": {
+        "description": "Velocità massima asse X",
+        "details": "Velocità massima dell'asse X. Usata come velocità di rapido G0."
+      },
+      "111": {
+        "description": "Velocità massima asse Y",
+        "details": "Velocità massima dell'asse Y. Usata come velocità di rapido G0."
+      },
+      "112": {
+        "description": "Velocità massima asse Z",
+        "details": "Velocità massima dell'asse Z. Usata come velocità di rapido G0."
+      },
+      "120": {
+        "description": "Accelerazione asse X",
+        "details": "Accelerazione dell'asse X. Usata nella pianificazione del movimento per non superare la coppia del motore e perdere passi."
+      },
+      "121": {
+        "description": "Accelerazione asse Y",
+        "details": "Accelerazione dell'asse Y. Usata nella pianificazione del movimento per non superare la coppia del motore e perdere passi."
+      },
+      "122": {
+        "description": "Accelerazione asse Z",
+        "details": "Accelerazione dell'asse Z. Usata nella pianificazione del movimento per non superare la coppia del motore e perdere passi."
+      },
+      "130": {
+        "description": "Corsa massima asse X",
+        "details": "Distanza di corsa massima dell'asse X dal finecorsa di homing. Determina lo spazio macchina valido per i limiti software e le distanze di ricerca dell'homing."
+      },
+      "131": {
+        "description": "Corsa massima asse Y",
+        "details": "Distanza di corsa massima dell'asse Y dal finecorsa di homing. Determina lo spazio macchina valido per i limiti software e le distanze di ricerca dell'homing."
+      },
+      "132": {
+        "description": "Corsa massima asse Z",
+        "details": "Distanza di corsa massima dell'asse Z dal finecorsa di homing. Determina lo spazio macchina valido per i limiti software e le distanze di ricerca dell'homing."
+      },
+      "340": {
+        "description": "Tolleranza velocità mandrino raggiunta",
+        "details": "Disponibile per driver e plugin che supportano la funzione di velocità mandrino raggiunta. Se impostato su un valore > 0, viene generato l'allarme 14 se la velocità del mandrino non rientra nella tolleranza entro il tempo limite."
+      },
+      "341": {
+        "description": "Modalità cambio utensile manuale",
+        "details": "Disponibile per driver e plugin che supportano la funzione di velocità mandrino raggiunta. Se impostato su un valore > 0, viene generato l'allarme 14 se la velocità del mandrino non rientra nella tolleranza entro il tempo limite."
+      },
+      "342": {
+        "description": "Distanza di tastatura",
+        "details": "Usata nelle modalità 1 e 2 quando viene inviato il comando $TPW e nella modalità 3."
+      },
+      "343": {
+        "description": "Velocità di avanzamento lenta di tastatura",
+        "details": "Usata nelle modalità 1 e 2 quando viene inviato il comando $TPW e nella modalità 3 per ottenere un offset utensile preciso."
+      },
+      "344": {
+        "description": "Velocità di avanzamento di ricerca di tastatura",
+        "details": "Usata nelle modalità 1 e 2 quando viene inviato il comando $TPW e nella modalità 3 per ottenere un offset utensile iniziale. In caso di successo, l'utensile viene leggermente arretrato e la tastatura viene ripetuta con la velocità di avanzamento lenta di $343."
+      },
+      "3x0": {
+        "description": "Nome host",
+        "details": "Nome host."
+      },
+      "3x1": {
+        "description": "Modalità IP",
+        "details": "Modalità IP dell'interfaccia."
+      },
+      "3x2": {
+        "description": "Indirizzo gateway dell'interfaccia",
+        "details": "Indirizzo gateway dell'interfaccia. Indirizzo IPv4 o IPv6, fino a 16 ottetti. Può contenere un indirizzo IPv4 in formato binario o testuale."
+      },
+      "3x3": {
+        "description": "Maschera di rete dell'interfaccia",
+        "details": "Maschera di rete dell'interfaccia. Indirizzo IPv4 o IPv6, fino a 16 ottetti. Può contenere un indirizzo IPv4 in formato binario o testuale."
+      },
+      "3x4": {
+        "description": "Maschera di rete dell'interfaccia",
+        "details": "Maschera di rete dell'interfaccia. Indirizzo IPv4 o IPv6, fino a 16 ottetti. Può contenere un indirizzo IPv4 in formato binario o testuale."
+      },
+      "3x5": {
+        "description": "Porta Telnet",
+        "details": "Porta per la comunicazione seriale, tramite protocollo Telnet o semplice flusso socket."
+      },
+      "3x6": {
+        "description": "Porta HTTP",
+        "details": "Porta del server web."
+      },
+      "3x7": {
+        "description": "Porta WebSocket",
+        "details": "Porta per la comunicazione bidirezionale, tipicamente con un browser web. Solitamente usata da Grbl per la comunicazione seriale."
+      }
+    }
+  }
+}

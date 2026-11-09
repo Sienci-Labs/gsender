@@ -31,6 +31,7 @@ import {
 import { PROBING_CATEGORY } from 'app/constants';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { i18n } from 'app/i18n';
 import { TOUCHPLATE_TYPE_3D } from 'app/lib/constants';
 import { toast } from 'app/lib/toaster';
 import useKeybinding from 'app/lib/useKeybinding';
@@ -104,7 +105,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                     return;
                 }
 
-                toast.info('Probe Confirmed Manually', {
+                toast.info(i18n.t('notifications:probe.confirmedManually'), {
                     position: 'bottom-right',
                 });
 
@@ -122,7 +123,9 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         const probeCommands = actionsRef.current.generateProbeCommands();
 
         actionsRef.current.runProbeCommands(probeCommands);
-        toast.info('Initiated probing cycle', { position: 'bottom-right' });
+        toast.info(i18n.t('notifications:probe.cycleStarted'), {
+            position: 'bottom-right',
+        });
         actionsRef.current.onOpenChange(false);
     }, []);
 

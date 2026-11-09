@@ -5,6 +5,7 @@ import type {
 } from 'app/features/ATC/components/ToolTable.tsx';
 import type { RackConfig, ToolFlags } from 'app/features/ATC/types.ts';
 import { TOOLPATH_COLOR_HEXES } from 'app/features/Visualizer/constants';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -14,7 +15,7 @@ import pubsub from 'pubsub-js';
 import * as THREE from 'three';
 
 export function unimplemented() {
-    toast.info('Unimplemented :(');
+    toast.info(i18n.t('notifications:atc.unimplemented'));
 }
 
 export function mapToolNicknamesAndStatus(

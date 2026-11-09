@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import cx from 'classnames';
@@ -30,6 +31,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 const Controls = () => {
+    const { t } = useAppTranslation();
     const {
         completeSubStep,
         decrementStep,
@@ -73,7 +75,7 @@ const Controls = () => {
                 className="flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-md border border-gray-300 dark:border-outline text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-35 disabled:pointer-events-none transition-colors"
             >
                 <ArrowLeft size={12} />
-                Back
+                {t('common:actions.back')}
             </button>
 
             <div className="flex items-center gap-1">
@@ -102,7 +104,9 @@ const Controls = () => {
                 disabled={hasIncompleteActions() || isNotIdle()}
                 className="flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-md bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-35 disabled:pointer-events-none transition-colors"
             >
-                {isLastSubstep ? 'Complete' : 'Next'}
+                {isLastSubstep
+                    ? t('helper:wizard.complete')
+                    : t('helper:wizard.next')}
                 {isLastSubstep ? <Check size={12} /> : <ArrowRight size={12} />}
             </button>
         </div>

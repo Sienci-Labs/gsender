@@ -26,6 +26,7 @@ import {
     translateGrblCoreKey,
 } from 'app/features/Config/utils/grblCoreMigration.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { translateKey } from 'app/i18n';
 import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import store from 'app/store';
 import defaultStoreState from 'app/store/defaultState';
@@ -498,7 +499,19 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             searchChecker = eepromMap.get(idToUse as EEPROM);
         }
 
-        return JSON.stringify(searchChecker)
+        // Labels and descriptions are translation keys; search the text the
+        // user actually sees.
+        // EEPROM text is either a fallback key or text from the firmware.
+        const visibleText =
+            v.type === 'eeprom'
+                ? [searchChecker?.description, searchChecker?.details]
+                      .map(translateKey)
+                      .join(' ')
+                : [v.label, v.description, ...(v.labels ?? [])]
+                      .map(translateKey)
+                      .join(' ');
+
+        return `${JSON.stringify(searchChecker)} ${visibleText}`
             .toLowerCase()
             .includes(searchTerm.trim().toLowerCase());
     }

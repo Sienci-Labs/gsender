@@ -2,6 +2,7 @@ import api from 'app/api';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import type { EEPROM, FilteredEEPROM } from 'app/definitions/firmware';
 import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import {
     extractSettings,
@@ -103,12 +104,9 @@ const onImportConfirm = (file: File) => {
                 await storeUpdate(event.target.result as string);
             } catch (error) {
                 console.error('Import error:', error);
-                toast.error(
-                    'Failed to import settings. Please check the file format.',
-                    {
-                        position: 'bottom-right',
-                    },
-                );
+                toast.error(i18n.t('config:preferences.importFailed'), {
+                    position: 'bottom-right',
+                });
             }
         };
         reader.onerror = () => {
@@ -121,20 +119,18 @@ export function importSettings(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
 
     Confirm({
-        title: 'Import Settings',
-        content:
-            'All your current settings will be replaced. Are you sure you want to import your settings on gSender?',
-        confirmLabel: 'Import Settings',
+        title: i18n.t('config:preferences.importTitle'),
+        content: i18n.t('config:preferences.importConfirm'),
+        confirmLabel: i18n.t('config:preferences.importAction'),
         onConfirm: () => onImportConfirm(file),
     });
 }
 
 export function handleRestoreDefaultClick() {
     Confirm({
-        title: 'Restore Settings',
-        content:
-            'All your current settings will be removed. Are you sure you want to restore default settings on gSender?',
-        confirmLabel: 'Restore Settings',
+        title: i18n.t('config:preferences.restoreTitle'),
+        content: i18n.t('config:preferences.restoreConfirm'),
+        confirmLabel: i18n.t('config:preferences.restoreAction'),
         onConfirm: restoreDefault,
     });
 }
@@ -180,9 +176,12 @@ export function updateAllSettings(
         );
         changedSettings.push('$$');
         controller.command('gcode', changedSettings);
-        toast.success(`Updated ${eepromNumber} EEPROM values.`, {
-            position: 'bottom-right',
-        });
+        toast.success(
+            i18n.t('config:profileBar.eepromUpdated', { count: eepromNumber }),
+            {
+                position: 'bottom-right',
+            },
+        );
     }
 
     const settingsToUpdate = generateSenderSettings(settings);
@@ -197,9 +196,14 @@ export function updateAllSettings(
                 settingsToUpdate[k].onApply();
             }
         });
-        toast.success(`Updated ${updateableSettingsNumber} settings.`, {
-            position: 'bottom-right',
-        });
+        toast.success(
+            i18n.t('config:preferences.settingsUpdated', {
+                count: updateableSettingsNumber,
+            }),
+            {
+                position: 'bottom-right',
+            },
+        );
     }
 
     pubsub.publish('config:saved', settingsToUpdate);

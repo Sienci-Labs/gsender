@@ -4,6 +4,7 @@ import {
     type UploadState,
     useSDCard,
 } from 'app/features/SDCard/hooks/useSDCard.ts';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import cn from 'classnames';
@@ -33,7 +34,9 @@ export function StatusIndicator({ isMounted }) {
         };
         const handleYmodemError = (err) => {
             setUploadState('idle');
-            toast.error('Error uploading file - ' + err + '.');
+            toast.error(
+                i18n.t('notifications:sdCard.uploadFailed', { error: err }),
+            );
         };
 
         controller.addListener('ymodem:start', handleYmodemStart);

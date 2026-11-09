@@ -19,6 +19,7 @@ import api from 'app/api';
 import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import cx from 'classnames';
@@ -154,14 +155,24 @@ export const PortraitMacroBar = () => {
                 controller.context,
                 (err: Error | null) => {
                     if (err) {
-                        toast.error(`Failed to run macro "${macro.name}"`, {
-                            position: 'bottom-right',
-                        });
+                        toast.error(
+                            i18n.t('notifications:macros.runFailed', {
+                                name: macro.name,
+                            }),
+                            {
+                                position: 'bottom-right',
+                            },
+                        );
                         return;
                     }
-                    toast.info(`Started running macro "${macro.name}"!`, {
-                        position: 'bottom-right',
-                    });
+                    toast.info(
+                        i18n.t('notifications:macros.startedQuoted', {
+                            name: macro.name,
+                        }),
+                        {
+                            position: 'bottom-right',
+                        },
+                    );
                 },
             );
         },

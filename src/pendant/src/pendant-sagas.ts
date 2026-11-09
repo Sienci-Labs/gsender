@@ -11,6 +11,7 @@ import type {
     ControllerSettings,
     FIRMWARE_TYPES_T,
 } from 'app/definitions/firmware';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import type { PortInfo } from 'app/store/definitions';
 import { store as reduxStore } from 'app/store/redux';
@@ -169,8 +170,8 @@ export function* initialize() {
                 Confirm({
                     title: payload.message,
                     content: payload.description,
-                    confirmLabel: 'Resume',
-                    cancelLabel: 'Reset',
+                    confirmLabel: i18n.t('notifications:atc.dialog.resume'),
+                    cancelLabel: i18n.t('common:actions.reset'),
                     onConfirm: () => controller.command('cyclestart'),
                     onClose: () => controller.command('reset'),
                 });
@@ -178,8 +179,8 @@ export function* initialize() {
                 Confirm({
                     title: payload.message,
                     content: payload.description,
-                    confirmLabel: 'OK',
-                    cancelLabel: 'Reset',
+                    confirmLabel: i18n.t('common:actions.ok'),
+                    cancelLabel: i18n.t('common:actions.reset'),
                     onConfirm: () => controller.command('cyclestart'),
                     hideClose: true,
                 });
@@ -187,16 +188,16 @@ export function* initialize() {
                 Confirm({
                     title: payload.message,
                     content: payload.description,
-                    confirmLabel: 'Reset',
+                    confirmLabel: i18n.t('common:actions.reset'),
                     onConfirm: () => controller.command('reset'),
                     hideClose: true,
                 });
             } else {
                 Confirm({
-                    title: 'ATC requested a dialog.',
-                    content: 'Continue to unhold, Reset to stop action.',
-                    confirmLabel: 'Continue',
-                    cancelLabel: 'Reset',
+                    title: i18n.t('notifications:atc.dialog.title'),
+                    content: i18n.t('notifications:atc.dialog.content'),
+                    confirmLabel: i18n.t('common:actions.continue'),
+                    cancelLabel: i18n.t('common:actions.reset'),
                 });
             }
         },

@@ -3,6 +3,7 @@ import type {
     FIRMWARE_TYPES_T,
     RotaryModeFirmwareSettings,
 } from 'app/definitions/firmware';
+import { i18n } from 'app/i18n';
 import type { WORKSPACE_MODE_T } from 'app/workspace/definitions';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
@@ -105,9 +106,9 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
                 ).map(([key, value]) => `${key}=${value}`);
 
                 Confirm({
-                    title: 'Enable Rotary Mode',
-                    cancelLabel: 'Cancel',
-                    confirmLabel: 'OK',
+                    title: i18n.t('notifications:rotary.enable.title'),
+                    cancelLabel: i18n.t('common:actions.cancel'),
+                    confirmLabel: i18n.t('common:actions.ok'),
                     content: (
                         <div
                             style={{
@@ -117,35 +118,51 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
                                 fontSize: '1.25rem',
                             }}
                         >
-                            <p>
-                                Enabling rotary mode will perform the following
-                                actions:
-                            </p>
+                            <p>{i18n.t('notifications:rotary.enable.intro')}</p>
 
                             <ol>
                                 <li style={{ marginBottom: '1rem' }}>
-                                    Zero the Y-Axis in it&apos;s current
-                                    position
+                                    {i18n.t(
+                                        'notifications:rotary.enable.zeroY',
+                                    )}
                                 </li>
                                 <li style={{ marginBottom: '1rem' }}>
-                                    Turn soft and hard limits off, if they are
-                                    on
+                                    {i18n.t(
+                                        'notifications:rotary.enable.limitsOff',
+                                    )}
                                 </li>
                                 <li>
                                     <span>
-                                        Update the following firmware values:
+                                        {i18n.t(
+                                            'notifications:rotary.enable.updateFirmwareValues',
+                                        )}
                                     </span>
 
                                     <ul style={{ marginTop: '0.5rem' }}>
-                                        <li>$101 (Y-Axis travel resolution)</li>
-                                        <li>$111 (Y-Axis maximum rate)</li>
+                                        <li>
+                                            {i18n.t(
+                                                'notifications:rotary.enable.yTravelResolution',
+                                                {
+                                                    setting: '$101',
+                                                },
+                                            )}
+                                        </li>
+                                        <li>
+                                            {i18n.t(
+                                                'notifications:rotary.enable.yMaximumRate',
+                                                {
+                                                    setting: '$111',
+                                                },
+                                            )}
+                                        </li>
                                     </ul>
                                 </li>
                             </ol>
 
                             <p>
-                                Please make sure you have switched over your
-                                wiring for the new setup.
+                                {i18n.t(
+                                    'notifications:rotary.enable.checkWiring',
+                                )}
                             </p>
                         </div>
                     ),
@@ -160,7 +177,7 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 
                         pubsub.publish('visualizer:updateposition', { y: 0 });
 
-                        toast.info('Rotary Mode Enabled', {
+                        toast.info(i18n.t('notifications:rotary.enabled'), {
                             position: 'bottom-right',
                         });
                     },
@@ -170,9 +187,9 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
                 });
             } else if (firmwareType === GRBLHAL) {
                 Confirm({
-                    title: 'Enable Rotary Mode',
-                    cancelLabel: 'Cancel',
-                    confirmLabel: 'OK',
+                    title: i18n.t('notifications:rotary.enable.title'),
+                    cancelLabel: i18n.t('common:actions.cancel'),
+                    confirmLabel: i18n.t('common:actions.ok'),
                     content: (
                         <div
                             style={{
@@ -182,28 +199,58 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
                                 fontSize: '1.25rem',
                             }}
                         >
-                            <p>
-                                Enabling rotary mode will perform the following
-                                actions:
-                            </p>
+                            <p>{i18n.t('notifications:rotary.enable.intro')}</p>
 
                             <ol>
                                 <li style={{ marginBottom: '1rem' }}>
-                                    Zero the Y-Axis in it&apos;s current
-                                    position
+                                    {i18n.t(
+                                        'notifications:rotary.enable.zeroY',
+                                    )}
                                 </li>
                                 <li>
                                     <span>
-                                        Switch these A and Y axis settings:
+                                        {i18n.t(
+                                            'notifications:rotary.enable.swapAxisSettings',
+                                        )}
                                     </span>
 
                                     <ul style={{ marginTop: '0.5rem' }}>
                                         <li>
-                                            $101 and $103 (travel resolution)
+                                            {i18n.t(
+                                                'notifications:rotary.enable.travelResolution',
+                                                {
+                                                    y: '$101',
+                                                    a: '$103',
+                                                },
+                                            )}
                                         </li>
-                                        <li>$111 and $113 (maximum rate)</li>
-                                        <li>$121 and $123 (acceleration)</li>
-                                        <li>$131 and $133 (travel amount)</li>
+                                        <li>
+                                            {i18n.t(
+                                                'notifications:rotary.enable.maximumRate',
+                                                {
+                                                    y: '$111',
+                                                    a: '$113',
+                                                },
+                                            )}
+                                        </li>
+                                        <li>
+                                            {i18n.t(
+                                                'notifications:rotary.enable.acceleration',
+                                                {
+                                                    y: '$121',
+                                                    a: '$123',
+                                                },
+                                            )}
+                                        </li>
+                                        <li>
+                                            {i18n.t(
+                                                'notifications:rotary.enable.travelAmount',
+                                                {
+                                                    y: '$131',
+                                                    a: '$133',
+                                                },
+                                            )}
+                                        </li>
                                     </ul>
                                 </li>
                             </ol>
@@ -237,7 +284,7 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 
                         controller.command('updateRotaryMode', true);
 
-                        toast.info('Rotary Mode Enabled', {
+                        toast.info(i18n.t('notifications:rotary.enabled'), {
                             position: 'bottom-right',
                         });
                     },

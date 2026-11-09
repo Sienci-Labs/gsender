@@ -1,5 +1,6 @@
 import api from 'app/api';
 import Button from 'app/components/Button';
+import { i18n } from 'app/i18n';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import log from 'app/lib/log';
@@ -114,13 +115,16 @@ const MacroWidget = ({
 
                 combokeys.reload();
 
-                showToast({ msg: 'Added New Macro', type: 'success' });
+                showToast({
+                    msg: i18n.t('notifications:macros.added'),
+                    type: 'success',
+                });
                 actions.closeModal();
 
                 posthog?.capture('macro:add', { name });
             } catch (err) {
                 showToast({
-                    msg: 'Failed to add macro',
+                    msg: i18n.t('notifications:macros.addFailed'),
                     type: 'error',
                 });
             }
@@ -140,7 +144,10 @@ const MacroWidget = ({
                 combokeys.reload();
                 deleteGamepadMacro(id);
 
-                showToast({ msg: 'Deleted Macro', type: 'success' });
+                showToast({
+                    msg: i18n.t('notifications:macros.deleted'),
+                    type: 'success',
+                });
 
                 posthog?.capture('macro:delete');
             } catch (err) {
@@ -180,9 +187,12 @@ const MacroWidget = ({
 
                 actions.closeModal();
                 if (!skipToast) {
-                    toast.success(`Updated macro '${name}'`, {
-                        position: 'bottom-right',
-                    });
+                    toast.success(
+                        i18n.t('notifications:macros.updated', { name }),
+                        {
+                            position: 'bottom-right',
+                        },
+                    );
                 }
 
                 posthog?.capture('macro:update', { name });
@@ -276,7 +286,10 @@ const MacroWidget = ({
 
     const exportMacros = () => {
         if (macros.length === 0) {
-            showToast({ msg: 'No Macros to Export', type: 'error' });
+            showToast({
+                msg: i18n.t('notifications:macros.nothingToExport'),
+                type: 'error',
+            });
             return;
         }
 
@@ -354,12 +367,25 @@ const MacroWidget = ({
 
                 if (importedCount > 0) {
                     showToast({
-                        msg: `Successfully imported ${importedCount} macro(s)${updatedCount > 0 ? `, updated ${updatedCount} existing macro(s)` : ''}`,
+                        msg:
+                            updatedCount > 0
+                                ? i18n.t(
+                                      'notifications:macros.importedAndUpdated',
+                                      {
+                                          count: importedCount,
+                                          updated: updatedCount,
+                                      },
+                                  )
+                                : i18n.t('notifications:macros.imported', {
+                                      count: importedCount,
+                                  }),
                         type: 'success',
                     });
                 } else if (updatedCount > 0) {
                     showToast({
-                        msg: `Updated ${updatedCount} existing macro(s)`,
+                        msg: i18n.t('notifications:macros.updatedExisting', {
+                            count: updatedCount,
+                        }),
                         type: 'success',
                     });
                 }
@@ -371,7 +397,7 @@ const MacroWidget = ({
             };
             reader.onerror = () => {
                 showToast({
-                    msg: 'Error Importing Macros',
+                    msg: i18n.t('notifications:macros.importFailed'),
                     type: 'error',
                 });
             };

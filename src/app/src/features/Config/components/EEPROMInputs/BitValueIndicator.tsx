@@ -5,6 +5,7 @@ import {
     TooltipTrigger,
     Tooltip as TooltipWrapper,
 } from 'app/components/shadcn/Tooltip';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { getBitfieldArr } from './utils.ts';
 
 interface BitValueIndicatorProps {
@@ -24,6 +25,7 @@ export function BitValueIndicator({
     bits,
     numBits = 8,
 }: BitValueIndicatorProps) {
+    const { t } = useAppTranslation();
     const numericValue = Number(value);
     if (isNaN(numericValue)) return null;
 
@@ -33,7 +35,9 @@ export function BitValueIndicator({
     let labels: string[] = format;
     if (labels.length === 0 && bits) {
         const maxIndex = Math.max(...Object.keys(bits).map(Number));
-        labels = Array.from({ length: maxIndex + 1 }, (_, i) => bits[i] ?? '');
+        labels = Array.from({ length: maxIndex + 1 }, (_, i) =>
+            translateKey(bits[i] ?? ''),
+        );
     }
 
     const totalBits = Math.max(numBits, labels.length, 8);
@@ -56,7 +60,7 @@ export function BitValueIndicator({
                             {on ? '✓' : ' '}
                         </span>
                         <span className={on ? 'text-white' : 'text-slate-400'}>
-                            Bit {i}: {label}
+                            {t('config:inputs.bit', { bit: i, label })}
                         </span>
                     </div>
                 );

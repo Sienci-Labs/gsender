@@ -1,3 +1,6 @@
+import type { EEPROM } from 'app/definitions/firmware';
+import { tk } from 'app/i18n';
+
 export const GRBL_HAL_SETTINGS_INPUT_TYPES = {
     NUMBER: '5',
     MASK: '1',
@@ -15,10 +18,10 @@ const { NUMBER, MASK, AXIS_MASK, MASK_STATUS_REPORT, SWITCH, SELECT, STRING } =
 export const GRBL_SETTINGS = [
     {
         setting: '$0',
-        description: 'Step pulse time',
+        description: tk('config:firmware.grbl.0.description'),
         category: 'Motors',
         units: 'μs',
-        details: 'Sets time length per step. Minimum 3usec.',
+        details: tk('config:firmware.grbl.0.details'),
         dataType: NUMBER,
         min: 0,
         max: 20,
@@ -26,11 +29,10 @@ export const GRBL_SETTINGS = [
     },
     {
         setting: '$1',
-        description: 'Step idle delay',
+        description: tk('config:firmware.grbl.1.description'),
         category: 'Motors',
         units: 'ms',
-        details:
-            'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.',
+        details: tk('config:firmware.grbl.1.details'),
         dataType: NUMBER,
         min: 25,
         max: 255,
@@ -38,148 +40,138 @@ export const GRBL_SETTINGS = [
     },
     {
         setting: '$2',
-        description: 'Step pulse invert',
+        description: tk('config:firmware.grbl.2.description'),
         category: 'Motors',
         units: 'mask',
-        details: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
+        details: tk('config:firmware.grbl.2.details'),
         dataType: AXIS_MASK,
     },
     {
         setting: '$3',
-        description: 'Step direction invert',
+        description: tk('config:firmware.grbl.3.description'),
         category: 'Motors',
         units: 'mask',
-        details:
-            'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
+        details: tk('config:firmware.grbl.3.details'),
         dataType: AXIS_MASK,
     },
     {
         setting: '$4',
-        description: 'Invert step enable pin',
+        description: tk('config:firmware.grbl.4.description'),
         category: 'Pins',
         units: 'boolean',
-        details: 'Inverts the stepper driver enable pin signal.',
+        details: tk('config:firmware.grbl.4.details'),
         dataType: SWITCH,
     },
     {
         setting: '$5',
-        description: 'Invert limit pins',
+        description: tk('config:firmware.grbl.5.description'),
         category: 'Pins',
         units: 'boolean',
-        details: 'Inverts the all of the limit input pins.',
+        details: tk('config:firmware.grbl.5.details'),
         dataType: SWITCH,
     },
     {
         setting: '$6',
-        description: 'Invert probe pin',
+        description: tk('config:firmware.grbl.6.description'),
         category: 'Pins',
         units: 'boolean',
-        details: 'Inverts the probe input pin signal.',
+        details: tk('config:firmware.grbl.6.details'),
         dataType: SWITCH,
     },
     {
         setting: '$10',
-        description: 'Status report options',
+        description: tk('config:firmware.grbl.10.description'),
         category: 'GRBL',
         units: 'mask',
-        details: 'Alters data included in status reports.',
+        details: tk('config:firmware.grbl.10.details'),
         dataType: MASK_STATUS_REPORT,
     },
     {
         setting: '$11',
-        description: 'Junction deviation',
+        description: tk('config:firmware.grbl.11.description'),
         category: 'GRBL',
         units: 'mm',
-        details:
-            'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
+        details: tk('config:firmware.grbl.11.details'),
         dataType: NUMBER,
         min: 0.001,
         step: 0.001,
     },
     {
         setting: '$12',
-        description: 'Arc tolerance',
+        description: tk('config:firmware.grbl.12.description'),
         category: 'GRBL',
         units: 'mm',
-        details:
-            'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
+        details: tk('config:firmware.grbl.12.details'),
         dataType: NUMBER,
         min: 0.001,
         step: 0.001,
     },
     {
         setting: '$13',
-        description: 'Report in inches',
+        description: tk('config:firmware.grbl.13.description'),
         category: 'GRBL',
         units: 'boolean',
-        details:
-            'Enables inch units when returning any position and rate value that is not a settings value.',
+        details: tk('config:firmware.grbl.13.details'),
         dataType: SWITCH,
     },
     {
         setting: '$20',
-        description: 'Soft limits enable',
+        description: tk('config:firmware.grbl.20.description'),
         category: 'Homing',
         units: 'boolean',
-        details:
-            'Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing.',
+        details: tk('config:firmware.grbl.20.details'),
         dataType: SWITCH,
     },
     {
         setting: '$21',
-        description: 'Hard limits enable',
+        description: tk('config:firmware.grbl.21.description'),
         category: 'Homing',
         units: 'boolean',
-        details:
-            'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.',
+        details: tk('config:firmware.grbl.21.details'),
         dataType: SWITCH,
     },
     {
         setting: '$22',
-        description: 'Homing cycle enable',
+        description: tk('config:firmware.grbl.22.description'),
         category: 'Homing',
         units: 'boolean',
-        details: 'Enables homing cycle. Requires limit switches on all axes.',
+        details: tk('config:firmware.grbl.22.details'),
         dataType: SWITCH,
     },
     {
         setting: '$23',
-        description: 'Homing direction invert',
+        description: tk('config:firmware.grbl.23.description'),
         category: 'Homing',
         units: 'mask',
-        details:
-            'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
+        details: tk('config:firmware.grbl.23.details'),
         dataType: AXIS_MASK,
     },
     {
         setting: '$24',
-        description: 'Homing locate feed rate',
+        description: tk('config:firmware.grbl.24.description'),
         category: 'Homing',
         units: 'mm/min',
-        details:
-            'Feed rate to slowly engage limit switch to determine its location accurately.',
+        details: tk('config:firmware.grbl.24.details'),
         dataType: NUMBER,
         min: 1,
         step: 1,
     },
     {
         setting: '$25',
-        description: 'Homing search seek rate',
+        description: tk('config:firmware.grbl.25.description'),
         category: 'Homing',
         units: 'mm/min',
-        details:
-            'Seek rate to quickly find the limit switch before the slower locating phase.',
+        details: tk('config:firmware.grbl.25.details'),
         dataType: NUMBER,
         min: 100,
         step: 100,
     },
     {
         setting: '$26',
-        description: 'Homing switch debounce delay',
+        description: tk('config:firmware.grbl.26.description'),
         category: 'Homing',
         units: 'ms',
-        details:
-            'Sets a short delay between phases of homing cycle to let a switch debounce.',
+        details: tk('config:firmware.grbl.26.details'),
         dataType: NUMBER,
         min: 5,
         max: 255,
@@ -187,167 +179,158 @@ export const GRBL_SETTINGS = [
     },
     {
         setting: '$27',
-        description: 'Homing switch pull-off distance',
+        description: tk('config:firmware.grbl.27.description'),
         category: 'Homing',
         units: 'mm',
-        details:
-            "Retract distance after triggering switch to disengage it. Homing will fail if switch isn't cleared.",
+        details: tk('config:firmware.grbl.27.details'),
         dataType: NUMBER,
         min: 0,
         step: 0.5,
     },
     {
         setting: '$30',
-        description: 'Maximum spindle speed',
+        description: tk('config:firmware.grbl.30.description'),
         category: 'Spindle',
         units: 'rpm',
-        details: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
+        details: tk('config:firmware.grbl.30.details'),
         dataType: NUMBER,
         min: 100,
         step: 100,
     },
     {
         setting: '$31',
-        description: 'Minimum spindle speed',
+        description: tk('config:firmware.grbl.31.description'),
         category: 'Spindle',
         units: 'rpm',
-        details:
-            'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
+        details: tk('config:firmware.grbl.31.details'),
         dataType: NUMBER,
         min: 1,
         step: 1,
     },
     {
         setting: '$32',
-        description: 'Laser-mode enabled as spindle',
+        description: tk('config:firmware.grbl.32.description'),
         category: 'Spindle',
         units: 'boolean',
-        details:
-            'Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
+        details: tk('config:firmware.grbl.32.details'),
         dataType: SWITCH,
     },
     {
         setting: '$100',
-        description: 'X-axis travel resolution',
+        description: tk('config:firmware.grbl.100.description'),
         category: 'Motors',
         units: 'step/mm',
-        details: 'X-axis travel resolution in steps per millimeter.',
+        details: tk('config:firmware.grbl.100.details'),
         dataType: NUMBER,
         min: 10,
         step: 10,
     },
     {
         setting: '$101',
-        description: 'Y-axis travel resolution',
+        description: tk('config:firmware.grbl.101.description'),
         category: 'Motors',
         units: 'step/mm',
-        details: 'Y-axis travel resolution in steps per millimeter.',
+        details: tk('config:firmware.grbl.101.details'),
         dataType: NUMBER,
         min: 10,
         step: 10,
     },
     {
         setting: '$102',
-        description: 'Z-axis travel resolution',
+        description: tk('config:firmware.grbl.102.description'),
         category: 'Motors',
         units: 'step/mm',
-        details: 'Z-axis travel resolution in steps per millimeter.',
+        details: tk('config:firmware.grbl.102.details'),
         dataType: NUMBER,
         min: 10,
         step: 10,
     },
     {
         setting: '$110',
-        description: 'X-axis maximum rate',
+        description: tk('config:firmware.grbl.110.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'X-axis maximum rate. Used as G0 rapid rate.',
+        details: tk('config:firmware.grbl.110.details'),
         dataType: NUMBER,
         min: 100,
         step: 100,
     },
     {
         setting: '$111',
-        description: 'Y-axis maximum rate',
+        description: tk('config:firmware.grbl.111.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'Y-axis maximum rate. Used as G0 rapid rate.',
+        details: tk('config:firmware.grbl.111.details'),
         dataType: NUMBER,
         min: 100,
         step: 100,
     },
     {
         setting: '$112',
-        description: 'Z-axis maximum rate',
+        description: tk('config:firmware.grbl.112.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'Z-axis maximum rate. Used as G0 rapid rate.',
+        details: tk('config:firmware.grbl.112.details'),
         dataType: NUMBER,
         min: 10,
         step: 10,
     },
     {
         setting: '$120',
-        description: 'X-axis acceleration',
+        description: tk('config:firmware.grbl.120.description'),
         category: 'Motors',
         units: 'mm/sec^2',
-        details:
-            'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        details: tk('config:firmware.grbl.120.details'),
         dataType: NUMBER,
         min: 1,
         step: 10,
     },
     {
         setting: '$121',
-        description: 'Y-axis acceleration',
+        description: tk('config:firmware.grbl.121.description'),
         category: 'Motors',
         units: 'mm/sec^2',
-        details:
-            'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        details: tk('config:firmware.grbl.121.details'),
         dataType: NUMBER,
         min: 1,
         step: 10,
     },
     {
         setting: '$122',
-        description: 'Z-axis acceleration',
+        description: tk('config:firmware.grbl.122.description'),
         category: 'Motors',
         units: 'mm/sec^2',
-        details:
-            'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        details: tk('config:firmware.grbl.122.details'),
         dataType: NUMBER,
         min: 1,
         step: 10,
     },
     {
         setting: '$130',
-        description: 'X-axis maximum travel',
+        description: tk('config:firmware.grbl.130.description'),
         category: 'Limits',
         units: 'mm',
-        details:
-            'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        details: tk('config:firmware.grbl.130.details'),
         dataType: NUMBER,
         min: 1,
         step: 10,
     },
     {
         setting: '$131',
-        description: 'Y-axis maximum travel',
+        description: tk('config:firmware.grbl.131.description'),
         category: 'Limits',
         units: 'mm',
-        details:
-            'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        details: tk('config:firmware.grbl.131.details'),
         dataType: NUMBER,
         min: 1,
         step: 10,
     },
     {
         setting: '$132',
-        description: 'Z-axis maximum travel',
+        description: tk('config:firmware.grbl.132.description'),
         category: 'Limits',
         units: 'mm',
-        details:
-            'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        details: tk('config:firmware.grbl.132.details'),
         dataType: NUMBER,
         min: 1,
         step: 10,
@@ -360,10 +343,10 @@ export const GRBL_HAL_SETTINGS = [
         // TODO default value
         // NEW
         setting: '$3x0',
-        description: 'Hostname',
+        description: tk('config:firmware.grblhal.3x0.description'),
         category: 'NetInterface',
         units: '',
-        details: 'Hostname.',
+        details: tk('config:firmware.grblhal.3x0.details'),
         dataType: STRING,
         maxChars: 32,
     },
@@ -371,10 +354,10 @@ export const GRBL_HAL_SETTINGS = [
         // TODO default value
         // NEW
         setting: '$3x1',
-        description: 'IP Mode',
+        description: tk('config:firmware.grblhal.3x1.description'),
         category: 'NetInterface',
         units: '',
-        details: 'Interface IP mode.',
+        details: tk('config:firmware.grblhal.3x1.details'),
         dataType: SELECT,
         defaultValue: 0,
         values: {
@@ -387,11 +370,10 @@ export const GRBL_HAL_SETTINGS = [
         // TODO not sure about max
         // NEW
         setting: '$3x2',
-        description: 'Interface Gateway Address',
+        description: tk('config:firmware.grblhal.3x2.description'),
         category: 'NetInterface',
         units: '',
-        details:
-            'Interface gateway address. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
+        details: tk('config:firmware.grblhal.3x2.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -400,11 +382,10 @@ export const GRBL_HAL_SETTINGS = [
         // TODO not sure about max
         // NEW
         setting: '$3x3',
-        description: 'Interface Netmask',
+        description: tk('config:firmware.grblhal.3x3.description'),
         category: 'NetInterface',
         units: '',
-        details:
-            'Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
+        details: tk('config:firmware.grblhal.3x3.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -414,22 +395,20 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 255.255.255.0.
         setting: '$3x4',
-        description: 'Interface Netmask',
+        description: tk('config:firmware.grblhal.3x4.description'),
         category: 'NetInterface',
         units: '',
-        details:
-            'Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
+        details: tk('config:firmware.grblhal.3x4.details'),
         dataType: STRING,
     },
     {
         // NEW
         // default value 23
         setting: '$3x5',
-        description: 'Telnet port',
+        description: tk('config:firmware.grblhal.3x5.description'),
         category: 'NetInterface',
         units: '',
-        details:
-            'Port for serial communication, may be telnet protocol or a simple socket stream.',
+        details: tk('config:firmware.grblhal.3x5.details'),
         dataType: NUMBER,
         min: 0,
         max: 65536,
@@ -439,10 +418,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default value 80
         setting: '$3x6',
-        description: 'HTTP port',
+        description: tk('config:firmware.grblhal.3x6.description'),
         category: 'NetInterface',
         units: '',
-        details: 'Web server port.',
+        details: tk('config:firmware.grblhal.3x6.details'),
         dataType: NUMBER,
         min: 0,
         max: 65536,
@@ -452,11 +431,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default value 81
         setting: '$3x7',
-        description: 'Websocket port',
+        description: tk('config:firmware.grblhal.3x7.description'),
         category: 'NetInterface',
         units: '',
-        details:
-            'Port for two way communication, typically with web browser. Usually used for serial communication by grbl.',
+        details: tk('config:firmware.grblhal.3x7.details'),
         dataType: NUMBER,
         min: 0,
         max: 65536,
@@ -464,10 +442,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$0',
-        description: 'Step pulse time',
+        description: tk('config:firmware.grblhal.0.description'),
         category: 'Motors',
         units: 'μs',
-        details: 'Sets time length per step. Minimum 3usec.',
+        details: tk('config:firmware.grblhal.0.details'),
         dataType: NUMBER,
         min: 3,
         max: 12,
@@ -475,11 +453,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$1',
-        description: 'Step idle delay',
+        description: tk('config:firmware.grblhal.1.description'),
         category: 'Motors',
         units: 'ms',
-        details:
-            'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.',
+        details: tk('config:firmware.grblhal.1.details'),
         dataType: NUMBER,
         min: 25,
         max: 255,
@@ -487,43 +464,42 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$2',
-        description: 'Step pulse invert',
+        description: tk('config:firmware.grblhal.2.description'),
         category: 'Motors',
         units: 'mask',
-        details: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
+        details: tk('config:firmware.grblhal.2.details'),
         dataType: AXIS_MASK,
     },
     {
         setting: '$3',
-        description: 'Step direction invert',
+        description: tk('config:firmware.grblhal.3.description'),
         category: 'Motors',
         units: 'mask',
-        details:
-            'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
+        details: tk('config:firmware.grblhal.3.details'),
         dataType: AXIS_MASK,
     },
     {
         setting: '$4',
-        description: 'Invert step enable pin',
+        description: tk('config:firmware.grblhal.4.description'),
         category: 'Pins',
         units: 'boolean',
-        details: 'Inverts the stepper driver enable pin signal.',
+        details: tk('config:firmware.grblhal.4.details'),
         dataType: SWITCH,
     },
     {
         setting: '$5',
-        description: 'Invert limit pins',
+        description: tk('config:firmware.grblhal.5.description'),
         category: 'Pins',
         units: 'boolean',
-        details: 'Inverts the all of the limit input pins.',
+        details: tk('config:firmware.grblhal.5.details'),
         dataType: SWITCH,
     },
     {
         setting: '$6',
-        description: 'Invert probe pin',
+        description: tk('config:firmware.grblhal.6.description'),
         category: 'Pins',
         units: 'boolean',
-        details: 'Inverts the probe input pin signal.',
+        details: tk('config:firmware.grblhal.6.details'),
         dataType: SWITCH,
     },
     {
@@ -534,19 +510,18 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$10',
-        description: 'Status report options',
+        description: tk('config:firmware.grblhal.10.description'),
         category: 'GRBL',
         units: 'mask',
-        details: 'Alters data included in status reports.',
+        details: tk('config:firmware.grblhal.10.details'),
         dataType: MASK_STATUS_REPORT,
     },
     {
         setting: '$11',
-        description: 'Junction deviation',
+        description: tk('config:firmware.grblhal.11.description'),
         category: 'GRBL',
         units: 'mm',
-        details:
-            'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
+        details: tk('config:firmware.grblhal.11.details'),
         dataType: NUMBER,
         min: 0.001,
         max: 0.02,
@@ -554,11 +529,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$12',
-        description: 'Arc tolerance',
+        description: tk('config:firmware.grblhal.12.description'),
         category: 'GRBL',
         units: 'mm',
-        details:
-            'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
+        details: tk('config:firmware.grblhal.12.details'),
         dataType: NUMBER,
         min: 0.001,
         max: 0.003,
@@ -566,11 +540,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$13',
-        description: 'Report in inches',
+        description: tk('config:firmware.grblhal.13.description'),
         category: 'GRBL',
         units: 'boolean',
-        details:
-            'Enables inch units when returning any position and rate value that is not a settings value.',
+        details: tk('config:firmware.grblhal.13.details'),
         dataType: SWITCH,
     },
     {
@@ -593,11 +566,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$20',
-        description: 'Soft limits enable',
+        description: tk('config:firmware.grblhal.20.description'),
         category: 'Homing',
         units: 'boolean',
-        details:
-            'Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing.',
+        details: tk('config:firmware.grblhal.20.details'),
         dataType: SWITCH,
     },
     {
@@ -608,15 +580,14 @@ export const GRBL_HAL_SETTINGS = [
             - bit1 - enable strict mode when hard limits enabled, this bit cannot be changed when COMPATIBILITY_LEVEL > 1.
         */
         setting: '$21',
-        description: 'Hard limits enable',
+        description: tk('config:firmware.grblhal.21.description'),
         category: 'Homing',
         units: 'mask',
-        details:
-            'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.',
+        details: tk('config:firmware.grblhal.21.details'),
         dataType: MASK,
         bits: {
-            0: 'Enable Hard Limits',
-            1: 'Enable Strict Mode when Hard Limits enabled',
+            0: tk('config:firmware.grblhal.21.bits.0'),
+            1: tk('config:firmware.grblhal.21.bits.1'),
         },
         numBits: 2,
     },
@@ -633,40 +604,38 @@ export const GRBL_HAL_SETTINGS = [
             - bit7 - keep homed status on reset if possible.
         */
         setting: '$22',
-        description: 'Homing cycle enable',
+        description: tk('config:firmware.grblhal.22.description'),
         category: 'Homing',
         units: 'mask',
-        details: 'Enables homing cycle. Requires limit switches on all axes.',
+        details: tk('config:firmware.grblhal.22.details'),
         dataType: MASK,
         bits: {
-            0: 'Enable homing.',
-            1: 'Enable single axis homing commands.',
-            2: 'Homing on startup required.',
-            3: 'Set machine origin to 0.',
-            4: 'Two switches shares one input pin.',
-            5: 'Allow manual homing of axes not automatically homed.',
-            6: 'Override locks, allow reset to clear homing on startup required alarm.',
-            7: 'Keep homed status on reset if possible.',
+            0: tk('config:firmware.grblhal.22.bits.0'),
+            1: tk('config:firmware.grblhal.22.bits.1'),
+            2: tk('config:firmware.grblhal.22.bits.2'),
+            3: tk('config:firmware.grblhal.22.bits.3'),
+            4: tk('config:firmware.grblhal.22.bits.4'),
+            5: tk('config:firmware.grblhal.22.bits.5'),
+            6: tk('config:firmware.grblhal.22.bits.6'),
+            7: tk('config:firmware.grblhal.22.bits.7'),
         },
         numBits: 8,
         requiredBit: 0,
     },
     {
         setting: '$23',
-        description: 'Homing direction invert',
+        description: tk('config:firmware.grblhal.23.description'),
         category: 'Homing',
         units: 'mask',
-        details:
-            'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
+        details: tk('config:firmware.grblhal.23.details'),
         dataType: AXIS_MASK,
     },
     {
         setting: '$24',
-        description: 'Homing locate feed rate',
+        description: tk('config:firmware.grblhal.24.description'),
         category: 'Homing',
         units: 'mm/min',
-        details:
-            'Feed rate to slowly engage limit switch to determine its location accurately.',
+        details: tk('config:firmware.grblhal.24.details'),
         dataType: NUMBER,
         min: 1,
         max: 30,
@@ -674,11 +643,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$25',
-        description: 'Homing search seek rate',
+        description: tk('config:firmware.grblhal.25.description'),
         category: 'Homing',
         units: 'mm/min',
-        details:
-            'Seek rate to quickly find the limit switch before the slower locating phase.',
+        details: tk('config:firmware.grblhal.25.details'),
         dataType: NUMBER,
         min: 100,
         max: 1000,
@@ -686,11 +654,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$26',
-        description: 'Homing switch debounce delay',
+        description: tk('config:firmware.grblhal.26.description'),
         category: 'Homing',
         units: 'ms',
-        details:
-            'Sets a short delay between phases of homing cycle to let a switch debounce.',
+        details: tk('config:firmware.grblhal.26.details'),
         dataType: NUMBER,
         min: 5,
         max: 255,
@@ -698,11 +665,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$27',
-        description: 'Homing switch pull-off distance',
+        description: tk('config:firmware.grblhal.27.description'),
         category: 'Homing',
         units: 'mm',
-        details:
-            "Retract distance after triggering switch to disengage it. Homing will fail if switch isn't cleared.",
+        details: tk('config:firmware.grblhal.27.details'),
         dataType: NUMBER,
         min: 0,
         max: 5,
@@ -712,10 +678,10 @@ export const GRBL_HAL_SETTINGS = [
         // TODO max and default
         // NEW
         setting: '$28',
-        description: 'G73 pull-off distance',
+        description: tk('config:firmware.grblhal.28.description'),
         category: 'Homing',
         units: 'mm',
-        details: 'Specifies G73 retract distance in mm.',
+        details: tk('config:firmware.grblhal.28.details'),
         dataType: NUMBER,
         min: 0,
         step: 0.5,
@@ -724,20 +690,20 @@ export const GRBL_HAL_SETTINGS = [
         // TODO max and default
         // NEW
         setting: '$29',
-        description: 'Step Pulse Delay',
+        description: tk('config:firmware.grblhal.29.description'),
         category: 'Homing',
         units: 'μs',
-        details: 'Stepper pulse delay in microseconds.',
+        details: tk('config:firmware.grblhal.29.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
     },
     {
         setting: '$30',
-        description: 'Maximum spindle speed',
+        description: tk('config:firmware.grblhal.30.description'),
         category: 'Spindle',
         units: 'rpm',
-        details: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
+        details: tk('config:firmware.grblhal.30.details'),
         dataType: NUMBER,
         min: 100,
         max: 10000,
@@ -754,10 +720,10 @@ export const GRBL_HAL_SETTINGS = [
             we also may want a different input
         */
         setting: '$31',
-        description: 'Spindle Mode',
+        description: tk('config:firmware.grblhal.31.description'),
         category: 'Spindle',
         units: '',
-        details: 'Specifies Spindle/Laser/Lathe mode',
+        details: tk('config:firmware.grblhal.31.details'),
         dataType: SELECT,
         defaultValue: 0,
         values: {
@@ -768,21 +734,20 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$32',
-        description: 'Laser-mode enabled as spindle',
+        description: tk('config:firmware.grblhal.32.description'),
         category: 'Spindle',
         units: 'boolean',
-        details:
-            'Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
+        details: tk('config:firmware.grblhal.32.details'),
         dataType: SWITCH,
     },
     {
         // TODO default
         // NEW
         setting: '$33',
-        description: 'Spindle Frequency',
+        description: tk('config:firmware.grblhal.33.description'),
         category: 'Spindle',
         units: 'Hz',
-        details: 'Spindle PWM frequency in Hz',
+        details: tk('config:firmware.grblhal.33.details'),
         dataType: NUMBER,
         min: 1,
         max: 10000,
@@ -791,10 +756,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$34',
-        description: 'Spindle Duty Cycle',
+        description: tk('config:firmware.grblhal.34.description'),
         category: 'Spindle',
         units: '%',
-        details: 'Spindle off PWM duty cycle in percent',
+        details: tk('config:firmware.grblhal.34.details'),
         dataType: NUMBER,
         min: 1,
         max: 100,
@@ -803,11 +768,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$35',
-        description: 'Minimum spindle speed',
+        description: tk('config:firmware.grblhal.35.description'),
         category: 'Spindle',
         units: '%',
-        details:
-            'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
+        details: tk('config:firmware.grblhal.35.details'),
         dataType: NUMBER,
         min: 1,
         max: 100,
@@ -816,10 +780,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$36',
-        description: 'Maximum spindle speed',
+        description: tk('config:firmware.grblhal.36.description'),
         category: 'Spindle',
         units: '%',
-        details: 'Maximum spindle speed.',
+        details: tk('config:firmware.grblhal.36.details'),
         dataType: NUMBER,
         min: 1,
         max: 100,
@@ -828,11 +792,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$37',
-        description: 'Deenergized Steppers',
+        description: tk('config:firmware.grblhal.37.description'),
         category: 'Spindle',
         units: '%',
-        details:
-            'Defines which steppers is to be deenergized when motion completes.',
+        details: tk('config:firmware.grblhal.37.details'),
         dataType: AXIS_MASK,
         min: 1,
         max: 100,
@@ -842,10 +805,10 @@ export const GRBL_HAL_SETTINGS = [
         // TODO max
         // NEW
         setting: '$38',
-        description: 'Encoder Pulses',
+        description: tk('config:firmware.grblhal.38.description'),
         category: 'Spindle',
         units: '/revolution',
-        details: 'Spindle encoder pulses per revolution.',
+        details: tk('config:firmware.grblhal.38.details'),
         dataType: NUMBER,
         min: 1,
         max: 100,
@@ -861,20 +824,19 @@ export const GRBL_HAL_SETTINGS = [
                 instead when part of a comment or a $-setting.)
         */
         setting: '$39',
-        description: 'Printable Command Characters',
+        description: tk('config:firmware.grblhal.39.description'),
         category: 'Spindle',
         units: 'boolean',
-        details: 'Enable printable realtime command characters.',
+        details: tk('config:firmware.grblhal.39.details'),
         dataType: SWITCH,
     },
     {
         // NEW
         setting: '$40',
-        description: 'Soft Limits Jogging',
+        description: tk('config:firmware.grblhal.40.description'),
         category: 'Motors',
         units: 'boolean',
-        details:
-            'Enable soft limits for jogging. When enabled jog targets will be limited to machine travel limits for homed axes.',
+        details: tk('config:firmware.grblhal.40.details'),
         dataType: SWITCH,
     },
     {
@@ -886,10 +848,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$43',
-        description: 'Homing Locate Cycle',
+        description: tk('config:firmware.grblhal.43.description'),
         category: 'Homing',
         units: '',
-        details: 'Number of homing locate cycles.',
+        details: tk('config:firmware.grblhal.43.details'),
         dataType: NUMBER,
         min: 0,
         max: 255,
@@ -898,70 +860,64 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$44',
-        description: 'Axis Mask',
+        description: tk('config:firmware.grblhal.44.description'),
         category: 'Homing',
         units: '',
-        details:
-            'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        details: tk('config:firmware.grblhal.44.details'),
         dataType: AXIS_MASK,
     },
     {
         // NEW
         setting: '$45',
-        description: 'Axis Mask',
+        description: tk('config:firmware.grblhal.45.description'),
         category: 'Homing',
         units: '',
-        details:
-            'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        details: tk('config:firmware.grblhal.45.details'),
         dataType: AXIS_MASK,
     },
     {
         // NEW
         setting: '$46',
-        description: 'Axis Mask',
+        description: tk('config:firmware.grblhal.46.description'),
         category: 'Homing',
         units: '',
-        details:
-            'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        details: tk('config:firmware.grblhal.46.details'),
         dataType: AXIS_MASK,
     },
     {
         // NEW
         setting: '$47',
-        description: 'Axis Mask',
+        description: tk('config:firmware.grblhal.47.description'),
         category: 'Homing',
         units: '',
-        details:
-            'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        details: tk('config:firmware.grblhal.47.details'),
         dataType: AXIS_MASK,
     },
     {
         // NEW
         setting: '$48',
-        description: 'Axis Mask',
+        description: tk('config:firmware.grblhal.48.description'),
         category: 'Homing',
         units: '',
-        details:
-            'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        details: tk('config:firmware.grblhal.48.details'),
         dataType: AXIS_MASK,
     },
     {
         // NEW
         setting: '$49',
-        description: 'Axis Mask',
+        description: tk('config:firmware.grblhal.49.description'),
         category: 'Homing',
         units: '',
-        details:
-            'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        details: tk('config:firmware.grblhal.49.details'),
         dataType: AXIS_MASK,
     },
     {
         // NEW
         setting: '$50',
-        description: 'Jogging Step Speed',
+        description: tk('config:firmware.grblhal.50.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'Jogging step speed in mm/min. Used by driver/sender',
+        details: tk('config:firmware.grblhal.50.details'),
         dataType: NUMBER,
         min: 1,
         max: 10000,
@@ -970,10 +926,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$51',
-        description: 'Jogging Slow Speed',
+        description: tk('config:firmware.grblhal.51.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'Jogging slow speed in mm/min. Used by driver/sender',
+        details: tk('config:firmware.grblhal.51.details'),
         dataType: NUMBER,
         min: 1,
         max: 10000,
@@ -982,10 +938,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$52',
-        description: 'Jogging Fast Speed',
+        description: tk('config:firmware.grblhal.52.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'Jogging fast speed in mm/min. Used by driver/sender',
+        details: tk('config:firmware.grblhal.52.details'),
         dataType: NUMBER,
         min: 1,
         max: 10000,
@@ -994,10 +950,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$53',
-        description: 'Jogging Step Distance',
+        description: tk('config:firmware.grblhal.53.description'),
         category: 'Motors',
         units: 'mm',
-        details: 'Jogging step distance in mm. Used by driver/sender',
+        details: tk('config:firmware.grblhal.53.details'),
         dataType: NUMBER,
         min: 1,
         max: 10000,
@@ -1006,10 +962,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$54',
-        description: 'Jogging Slow Distance',
+        description: tk('config:firmware.grblhal.54.description'),
         category: 'Motors',
         units: 'mm',
-        details: 'Jogging slow distance in mm. Used by driver/sender',
+        details: tk('config:firmware.grblhal.54.details'),
         dataType: NUMBER,
         min: 1,
         max: 10000,
@@ -1018,10 +974,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$55',
-        description: 'Jogging Fast Distance',
+        description: tk('config:firmware.grblhal.55.description'),
         category: 'Motors',
         units: 'mm',
-        details: 'Jogging fast distance in mm. Used by driver/sender',
+        details: tk('config:firmware.grblhal.55.details'),
         dataType: NUMBER,
         min: 1,
         max: 10000,
@@ -1043,61 +999,60 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 1 (on)
         setting: '$60',
-        description: 'Restore Default Overrides',
+        description: tk('config:firmware.grblhal.60.description'),
         category: 'GRBL',
         units: 'boolean',
-        details: 'Restore default overrides when program ends.',
+        details: tk('config:firmware.grblhal.60.details'),
         dataType: SWITCH,
     },
     {
         // NEW
         // default 0 (off)
         setting: '$61',
-        description: 'Ignore Safety Door Signal',
+        description: tk('config:firmware.grblhal.61.description'),
         category: 'GRBL',
         units: 'boolean',
-        details:
-            'Ignore safety door signal when idle. If on only the spindle (laser) will be switched off. May be useful if positioning a laser head with the lid open is needed.',
+        details: tk('config:firmware.grblhal.61.details'),
         dataType: SWITCH,
     },
     {
         // NEW
         // default 0 (off)
         setting: '$62',
-        description: 'Sleep Function',
+        description: tk('config:firmware.grblhal.62.description'),
         category: 'GRBL',
         units: 'boolean',
-        details: 'Enable sleep function.',
+        details: tk('config:firmware.grblhal.62.details'),
         dataType: SWITCH,
     },
     {
         // NEW
         // default 0 (on)
         setting: '$63',
-        description: 'Disable Laser on Hold',
+        description: tk('config:firmware.grblhal.63.description'),
         category: 'GRBL',
         units: 'boolean',
-        details: 'Disable laser during hold.',
+        details: tk('config:firmware.grblhal.63.details'),
         dataType: SWITCH,
     },
     {
         // NEW
         // default 0 (off)
         setting: '$64',
-        description: 'Alarm on Startup',
+        description: tk('config:firmware.grblhal.64.description'),
         category: 'GRBL',
         units: 'boolean',
-        details: 'Force grbl to enter alarm mode on startup.',
+        details: tk('config:firmware.grblhal.64.details'),
         dataType: SWITCH,
     },
     {
         // NEW
         // default 0 (off)
         setting: '$65',
-        description: 'Allow Feedrate Override',
+        description: tk('config:firmware.grblhal.65.description'),
         category: 'GRBL',
         units: 'boolean',
-        details: 'Allow feed rate override during probing.',
+        details: tk('config:firmware.grblhal.65.details'),
         dataType: SWITCH,
     },
     // Network Settings
@@ -1114,10 +1069,10 @@ export const GRBL_HAL_SETTINGS = [
             Bit 7: WebDAV
         */
         setting: '$70',
-        description: 'Network Service',
+        description: tk('config:firmware.grblhal.70.description'),
         category: 'Network',
         units: '',
-        details: 'Specify Network Service.',
+        details: tk('config:firmware.grblhal.70.details'),
         dataType: MASK,
         bits: {
             0: 'Telnet',
@@ -1135,10 +1090,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default "GRBL"
         setting: '$71',
-        description: 'Bluetooth Device',
+        description: tk('config:firmware.grblhal.71.description'),
         category: 'Network',
         units: '',
-        details: 'Bluetooth device name.',
+        details: tk('config:firmware.grblhal.71.details'),
         dataType: STRING,
         maxChars: 32,
     },
@@ -1146,10 +1101,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default "GRBL serial port"
         setting: '$72',
-        description: 'Bluetooth Service',
+        description: tk('config:firmware.grblhal.72.description'),
         category: 'Network',
         units: '',
-        details: 'Bluetooth service name.',
+        details: tk('config:firmware.grblhal.72.details'),
         dataType: STRING,
         maxChars: 32,
     },
@@ -1163,10 +1118,10 @@ export const GRBL_HAL_SETTINGS = [
             3: APSTA - Access Point + Station
         */
         setting: '$73',
-        description: 'Wi-Fi Mode',
+        description: tk('config:firmware.grblhal.73.description'),
         category: 'Network',
         units: '',
-        details: 'Wi-Fi Mode.',
+        details: tk('config:firmware.grblhal.73.details'),
         dataType: SELECT,
         defaultValue: 0,
         values: {
@@ -1180,10 +1135,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default empty
         setting: '$74',
-        description: 'Wi-Fi STA SSID',
+        description: tk('config:firmware.grblhal.74.description'),
         category: 'Network',
         units: '',
-        details: 'WiFi STA (Station) SSID.',
+        details: tk('config:firmware.grblhal.74.details'),
         dataType: STRING,
         maxChars: 64,
     },
@@ -1191,10 +1146,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default empty
         setting: '$75',
-        description: 'Wi-Fi STA Password',
+        description: tk('config:firmware.grblhal.75.description'),
         category: 'Network',
         units: '',
-        details: 'WiFi STA (Station) password.',
+        details: tk('config:firmware.grblhal.75.details'),
         dataType: STRING,
         maxChars: 32,
     },
@@ -1202,10 +1157,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default empty
         setting: '$76',
-        description: 'Wi-Fi AP SSID',
+        description: tk('config:firmware.grblhal.76.description'),
         category: 'Network',
         units: '',
-        details: 'WiFi AP (Access Point) SSID.',
+        details: tk('config:firmware.grblhal.76.details'),
         dataType: STRING,
         maxChars: 64,
     },
@@ -1214,10 +1169,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default provided by driver. blank = AP is "Open"
         setting: '$77',
-        description: 'Wi-Fi AP Password',
+        description: tk('config:firmware.grblhal.77.description'),
         category: 'Network',
         units: '',
-        details: 'WiFi AP (Access Point) password.',
+        details: tk('config:firmware.grblhal.77.details'),
         dataType: STRING,
         maxChars: 32,
     },
@@ -1225,10 +1180,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default empty
         setting: '$78',
-        description: 'Wi-Fi Country',
+        description: tk('config:firmware.grblhal.78.description'),
         category: 'Network',
         units: '',
-        details: 'WiFi AP Country (Access Point).',
+        details: tk('config:firmware.grblhal.78.details'),
         dataType: STRING,
         maxChars: 3,
     },
@@ -1236,10 +1191,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 0
         setting: '$79',
-        description: 'Wi-Fi AP Channel Password',
+        description: tk('config:firmware.grblhal.79.description'),
         category: 'Network',
         units: '',
-        details: 'WiFi AP Channel (Access Point) password.',
+        details: tk('config:firmware.grblhal.79.details'),
         dataType: NUMBER,
         min: 0,
         max: 11,
@@ -1249,10 +1204,10 @@ export const GRBL_HAL_SETTINGS = [
         // TODO default
         // NEW
         setting: '$80',
-        description: 'Spindle PID Regulator Proportional Gain',
+        description: tk('config:firmware.grblhal.80.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle PID regulator proportional gain.',
+        details: tk('config:firmware.grblhal.80.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -1260,10 +1215,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$81',
-        description: 'Spindle PID Regulator Integral Gain',
+        description: tk('config:firmware.grblhal.81.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle PID regulator integral gain.',
+        details: tk('config:firmware.grblhal.81.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -1271,10 +1226,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$82',
-        description: 'Spindle PID Regulator Derivative Gain',
+        description: tk('config:firmware.grblhal.82.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle PID regulator derivative gain.',
+        details: tk('config:firmware.grblhal.82.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -1282,10 +1237,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$84',
-        description: 'Spindle PID Max Output Error',
+        description: tk('config:firmware.grblhal.84.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle PID max output error.',
+        details: tk('config:firmware.grblhal.84.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -1293,10 +1248,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$85',
-        description: 'Spindle PID Max Output Error',
+        description: tk('config:firmware.grblhal.85.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle PID regulator max integral error.',
+        details: tk('config:firmware.grblhal.85.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -1304,10 +1259,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$90',
-        description: 'Spindle Sunced Motion PID Regulator Proportional Gain',
+        description: tk('config:firmware.grblhal.90.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle synced motion PID regulator proportional gain.',
+        details: tk('config:firmware.grblhal.90.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -1315,10 +1270,10 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$91',
-        description: 'Spindle Sunced Motion PID Regulator Integral Gain',
+        description: tk('config:firmware.grblhal.91.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle synced motion PID regulator integral gain.',
+        details: tk('config:firmware.grblhal.91.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
@@ -1326,20 +1281,20 @@ export const GRBL_HAL_SETTINGS = [
     {
         // NEW
         setting: '$92',
-        description: 'Spindle Sunced Motion PID Regulator Derivative Gain',
+        description: tk('config:firmware.grblhal.92.description'),
         category: 'PID',
         units: '',
-        details: 'Spindle synced motion PID regulator derivative gain.',
+        details: tk('config:firmware.grblhal.92.details'),
         dataType: NUMBER,
         min: 0,
         step: 1,
     },
     {
         setting: '$100',
-        description: 'X-axis travel resolution',
+        description: tk('config:firmware.grblhal.100.description'),
         category: 'Motors',
         units: 'step/mm',
-        details: 'X-axis travel resolution in steps per millimeter.',
+        details: tk('config:firmware.grblhal.100.details'),
         dataType: NUMBER,
         min: 10,
         max: 500,
@@ -1347,10 +1302,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$101',
-        description: 'Y-axis travel resolution',
+        description: tk('config:firmware.grblhal.101.description'),
         category: 'Motors',
         units: 'step/mm',
-        details: 'Y-axis travel resolution in steps per millimeter.',
+        details: tk('config:firmware.grblhal.101.details'),
         dataType: NUMBER,
         min: 10,
         max: 500,
@@ -1358,10 +1313,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$102',
-        description: 'Z-axis travel resolution',
+        description: tk('config:firmware.grblhal.102.description'),
         category: 'Motors',
         units: 'step/mm',
-        details: 'Z-axis travel resolution in steps per millimeter.',
+        details: tk('config:firmware.grblhal.102.details'),
         dataType: NUMBER,
         min: 10,
         max: 500,
@@ -1369,10 +1324,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$110',
-        description: 'X-axis maximum rate',
+        description: tk('config:firmware.grblhal.110.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'X-axis maximum rate. Used as G0 rapid rate.',
+        details: tk('config:firmware.grblhal.110.details'),
         dataType: NUMBER,
         min: 100,
         max: 1500,
@@ -1380,10 +1335,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$111',
-        description: 'Y-axis maximum rate',
+        description: tk('config:firmware.grblhal.111.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'Y-axis maximum rate. Used as G0 rapid rate.',
+        details: tk('config:firmware.grblhal.111.details'),
         dataType: NUMBER,
         min: 100,
         max: 1500,
@@ -1391,10 +1346,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$112',
-        description: 'Z-axis maximum rate',
+        description: tk('config:firmware.grblhal.112.description'),
         category: 'Motors',
         units: 'mm/min',
-        details: 'Z-axis maximum rate. Used as G0 rapid rate.',
+        details: tk('config:firmware.grblhal.112.details'),
         dataType: NUMBER,
         min: 10,
         max: 1000,
@@ -1402,11 +1357,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$120',
-        description: 'X-axis acceleration',
+        description: tk('config:firmware.grblhal.120.description'),
         category: 'Motors',
         units: 'mm/sec^2',
-        details:
-            'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        details: tk('config:firmware.grblhal.120.details'),
         dataType: NUMBER,
         min: 1,
         max: 15,
@@ -1414,11 +1368,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$121',
-        description: 'Y-axis acceleration',
+        description: tk('config:firmware.grblhal.121.description'),
         category: 'Motors',
         units: 'mm/sec^2',
-        details:
-            'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        details: tk('config:firmware.grblhal.121.details'),
         dataType: NUMBER,
         min: 1,
         max: 15,
@@ -1426,11 +1379,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$122',
-        description: 'Z-axis acceleration',
+        description: tk('config:firmware.grblhal.122.description'),
         category: 'Motors',
         units: 'mm/sec^2',
-        details:
-            'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        details: tk('config:firmware.grblhal.122.details'),
         dataType: NUMBER,
         min: 1,
         max: 15,
@@ -1438,11 +1390,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$130',
-        description: 'X-axis maximum travel',
+        description: tk('config:firmware.grblhal.130.description'),
         category: 'Limits',
         units: 'mm',
-        details:
-            'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        details: tk('config:firmware.grblhal.130.details'),
         dataType: NUMBER,
         min: 1,
         max: 1500,
@@ -1450,11 +1401,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$131',
-        description: 'Y-axis maximum travel',
+        description: tk('config:firmware.grblhal.131.description'),
         category: 'Limits',
         units: 'mm',
-        details:
-            'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        details: tk('config:firmware.grblhal.131.details'),
         dataType: NUMBER,
         min: 1,
         max: 1500,
@@ -1462,11 +1412,10 @@ export const GRBL_HAL_SETTINGS = [
     },
     {
         setting: '$132',
-        description: 'Z-axis maximum travel',
+        description: tk('config:firmware.grblhal.132.description'),
         category: 'Limits',
         units: 'mm',
-        details:
-            'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        details: tk('config:firmware.grblhal.132.details'),
         dataType: NUMBER,
         min: 1,
         max: 1500,
@@ -1495,11 +1444,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 0 percent
         setting: '$340',
-        description: 'Spindle at speed tolerance',
+        description: tk('config:firmware.grblhal.340.description'),
         category: 'Limits',
         units: '%',
-        details:
-            'Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay.',
+        details: tk('config:firmware.grblhal.340.details'),
         dataType: NUMBER,
         min: 0,
         max: 100,
@@ -1521,11 +1469,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 0
         setting: '$341',
-        description: 'Manual tool change mode',
+        description: tk('config:firmware.grblhal.341.description'),
         category: 'Limits',
         units: '',
-        details:
-            'Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay.',
+        details: tk('config:firmware.grblhal.341.details'),
         dataType: SELECT,
         defaultValue: 0,
         values: {
@@ -1541,11 +1488,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 30mm
         setting: '$342',
-        description: 'Probing distance',
+        description: tk('config:firmware.grblhal.342.description'),
         category: 'Limits',
         units: 'mm',
-        details:
-            'Used in mode 1 and 2 when $TPW command is issued and in mode 3.',
+        details: tk('config:firmware.grblhal.342.details'),
         dataType: NUMBER,
         min: 0,
         step: 10,
@@ -1555,11 +1501,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 25mm/min
         setting: '$343',
-        description: 'Probing slow feed rate',
+        description: tk('config:firmware.grblhal.343.description'),
         category: 'Limits',
         units: 'mm/min',
-        details:
-            'Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an accurate tool offset.',
+        details: tk('config:firmware.grblhal.343.details'),
         dataType: NUMBER,
         min: 0,
         step: 10,
@@ -1569,11 +1514,10 @@ export const GRBL_HAL_SETTINGS = [
         // NEW
         // default 200mm/min
         setting: '$344',
-        description: 'Probing seek feed rate',
+        description: tk('config:firmware.grblhal.344.description'),
         category: 'Limits',
         units: 'mm/min',
-        details:
-            'Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an initial tool offset. If successful tool is backed off a bit and probing is redone with the slow feed rate from $343.',
+        details: tk('config:firmware.grblhal.344.details'),
         dataType: NUMBER,
         min: 0,
         step: 10,
@@ -1674,8 +1618,8 @@ export const GRBL_HAL_SETTINGS = [
 ];
 
 export const GRBL_SETTINGS_MAP = new Map(
-    GRBL_SETTINGS.map((s) => [s.setting, s]),
+    GRBL_SETTINGS.map((s) => [s.setting as EEPROM, s]),
 );
 export const GRBL_HAL_SETTINGS_MAP = new Map(
-    GRBL_HAL_SETTINGS.map((s) => [s.setting, s]),
+    GRBL_HAL_SETTINGS.map((s) => [s.setting as EEPROM, s]),
 );

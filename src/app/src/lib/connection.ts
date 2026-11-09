@@ -1,5 +1,6 @@
 import { GRBL } from 'app/constants';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import controller from './controller';
@@ -28,7 +29,10 @@ export const connectToLastDevice = (callback: () => any) => {
         (err: any) => {
             if (err) {
                 toast.error(
-                    `Unable to reconnect to ${port} - ${err.message || err}`,
+                    i18n.t('notifications:connection.reconnectFailed', {
+                        port,
+                        reason: err.message || err,
+                    }),
                     {
                         position: 'bottom-right',
                     },

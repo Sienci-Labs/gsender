@@ -1,6 +1,8 @@
+import { useAppTranslation } from 'app/i18n';
 import { TiWarning } from 'react-icons/ti';
 
 export function MenuWarning() {
+    const { t } = useAppTranslation();
     return (
         <div
             className="bg-yellow-100 border-t border-b border-yellow-500 text-yellow-700 px-4 py-3"
@@ -10,10 +12,10 @@ export function MenuWarning() {
                 <span>
                     <TiWarning />
                 </span>
-                Disconnected
+                {t('config:page.disconnected')}
             </p>
             <p className="text-sm text-center">
-                Some settings may not appear unless connected to a machine.
+                {t('config:page.disconnectedMessage')}
             </p>
         </div>
     );

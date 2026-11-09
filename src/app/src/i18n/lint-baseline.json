@@ -1,0 +1,1161 @@
+{
+  "src/app/src/components/GcodeViewer/index.tsx": {
+    "hardcoded: Copy to Clipboard": 1
+  },
+  "src/app/src/components/Page/index.tsx": {
+    "hardcoded: Go Back": 1
+  },
+  "src/app/src/components/PluginToolCard/index.tsx": {
+    "hardcoded: Plugin": 1
+  },
+  "src/app/src/components/shadcn/Carousel.tsx": {
+    "hardcoded: Next slide": 1,
+    "hardcoded: Previous slide": 1,
+    "hardcoded: carousel": 1,
+    "hardcoded: slide": 1
+  },
+  "src/app/src/components/shadcn/Dialog.tsx": {
+    "hardcoded: Close": 1
+  },
+  "src/app/src/components/shadcn/Sheet.tsx": {
+    "hardcoded: Close": 1
+  },
+  "src/app/src/components/SortableTable/index.tsx": {
+    "hardcoded: <<": 1,
+    "hardcoded: >>": 1,
+    "hardcoded: Add New": 2,
+    "hardcoded: Add New Task": 1,
+    "hardcoded: Entries/Page:": 1,
+    "hardcoded: Jump to page:": 1,
+    "hardcoded: Page": 1,
+    "hardcoded: Reset All": 1,
+    "hardcoded: Show": 1,
+    "hardcoded: of": 1
+  },
+  "src/app/src/components/Tabs/index.tsx": {
+    "hardcoded: Scroll tabs left": 1,
+    "hardcoded: Scroll tabs right": 1,
+    "hardcoded: Widget Tabs": 1
+  },
+  "src/app/src/components/UpdateAlert/index.tsx": {
+    "hardcoded: Feature In-progress": 1,
+    "hardcoded: Look, feel and functionality of this area will be\n                        updated in a later build.": 1
+  },
+  "src/app/src/components/Wizard/hooks/UseValidations.tsx": {
+    "hardcoded: Learn More": 1,
+    "hardcoded: This setup wizard requires a newer firmware version, please\n                    update your firmware before proceeding.": 1
+  },
+  "src/app/src/components/Wizard/ProgressBar.tsx": {
+    "hardcoded: % Complete": 1,
+    "hardcoded: Exit": 1
+  },
+  "src/app/src/components/Wizard/RestartHome.tsx": {
+    "hardcoded: Restart Home": 1
+  },
+  "src/app/src/components/Wizard/SecondaryContentPanel.tsx": {
+    "hardcoded: Scan QR Code": 1,
+    "hardcoded: online resources": 1
+  },
+  "src/app/src/components/Wizard/StepActionButton.tsx": {
+    "hardcoded: Error": 1,
+    "hardcoded: Success": 1
+  },
+  "src/app/src/components/Wizard/WizardContainer.tsx": {
+    "hardcoded: Configuration File Version:": 1,
+    "hardcoded: Exit": 1,
+    "hardcoded: Exit Wizard": 1,
+    "hardcoded: Next": 1,
+    "hardcoded: Previous": 1,
+    "hardcoded: Restart Wizard": 1
+  },
+  "src/app/src/components/Wizard/WizardLanding.tsx": {
+    "hardcoded: Configuration File Version:": 1,
+    "hardcoded: Estimated time:": 1,
+    "hardcoded: Follow along in our": 1,
+    "hardcoded: Need Help?": 1,
+    "hardcoded: Wizard image": 1,
+    "hardcoded: online resources": 1
+  },
+  "src/app/src/components/Wizard/WizardsHub.tsx": {
+    "hardcoded: No wizards available": 1,
+    "hardcoded: Start Wizard": 1,
+    "hardcoded: configuration": 1,
+    "hardcoded: total steps": 1
+  },
+  "src/app/src/features/AccessoryConnectivity/AccessoryConnectivityToast.tsx": {
+    "hardcoded: Device available": 1,
+    "hardcoded: Manage": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx": {
+    "hardcoded: Reconnect to your CNC to start using your ATC.": 1,
+    "hardcoded: Setup Complete!": 1,
+    "hardcoded: Suggested Next Steps:": 1,
+    "hardcoded: • Perform spindle warm up": 1,
+    "hardcoded: • Test your ATC with a tool change": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/ControllerConfiguration.tsx": {
+    "hardcoded: Homing direction": 1,
+    "hardcoded: Input and output pin settings": 1,
+    "hardcoded: Select": 1,
+    "hardcoded: Startup g-code": 1,
+    "hardcoded: The following controller settings are being updated to ensure\n                compatibility with the ATC.": 1,
+    "hardcoded: Tool number persistence": 1,
+    "hardcoded: to apply these changes.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/MacroConfiguration.tsx": {
+    "hardcoded: 12 Tool Rack": 1,
+    "hardcoded: 6 Tool Rack": 1,
+    "hardcoded: No tool rack": 1,
+    "hardcoded: Rack Size": 1,
+    "hardcoded: Sienci ATC operates using a set of macro programs stored in the\n                micro SD card of your controller.": 1,
+    "hardcoded: Specify your rack size and press": 1,
+    "hardcoded: to\n                upload the relevant program files into the SD card. This can be\n                changed later.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/Modbus.tsx": {
+    "hardcoded: Additional spindle settings are applied in this step.": 1,
+    "hardcoded: Press": 1,
+    "hardcoded: Reconnect to your controller. Please ignore any alarms that\n                    pop-up.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx": {
+    "hardcoded: Go To": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/RackPosition.tsx": {
+    "hardcoded: Automatic": 1,
+    "hardcoded: Find Rack Position Method": 1,
+    "hardcoded: For ATC Configuration, you selected “No Tool Rack” and so do\n                    not need to set a rack position.": 1,
+    "hardcoded: If you have a rack installed, please return to the previous\n                    step to correct your selection.": 1,
+    "hardcoded: Install a tool holder (with pull-stud removed) into\n                            the left-most slot": 1,
+    "hardcoded: Lower the spindle taper onto the tool holder until\n                            the tapers match": 1,
+    "hardcoded: Manual": 1,
+    "hardcoded: Populate your tool rack with tool holders": 1,
+    "hardcoded: Position the spindle so that the tool-stud sensor is\n                            directly over the right most tool holder. Once in\n                            the proper position, the LED on the sensor will\n                            light up.": 1,
+    "hardcoded: Press": 1,
+    "hardcoded: Press the": 1,
+    "hardcoded: The machine will take a few minutes to check the\n                        position of the left-most and right-most position of\n                        each tool rack.": 1,
+    "hardcoded: button for the wizard\n                            to determine the precise position of your tool\n                            holders.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx": {
+    "hardcoded: Homing movements have been updated and require the machine to be\n                rehomed.": 1,
+    "hardcoded: Rehome": 1,
+    "hardcoded: Select": 1,
+    "hardcoded: to continue.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/SpindleSetRestart.tsx": {
+    "hardcoded: Click": 1,
+    "hardcoded: Press": 1,
+    "hardcoded: Your spindle settings are applied in this step and the\n                controller will restart automatically.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx": {
+    "hardcoded: Please jog until just above the Tool Length Sensor and set the\n                position of your tool length sensor using the": 1,
+    "hardcoded: button.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/autospin/components/Completion.tsx": {
+    "hardcoded: Next Steps:": 1,
+    "hardcoded: Setup Complete!": 1,
+    "hardcoded: Your AutoSpin has been successfully configured and is ready to\n                use.": 1,
+    "hardcoded: • Reconnect in gSender and verify your spindle starts\n                        and stops from the Carve page.": 1,
+    "hardcoded: • Restart your controller using the power switch": 1,
+    "hardcoded: • Turn the AutoSpin dial to \"S\" and turn on the power\n                        toggle": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/autospin/components/EepromConfig.tsx": {
+    "hardcoded: Click": 1,
+    "hardcoded: Press": 1,
+    "hardcoded: Reboot your controller using the power switch and reconnect": 1,
+    "hardcoded: Your AutoSpin EEPROM settings are applied in this step based on\n                your connected firmware type.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/autospin/components/TestAutoSpin.tsx": {
+    "hardcoded: Choose a speed with the slider": 1,
+    "hardcoded: Press": 1,
+    "hardcoded: RPM": 1,
+    "hardcoded: RPM ($31 - $30)": 1,
+    "hardcoded: Range": 1,
+    "hardcoded: Speed": 1,
+    "hardcoded: Test your AutoSpin setup by running the spindle at a set speed.": 1,
+    "hardcoded: Turn on the spindle using the power toggle": 1,
+    "hardcoded: Turn the AutoSpin dial to \"S\"": 1,
+    "hardcoded: to run the spindle (M3)": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/spindle/components/Completion.tsx": {
+    "hardcoded: Next Steps:": 1,
+    "hardcoded: Setup Complete!": 1,
+    "hardcoded: Sienci Spindle": 1,
+    "hardcoded: Your spindle has been successfully configured and is ready to\n                use.": 1,
+    "hardcoded: • Ensure the VFD is turned on before restarting the\n                        controller": 1,
+    "hardcoded: • Reconnect in gSender and verify your spindle is\n                        working as expected.": 1,
+    "hardcoded: • Restart your controller using the power switch": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/spindle/components/ControllerReboot.tsx": {
+    "hardcoded: I am step 2": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/spindle/components/ModbusConfig.tsx": {
+    "hardcoded: Additional spindle settings are applied in this step.": 1,
+    "hardcoded: Press": 1,
+    "hardcoded: Reconnect to your controller. Please ignore any alarms that\n                    pop-up.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/spindle/components/SpindleConfig.tsx": {
+    "hardcoded: Click": 1,
+    "hardcoded: Press": 1,
+    "hardcoded: Reboot your controller using the power switch and\n                        reconnect": 1,
+    "hardcoded: Your spindle settings are applied in this step and the\n                controller will restart automatically.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/tls/components/Completion.tsx": {
+    "hardcoded: If you change your spindle or router's physical position\n                    (e.g. reinstalling it or a mounting bracket), you may need\n                    to update these settings in": 1,
+    "hardcoded: Next Steps:": 1,
+    "hardcoded: Setup Complete!": 1,
+    "hardcoded: Your Tool Length Sensor and tool change behaviour have been\n                configured.": 1,
+    "hardcoded: or run this\n                    installation wizard again.": 1,
+    "hardcoded: • Reconnect in gSender to finish setting up your\n                            Tool Length Sensor.": 1,
+    "hardcoded: • Restart your controller using the power switch\n                            (power cycle)": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/tls/components/ContinuityCheck.tsx": {
+    "hardcoded: Continuity check passed. Your TLS is working\n                                    correctly.": 1,
+    "hardcoded: Error": 1,
+    "hardcoded: Firmly press the TLS sensor to verify the connection.": 1,
+    "hardcoded: Let's confirm your Tool Length Sensor is wired correctly. Press\n                the TLS down when prompted below.": 1,
+    "hardcoded: Probe pin immediately asserted. Check\n                                        your wiring or probe for a short and\n                                        confirm $6 (Invert Probe Pin) is set\n                                        correctly.": 1,
+    "hardcoded: Success": 1,
+    "hardcoded: Try Again": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/tls/components/ManualToolChangePosition.tsx": {
+    "hardcoded: Jog to the location you'd like the machine to move to for manual\n                tool changes, then set the position using the": 1,
+    "hardcoded: The fields below are already filled with a recommended position.\n                Hit": 1,
+    "hardcoded: button.": 1,
+    "hardcoded: to send the machine there, then jog to\n                fine-tune it from that starting point before setting the\n                position.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/tls/components/TLSContinuitySidebar.tsx": {
+    "hardcoded: $6 - Invert Probe Pin": 1,
+    "hardcoded: $668 - Legacy Tool Sensor": 1,
+    "hardcoded: Related Settings": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/tls/components/TLSInputEnable.tsx": {
+    "hardcoded: $6 - Invert Probe Pin": 1,
+    "hardcoded: Enable TLS Input": 1,
+    "hardcoded: Probe Type": 1,
+    "hardcoded: TLS Input": 1,
+    "hardcoded: TLS input enable command sent.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/tls/components/TLSLocation.tsx": {
+    "hardcoded: Install the tallest bit you own in your spindle or router. Jog\n                until it's positioned just above (10-20mm) the Tool Length\n                Sensor, then set the position using the": 1,
+    "hardcoded: Using your tallest tool gives the most Z-axis clearance above\n                the sensor, so its measured position ends up negative — this is\n                what lets gSender accurately probe tools of any length during a\n                tool change without running out of travel.": 1,
+    "hardcoded: button.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/tls/components/TLSOptions.tsx": {
+    "hardcoded: Configure how gSender should handle tool changes with your Tool\n                Length Sensor (TLS).": 1,
+    "hardcoded: First tool behaviour": 1,
+    "hardcoded: Move the CNC to a more convenient location for manual\n                        tool changes instead of prompting to change over the\n                        sensor.": 1,
+    "hardcoded: Select": 1,
+    "hardcoded: Set manual tool change location": 1,
+    "hardcoded: to set your tool change strategy to Fixed\n                Tool Sensor and save these options.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/LoadGridFile.tsx": {
+    "hardcoded: Load the alignment grid pattern for your vacuum table. This will\n                open the file in the main visualizer.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/LoadMountingFile.tsx": {
+    "hardcoded: Load the mounting-hole pattern for your vacuum table. This will\n                open the file in the main visualizer.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/SelectSize.tsx": {
+    "hardcoded: Choose the size of your vacuum table.": 1
+  },
+  "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/ZeroPosition.tsx": {
+    "hardcoded: Jog to the front-left corner of your vacuum table.": 1,
+    "hardcoded: Once you're in position, zero the X and Y axes so the mounting\n                and grid files line up with the table.": 1
+  },
+  "src/app/src/features/ATC/components/ATCStartValidations.tsx": {
+    "hardcoded: Run job": 1
+  },
+  "src/app/src/features/ATC/components/ATCUnavailable.tsx": {
+    "hardcoded: ATC Unavailable": 1
+  },
+  "src/app/src/features/ATC/components/Configuration/components/ConfigTab.tsx": {
+    "hardcoded: ). Ensure the file exists\n                                and SD card is installed — apply disabled.": 1,
+    "hardcoded: Advanced": 1,
+    "hardcoded: Check pressure before tool\n                                                    change": 1,
+    "hardcoded: Check tool collision before\n                                                    tool unload": 1,
+    "hardcoded: Distance between each fork.": 1,
+    "hardcoded: Go to ATC Setup": 1,
+    "hardcoded: Manual Change Position": 1,
+    "hardcoded: Offset Management": 1,
+    "hardcoded: Other": 1,
+    "hardcoded: Pressure Sensor": 1,
+    "hardcoded: Retain tool table settings when rack\n                                        removed": 1,
+    "hardcoded: Safety Checks": 1,
+    "hardcoded: Sensor Position": 1,
+    "hardcoded: Tool Fork Spacing (mm)": 1,
+    "hardcoded: Tool rack configuration is managed through the ATC\n                            setup process. Re-run setup to reconfigure your\n                            rack.": 1,
+    "hardcoded: Tool-stud Sensor": 1,
+    "hardcoded: Unable to read board config (": 1,
+    "hardcoded: When loading from tool rack:": 1,
+    "hardcoded: When loading manually:": 1
+  },
+  "src/app/src/features/ATC/components/Configuration/components/PositionInput.tsx": {
+    "hardcoded: X:": 1,
+    "hardcoded: Y:": 1,
+    "hardcoded: Z:": 1
+  },
+  "src/app/src/features/ATC/components/Configuration/components/TemplatesTab.tsx": {
+    "hardcoded: Controller Templates:": 1,
+    "hardcoded: Local Templates:": 1,
+    "hardcoded: Macros (": 1,
+    "hardcoded: Select a macro to view its contents": 1,
+    "hardcoded: Status:": 1,
+    "hardcoded: Upload JSON Template File": 1
+  },
+  "src/app/src/features/ATC/components/CurrentToolInfo.tsx": {
+    "hardcoded: Manual": 1,
+    "hardcoded: Probe": 1,
+    "hardcoded: Rack": 1
+  },
+  "src/app/src/features/ATC/components/KeepOut/KeepOutToggle.tsx": {
+    "hardcoded: OK": 1
+  },
+  "src/app/src/features/ATC/components/LoadToolPopover.tsx": {
+    "hardcoded: Loading...": 1
+  },
+  "src/app/src/features/ATC/components/ToolDisplayModal.tsx": {
+    "hardcoded: Tools": 1
+  },
+  "src/app/src/features/ATC/components/ToolTable.tsx": {
+    "hardcoded: Probe All": 1
+  },
+  "src/app/src/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx": {
+    "hardcoded: Cancel": 1,
+    "hardcoded: Confirm Remap": 1,
+    "hardcoded: New Tool Number": 1,
+    "hardcoded: Select a tool": 1
+  },
+  "src/app/src/features/ATC/components/ui/ProbeButton.tsx": {
+    "hardcoded: Probe Tool": 1
+  },
+  "src/app/src/features/Config/components/EEPROMInputs/BitValueIndicator.tsx": {
+    "hardcoded: Value:": 2
+  },
+  "src/app/src/features/Config/components/SettingInputs/EEPROMSettingInput.tsx": {
+    "hardcoded: HI": 1
+  },
+  "src/app/src/features/Config/components/SettingInputs/JogInput.tsx": {
+    "hardcoded: A:": 1,
+    "hardcoded: XY:": 1,
+    "hardcoded: Z:": 1
+  },
+  "src/app/src/features/Config/components/SettingInputs/LocationInput.tsx": {
+    "hardcoded: X:": 1,
+    "hardcoded: Y:": 1,
+    "hardcoded: Z:": 1
+  },
+  "src/app/src/features/Config/components/wizards/AccessoryOutputWizard.tsx": {
+    "hardcoded: M3": 1,
+    "hardcoded: M4": 1,
+    "hardcoded: M5": 1,
+    "hardcoded: M7": 1,
+    "hardcoded: M8": 1,
+    "hardcoded: M9": 1
+  },
+  "src/app/src/features/Config/components/wizards/LimitSwitchIndicators.tsx": {
+    "hardcoded: A:": 1,
+    "hardcoded: X:": 1,
+    "hardcoded: Y:": 1,
+    "hardcoded: Z:": 1
+  },
+  "src/app/src/features/Connection/components/DisconnectButton.tsx": {
+    "hardcoded: Disconnect": 1
+  },
+  "src/app/src/features/Connection/components/PortListings.tsx": {
+    "hardcoded: Ethernet (port": 1,
+    "hardcoded: No USB devices found": 1,
+    "hardcoded: USB (": 1,
+    "hardcoded: Unrecognized Ports": 1
+  },
+  "src/app/src/features/Connection/index.tsx": {
+    "hardcoded: Connect": 1,
+    "hardcoded: Connect to CNC": 1,
+    "hardcoded: Connecting...": 1,
+    "hardcoded: Connection menu": 1,
+    "hardcoded: Unable to connect.": 1
+  },
+  "src/app/src/features/Console/components/ConsoleInput.tsx": {
+    "hardcoded: Run": 1
+  },
+  "src/app/src/features/Console/components/ConsoleList.tsx": {
+    "hardcoded: Scroll to latest message": 1
+  },
+  "src/app/src/features/Console/components/ConsoleToolbar.tsx": {
+    "hardcoded: Filter console messages": 1
+  },
+  "src/app/src/features/Console/index.tsx": {
+    "hardcoded: Not connected to a device": 1
+  },
+  "src/app/src/features/DataCollection/index.tsx": {
+    "hardcoded: Accept": 1,
+    "hardcoded: Anonymous": 1,
+    "hardcoded: Change anytime in Settings": 1,
+    "hardcoded: Close": 1,
+    "hardcoded: Decline": 1,
+    "hardcoded: Help us make gSender better": 1,
+    "hardcoded: Optional": 1
+  },
+  "src/app/src/features/DRO/component/GoTo.tsx": {
+    "hardcoded: Execute move to location": 1,
+    "hardcoded: Go To Location": 1,
+    "hardcoded: Go!": 1,
+    "hardcoded: Open Go To Location dialog": 1
+  },
+  "src/app/src/features/DRO/component/HomingSwitch.tsx": {
+    "hardcoded: Home": 1
+  },
+  "src/app/src/features/DRO/component/Parking.tsx": {
+    "hardcoded: Go to Park Location": 1
+  },
+  "src/app/src/features/DRO/component/UnitBadge.tsx": {
+    "hardcoded: Units:": 1
+  },
+  "src/app/src/features/DRO/index.tsx": {
+    "hardcoded: Go to": 1,
+    "hardcoded: Zero all axes: Set current position as work zero for all axes": 2
+  },
+  "src/app/src/features/FileControl/ButtonControlGroup.tsx": {
+    "hardcoded: Close File": 1,
+    "hardcoded: View Recent Files": 1
+  },
+  "src/app/src/features/FileControl/components/ReloadFileAlert.tsx": {
+    "hardcoded: Reload File": 1
+  },
+  "src/app/src/features/FileControl/FileInformation/index.tsx": {
+    "hardcoded: Info": 1,
+    "hardcoded: Last Job": 1,
+    "hardcoded: Open G-code step through": 1,
+    "hardcoded: Recent Files": 1,
+    "hardcoded: Size": 1,
+    "hardcoded: Toggle G-code editor": 1,
+    "hardcoded: lines)": 1
+  },
+  "src/app/src/features/FileControl/FileInformation/Info.tsx": {
+    "hardcoded: Estimated Time": 1,
+    "hardcoded: Feed": 1,
+    "hardcoded: Speed": 1,
+    "hardcoded: Tools": 1
+  },
+  "src/app/src/features/FileControl/FileInformation/Size.tsx": {
+    "hardcoded: Max": 1,
+    "hardcoded: Min": 1,
+    "hardcoded: Size": 1
+  },
+  "src/app/src/features/GcodeStepper/components/GCodeSourcePanel.tsx": {
+    "hardcoded: G-code (": 1,
+    "hardcoded: Go to start": 1,
+    "hardcoded: lines)": 1
+  },
+  "src/app/src/features/GcodeStepper/components/StepControls.tsx": {
+    "hardcoded: Reset to start": 1,
+    "hardcoded: Step Controls": 1,
+    "hardcoded: lines": 1
+  },
+  "src/app/src/features/GcodeStepper/components/StepThroughScrubber.tsx": {
+    "hardcoded: G-code line": 1
+  },
+  "src/app/src/features/GcodeStepper/components/ToolVisibilityPanel.tsx": {
+    "hardcoded: No tools found in this file.": 1,
+    "hardcoded: RPM": 1,
+    "hardcoded: Tools": 1
+  },
+  "src/app/src/features/GcodeStepper/index.tsx": {
+    "hardcoded: Close step through": 1,
+    "hardcoded: Reading positions…": 1
+  },
+  "src/app/src/features/IconUpdater/index.tsx": {
+    "hardcoded: gSender Logo": 1
+  },
+  "src/app/src/features/JobControl/index.tsx": {
+    "hardcoded: , which exceed": 1,
+    "hardcoded: Alternatively, you can update your\n                                post-processor to include a tool change command\n                                with your file.": 1,
+    "hardcoded: Load the tool you want to use into the spindle\n                                before trying again.": 1,
+    "hardcoded: Please confirm that you want to use this\n                                    tool": 1,
+    "hardcoded: Remap": 1,
+    "hardcoded: Select": 1,
+    "hardcoded: The file contains no tool change commands\n                                    (M6) and the tool in the spindle will be\n                                    used. However, the tool in the spindle does\n                                    not have an offset.": 1,
+    "hardcoded: This file contains no tool change commands\n                                    (M6) and the tool in the spindle will be\n                                    used.": 1,
+    "hardcoded: This file contains no tool change commands (M6)\n                                and there is no tool in the spindle.": 1,
+    "hardcoded: This file references tool": 1,
+    "hardcoded: in the ATC tab to\n                                    establish an offset and re-zero the\n                                    workpiece before trying again.": 1,
+    "hardcoded: in the Tool Timeline before starting, or confirm\n                                to run anyway.": 1,
+    "hardcoded: tools).": 1,
+    "hardcoded: your\n                                configured tool table size (": 1
+  },
+  "src/app/src/features/JobControl/OutlineButton.tsx": {
+    "hardcoded: Outline": 1
+  },
+  "src/app/src/features/JobControl/ProgressArea.tsx": {
+    "hardcoded: Finalizing": 1,
+    "hardcoded: Job Progress": 1,
+    "hardcoded: cutting": 1,
+    "hardcoded: remaining": 1
+  },
+  "src/app/src/features/JobControl/StartFromLine.tsx": {
+    "hardcoded: (amount above the max height of the file)": 1,
+    "hardcoded: 10 lines": 1,
+    "hardcoded: Calculates all your CNC movements, attributes,\n                                and gSender automations to pick up right where\n                                you left off.": 1,
+    "hardcoded: For best success, we usually recommend\n                                    resuming about": 1,
+    "hardcoded: Recover a job after power loss, mechanical\n                                malfunction, disconnection, or other failure.": 1,
+    "hardcoded: Resume job at line:": 1,
+    "hardcoded: Start from Line": 1,
+    "hardcoded: With Safe Height:": 1,
+    "hardcoded: Your job of": 1,
+    "hardcoded: earlier:": 1,
+    "hardcoded: line": 1,
+    "hardcoded: lines was last\n                                stopped around line:": 1
+  },
+  "src/app/src/features/JobControl/WoodcuttingProgress.tsx": {
+    "hardcoded: Spinning Drill": 1
+  },
+  "src/app/src/features/Jogging/components/AJog.tsx": {
+    "hardcoded: a Labels tab": 1
+  },
+  "src/app/src/features/Jogging/components/ZJog.tsx": {
+    "hardcoded: Z Labels tab": 1
+  },
+  "src/app/src/features/Jogging/index.tsx": {
+    "hardcoded: Jog wheel arrows": 1
+  },
+  "src/app/src/features/Keyboard/Keyboard/EditArea.tsx": {
+    "hardcoded: Action": 1,
+    "hardcoded: Cancel": 1,
+    "hardcoded: Current Shortcut": 1,
+    "hardcoded: New Shortcut:": 1,
+    "hardcoded: None": 1,
+    "hardcoded: Press Some Keys...": 1,
+    "hardcoded: Update Shortcut": 1
+  },
+  "src/app/src/features/MachineInfo/index.tsx": {
+    "hardcoded: Machine Information": 1
+  },
+  "src/app/src/features/MachineInfo/MachineInfoDisplay.tsx": {
+    "hardcoded: CNC Modals": 1,
+    "hardcoded: Close machine information": 1,
+    "hardcoded: Current tool:": 1,
+    "hardcoded: Keepout:": 1,
+    "hardcoded: Lock stepper motors": 1,
+    "hardcoded: Machine Information": 1,
+    "hardcoded: Pins": 1
+  },
+  "src/app/src/features/MachineStatus/MachineStatus.tsx": {
+    "hardcoded: Disconnected": 1
+  },
+  "src/app/src/features/Macros/Macro.tsx": {
+    "hardcoded: No Macros...": 1
+  },
+  "src/app/src/features/Macros/MacroForm.tsx": {
+    "hardcoded: Cancel": 1,
+    "hardcoded: G-code": 1,
+    "hardcoded: Macro Description": 1,
+    "hardcoded: Name": 1
+  },
+  "src/app/src/features/Macros/MacroItem.tsx": {
+    "hardcoded: Delete": 1,
+    "hardcoded: Edit": 1
+  },
+  "src/app/src/features/MovementTuning/Steps/AxisSelection.tsx": {
+    "hardcoded: Axis to Tune": 1,
+    "hardcoded: Please connect to a device before starting the\n                            movement tuning wizard.": 1,
+    "hardcoded: Whichever axis you'll be tuning, please place it in an\n                    initial location so that it'll have space to move to the\n                    right (for X), backwards (for Y), and downwards (for Z).": 1
+  },
+  "src/app/src/features/MovementTuning/Steps/Completion.tsx": {
+    "hardcoded: -axis": 1,
+    "hardcoded: -axis looks accurate, so\n                    you should be good to go!": 1,
+    "hardcoded: -axis movement was off\n                        by": 1,
+    "hardcoded: -axis step/mm value in your CNC firmware.": 1,
+    "hardcoded: Consider updating your": 1,
+    "hardcoded: From:": 1,
+    "hardcoded: This will update the": 1,
+    "hardcoded: To:": 1,
+    "hardcoded: Update step/mm": 1,
+    "hardcoded: Your": 2,
+    "hardcoded: step/mm value in your CNC firmware (": 1
+  },
+  "src/app/src/features/MovementTuning/Steps/DistanceTravelled.tsx": {
+    "hardcoded: Lastly, measure the distance travelled between the original\n                    mark and the current gantry location. Take your time when\n                    entering this value, a more accurate measurement will give\n                    you better tuning results.": 1,
+    "hardcoded: Set Distance Travelled": 1
+  },
+  "src/app/src/features/MovementTuning/Steps/index.tsx": {
+    "hardcoded: -axis": 2,
+    "hardcoded: -axis looks accurate,\n                        so you should be good to go!": 1,
+    "hardcoded: -axis movement was\n                            off by": 1,
+    "hardcoded: -axis step/mm value in your CNC firmware.": 1,
+    "hardcoded: Axis to Tune": 1,
+    "hardcoded: By testing for this difference using a marker or\n                            tape and a measuring tape, this tool will better\n                            tune the firmware to your machine.": 1,
+    "hardcoded: Consider updating your": 1,
+    "hardcoded: Diagram": 1,
+    "hardcoded: From:": 1,
+    "hardcoded: If you're looking to use your CNC for more accurate\n                            work and notice a specific axis is always off by a\n                            small amount - say 102mm instead of 100 - then use\n                            this tool.": 1,
+    "hardcoded: Instructions": 1,
+    "hardcoded: Mark First Location": 1,
+    "hardcoded: Move": 1,
+    "hardcoded: Movement Tuning Example": 1,
+    "hardcoded: Movement Tuning Step": 1,
+    "hardcoded: Please connect to a device before starting\n                                    the movement tuning wizard.": 1,
+    "hardcoded: Set Distance Travelled": 1,
+    "hardcoded: Since CNC firmware needs to understand its hardware\n                            to make exact movements, small manufacturing\n                            variations in the motors, lead screws, pulleys, or\n                            incorrect firmware will create inaccuracies over\n                            longer distances.": 1,
+    "hardcoded: Start Movement Tuning": 1,
+    "hardcoded: This will update the": 1,
+    "hardcoded: To:": 1,
+    "hardcoded: Update step/mm": 1,
+    "hardcoded: Whichever axis you'll be tuning, please place it in\n                            an initial location so that it'll have space to move\n                            to the right (for X), backwards (for Y), and\n                            downwards (for Z).": 1,
+    "hardcoded: Your": 2,
+    "hardcoded: step/mm value in your CNC firmware (": 1
+  },
+  "src/app/src/features/MovementTuning/Steps/MarkFirstLocation.tsx": {
+    "hardcoded: First, mark next to the gantry in the location shown with\n                    your marker, pencil, or using a strip of tape.": 1,
+    "hardcoded: Mark First Location": 1
+  },
+  "src/app/src/features/MovementTuning/Steps/MoveAxis.tsx": {
+    "hardcoded: -axis": 1,
+    "hardcoded: Move": 1,
+    "hardcoded: Now move any distance you wish. A larger value will better\n                    tune your movement, just make sure you don't hit your\n                    machine limits. Once you are ready, clicked the Move Axis\n                    Button.": 1
+  },
+  "src/app/src/features/MovementTuning/Steps/MovementTuning.tsx": {
+    "hardcoded: By testing for this difference using a marker or\n                                tape and a measuring tape, this tool will better\n                                tune the firmware to your machine.": 1,
+    "hardcoded: If you're looking to use your CNC for more\n                                accurate work and notice a specific axis is\n                                always off by a small amount - say 102mm instead\n                                of 100 - then use this tool.": 1,
+    "hardcoded: Since CNC firmware needs to understand its\n                                hardware to make exact movements, small\n                                manufacturing variations in the motors, lead\n                                screws, pulleys, or incorrect firmware will\n                                create inaccuracies over longer distances.": 1
+  },
+  "src/app/src/features/NotificationsArea/Header.tsx": {
+    "hardcoded: Clear all notifications": 1,
+    "hardcoded: Notifications": 1
+  },
+  "src/app/src/features/NotificationsArea/NotificationList.tsx": {
+    "hardcoded: No notifications": 1
+  },
+  "src/app/src/features/Plugins/components/InstallPluginDialog.tsx": {
+    "hardcoded: A gSender plugin is a folder holding a": 1,
+    "hardcoded: From .zip…": 1,
+    "hardcoded: From folder…": 1,
+    "hardcoded: Installing": 1,
+    "hardcoded: Nothing was left half-installed. You can\n                                        pick a different folder or zip and try\n                                        again.": 1,
+    "hardcoded: Only continue if you trust where this plugin came from.": 1,
+    "hardcoded: Only install plugins from sources you\n                                        trust.": 1,
+    "hardcoded: Permissions": 1,
+    "hardcoded: Permissions marked “declared, not confirmed”\n                        are ones the plugin asks for that we could not find in\n                        its code. That is normal for plugins that bundle\n                        gSender's SDK, but it does mean you are taking the\n                        author's word for it.": 1,
+    "hardcoded: Pick the plugin you want to install.\n                                        Nothing is copied anywhere until you\n                                        have seen what it can do.": 1,
+    "hardcoded: Reading the plugin…": 1,
+    "hardcoded: This is a downgrade.": 1,
+    "hardcoded: This plugin's use of gSender cannot be fully verified.": 1,
+    "hardcoded: Version numbers could not be compared.": 1,
+    "hardcoded: Your previous version is kept until this\n                                        finishes.": 1,
+    "hardcoded: build, or a": 1,
+    "hardcoded: declared, not confirmed": 1,
+    "hardcoded: gSender registers plugin pages when it\n                                        starts, so it needs a restart before you\n                                        can open this plugin.": 1,
+    "hardcoded: is already installed.": 1,
+    "hardcoded: manifest and a": 1,
+    "hardcoded: of that folder.": 1
+  },
+  "src/app/src/features/Plugins/components/PluginManager.tsx": {
+    "hardcoded: Each plugin is a folder containing": 1,
+    "hardcoded: Install Plugin": 1,
+    "hardcoded: Loading plugins...": 1,
+    "hardcoded: No plugins installed.": 1,
+    "hardcoded: Plugins directory:": 1,
+    "hardcoded: Refresh": 1,
+    "hardcoded: Restart gSender to apply plugin changes. Mount\n                            routes are registered when the server starts.": 1,
+    "hardcoded: Restart now": 1,
+    "hardcoded: Slots:": 1,
+    "hardcoded: Uninstall": 1,
+    "hardcoded: and a": 1,
+    "hardcoded: build output. After\n                    installing, removing or enabling a plugin, restart gSender\n                    for mount routes to apply.": 1,
+    "hardcoded: · v": 1
+  },
+  "src/app/src/features/Plugins/components/PluginPage.tsx": {
+    "hardcoded: Plugin not found or disabled. Install plugins to": 1,
+    "hardcoded: folder and\n                        restart gSender.": 1
+  },
+  "src/app/src/features/Plugins/components/PluginVisualizerOverlayHost.tsx": {
+    "hardcoded: Close plugin": 1
+  },
+  "src/app/src/features/Probe/Probe.tsx": {
+    "hardcoded: Change Probe Type": 1,
+    "hardcoded: Probe": 1
+  },
+  "src/app/src/features/Probe/ProbeDiameter.tsx": {
+    "hardcoded: No tools available, add one below.": 1
+  },
+  "src/app/src/features/Probe/ProbeImage.tsx": {
+    "hardcoded: Probe Block orientation guide image": 1
+  },
+  "src/app/src/features/Probe/RunProbe.tsx": {
+    "hardcoded: 1. Check the tool is positioned correctly\n                                (pictured).": 1,
+    "hardcoded: 3. In some cases, holding the touch plate\n                                    still while probing will give a more\n                                    consistent measurement.": 1,
+    "hardcoded: Verify this is correct before starting.": 1,
+    "hardcoded: Warning": 1,
+    "hardcoded: Warning - Probing": 1,
+    "hardcoded: corner": 1
+  },
+  "src/app/src/features/RemoteMode/components/AddressOption.tsx": {
+    "hardcoded: Recommended": 1
+  },
+  "src/app/src/features/RemoteMode/components/QRCode.tsx": {
+    "hardcoded: Or type the text below into a web browser for any other device:": 1,
+    "hardcoded: Scan QR Code": 1,
+    "hardcoded: Scan with your phone camera to control your CNC": 1
+  },
+  "src/app/src/features/RemoteMode/components/RemoteMenuFlyout.tsx": {
+    "hardcoded: Menu": 2
+  },
+  "src/app/src/features/RemoteMode/index.tsx": {
+    "hardcoded: ) instead": 1,
+    "hardcoded: Addr:": 1,
+    "hardcoded: Clicking \"Save\" will ask you to\n                                restart gSender so that the settings can be\n                                updated.": 1,
+    "hardcoded: Enable Wireless Control": 1,
+    "hardcoded: In most cases you'll want the recommended\n                                address and the default port:": 1,
+    "hardcoded: Other devices can't reach\n                                                gSender at this address — pick\n                                                the recommended one to use\n                                                wireless control.": 1,
+    "hardcoded: Port:": 1,
+    "hardcoded: Save": 1,
+    "hardcoded: This computer no longer\n                                                        has": 1,
+    "hardcoded: Use": 1,
+    "hardcoded: other devices on your network\n                                                use this address to reach\n                                                gSender.": 1
+  },
+  "src/app/src/features/Rotary/Actions.tsx": {
+    "hardcoded: Probe Rotary Z-Axis": 1,
+    "hardcoded: Rotary Surfacing": 1,
+    "hardcoded: Y-Axis Alignment": 1
+  },
+  "src/app/src/features/Rotary/components/VisualizerPreview.tsx": {
+    "hardcoded: No g-code generated yet.": 1,
+    "hardcoded: Please generate g-code\n                    first.": 1
+  },
+  "src/app/src/features/Rotary/MountingSetup.tsx": {
+    "hardcoded: Load G-Code to Visualizer": 1,
+    "hardcoded: Mounting Setup": 2
+  },
+  "src/app/src/features/Rotary/RotarySurfacing.tsx": {
+    "hardcoded: Cut faster and cleaner by only rotating one\n                                direction, but you will need to rehome your\n                                A-axis at the end.": 1,
+    "hardcoded: Delay": 1,
+    "hardcoded: Generate G-Code": 1,
+    "hardcoded: Load to Main Visualizer": 1,
+    "hardcoded: Make sure that your tool clears the surface of your\n                            material without running into the limits of your\n                            Z-axis. You should also use the probing feature to\n                            zero your Z-axis to the centerline before surfacing.": 1,
+    "hardcoded: lines)": 1
+  },
+  "src/app/src/features/Rotary/Toggle.tsx": {
+    "hardcoded: 4-Axis": 1,
+    "hardcoded: Rotary": 1
+  },
+  "src/app/src/features/SDCard/components/ActionButtons.tsx": {
+    "hardcoded: Refresh Files": 1,
+    "hardcoded: Upload": 1
+  },
+  "src/app/src/features/SDCard/components/FileList.tsx": {
+    "hardcoded: ATC Macro": 1,
+    "hardcoded: Delete": 1,
+    "hardcoded: Enable FTP or YMODEM in firmware to use SD card tools.": 1,
+    "hardcoded: Files (": 1,
+    "hardcoded: Must be connected to use SD card functionality.": 1,
+    "hardcoded: No files found": 1,
+    "hardcoded: Run": 1,
+    "hardcoded: SD card tools are only available for grblHAL devices.": 1,
+    "hardcoded: Unusable": 1,
+    "hardcoded: Upload files or refresh to see SD card contents": 1
+  },
+  "src/app/src/features/SDCard/components/StatusIndicator.tsx": {
+    "hardcoded: SD Card Status:": 1
+  },
+  "src/app/src/features/SDCard/components/UploadModal.tsx": {
+    "hardcoded: ):": 1,
+    "hardcoded: Accepts: .gcode, .nc, .macro and other supported\n                            files": 1,
+    "hardcoded: Cancel": 1,
+    "hardcoded: Drag & drop files here, or": 1,
+    "hardcoded: Remove file": 1,
+    "hardcoded: Selected Files (": 1,
+    "hardcoded: browse": 1
+  },
+  "src/app/src/features/SDCard/components/UploadProgressBar.tsx": {
+    "hardcoded: Upload complete!": 1,
+    "hardcoded: Uploading...": 1
+  },
+  "src/app/src/features/Spindle/components/LaserControls.tsx": {
+    "hardcoded: Power": 1,
+    "hardcoded: Test Duration:": 1
+  },
+  "src/app/src/features/Spindle/components/ModalToggle.tsx": {
+    "hardcoded: Laser": 1,
+    "hardcoded: Spindle": 1
+  },
+  "src/app/src/features/Spindle/components/SpindleControls.tsx": {
+    "hardcoded: RPM": 2,
+    "hardcoded: Speed": 1
+  },
+  "src/app/src/features/Squaring/components/ShowJogControls.tsx": {
+    "hardcoded: Show Jog Controls": 1
+  },
+  "src/app/src/features/Squaring/Steps/index.tsx": {
+    "hardcoded: 3 squares of tape marked with an\n                                    'X'": 1,
+    "hardcoded: A long ruler or measuring tape": 1,
+    "hardcoded: If the X and Y axes aren't squared to each other on\n                            your CNC then it will cause your cuts to end up\n                            skewed.": 1,
+    "hardcoded: If your CNC is making skewed cuts (pictured),\n                            it's because the X and Y axes aren't\n                            squared to each other. This can be fixed.": 1,
+    "hardcoded: Next Step": 1,
+    "hardcoded: Please connect to a device before starting\n                                    the squaring wizard.": 1,
+    "hardcoded: Put something pointed in the spindle like an\n                                    old v-bit, tapered bit, pencil, or a pointed\n                                    dowel": 1,
+    "hardcoded: Start XY Squaring": 1,
+    "hardcoded: To know how much adjustment is needed, follow the\n                            steps below. Prepare:": 1,
+    "hardcoded: Use the jog buttons to position your CNC near its\n                            front, left corner with the pointed tip almost\n                            touching the wasteboard, then continue below.": 1,
+    "hardcoded: XY Squaring Example": 1
+  },
+  "src/app/src/features/Squaring/Steps/Landing.tsx": {
+    "hardcoded: 3 squares of tape marked with an 'X'": 1,
+    "hardcoded: A long ruler or measuring tape": 1,
+    "hardcoded: Put something pointed in the spindle like an old\n                            v-bit, tapered bit, pencil, or a pointed dowel": 1,
+    "hardcoded: To know how much adjustment is needed, follow the steps\n                    below. Prepare:": 1,
+    "hardcoded: Use the jog buttons to position your CNC near its front,\n                    left corner with the pointed tip almost touching the\n                    wasteboard, then continue below.": 1
+  },
+  "src/app/src/features/Squaring/Steps/MarkingStep.tsx": {
+    "hardcoded: Instructions": 1
+  },
+  "src/app/src/features/Squaring/Steps/MeasurementStep.tsx": {
+    "hardcoded: Instructions": 1
+  },
+  "src/app/src/features/Squaring/Steps/ResultsStep.tsx": {
+    "hardcoded: ) but you may want to adjust the right Y-axis\n                        rail to achieve better squareness.": 1,
+    "hardcoded: Angle Deviation": 1,
+    "hardcoded: Bottom Edge (1-2)": 1,
+    "hardcoded: Current:": 2,
+    "hardcoded: Diagonal (1-3)": 1,
+    "hardcoded: Measured Dimensions": 1,
+    "hardcoded: No adjustments are needed.": 1,
+    "hardcoded: Other Recommendations": 1,
+    "hardcoded: Recommended:": 2,
+    "hardcoded: Results": 1,
+    "hardcoded: Right Edge (2-3)": 1,
+    "hardcoded: The deviation is minor (": 1,
+    "hardcoded: The machine is off by": 1,
+    "hardcoded: This will update the\n                                                        X-axis ($100) and Y-axis\n                                                        ($101) step/mm values in\n                                                        your CNC firmware to the\n                                                        new ones below:": 1,
+    "hardcoded: Updating Firmware values can affect your\n                                        machine's accuracy. Make sure to verify\n                                        the new settings after applying them.": 1,
+    "hardcoded: Warning": 1,
+    "hardcoded: We also noticed from the results that your motor\n                                movement settings could be updated to improve\n                                your machines accuracy.": 1,
+    "hardcoded: X-axis step/mm": 1,
+    "hardcoded: X-axis:": 1,
+    "hardcoded: Y-axis step/mm": 1,
+    "hardcoded: Y-axis:": 1,
+    "hardcoded: You can move your either the right y-axis rail forward\n                        by": 1,
+    "hardcoded: You can move your either the right y-axis rail forward by": 1,
+    "hardcoded: Your machine is properly squared!": 1,
+    "hardcoded: Your machine is slightly out of square": 1,
+    "hardcoded: Your machine needs adjustment": 1,
+    "hardcoded: on the diagonal.": 1,
+    "hardcoded: or the left y-axis rail backward by": 2,
+    "hardcoded: ° or": 1
+  },
+  "src/app/src/features/Stats/About.tsx": {
+    "hardcoded: By Sienci Labs": 1,
+    "hardcoded: Canada Flag": 1,
+    "hardcoded: Copyright ©": 1,
+    "hardcoded: GNU GPLv3 License": 1,
+    "hardcoded: GitHub.": 1,
+    "hardcoded: If this issue persists, please checkout the release\n                        notes on": 1,
+    "hardcoded: Made in Canada": 1,
+    "hardcoded: No release notes found": 1,
+    "hardcoded: Release Notes": 1,
+    "hardcoded: Retry": 2,
+    "hardcoded: See all latest updates made": 1,
+    "hardcoded: Sienci Labs Inc.": 1,
+    "hardcoded: There was a problem loading the release notes. Please\n                        try again.": 1,
+    "hardcoded: Version": 1,
+    "hardcoded: gSender": 1,
+    "hardcoded: gSender Logo": 1,
+    "hardcoded: gSender Team": 1,
+    "hardcoded: gSender is a free and feature-packed CNC control software,\n                designed to be clean and easy to learn while retaining a depth\n                of capabilities for advanced users. Many thousands of people\n                trust gSender to control their grbl and grblHAL-based CNCs every\n                day, and they keep coming back for its ease of use, engaged\n                community, and reliability.": 1
+  },
+  "src/app/src/features/Stats/Alarms.tsx": {
+    "hardcoded: Clear all prior alarms and errors. This action\n                                cannot be undone.": 1
+  },
+  "src/app/src/features/Stats/components/AlarmListing.tsx": {
+    "hardcoded: Line:": 1
+  },
+  "src/app/src/features/Stats/components/AlarmPreview.tsx": {
+    "hardcoded: on": 1
+  },
+  "src/app/src/features/Stats/components/Configuration.tsx": {
+    "hardcoded: at": 1,
+    "hardcoded: baud": 1
+  },
+  "src/app/src/features/Stats/components/Diagnostic.tsx": {
+    "hardcoded: Share this file with our customer support or community so others\n                can help you better. It contains your machine errors, profile,\n                settings, and more.": 1
+  },
+  "src/app/src/features/Stats/components/DownloadGSender.tsx": {
+    "hardcoded: %)": 1,
+    "hardcoded: Clicking the below button will update gSender to version": 1,
+    "hardcoded: Downloading (": 1,
+    "hardcoded: Info": 1,
+    "hardcoded: It is recommended you backup your EEPROM values and settings\n                    before updating.": 1,
+    "hardcoded: Read our documentation on updating to learn\n                                more.": 1,
+    "hardcoded: Update to v": 1,
+    "hardcoded: available to download!": 1,
+    "hardcoded: gSender v": 1,
+    "hardcoded: now!": 1
+  },
+  "src/app/src/features/Stats/components/EmptyAlarmList.tsx": {
+    "hardcoded: No Alarms or Errors recorded. Hooray!": 1
+  },
+  "src/app/src/features/Stats/components/JobPreviewList.tsx": {
+    "hardcoded: No Jobs recorded. Get carving!": 1
+  },
+  "src/app/src/features/Stats/components/MaintenanceAddTaskDialog.tsx": {
+    "hardcoded: Add": 1,
+    "hardcoded: Cancel": 1
+  },
+  "src/app/src/features/Stats/components/MaintenanceEditTaskDialog.tsx": {
+    "hardcoded: Cancel": 1,
+    "hardcoded: Delete": 1,
+    "hardcoded: Save": 1
+  },
+  "src/app/src/features/Stats/components/MaintenanceList.tsx": {
+    "hardcoded: Urgent!": 1
+  },
+  "src/app/src/features/Stats/components/MaintenancePreview.tsx": {
+    "hardcoded: hrs": 1
+  },
+  "src/app/src/features/Stats/components/MaintenanceTaskForm.tsx": {
+    "hardcoded: Keeping these unique makes it easier for you to\n                                remember what it is you need to do.": 1,
+    "hardcoded: Task Description": 1,
+    "hardcoded: Task End Range (Hrs)": 1,
+    "hardcoded: Task Name": 1,
+    "hardcoded: Task Start Range (Hrs)": 1,
+    "hardcoded: What do I want to do": 1
+  },
+  "src/app/src/features/Stats/components/UpdateGSender.tsx": {
+    "hardcoded: See all recent releases": 1,
+    "hardcoded: What's new in v": 1
+  },
+  "src/app/src/features/Stats/index.tsx": {
+    "hardcoded: Get Help": 1,
+    "hardcoded: Your Machine": 1
+  },
+  "src/app/src/features/Stats/JobResultsChart.tsx": {
+    "hardcoded: No data to display": 1
+  },
+  "src/app/src/features/Surfacing/components/GcodeViewer.tsx": {
+    "hardcoded: G-code Output": 1
+  },
+  "src/app/src/features/Surfacing/components/MachinePosition.tsx": {
+    "hardcoded: Flip Cut Direction": 1
+  },
+  "src/app/src/features/Surfacing/components/VisualizerPreview.tsx": {
+    "hardcoded: No g-code generated yet.": 1,
+    "hardcoded: Please generate g-code\n                    first.": 1
+  },
+  "src/app/src/features/Surfacing/index.tsx": {
+    "hardcoded: ) exceeds max depth (": 1,
+    "hardcoded: Delay": 1,
+    "hardcoded: Flood (M8)": 1,
+    "hardcoded: Generate G-code": 1,
+    "hardcoded: Load to Main Visualizer": 1,
+    "hardcoded: Mist (M7)": 1,
+    "hardcoded: Start Position": 1,
+    "hardcoded: Warning: Cut depth (": 1,
+    "hardcoded: know your CNCs\n                        exact movement limits accounting for limit switches and\n                        other add-ons, get nicer and faster cuts using your\n                        widest diameter bit, and consider turning off hard and\n                        soft limits so you don't encounter alarms or\n                        errors.": 1,
+    "hardcoded: lines)": 1
+  },
+  "src/app/src/features/Visualizer/GcodeEditor.tsx": {
+    "hardcoded: G-code Editor": 1,
+    "hardcoded: Jump to line:": 1,
+    "hardcoded: No G-code file loaded": 1,
+    "hardcoded: lines": 1,
+    "hardcoded: selected": 1
+  },
+  "src/app/src/features/Visualizer/GcodeViewer.tsx": {
+    "hardcoded: Detected": 1,
+    "hardcoded: Sample invalid lines found include:": 1,
+    "hardcoded: invalid lines on file load. Your\n                    job may not run correctly.": 1
+  },
+  "src/app/src/features/Visualizer/index.tsx": {
+    "hardcoded: Go to iso view": 1,
+    "hardcoded: It looks like your device doesn't support WebGL": 1,
+    "hardcoded: Move To Here": 1
+  },
+  "src/app/src/features/Visualizer/Loading.tsx": {
+    "hardcoded: Loading...": 1
+  },
+  "src/app/src/features/Visualizer/Placeholder.tsx": {
+    "hardcoded: Detected": 1,
+    "hardcoded: Louis the dog placeholder": 1,
+    "hardcoded: Sample invalid lines found include:": 1,
+    "hardcoded: invalid lines on file load.\n                                Your job may not run correctly.": 1
+  },
+  "src/app/src/features/Visualizer/Rendering.tsx": {
+    "hardcoded: Rendering": 1
+  },
+  "src/app/src/features/Visualizer/SoftLimitsWarningArea.tsx": {
+    "hardcoded: Warning: Cut will leave soft limits!": 1
+  },
+  "src/app/src/features/WorkspaceSelector/index.tsx": {
+    "hardcoded: Workspace:": 1
+  },
+  "src/app/src/routes/tools.tsx": {
+    "hardcoded: Tools": 1,
+    "hardcoded: Tools are plugins that can be installed and used to extend the\n                functionality of gSender. Some are built in to gSender, some are\n                third party plugins. Star a tool to pin it to the top.": 1
+  },
+  "src/app/src/store/redux/sagas/controllerSagas.tsx": {
+    "hardcoded: , so\n                                gSender handles tool changes instead of the ATC\n                                macros.": 1,
+    "hardcoded: , so M6 commands are\n                                being commented out and never reach the\n                                controller.": 1,
+    "hardcoded: Keepout": 1,
+    "hardcoded: Passthrough is": 1,
+    "hardcoded: The controller rejected this line:": 1,
+    "hardcoded: Tool change strategy is": 1,
+    "hardcoded: Update gSender's tool change settings?": 1
+  },
+  "src/app/src/wizards/automaticToolchange.tsx": {
+    "hardcoded: ), click the button below to\n                                automatically probe and set the new tool's\n                                length offset.": 1,
+    "hardcoded: ).": 1,
+    "hardcoded: After you've switched to the new tool (": 1,
+    "hardcoded: Ensure that your router/spindle is turned off and has fully stopped\n            spinning, and prepare to change over to the next tool (": 1
+  },
+  "src/app/src/wizards/manualToolchange.tsx": {
+    "hardcoded: Jog your machine to a place you can reach using the\n                            jog controls and ensure that your router/spindle is\n                            turned off and has fully stopped spinning.": 1
+  },
+  "src/app/src/wizards/semiautoToolchange.tsx": {
+    "hardcoded: ). Once ready,\n                                    jog to": 1,
+    "hardcoded: Ensure that your router/spindle is turned\n                                    off and has fully stopped spinning then jog\n                                    your machine to your": 1,
+    "hardcoded: above the probe\n                                    location, attach the magnet, and prepare to\n                                    probe": 1,
+    "hardcoded: using\n                                    the jog controls.": 1
+  },
+  "src/app/src/workspace/Alerts/JobEndModal.tsx": {
+    "hardcoded: Errors:": 1,
+    "hardcoded: None": 1,
+    "hardcoded: Status:": 1,
+    "hardcoded: Time:": 1
+  },
+  "src/app/src/workspace/Alerts/MaintenanceAlert.tsx": {
+    "hardcoded: Click 'Reset Timers' to reset the timers on ALL\n                            listed tasks. Click 'Close' to close the popup and\n                            do nothing.": 1,
+    "hardcoded: Close": 1,
+    "hardcoded: Reset Timers": 1,
+    "hardcoded: The following maintenance tasks are due:": 1
+  },
+  "src/app/src/workspace/index.tsx": {
+    "hardcoded: Skip to main content": 1
+  },
+  "src/app/src/workspace/PortraitMacroBar/index.tsx": {
+    "hardcoded: Drag to reorder": 1
+  },
+  "src/app/src/workspace/PrimaryArea/index.tsx": {
+    "hardcoded: Vizualizer": 1
+  },
+  "src/pendant/src/components/ATCPanel.tsx": {
+    "hardcoded: No tool changes in loaded file.": 1,
+    "hardcoded: Tool Timeline": 1,
+    "hardcoded: Tools": 1
+  },
+  "src/pendant/src/components/BottomDrawer.tsx": {
+    "hardcoded: Close": 1,
+    "hardcoded: Load": 1,
+    "hardcoded: Load File": 1,
+    "hardcoded: No file loaded": 1,
+    "hardcoded: No output yet": 1,
+    "hardcoded: No recent files.": 1,
+    "hardcoded: Recent files": 1
+  },
+  "src/pendant/src/components/ConnectionWidget.tsx": {
+    "hardcoded: Connect to CNC": 1,
+    "hardcoded: Connecting…": 1,
+    "hardcoded: Connection failed": 1,
+    "hardcoded: Firmware:": 1,
+    "hardcoded: Hold the button to disconnect.": 1,
+    "hardcoded: No devices found": 1,
+    "hardcoded: Port:": 1,
+    "hardcoded: Recognized": 1,
+    "hardcoded: Unrecognized Ports": 1
+  },
+  "src/pendant/src/components/ConsolePanel.tsx": {
+    "hardcoded: Clear": 1,
+    "hardcoded: No output yet": 1,
+    "hardcoded: Send": 1
+  },
+  "src/pendant/src/components/DROCard.tsx": {
+    "hardcoded: ZERO": 1
+  },
+  "src/pendant/src/components/FileLoadingOverlay.tsx": {
+    "hardcoded: building toolpath...": 1
+  },
+  "src/pendant/src/components/JoggingCard.tsx": {
+    "hardcoded: A+": 1,
+    "hardcoded: A-": 1,
+    "hardcoded: Z+": 1,
+    "hardcoded: Z-": 1
+  },
+  "src/pendant/src/components/MacrosPanel.tsx": {
+    "hardcoded: ? This\n                        cannot be undone.": 1,
+    "hardcoded: Cancel": 1,
+    "hardcoded: Delete": 2,
+    "hardcoded: No macros yet": 1,
+    "hardcoded: Running": 1
+  },
+  "src/pendant/src/components/MovePanel.tsx": {
+    "hardcoded: Corner Select": 1,
+    "hardcoded: Go To Position": 1,
+    "hardcoded: Go to position": 1,
+    "hardcoded: Target:": 1,
+    "hardcoded: · Hold to move": 1
+  },
+  "src/pendant/src/components/PendantConfigView.tsx": {
+    "hardcoded: Config crashed:": 1
+  },
+  "src/pendant/src/components/PendantToolsView.tsx": {
+    "hardcoded: Back": 1,
+    "hardcoded: Tools": 1,
+    "hardcoded: Tools are plugins that can be installed and used to extend the\n                functionality of gSender. Some are built in to gSender, some are\n                third party plugins.": 1
+  },
+  "src/pendant/src/components/PendantTopBar.tsx": {
+    "hardcoded: E-STOP": 1,
+    "hardcoded: gSender": 1
+  },
+  "src/pendant/src/components/PlaceholderView.tsx": {
+    "hardcoded: Coming soon": 1
+  },
+  "src/pendant/src/components/probe-wizard/ContinuityCheck.tsx": {
+    "hardcoded: Error": 1,
+    "hardcoded: Sensor triggered immediately. Check your\n                                        wiring or probe for a short and confirm\n                                        $6 (Invert Probe Pin) is set correctly.": 1,
+    "hardcoded: Touch the probe to the workpiece to verify the\n                        connection.": 1,
+    "hardcoded: Try Again": 1
+  },
+  "src/pendant/src/components/probe-wizard/CornerSelector.tsx": {
+    "hardcoded: Non-default corner selected. Confirm this is correct for the\n                    current job.": 1,
+    "hardcoded: selected": 1
+  },
+  "src/pendant/src/components/probe-wizard/ProbeWizardDrawer.tsx": {
+    "hardcoded: Corner": 2,
+    "hardcoded: Next": 1,
+    "hardcoded: Not needed for the": 1,
+    "hardcoded: Probe diameter": 2,
+    "hardcoded: Ready to run": 1,
+    "hardcoded: Routine": 1,
+    "hardcoded: Start probe": 1,
+    "hardcoded: Step": 1,
+    "hardcoded: of 3": 1,
+    "hardcoded: routine. Choose\n                                    XY, XYZ, X, or Y in the routine selector to\n                                    set a diameter.": 1
+  },
+  "src/pendant/src/components/ProbePanel.tsx": {
+    "hardcoded: Configuration": 1,
+    "hardcoded: Probe": 1,
+    "hardcoded: Repeat last:": 1
+  },
+  "src/pendant/src/components/ProgressAreaWrapper.tsx": {
+    "hardcoded: Progress": 1
+  },
+  "src/pendant/src/components/SpindlePanel.tsx": {
+    "hardcoded: Duration": 1,
+    "hardcoded: Laser": 1,
+    "hardcoded: Spindle": 1,
+    "hardcoded: sec": 1
+  },
+  "src/pendant/src/components/VisualizerCard.tsx": {
+    "hardcoded: Bounds": 1,
+    "hardcoded: Cut": 1,
+    "hardcoded: No file loaded": 1,
+    "hardcoded: Open G-code file": 1,
+    "hardcoded: Rapid": 1,
+    "hardcoded: Tap here to open a G-code file": 1
+  },
+  "src/pendant/src/components/WorkspaceSelector.tsx": {
+    "hardcoded: Select workspace": 1
+  },
+  "src/pendant/src/MachineStatus.tsx": {
+    "hardcoded: Controller": 1,
+    "hardcoded: Waiting for connection": 1
+  },
+  "src/pendant/src/PendantDRO.tsx": {
+    "hardcoded: Waiting for connection…": 1,
+    "hardcoded: Work Position": 1
+  }
+}

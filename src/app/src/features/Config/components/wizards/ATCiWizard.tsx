@@ -4,6 +4,7 @@ import { GRBLHAL } from 'app/constants';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import controller from 'app/lib/controller.ts';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
 import store from 'app/store';
 import type { RootState } from 'app/store/redux';
@@ -17,11 +18,13 @@ import { toast } from 'sonner';
 // Prompt to restart
 function enableATCiWizard(firmware, version) {
     if (firmware !== GRBLHAL) {
-        toast.error('ATCi is only supported by boards running grblHAL.');
+        toast.error(i18n.t('config:wizards.atciRequiresGrblHal'));
     }
     if (!firmwareSemver(version.semver, ATCI_SUPPORTED_VERSION)) {
         toast.error(
-            `ATCi is only supported by grblHAL version ${ATCI_SUPPORTED_VERSION} or above.`,
+            i18n.t('config:wizards.atciMinVersion', {
+                version: ATCI_SUPPORTED_VERSION,
+            }),
         );
     }
 
@@ -43,16 +46,16 @@ function enableATCiWizard(firmware, version) {
 
     delay(() => {
         Confirm({
-            title: 'ATCi - Restart your Controller',
-            content:
-                'Please manually restart your CNC controller (power cycle) and reconnect to gSender for these settings to take effect.',
-            confirmLabel: 'OK',
+            title: i18n.t('config:wizards.atciRestartTitle'),
+            content: i18n.t('config:wizards.atciRestartMessage'),
+            confirmLabel: i18n.t('common:actions.ok'),
             hideClose: true,
         });
     }, 500);
 }
 
 export function ATCIWizard() {
+    const { t } = useAppTranslation();
     const controllerType = useTypedSelector(
         (state: RootState) => state.controller.type,
     );
@@ -65,7 +68,7 @@ export function ATCIWizard() {
                 className={'flex flex-row justify-start'}
                 onClick={() => enableATCiWizard(controllerType, version)}
             >
-                <span>Configure Sienci ATCi</span>
+                <span>{t('config:wizards.configureAtci')}</span>
             </Button>
         </div>
     );

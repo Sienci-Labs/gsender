@@ -44,6 +44,7 @@ import {
     TOOLBAR_CATEGORY,
     VISUALIZER_CATEGORY,
 } from 'app/constants';
+import { i18n } from 'app/i18n';
 import combokeys from 'app/lib/combokeys';
 import type {
     CommandKey,
@@ -214,7 +215,7 @@ const Keyboard = () => {
     }, []);
 
     const showToast = _.throttle(
-        (msg = 'Shortcut Updated') => {
+        (msg = i18n.t('notifications:keyboard.shortcutUpdated')) => {
             toast.info(msg, {
                 duration: 3000,
                 position: 'bottom-right',
@@ -237,7 +238,7 @@ const Keyboard = () => {
         updatedShortcuts[shortcut.cmd].keys = '';
         updateKeybindings(updatedShortcuts, false);
 
-        showToast('Shortcut Cleared');
+        showToast(i18n.t('notifications:keyboard.shortcutCleared'));
     };
 
     /**
@@ -353,13 +354,13 @@ const Keyboard = () => {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
 
-            toast.success('Shortcuts exported successfully!', {
+            toast.success(i18n.t('notifications:keyboard.exported'), {
                 duration: 3000,
                 position: 'bottom-right',
             });
         } catch (error) {
             console.error('Export error:', error);
-            toast.error('Failed to export shortcuts.', {
+            toast.error(i18n.t('notifications:keyboard.exportFailed'), {
                 position: 'bottom-right',
             });
         }
@@ -406,18 +407,15 @@ const Keyboard = () => {
 
                     updateKeybindings(mergedShortcuts, false);
 
-                    toast.success('Shortcuts imported successfully!', {
+                    toast.success(i18n.t('notifications:keyboard.imported'), {
                         duration: 3000,
                         position: 'bottom-right',
                     });
                 } catch (error) {
                     console.error('Import error:', error);
-                    toast.error(
-                        'Failed to import shortcuts. Please check the file format.',
-                        {
-                            position: 'bottom-right',
-                        },
-                    );
+                    toast.error(i18n.t('notifications:keyboard.importFailed'), {
+                        position: 'bottom-right',
+                    });
                 }
             };
 
@@ -668,13 +666,16 @@ const Keyboard = () => {
                     iframe.contentWindow?.print();
                 };
             } else {
-                toast.error('Unable to create print document.', {
-                    position: 'bottom-right',
-                });
+                toast.error(
+                    i18n.t('notifications:keyboard.printDocumentFailed'),
+                    {
+                        position: 'bottom-right',
+                    },
+                );
             }
         } catch (error) {
             console.error('Print error:', error);
-            toast.error('Failed to print shortcuts.', {
+            toast.error(i18n.t('notifications:keyboard.printFailed'), {
                 position: 'bottom-right',
             });
         }

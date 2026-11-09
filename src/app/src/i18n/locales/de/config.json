@@ -1,0 +1,1231 @@
+{
+  "basics": {
+    "title": "Grundlagen",
+    "carveScreenUnits": {
+      "label": "Einheiten im Fräsen-Bildschirm",
+      "description": "Welche Einheiten möchten Sie im Fräsen-Bildschirm sehen? Die Einstellungen sind immer metrisch, da alle gängigen CNC-Firmwares metrische Werte als Eingabe erwarten."
+    },
+    "reconnectAutomatically": {
+      "label": "Automatisch neu verbinden",
+      "description": "Beim Öffnen von gSender automatisch wieder mit der zuletzt verwendeten Maschine verbinden."
+    },
+    "firmwareFallback": {
+      "label": "Firmware-Rückfalloption",
+      "description": "Die Firmware, die gSender verwendet, wenn die automatische Erkennung fehlschlägt."
+    },
+    "baudRate": {
+      "label": "Baudrate",
+      "description": "Muss mit dem Wert Ihrer CNC übereinstimmen. (Serielle Übertragungsgeschwindigkeit, Standard 115200)"
+    },
+    "safeHeight": {
+      "label": "Sichere Höhe",
+      "description": "Strecke, um die die Z-Achse nach oben fährt, bevor bei „Gehe zu“-Bewegungen in X/Y/A verfahren wird. (Gilt nicht für Dateien, Eckbewegungen oder Parken; bei aktivierter Referenzfahrt wird dieser Wert zu einem Versatz von der Oberkante der Z-Achse, Standard 0)"
+    },
+    "checkFileOnLoad": {
+      "label": "Datei beim Laden prüfen",
+      "description": "Führt den Prüfmodus ($C) aus, sobald eine neue G-code-Datei geladen wird."
+    },
+    "outlineStyle": {
+      "label": "Umriss-Stil",
+      "description": "Wählen Sie, wie der Umriss Ihrer Dateien abgefahren wird. (Detailliert dauert länger und folgt der Kontur genauer, Rechteck fährt ein einfaches umschließendes Rechteck ab, Rechteck ohne Eilgang macht dasselbe, ignoriert aber Eilgang-/G0-Bewegungen, Standard Detailliert)"
+    },
+    "outlineSpeed": {
+      "label": "Umriss-Geschwindigkeit",
+      "description": "Legt den Vorschub für das Abfahren des Umrisses fest. (Niedrigere Werte ergeben kontrolliertere Bewegungen, Standard 0 fährt den Umriss mit maximaler/G0-Geschwindigkeit)"
+    },
+    "revertWorkspace": {
+      "label": "Arbeitsbereich zurücksetzen",
+      "description": "Erlaubt G-code-Befehle zum Jobende wie M2 und M30, den Arbeitsbereich Ihrer CNC am Ende jedes Jobs wieder auf G54 zurückzusetzen."
+    },
+    "powerSaving": {
+      "label": "Energiesparen",
+      "description": "Erlaubt dem Bildschirm, sich abzuschalten bzw. in den Ruhezustand zu wechseln."
+    },
+    "promptOnExit": {
+      "label": "Beim Beenden nachfragen",
+      "description": "Beim Beenden des Programms ein Bestätigungsfenster anzeigen."
+    },
+    "allowGcamToSendFiles": {
+      "label": "gCAM das Senden von Dateien erlauben",
+      "description": "Erlaubt gCAM auf diesem Computer, Programme über „Send to gSender“ direkt in gSender zu laden. Während ein Job läuft, werden Dateien abgelehnt."
+    },
+    "runSettingsBackup": {
+      "label": "Einstellungs-Backup ausführen",
+      "description": "Wählen Sie, wie oft gSender Ihre Einstellungen sichert. Nützlich, falls Sie diese später wiederherstellen müssen."
+    },
+    "settingsBackupLocation": {
+      "label": "Speicherort für Einstellungs-Backup",
+      "description": "Wählen Sie den Speicherort für die Sicherung Ihrer Einstellungen. Standard: der appData-Ordner Ihres Betriebssystems."
+    },
+    "importedPluginsLocation": {
+      "label": "Speicherort für importierte Plugins",
+      "description": "Wählen Sie den Speicherort, in den Ihre Plugins importiert werden. Standard: der userData-Ordner Ihres Betriebssystems.",
+      "restart": "Starten Sie gSender neu, um Plugins aus dem neuen Speicherort zu laden.",
+      "restartAbandoned": "Starten Sie gSender neu, um Plugins aus dem neuen Speicherort zu laden. Plugins in „{{previousUserPluginsDir}}“ werden nicht mehr durchsucht, bis Sie dies zurückstellen.",
+      "updateFailed": "Der Plugin-Speicherort konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+    },
+    "collectUsageData": {
+      "label": "Nutzungsdaten erfassen",
+      "description": "Diese Informationen werden anonym erfasst, damit wir gSender verbessern können, indem wir sehen, wie es verwendet wird."
+    },
+    "uiOptionsGroup": "Oberflächenoptionen",
+    "darkMode": {
+      "label": "Dunkelmodus",
+      "description": "Ändern Sie die Farben der App, um die Augen zu schonen, den Kontrast zu verbessern oder einfach zum Spaß!"
+    },
+    "usePendantViewAsDefault": {
+      "label": "Pendant-Ansicht als Standardoberfläche verwenden",
+      "description": "Startet direkt in die touchfreundliche Pendant-Oberfläche im Vollbild-Kioskmodus statt in die normale Desktop-Oberfläche. Wird erst nach einem Neustart der App wirksam.",
+      "restartTitle": "Neustart erforderlich",
+      "restartToPendant": "gSender muss neu gestartet werden, um zur Pendant-Ansicht zu wechseln.",
+      "restartToDesktop": "gSender muss neu gestartet werden, um zur Desktop-Ansicht zurückzukehren.",
+      "restartNow": "Jetzt neu starten",
+      "restartLater": "Später"
+    },
+    "droZeros": {
+      "label": "DRO-Nachkommastellen",
+      "description": "Legt die Anzahl der angezeigten Nachkommastellen zwischen 1 und 4 fest. (Standard 0 zeigt 2 für mm und 3 für Zoll)"
+    },
+    "visualizerOptionsGroup": "Visualisierungsoptionen",
+    "visualizerTheme": {
+      "label": "Visualisierungs-Design",
+      "description": "Unabhängige Farbsteuerung für die Visualisierung."
+    },
+    "cameraProjection": {
+      "label": "Kameraprojektion",
+      "description": "Perspektivisch (Standard) zeigt Tiefe wie eine normale Kameraansicht. Orthografisch entfernt diese Tiefenverzerrung, sodass parallele Linien parallel bleiben – nützlich, um Werkzeugbahnen genau auszurichten."
+    },
+    "showBoundingBox": {
+      "label": "Begrenzungsrahmen anzeigen",
+      "description": "Zeichnet ein Drahtgitter um die Ausdehnung der geladenen G-code-Datei."
+    },
+    "showBoundingBoxLabels": {
+      "label": "Beschriftung des Begrenzungsrahmens anzeigen",
+      "description": "Zeigt X/Y/Z-Maßbeschriftungen am Begrenzungsrahmen an."
+    },
+    "showMachineBedIndicator": {
+      "label": "Maschinenbett-Anzeige einblenden",
+      "description": "Zeichnet nach abgeschlossener Referenzfahrt einen Umriss des referenzierten Arbeitsbereichs der Maschine."
+    },
+    "trimGridToMachineBed": {
+      "label": "Raster auf Maschinenbett zuschneiden",
+      "description": "Wenn die Maschinenbett-Anzeige eingeblendet ist, wird das Hintergrundraster knapp hinter den Rändern des Betts abgeschnitten statt als festes Quadrat dargestellt."
+    },
+    "hideProcessedLines": {
+      "label": "Abgearbeitete Zeilen ausblenden",
+      "description": "Blendet bereits abgearbeitete G-code-Zeilen in der Visualisierung aus."
+    },
+    "showPlannedLines": {
+      "label": "Geplante Zeilen anzeigen",
+      "description": "Hebt während eines laufenden Jobs die Werkzeugbahn zwischen dem Fräser und der zuletzt an die Steuerung gesendeten Zeile hervor."
+    },
+    "animatePlannedLines": {
+      "label": "Geplante Zeilen animieren",
+      "description": "Ein Impuls läuft in der Reihenfolge, in der gefräst wird, über die geplanten Zeilen."
+    },
+    "lightweightOptions": {
+      "label": "Ressourcensparende Optionen",
+      "description": "Mit der Feder aktivieren, wenn große Dateien Ihren Computer verlangsamen. (Leicht schaltet die 3D-Dateiansicht ab, Alles deaktiviert die Visualisierung)"
+    },
+    "followToolDuringRuntime": {
+      "label": "Werkzeug während der Laufzeit folgen",
+      "description": "Schwenkt die Kamera während eines laufenden Jobs mit, um dem Werkzeug in X/Y zu folgen, bei gleichem Blickwinkel und gleicher Höhe."
+    },
+    "portraitMacroBar": {
+      "label": "Makroleiste im Hochformat",
+      "description": "Zeigt im Hochformat eine Schnellzugriffs-Makroleiste am unteren Bildschirmrand an."
+    },
+    "joggingPresetsGroup": "Voreinstellungen für Tippbetrieb",
+    "rapid": {
+      "label": "Schnell"
+    },
+    "normal": {
+      "label": "Normal",
+      "description": "Legt die Verfahrwege und Geschwindigkeiten für jede Tippbetrieb-Voreinstellung fest."
+    },
+    "precise": {
+      "label": "Präzise"
+    },
+    "continuousJogDelay": {
+      "label": "Verzögerung für Dauer-Tippbetrieb",
+      "description": "Normales Drücken oder Klicken löst einzelne Bewegungen aus; halten Sie so lange gedrückt, um kontinuierlich zu verfahren. Manche bevorzugen eine längere Verzögerung wie 700. (Standard 250)"
+    },
+    "notificationsGroup": "Benachrichtigungen",
+    "warnIfBadFile": {
+      "label": "Bei fehlerhafter Datei warnen",
+      "description": "Warnt, wenn beim Öffnen einer Datei ungültige Befehle gefunden werden."
+    },
+    "warnOnBadLine": {
+      "label": "Bei fehlerhafter Zeile warnen",
+      "description": "Warnt, wenn während eines Jobs ungültige Befehle gefunden werden."
+    },
+    "warnWhenSettingZero": {
+      "label": "Beim Nullsetzen warnen",
+      "description": "Nützlich, wenn Sie den Nullpunkt öfter versehentlich setzen."
+    },
+    "warnIfBeyondSoftLimits": {
+      "label": "Bei Überschreitung der Software-Endlagen warnen",
+      "description": "Warnt, wenn Ihre Datei ausgehend vom aktuellen Nullpunkt die Grenzen Ihrer Maschine überschreitet. (Referenzfahrt und Software-Endlagen müssen aktiviert sein)"
+    },
+    "jobEndNotifications": {
+      "label": "Benachrichtigungen bei Jobende",
+      "description": "Zeigt am Ende jedes Jobs eine Zusammenfassung an."
+    },
+    "maintenanceNotifications": {
+      "label": "Wartungsbenachrichtigungen",
+      "description": "Zeigt am Ende jedes Jobs anstehende Wartungsaufgaben an."
+    },
+    "popUpNotificationDuration": {
+      "label": "Anzeigedauer von Pop-up-Benachrichtigungen",
+      "description": "Wie lange Benachrichtigungen in Millisekunden sichtbar bleiben, bevor sie automatisch ausgeblendet werden. (-1 lässt sie bis zum manuellen Schließen stehen, -2 deaktiviert sie, Standard 0 behält die Standarddauer bei)"
+    },
+    "shortcutsGroup": "Tastenkürzel",
+    "keyboard": {
+      "label": "Tastatur",
+      "description": "Steuern Sie Ihre CNC und navigieren Sie durch gSender mit eigenen Tastenkombinationen auf jeder Tastatur, jedem Ziffernblock oder Makro-Pad."
+    },
+    "gamepad": {
+      "label": "Gamepad",
+      "description": "Verfahren, Nullpunkte setzen, Jobs starten und mehr – ganz einfach mit den meisten gängigen Gamepads. Erstellen Sie ein eigenes Profil oder verwenden Sie ein vorgefertigtes."
+    }
+  },
+  "customizeUi": {
+    "title": "Oberfläche anpassen"
+  },
+  "motors": {
+    "title": "Motoren",
+    "squareUpCncRails": {
+      "label": "CNC-Schienen rechtwinklig ausrichten",
+      "description": "Schief ausgerichtete Schienen können dazu führen, dass 90-Grad-Schnitte verzogen sind; der Assistent hilft, dies zu beheben."
+    },
+    "xAxisGroup": "X-Achse",
+    "yAxisGroup": "Y-Achse",
+    "zAxisGroup": "Z-Achse"
+  },
+  "probe": {
+    "title": "Antasten",
+    "touchPlateType": {
+      "label": "Typ der Antastplatte",
+      "description": "Wählen Sie die Antastplatte, die Sie mit Ihrer Maschine verwenden. (Standard: Standardblock)"
+    },
+    "showTouchPlateSwitcher": {
+      "label": "Antastplatten-Umschalter anzeigen",
+      "description": "Zeigt auf der Registerkarte „Antasten“ eine Schaltfläche zum Wechseln zwischen Antastplatten-Typen an."
+    },
+    "tipDiameter": {
+      "label": "Spitzendurchmesser",
+      "description": "Durchmesser der Tasterspitze an der Stelle, an der sie das Material berührt. (Standard 2)"
+    },
+    "blockThickness": {
+      "label": "Blockdicke",
+      "description": "Plattendicke an der Stelle, die der Fräser beim Antasten der Z-Achse mit der Standardblock-Platte berührt. (Standard 15)"
+    },
+    "autozeroThickness": {
+      "label": "AutoZero-Dicke",
+      "description": "Plattendicke an der Stelle, die der Fräser beim Antasten der Z-Achse mit der AutoZero-Platte berührt. (Standard 5)"
+    },
+    "puckThickness": {
+      "label": "Puck-Dicke",
+      "description": "Plattendicke an der Stelle, die der Fräser beim Antasten der Z-Achse mit der Z-Taster-Platte berührt. (Standard 15)"
+    },
+    "zOffset": {
+      "label": "Z-Versatz",
+      "description": "Anpassen, um die Genauigkeit der Z-Nullpunktermittlung Ihres Tasters zu verbessern. (Standard 0)"
+    },
+    "bitzeroThicknessXyz": {
+      "label": "BitZero-Dicke (XYZ)",
+      "description": "Plattendicke für das XYZ-Antasten an der Stelle, an der der Fräser die vertiefte Fläche in der Bohrung berührt. (Standard 13)"
+    },
+    "bitzeroThicknessZOnly": {
+      "label": "BitZero-Dicke (nur Z)",
+      "description": "Plattendicke für das reine Z-Antasten, bei dem der Taster flach auf die Oberfläche gelegt wird. (Standard 15.5)"
+    },
+    "xyThickness": {
+      "label": "XY-Dicke",
+      "description": "Plattendicke an der Stelle, die der Fräser beim Antasten der X/Y-Achse berührt. (Standard 10)"
+    },
+    "xyRetract": {
+      "label": "XY-Rückzug",
+      "description": "Wie weit beim Antasten zusätzlich von der Oberfläche weggefahren wird. (Standard 10)"
+    },
+    "zProbeDistance": {
+      "label": "Z-Antastweg",
+      "description": "Verfahrweg in Z, bevor das Antasten abgebrochen wird. (Verringern Sie diesen Wert, wenn beim Antasten ein Software-Endlagen-Alarm 2 auftritt, Standard 30)"
+    },
+    "fastFind": {
+      "label": "Schnelle Suche",
+      "description": "Antastgeschwindigkeit vor der ersten Berührung. (Standard 150)"
+    },
+    "slowFind": {
+      "label": "Langsame Suche",
+      "description": "Geschwindigkeit für die genauere zweite Berührung. (Standard 75)"
+    },
+    "retraction": {
+      "label": "Rückzug",
+      "description": "Wie weit sich der Fräser nach einer erfolgreichen Berührung wegbewegt. (Standard 2)"
+    },
+    "probeMovementSpeed": {
+      "label": "Verfahrgeschwindigkeit beim Antasten",
+      "description": "Vorschub für Rückzugs- und Neupositionierungsbewegungen beim Antasten. Bei 0 verwenden diese Bewegungen den Eilgang (G0). Wenn gesetzt, wird stattdessen eine kontrollierte Vorschubbewegung (G1) mit dieser Geschwindigkeit verwendet. (Standard 0)"
+    },
+    "finalZRetract": {
+      "label": "Abschließender Z-Rückzug",
+      "description": "Wie weit am Ende des Ablaufs in der Z-Achse weggefahren wird. (Standard 2)"
+    },
+    "finalZRetract2": {
+      "label": "Abschließender Z-Rückzug",
+      "description": "Wie weit am Ende des Ablaufs in der Z-Achse weggefahren wird. (Standard 1)"
+    },
+    "connectionTest": {
+      "label": "Verbindungstest",
+      "description": "Sicherheitsprüfung, ob Ihr Taster korrekt angeschlossen ist."
+    }
+  },
+  "actionButtons": {
+    "title": "Aktionstasten"
+  },
+  "homingLimits": {
+    "title": "Referenzfahrt/Endlagen",
+    "stopJoggingPastLimits": {
+      "label": "Verfahren über Endlagen verhindern",
+      "description": "Verhindert das Verfahren in eine Richtung, in der bereits ein Endschalter ausgelöst wurde."
+    },
+    "homingBehaviourGroup": "Verhalten der Referenzfahrt",
+    "parkingGroup": "Parken",
+    "parkLocation": {
+      "label": "Parkposition",
+      "description": "Das P auf der Hauptseite „Fräsen“ bringt Sie immer zu dieser praktischen Parkposition. (Referenzfahrt muss aktiviert sein)"
+    }
+  },
+  "spindleLaser": {
+    "title": "Spindel/Laser",
+    "spindleLaserControls": {
+      "label": "Spindel-/Lasersteuerung",
+      "description": "Zeigt die Registerkarte „Spindel/Laser“ und zugehörige Funktionen auf der Hauptseite „Fräsen“ an."
+    },
+    "insertDwellForSpindleCommands": {
+      "label": "Verweilzeit für Spindelbefehle einfügen",
+      "description": "Fügt eine Verzögerung ein, damit die Spindel Zeit zum Hochlaufen hat. Dabei wird bei jedem M3/M4 in der Datei ein G4-Befehl eingefügt; dies ist unnötig, wenn Ihre Firmware das Erreichen der Spindeldrehzahl anderweitig berücksichtigt. (Standard 0)"
+    },
+    "minimumSpindleSpeed": {
+      "label": "Minimale Spindeldrehzahl",
+      "description": "Auf die minimale Drehzahl Ihrer Spindel abstimmen. ($31, Standard 10000)"
+    },
+    "maximumSpindleSpeed": {
+      "label": "Maximale Spindeldrehzahl",
+      "description": "Auf die maximale Drehzahl Ihrer Spindel abstimmen. ($30, Standard 30000)"
+    },
+    "spindlePwmGroup": "Spindel-PWM",
+    "spindleModbusGroup": "Spindel-Modbus",
+    "laserGroup": "Laser",
+    "minimumLaserPower": {
+      "label": "Minimale Laserleistung",
+      "description": "Auf den minimalen S-Wert in Ihrer Laser-CAM-Software abstimmen. ($731, Standard 0)"
+    },
+    "maximumLaserPower": {
+      "label": "Maximale Laserleistung",
+      "description": "Auf den maximalen S-Wert in Ihrer Laser-CAM-Software abstimmen. ($730, Standard 255.000)"
+    },
+    "laserOnDuringOutline": {
+      "label": "Laser beim Umriss einschalten",
+      "description": "Schaltet den Laser mit geringster Leistung ein, um die Jobposition besser zu sehen."
+    },
+    "laserXOffset": {
+      "label": "Laser-X-Versatz",
+      "description": "Versatz in der X-Achse zur Spindel. (Mit einem V-Fräser markieren und dann die Laserbewegung bis zu dieser Markierung verfolgen, $741, Standard 0)"
+    },
+    "laserYOffset": {
+      "label": "Laser-Y-Versatz",
+      "description": "Versatz in der Y-Achse zur Spindel. (Mit einem V-Fräser markieren und dann die Laserbewegung bis zu dieser Markierung verfolgen, $742, Standard 0)"
+    }
+  },
+  "accessoryOutputs": {
+    "title": "Zubehörausgänge",
+    "coolantControls": {
+      "label": "Kühlmittelsteuerung",
+      "description": "Zeigt die Registerkarte „Kühlmittel“ und zugehörige Funktionen auf der Hauptseite „Fräsen“ an."
+    }
+  },
+  "rotary": {
+    "title": "Drehachse",
+    "rotaryControls": {
+      "label": "Drehachsensteuerung",
+      "description": "Zeigt die Registerkarte „Drehachse“ und zugehörige Funktionen auf der Hauptseite „Fräsen“ an."
+    },
+    "resolution": {
+      "label": "Auflösung",
+      "description": "Verfahrauflösung in Schritten pro Grad. ($103, Standard 19.75308642)"
+    },
+    "maxSpeed": {
+      "label": "Max. Geschwindigkeit",
+      "description": "Maximale Achsgeschwindigkeit, wird auch für G0-Eilgänge verwendet. ($113, Standard 8000)"
+    },
+    "forceSoftLimits": {
+      "label": "Software-Endlagen erzwingen",
+      "description": "Aktiviert Software-Endlagen beim Umschalten in den Drehachsenmodus. (nur Grbl)"
+    },
+    "forceHardLimits": {
+      "label": "Hardware-Endlagen erzwingen",
+      "description": "Aktiviert Hardware-Endlagen beim Umschalten in den Drehachsenmodus. (nur Grbl)"
+    },
+    "visualizeNonCenterZeros": {
+      "label": "Nicht zentrierte Nullpunkte visualisieren",
+      "description": "Wendet bei Drehachsen-Dateien, deren Nullpunkt nicht auf dem Mittelpunkt liegt, einen Versatz an, wenn in der Datei ein Zylinderdurchmesser gefunden wird."
+    },
+    "useAAxisForGrbl": {
+      "label": "A-Achse für Grbl verwenden",
+      "description": "Ermöglicht A-Achsen-Steuerung und das Senden von Befehlen an Geräte mit modifiziertem 4-Achsen-Grbl, statt A in Y umzurechnen. (nur Grbl)"
+    }
+  },
+  "automations": {
+    "title": "Automatisierungen",
+    "fileStart": {
+      "label": "Dateistart",
+      "description": "Wird beim Starten eines Jobs ausgeführt, bevor die Datei selbst läuft."
+    },
+    "filePause": {
+      "label": "Dateipause",
+      "description": "Falls Sie beim Pausieren eines Jobs Zubehör stoppen oder aus dem Weg fahren möchten."
+    },
+    "fileResume": {
+      "label": "Datei fortsetzen",
+      "description": "Stellen Sie sicher, dass alles, was Sie für die Dateipause eingerichtet haben, beim Fortsetzen rückgängig gemacht wird."
+    },
+    "fileStopEnd": {
+      "label": "Datei stoppen/beenden",
+      "description": "Ein Auffangpunkt, der sicherstellt, dass bei gestoppten oder beendeten Jobs immer alles sicher abgeschaltet wird."
+    }
+  },
+  "toolChanging": {
+    "title": "Werkzeugwechsel",
+    "enableAtcControls": {
+      "label": "ATC-Steuerung aktivieren",
+      "description": "ATC-Steuerung aktivieren"
+    },
+    "passthrough": {
+      "label": "Durchreichen",
+      "description": "Sendet Werkzeugwechselzeilen unverändert, in der Annahme, dass Ihre CNC M6- und T-Befehle korrekt verarbeiten kann."
+    },
+    "gsenderStrategy": {
+      "label": "gSender-Strategie",
+      "description": "Standard: Ein Assistent führt Sie durch die Schritte, um manuell ein neues Werkzeug einzurichten und das Fräsen fortzusetzen.\n\nFlexibel ist ähnlich, verwendet aber eine Antastplatte wie einen Werkzeuglängensensor.\n\nFest ist ebenfalls geführt, aber vollständig automatisiert: Die Maschine verfährt und vermisst die Werkzeuge für Sie. Referenzfahrt und Werkzeuglängensensor (TLS) erforderlich.\n\nCode ist für vollständig benutzerdefinierte Konfigurationen."
+    },
+    "skipDialog": {
+      "label": "Dialog überspringen",
+      "description": "Keine Nachfrage bei Pause und keine Pause zwischen Code-Blöcken."
+    },
+    "fixedSensorLocation": {
+      "label": "Position des festen Sensors",
+      "description": "Die Startposition für das Antasten. Damit keine Fräser brechen, legen Sie sie mit einem langen Werkzeug und zusätzlichem Platz in der Z-Achse über dem Sensor fest. (Z sollte negativ sein)"
+    },
+    "firstToolBehaviour": {
+      "label": "Verhalten beim ersten Werkzeug",
+      "description": "Steuert, wie der erste Werkzeugwechsel behandelt wird. Viele CAM-Programme fügen einen anfänglichen Werkzeugwechselbefehl ein, auch wenn das Werkzeug bereits eingesetzt ist.\n\n„Immer vollständigen Assistenten ausführen“ führt den gesamten Werkzeugwechselablauf aus.\n\n„Beim ersten Werkzeug nachfragen“ fragt, ob der vollständige Assistent ausgeführt oder nur die Länge des aktuellen Werkzeugs angetastet werden soll.\n\n„Immer nur Länge antasten“ überspringt den Werkzeugwechsel und vermisst nur das aktuelle Werkzeug."
+    },
+    "setToolChangeLocation": {
+      "label": "Werkzeugwechselposition festlegen",
+      "description": "Fährt die CNC für manuelle Werkzeugwechsel an eine günstigere Position, statt zum Wechsel über dem Sensor aufzufordern."
+    },
+    "manualToolChangeLocation": {
+      "label": "Position für manuellen Werkzeugwechsel",
+      "description": "Die Position, die beim manuellen Werkzeugwechsel angefahren wird."
+    },
+    "beforeToolChange": {
+      "label": "Vor dem Werkzeugwechsel",
+      "description": "Bei Verwendung der Code-Strategie wird dieser Code ausgeführt, sobald ein M6-Befehl auftritt."
+    },
+    "afterToolChange": {
+      "label": "Nach dem Werkzeugwechsel",
+      "description": "Bei Verwendung der Code-Strategie wird dieser Code nach Abschluss eines Werkzeugwechsels ausgeführt."
+    },
+    "keepoutGroup": "Sperrbereich",
+    "warnOnHome": {
+      "label": "Bei Referenzfahrt warnen",
+      "description": "Warnt bei der Referenzfahrt, dass der Sperrbereich deaktiviert ist und je nach Referenzfahrtzyklus Kollisionen möglich sind."
+    }
+  },
+  "ethernet": {
+    "title": "Ethernet",
+    "connectToIp": {
+      "label": "Mit IP verbinden",
+      "description": "IP-Adresse für die Verbindung mit CNCs über Ethernet und für andere Netzwerksuchen. (Standard 192.168.5.1)"
+    },
+    "ethernetPort": {
+      "label": "Ethernet-Port",
+      "description": "Der Port, den die Steuerung für die Ethernet-Verbindung bereitstellt. (Wird beim Verbindungsversuch über Ethernet verwendet, Standard 23)"
+    }
+  },
+  "statusLights": {
+    "title": "Statusleuchten"
+  },
+  "advancedMotors": {
+    "title": "Erweiterte Motoreinstellungen"
+  },
+  "moreSettings": {
+    "title": "Weitere Einstellungen"
+  },
+  "accessibility": {
+    "title": "Barrierefreiheit",
+    "announcementsGroup": "Ansagen",
+    "machineStatus": {
+      "label": "Maschinenstatus",
+      "description": "Änderungen des Maschinenstatus automatisch über Screenreader ansagen. (Leerlauf, Läuft, Alarm usw.)"
+    },
+    "jobProgress": {
+      "label": "Jobfortschritt",
+      "description": "Den Fertigstellungsgrad des Jobs in Prozent regelmäßig ansagen."
+    },
+    "progressIncrement": {
+      "label": "Fortschrittsschritte",
+      "description": "Die Prozentschritte, in denen der Jobfortschritt angesagt wird. (Standard 10%)"
+    },
+    "audioCuesGroup": "Akustische Signale",
+    "enableAudioCues": {
+      "label": "Akustische Signale aktivieren",
+      "description": "Kurze Töne bei bestimmten Maschinenereignissen abspielen."
+    },
+    "jobCompleteSound": {
+      "label": "Ton bei Jobende",
+      "description": "Einen Ton abspielen, wenn ein Job abgeschlossen ist."
+    },
+    "alarmSound": {
+      "label": "Alarmton",
+      "description": "Einen Ton abspielen, wenn die Maschine in einen Alarmzustand wechselt."
+    },
+    "toolChangeSound": {
+      "label": "Ton bei Werkzeugwechsel",
+      "description": "Einen Ton abspielen, wenn ein Werkzeugwechsel erforderlich ist."
+    },
+    "probeSuccessSound": {
+      "label": "Ton bei erfolgreichem Antasten",
+      "description": "Nach erfolgreichem Antasten einen Ton abspielen."
+    },
+    "navigationAndVisualsGroup": "Navigation & Darstellung",
+    "focusRings": {
+      "label": "Fokusrahmen",
+      "description": "Zeigt einen kontrastreichen Rahmen um das aktuell fokussierte Element für bessere Sichtbarkeit bei der Tastaturnavigation."
+    },
+    "focusTrapping": {
+      "label": "Fokus festhalten",
+      "description": "Hält den Tastaturfokus innerhalb geöffneter Modalfenster und Dialoge."
+    },
+    "reducedMotion": {
+      "label": "Reduzierte Bewegung",
+      "description": "Animationen und Übergänge der Oberfläche minimieren, für bessere Sichtbarkeit und Barrierefreiheit."
+    },
+    "spindleSpeedInputType": {
+      "label": "Eingabeart für Spindeldrehzahl",
+      "description": "Wählen Sie zwischen Schieberegler und Zahleneingabe zum Einstellen der Spindeldrehzahl."
+    },
+    "appDisplayScale": {
+      "label": "Anzeigeskalierung der App",
+      "description": "Überschreibt die Anzeigeskalierung der App unabhängig von den DPI-Einstellungen Ihres Betriebssystems."
+    },
+    "visualizerGroup": "Visualisierung",
+    "keyboardControl": {
+      "label": "Tastatursteuerung",
+      "description": "Erlaubt das Drehen, Verschieben und Zoomen der 3D-Visualisierung mit Pfeiltasten und Tastenkürzeln."
+    },
+    "jobSummary": {
+      "label": "Job-Zusammenfassung",
+      "description": "Stellt Screenreadern eine Textzusammenfassung der geladenen G-code-Datei bereit."
+    },
+    "showSummaryVisually": {
+      "label": "Zusammenfassung sichtbar anzeigen",
+      "description": "Zeigt den Zusammenfassungstext des G-codes sichtbar über der Visualisierung an."
+    },
+    "keyboardMapGroup": "Tastaturbelegung",
+    "showKeyboardShortcutMap": {
+      "label": "Tastenkürzel-Übersicht anzeigen",
+      "description": "Zeigt eine Überlagerung mit den aktiven Tastenkürzeln an."
+    }
+  },
+  "options": {
+    "outline": {
+      "detailed": "Detailliert",
+      "square": "Rechteck",
+      "rapidlessSquare": "Rechteck ohne Eilgang"
+    },
+    "backupFrequency": {
+      "onUpdate": "Bei Update",
+      "daily": "Täglich",
+      "weekly": "Wöchentlich",
+      "monthly": "Monatlich"
+    },
+    "projection": {
+      "perspective": "Perspektivisch",
+      "orthographic": "Orthografisch"
+    },
+    "lightweight": {
+      "light": "Leicht",
+      "everything": "Alles"
+    },
+    "toolChangeStrategy": {
+      "ignore": "Ignorieren",
+      "pause": "Pause",
+      "standardRezero": "Standard-Nullung",
+      "flexibleRezero": "Flexible Nullung",
+      "fixedToolSensor": "Fester Werkzeugsensor",
+      "code": "Code"
+    },
+    "firstToolBehaviour": {
+      "alwaysRunFullWizard": "Immer vollständigen Assistenten ausführen",
+      "promptForFirstTool": "Beim ersten Werkzeug nachfragen",
+      "alwaysProbeLengthOnly": "Immer nur Länge antasten"
+    },
+    "spindleInputType": {
+      "slider": "Schieberegler",
+      "number": "Zahl"
+    }
+  },
+  "row": {
+    "resetTooltip": "Auf Standardwert zurücksetzen",
+    "resetTitle": "Einstellung zurücksetzen",
+    "resetConfirm": "Möchten Sie diesen Wert wirklich auf den Standardwert zurücksetzen?",
+    "resetPluginsDirIntro": "Durch das Zurücksetzen durchsucht gSender folgenden Ordner nicht mehr:",
+    "resetPluginsDirWarning": "Dort importierte Plugins verschwinden aus dem Plugin-Manager, bis Sie dies zurückstellen. Möchten Sie diesen Wert wirklich auf den Standardwert zurücksetzen?",
+    "restored": "{{setting}} wurde auf den Standardwert {{value}} zurückgesetzt",
+    "noDefault": "Kein Standardwert für {{setting}} gefunden."
+  },
+  "page": {
+    "allConfigTab": "Alle Einstellungen",
+    "searchLabel": "Suchen",
+    "searchPlaceholder": "Einstellungen durchsuchen",
+    "searchClear": "Leeren",
+    "viewModified": "Geänderte anzeigen",
+    "modified": "Geändert",
+    "viewModifiedAria": "Nur geänderte Einstellungen anzeigen",
+    "disconnected": "Getrennt",
+    "disconnectedTitle": "Getrennt!",
+    "disconnectedMessage": "Manche Einstellungen werden nur angezeigt, wenn eine Maschine verbunden ist.",
+    "emptySection": "Überprüfen Sie Ihren Suchfilter oder verbinden Sie sich mit Ihrer Maschine, um weitere Optionen zu sehen."
+  },
+  "preferences": {
+    "legend": "gSender-Einstellungen",
+    "import": "Importieren",
+    "export": "Exportieren",
+    "importTitle": "Einstellungen importieren",
+    "importConfirm": "Alle aktuellen Einstellungen werden ersetzt. Möchten Sie Ihre Einstellungen wirklich in gSender importieren?",
+    "importAction": "Einstellungen importieren",
+    "restoreTitle": "Einstellungen wiederherstellen",
+    "restoreConfirm": "Alle aktuellen Einstellungen werden entfernt. Möchten Sie die Standardeinstellungen von gSender wirklich wiederherstellen?",
+    "restoreAction": "Einstellungen wiederherstellen",
+    "importFailed": "Import der Einstellungen fehlgeschlagen. Bitte überprüfen Sie das Dateiformat.",
+    "settingsUpdated_one": "{{count}} Einstellung aktualisiert.",
+    "settingsUpdated_other": "{{count}} Einstellungen aktualisiert."
+  },
+  "profileBar": {
+    "flash": "Flashen",
+    "import": "Importieren",
+    "export": "Exportieren",
+    "apply": "Übernehmen",
+    "applySettings": "Einstellungen übernehmen",
+    "eepromImported": "EEPROM-Einstellungen importiert",
+    "importFailed": "Import der Einstellungen fehlgeschlagen. Bitte überprüfen Sie das Dateiformat.",
+    "importUnable": "Einstellungen konnten nicht importiert werden",
+    "eepromUpdated_one": "{{count}} EEPROM-Wert aktualisiert.",
+    "eepromUpdated_other": "{{count}} EEPROM-Werte aktualisiert."
+  },
+  "restoreDefaults": {
+    "button": "Standardwerte",
+    "title": "Standardwerte wiederherstellen",
+    "confirm": "Möchten Sie <1>{{machineName}}</1> wirklich auf den Standardzustand zurücksetzen?",
+    "action": "Standardwerte wiederherstellen",
+    "tooltip": "Klicken Sie unbedingt auf Übernehmen, um die Standardwerte auf Ihre Steuerung anzuwenden",
+    "restored": "Standardeinstellungen für Ihre Maschine wiederhergestellt."
+  },
+  "flash": {
+    "title": "Firmware flashen",
+    "intro": "Mit dieser Funktion können Sie Firmware auf ein kompatibles SLB- oder Arduino-basiertes Gerät flashen.",
+    "port": "Port",
+    "recognizedPorts": "Erkannte Ports",
+    "unrecognizedPorts": "Nicht erkannte Ports",
+    "controllerType": "Steuerungstyp",
+    "selectBoardType": "Platinentyp auswählen",
+    "firmwareFile": "Firmware-Datei",
+    "warning": "Dieser Vorgang trennt die Verbindung zu Ihrer Maschine und kann einige Minuten dauern.",
+    "continuePrompt": "Fortfahren?",
+    "noPort": "Kein Port angegeben – bitte verbinden Sie sich mit dem Gerät, um festzustellen, was geflasht wird.",
+    "logTitle": "Flash-Protokoll",
+    "logWaiting": "Warte auf Protokolle...",
+    "completed": "Flashen abgeschlossen, bitte verbinden Sie sich erneut mit Ihrem Gerät.",
+    "logType": {
+      "info": "Info",
+      "success": "Erfolg",
+      "warning": "Warnung",
+      "error": "Fehler"
+    }
+  },
+  "eepromRow": {
+    "resetTitle": "Einzelnen EEPROM-Wert zurücksetzen",
+    "machineSetting": "Maschineneinstellung",
+    "settingDefault": "({{setting}}, Standard {{value}})"
+  },
+  "wizards": {
+    "configureGamepad": "Gamepad konfigurieren",
+    "configureKeyboard": "Tastatur konfigurieren",
+    "squareXY": "XY ausrichten",
+    "tuneCorrection": "Korrektur feinabstimmen",
+    "jogMinus": "{{axis}}- verfahren",
+    "jogPlus": "{{axis}}+ verfahren",
+    "laserOn": "Laser ein",
+    "laserOff": "Laser aus",
+    "spindleForward": "Vor",
+    "spindleReverse": "Rück",
+    "spindleStop": "Stopp",
+    "setupAutoSpin": "AutoSpin einrichten",
+    "autoSpinIcon": "AutoSpin-Symbol",
+    "probePin": "Taster/TLS:",
+    "configureAtci": "Sienci ATCi konfigurieren",
+    "atciRequiresGrblHal": "ATCi wird nur von Platinen mit grblHAL unterstützt.",
+    "atciMinVersion": "ATCi wird nur ab grblHAL-Version {{version}} unterstützt.",
+    "atciRestartTitle": "ATCi – Steuerung neu starten",
+    "atciRestartMessage": "Bitte starten Sie Ihre CNC-Steuerung manuell neu (aus- und wieder einschalten) und verbinden Sie sich erneut mit gSender, damit diese Einstellungen wirksam werden."
+  },
+  "inputs": {
+    "eventEditTitle": "Ereignis bearbeiten",
+    "eventDialogDescription": "Geben Sie die G-code-Befehle ein, die bei diesem Ereignis ausgeführt werden sollen.",
+    "eventEnabled": "Aktiviert:",
+    "eventNoCommands": "; Keine Befehle festgelegt",
+    "eventEdit": "Ereignis bearbeiten",
+    "eventFetchFailed": "Ereignisdaten {{eventType}} konnten nicht abgerufen werden",
+    "eventSaveFailed": "Ereignisbefehle konnten nicht gespeichert werden",
+    "locationGrab": "Übernehmen",
+    "locationGoTo": "Gehe zu",
+    "jogSpeed": "Geschwindigkeit:",
+    "chooseFolder": "Ordner wählen",
+    "bit": "Bit {{bit}}: {{label}}"
+  },
+  "firmware": {
+    "grbl": {
+      "0": {
+        "description": "Schrittimpulsdauer",
+        "details": "Legt die Dauer eines Schrittimpulses fest. Minimum 3 μs."
+      },
+      "1": {
+        "description": "Schritt-Leerlaufverzögerung",
+        "details": "Legt beim Anhalten eine kurze Halteverzögerung fest, damit die Dynamik abklingen kann, bevor die Schrittmotoren deaktiviert werden. Der Wert 255 hält die Motoren ohne Verzögerung dauerhaft aktiviert."
+      },
+      "2": {
+        "description": "Schrittimpuls invertieren",
+        "details": "Invertiert das Schrittsignal. Achsbit setzen, um zu invertieren (00000ZYX)."
+      },
+      "3": {
+        "description": "Schrittrichtung invertieren",
+        "details": "Invertiert das Richtungssignal. Achsbit setzen, um zu invertieren (00000ZYX)."
+      },
+      "4": {
+        "description": "Schritt-Freigabepin invertieren",
+        "details": "Invertiert das Signal am Freigabepin (Enable) des Schrittmotortreibers."
+      },
+      "5": {
+        "description": "Endschalter-Pins invertieren",
+        "details": "Invertiert alle Endschalter-Eingangspins."
+      },
+      "6": {
+        "description": "Taster-Pin invertieren",
+        "details": "Invertiert das Signal am Taster-Eingangspin."
+      },
+      "10": {
+        "description": "Optionen für Statusberichte",
+        "details": "Ändert die in Statusberichten enthaltenen Daten."
+      },
+      "11": {
+        "description": "Übergangsabweichung (Junction Deviation)",
+        "details": "Legt fest, wie schnell Grbl aufeinanderfolgende Bewegungen durchfährt. Ein niedrigerer Wert verlangsamt dies."
+      },
+      "12": {
+        "description": "Bogentoleranz",
+        "details": "Legt die Genauigkeit der G2- und G3-Bogeninterpolation anhand des radialen Fehlers fest. Achtung: Ein sehr kleiner Wert kann die Leistung beeinträchtigen."
+      },
+      "13": {
+        "description": "Ausgabe in Zoll",
+        "details": "Aktiviert Zoll-Einheiten bei der Rückgabe aller Positions- und Geschwindigkeitswerte, die keine Einstellungswerte sind."
+      },
+      "20": {
+        "description": "Software-Endlagen aktivieren",
+        "details": "Aktiviert die Prüfung der Software-Endlagen innerhalb des Maschinenverfahrwegs und löst bei Überschreitung einen Alarm aus. Erfordert Referenzfahrt."
+      },
+      "21": {
+        "description": "Hardware-Endlagen aktivieren",
+        "details": "Aktiviert Hardware-Endlagen. Hält die Bewegung sofort an und löst einen Alarm aus, wenn ein Schalter ausgelöst wird."
+      },
+      "22": {
+        "description": "Referenzfahrtzyklus aktivieren",
+        "details": "Aktiviert den Referenzfahrtzyklus. Erfordert Endschalter an allen Achsen."
+      },
+      "23": {
+        "description": "Richtung der Referenzfahrt invertieren",
+        "details": "Die Referenzfahrt sucht einen Schalter in positiver Richtung. Achsbit (00000ZYX) setzen, um in negativer Richtung zu suchen."
+      },
+      "24": {
+        "description": "Vorschub zum Lokalisieren bei Referenzfahrt",
+        "details": "Vorschub, mit dem der Endschalter langsam angefahren wird, um seine Position genau zu bestimmen."
+      },
+      "25": {
+        "description": "Suchgeschwindigkeit bei Referenzfahrt",
+        "details": "Suchgeschwindigkeit, um den Endschalter vor der langsameren Lokalisierungsphase schnell zu finden."
+      },
+      "26": {
+        "description": "Entprellverzögerung des Referenzschalters",
+        "details": "Legt eine kurze Verzögerung zwischen den Phasen des Referenzfahrtzyklus fest, damit ein Schalter entprellen kann."
+      },
+      "27": {
+        "description": "Freifahrweg vom Referenzschalter",
+        "details": "Rückzugsweg nach dem Auslösen des Schalters, um ihn wieder freizugeben. Die Referenzfahrt schlägt fehl, wenn der Schalter nicht freigegeben wird."
+      },
+      "30": {
+        "description": "Maximale Spindeldrehzahl",
+        "details": "Maximale Spindeldrehzahl. Setzt PWM auf 100 % Tastgrad."
+      },
+      "31": {
+        "description": "Minimale Spindeldrehzahl",
+        "details": "Minimale Spindeldrehzahl. Setzt PWM auf 0,4 % bzw. den niedrigsten Tastgrad."
+      },
+      "32": {
+        "description": "Lasermodus statt Spindel aktiviert",
+        "details": "Wandelt Spindelbefehle in den Lasermodus um. Aufeinanderfolgende G1/2/3-Befehle halten bei einer Änderung der Spindeldrehzahl nicht an."
+      },
+      "100": {
+        "description": "Verfahrauflösung der X-Achse",
+        "details": "Verfahrauflösung der X-Achse in Schritten pro Millimeter."
+      },
+      "101": {
+        "description": "Verfahrauflösung der Y-Achse",
+        "details": "Verfahrauflösung der Y-Achse in Schritten pro Millimeter."
+      },
+      "102": {
+        "description": "Verfahrauflösung der Z-Achse",
+        "details": "Verfahrauflösung der Z-Achse in Schritten pro Millimeter."
+      },
+      "110": {
+        "description": "Maximalgeschwindigkeit der X-Achse",
+        "details": "Maximalgeschwindigkeit der X-Achse. Wird als G0-Eilganggeschwindigkeit verwendet."
+      },
+      "111": {
+        "description": "Maximalgeschwindigkeit der Y-Achse",
+        "details": "Maximalgeschwindigkeit der Y-Achse. Wird als G0-Eilganggeschwindigkeit verwendet."
+      },
+      "112": {
+        "description": "Maximalgeschwindigkeit der Z-Achse",
+        "details": "Maximalgeschwindigkeit der Z-Achse. Wird als G0-Eilganggeschwindigkeit verwendet."
+      },
+      "120": {
+        "description": "Beschleunigung der X-Achse",
+        "details": "Beschleunigung der X-Achse. Wird für die Bewegungsplanung verwendet, damit das Motordrehmoment nicht überschritten wird und keine Schritte verloren gehen."
+      },
+      "121": {
+        "description": "Beschleunigung der Y-Achse",
+        "details": "Beschleunigung der Y-Achse. Wird für die Bewegungsplanung verwendet, damit das Motordrehmoment nicht überschritten wird und keine Schritte verloren gehen."
+      },
+      "122": {
+        "description": "Beschleunigung der Z-Achse",
+        "details": "Beschleunigung der Z-Achse. Wird für die Bewegungsplanung verwendet, damit das Motordrehmoment nicht überschritten wird und keine Schritte verloren gehen."
+      },
+      "130": {
+        "description": "Maximaler Verfahrweg der X-Achse",
+        "details": "Maximaler Verfahrweg der X-Achse vom Referenzschalter. Bestimmt den gültigen Maschinenraum für Software-Endlagen und die Suchwege der Referenzfahrt."
+      },
+      "131": {
+        "description": "Maximaler Verfahrweg der Y-Achse",
+        "details": "Maximaler Verfahrweg der Y-Achse vom Referenzschalter. Bestimmt den gültigen Maschinenraum für Software-Endlagen und die Suchwege der Referenzfahrt."
+      },
+      "132": {
+        "description": "Maximaler Verfahrweg der Z-Achse",
+        "details": "Maximaler Verfahrweg der Z-Achse vom Referenzschalter. Bestimmt den gültigen Maschinenraum für Software-Endlagen und die Suchwege der Referenzfahrt."
+      }
+    },
+    "grblhal": {
+      "0": {
+        "description": "Schrittimpulsdauer",
+        "details": "Legt die Dauer eines Schrittimpulses fest. Minimum 3 μs."
+      },
+      "1": {
+        "description": "Schritt-Leerlaufverzögerung",
+        "details": "Legt beim Anhalten eine kurze Halteverzögerung fest, damit die Dynamik abklingen kann, bevor die Schrittmotoren deaktiviert werden. Der Wert 255 hält die Motoren ohne Verzögerung dauerhaft aktiviert."
+      },
+      "2": {
+        "description": "Schrittimpuls invertieren",
+        "details": "Invertiert das Schrittsignal. Achsbit setzen, um zu invertieren (00000ZYX)."
+      },
+      "3": {
+        "description": "Schrittrichtung invertieren",
+        "details": "Invertiert das Richtungssignal. Achsbit setzen, um zu invertieren (00000ZYX)."
+      },
+      "4": {
+        "description": "Schritt-Freigabepin invertieren",
+        "details": "Invertiert das Signal am Freigabepin (Enable) des Schrittmotortreibers."
+      },
+      "5": {
+        "description": "Endschalter-Pins invertieren",
+        "details": "Invertiert alle Endschalter-Eingangspins."
+      },
+      "6": {
+        "description": "Taster-Pin invertieren",
+        "details": "Invertiert das Signal am Taster-Eingangspin."
+      },
+      "10": {
+        "description": "Optionen für Statusberichte",
+        "details": "Ändert die in Statusberichten enthaltenen Daten."
+      },
+      "11": {
+        "description": "Übergangsabweichung (Junction Deviation)",
+        "details": "Legt fest, wie schnell Grbl aufeinanderfolgende Bewegungen durchfährt. Ein niedrigerer Wert verlangsamt dies."
+      },
+      "12": {
+        "description": "Bogentoleranz",
+        "details": "Legt die Genauigkeit der G2- und G3-Bogeninterpolation anhand des radialen Fehlers fest. Achtung: Ein sehr kleiner Wert kann die Leistung beeinträchtigen."
+      },
+      "13": {
+        "description": "Ausgabe in Zoll",
+        "details": "Aktiviert Zoll-Einheiten bei der Rückgabe aller Positions- und Geschwindigkeitswerte, die keine Einstellungswerte sind."
+      },
+      "20": {
+        "description": "Software-Endlagen aktivieren",
+        "details": "Aktiviert die Prüfung der Software-Endlagen innerhalb des Maschinenverfahrwegs und löst bei Überschreitung einen Alarm aus. Erfordert Referenzfahrt."
+      },
+      "21": {
+        "description": "Hardware-Endlagen aktivieren",
+        "details": "Aktiviert Hardware-Endlagen. Hält die Bewegung sofort an und löst einen Alarm aus, wenn ein Schalter ausgelöst wird.",
+        "bits": {
+          "0": "Hardware-Endlagen aktivieren",
+          "1": "Strikten Modus bei aktivierten Hardware-Endlagen aktivieren"
+        }
+      },
+      "22": {
+        "description": "Referenzfahrtzyklus aktivieren",
+        "details": "Aktiviert den Referenzfahrtzyklus. Erfordert Endschalter an allen Achsen.",
+        "bits": {
+          "0": "Referenzfahrt aktivieren.",
+          "1": "Befehle für Referenzfahrt einzelner Achsen aktivieren.",
+          "2": "Referenzfahrt beim Start erforderlich.",
+          "3": "Maschinenursprung auf 0 setzen.",
+          "4": "Zwei Schalter teilen sich einen Eingangspin.",
+          "5": "Manuelle Referenzierung von Achsen erlauben, die nicht automatisch referenziert werden.",
+          "6": "Sperren übergehen, Reset darf den Alarm „Referenzfahrt beim Start erforderlich“ aufheben.",
+          "7": "Referenzierten Status bei Reset nach Möglichkeit beibehalten."
+        }
+      },
+      "23": {
+        "description": "Richtung der Referenzfahrt invertieren",
+        "details": "Die Referenzfahrt sucht einen Schalter in positiver Richtung. Achsbit (00000ZYX) setzen, um in negativer Richtung zu suchen."
+      },
+      "24": {
+        "description": "Vorschub zum Lokalisieren bei Referenzfahrt",
+        "details": "Vorschub, mit dem der Endschalter langsam angefahren wird, um seine Position genau zu bestimmen."
+      },
+      "25": {
+        "description": "Suchgeschwindigkeit bei Referenzfahrt",
+        "details": "Suchgeschwindigkeit, um den Endschalter vor der langsameren Lokalisierungsphase schnell zu finden."
+      },
+      "26": {
+        "description": "Entprellverzögerung des Referenzschalters",
+        "details": "Legt eine kurze Verzögerung zwischen den Phasen des Referenzfahrtzyklus fest, damit ein Schalter entprellen kann."
+      },
+      "27": {
+        "description": "Freifahrweg vom Referenzschalter",
+        "details": "Rückzugsweg nach dem Auslösen des Schalters, um ihn wieder freizugeben. Die Referenzfahrt schlägt fehl, wenn der Schalter nicht freigegeben wird."
+      },
+      "28": {
+        "description": "G73-Rückzugsweg",
+        "details": "Legt den G73-Rückzugsweg in mm fest."
+      },
+      "29": {
+        "description": "Schrittimpulsverzögerung",
+        "details": "Verzögerung des Schrittimpulses in Mikrosekunden."
+      },
+      "30": {
+        "description": "Maximale Spindeldrehzahl",
+        "details": "Maximale Spindeldrehzahl. Setzt PWM auf 100 % Tastgrad."
+      },
+      "31": {
+        "description": "Spindelmodus",
+        "details": "Legt den Spindel-/Laser-/Drehbankmodus fest"
+      },
+      "32": {
+        "description": "Lasermodus statt Spindel aktiviert",
+        "details": "Wandelt Spindelbefehle in den Lasermodus um. Aufeinanderfolgende G1/2/3-Befehle halten bei einer Änderung der Spindeldrehzahl nicht an."
+      },
+      "33": {
+        "description": "Spindelfrequenz",
+        "details": "Spindel-PWM-Frequenz in Hz"
+      },
+      "34": {
+        "description": "Spindel-Tastgrad",
+        "details": "PWM-Tastgrad bei ausgeschalteter Spindel in Prozent"
+      },
+      "35": {
+        "description": "Minimale Spindeldrehzahl",
+        "details": "Minimale Spindeldrehzahl. Setzt PWM auf 0,4 % bzw. den niedrigsten Tastgrad."
+      },
+      "36": {
+        "description": "Maximale Spindeldrehzahl",
+        "details": "Maximale Spindeldrehzahl."
+      },
+      "37": {
+        "description": "Stromlose Schrittmotoren",
+        "details": "Legt fest, welche Schrittmotoren nach Abschluss der Bewegung stromlos geschaltet werden."
+      },
+      "38": {
+        "description": "Encoder-Impulse",
+        "details": "Impulse des Spindel-Encoders pro Umdrehung."
+      },
+      "39": {
+        "description": "Druckbare Befehlszeichen",
+        "details": "Druckbare Echtzeit-Befehlszeichen aktivieren."
+      },
+      "40": {
+        "description": "Software-Endlagen im Tippbetrieb",
+        "details": "Software-Endlagen für den Tippbetrieb aktivieren. Wenn aktiviert, werden Verfahrziele bei referenzierten Achsen auf die Verfahrgrenzen der Maschine begrenzt."
+      },
+      "43": {
+        "description": "Lokalisierungszyklen der Referenzfahrt",
+        "details": "Anzahl der Lokalisierungszyklen bei der Referenzfahrt."
+      },
+      "44": {
+        "description": "Achsmaske",
+        "details": "Achspriorität für die Referenzfahrt, die niedrigste Nummer wird zuerst ausgeführt; die Anzahl der verfügbaren Einstellungen entspricht der Anzahl der unterstützten Achsen. Ersetzt #define HOMING_CYCLE_0 usw."
+      },
+      "45": {
+        "description": "Achsmaske",
+        "details": "Achspriorität für die Referenzfahrt, die niedrigste Nummer wird zuerst ausgeführt; die Anzahl der verfügbaren Einstellungen entspricht der Anzahl der unterstützten Achsen. Ersetzt #define HOMING_CYCLE_0 usw."
+      },
+      "46": {
+        "description": "Achsmaske",
+        "details": "Achspriorität für die Referenzfahrt, die niedrigste Nummer wird zuerst ausgeführt; die Anzahl der verfügbaren Einstellungen entspricht der Anzahl der unterstützten Achsen. Ersetzt #define HOMING_CYCLE_0 usw."
+      },
+      "47": {
+        "description": "Achsmaske",
+        "details": "Achspriorität für die Referenzfahrt, die niedrigste Nummer wird zuerst ausgeführt; die Anzahl der verfügbaren Einstellungen entspricht der Anzahl der unterstützten Achsen. Ersetzt #define HOMING_CYCLE_0 usw."
+      },
+      "48": {
+        "description": "Achsmaske",
+        "details": "Achspriorität für die Referenzfahrt, die niedrigste Nummer wird zuerst ausgeführt; die Anzahl der verfügbaren Einstellungen entspricht der Anzahl der unterstützten Achsen. Ersetzt #define HOMING_CYCLE_0 usw."
+      },
+      "49": {
+        "description": "Achsmaske",
+        "details": "Achspriorität für die Referenzfahrt, die niedrigste Nummer wird zuerst ausgeführt; die Anzahl der verfügbaren Einstellungen entspricht der Anzahl der unterstützten Achsen. Ersetzt #define HOMING_CYCLE_0 usw."
+      },
+      "50": {
+        "description": "Schrittgeschwindigkeit im Tippbetrieb",
+        "details": "Schrittgeschwindigkeit im Tippbetrieb in mm/min. Wird vom Treiber/Sender verwendet"
+      },
+      "51": {
+        "description": "Langsame Geschwindigkeit im Tippbetrieb",
+        "details": "Langsame Geschwindigkeit im Tippbetrieb in mm/min. Wird vom Treiber/Sender verwendet"
+      },
+      "52": {
+        "description": "Schnelle Geschwindigkeit im Tippbetrieb",
+        "details": "Schnelle Geschwindigkeit im Tippbetrieb in mm/min. Wird vom Treiber/Sender verwendet"
+      },
+      "53": {
+        "description": "Schrittweite im Tippbetrieb",
+        "details": "Schrittweite im Tippbetrieb in mm. Wird vom Treiber/Sender verwendet"
+      },
+      "54": {
+        "description": "Langsame Strecke im Tippbetrieb",
+        "details": "Langsame Strecke im Tippbetrieb in mm. Wird vom Treiber/Sender verwendet"
+      },
+      "55": {
+        "description": "Schnelle Strecke im Tippbetrieb",
+        "details": "Schnelle Strecke im Tippbetrieb in mm. Wird vom Treiber/Sender verwendet"
+      },
+      "60": {
+        "description": "Standard-Overrides wiederherstellen",
+        "details": "Standard-Overrides wiederherstellen, wenn das Programm endet."
+      },
+      "61": {
+        "description": "Schutztürsignal ignorieren",
+        "details": "Schutztürsignal im Leerlauf ignorieren. Wenn aktiviert, wird nur die Spindel (Laser) abgeschaltet. Kann nützlich sein, wenn ein Laserkopf bei geöffnetem Deckel positioniert werden muss."
+      },
+      "62": {
+        "description": "Ruhefunktion",
+        "details": "Ruhefunktion aktivieren."
+      },
+      "63": {
+        "description": "Laser bei Halt deaktivieren",
+        "details": "Laser während eines Halts deaktivieren."
+      },
+      "64": {
+        "description": "Alarm beim Start",
+        "details": "Grbl beim Start zwingend in den Alarmmodus versetzen."
+      },
+      "65": {
+        "description": "Vorschub-Override erlauben",
+        "details": "Vorschub-Override während des Antastens erlauben."
+      },
+      "70": {
+        "description": "Netzwerkdienst",
+        "details": "Netzwerkdienst festlegen."
+      },
+      "71": {
+        "description": "Bluetooth-Gerät",
+        "details": "Name des Bluetooth-Geräts."
+      },
+      "72": {
+        "description": "Bluetooth-Dienst",
+        "details": "Name des Bluetooth-Dienstes."
+      },
+      "73": {
+        "description": "WLAN-Modus",
+        "details": "WLAN-Modus."
+      },
+      "74": {
+        "description": "WLAN-STA-SSID",
+        "details": "WLAN-STA-SSID (Station)."
+      },
+      "75": {
+        "description": "WLAN-STA-Passwort",
+        "details": "WLAN-STA-Passwort (Station)."
+      },
+      "76": {
+        "description": "WLAN-AP-SSID",
+        "details": "WLAN-AP-SSID (Access Point)."
+      },
+      "77": {
+        "description": "WLAN-AP-Passwort",
+        "details": "WLAN-AP-Passwort (Access Point)."
+      },
+      "78": {
+        "description": "WLAN-Land",
+        "details": "WLAN-AP-Land (Access Point)."
+      },
+      "79": {
+        "description": "WLAN-AP-Kanal-Passwort",
+        "details": "WLAN-AP-Kanal-Passwort (Access Point)."
+      },
+      "80": {
+        "description": "Spindel-PID-Regler Proportionalverstärkung",
+        "details": "Proportionalverstärkung des Spindel-PID-Reglers."
+      },
+      "81": {
+        "description": "Spindel-PID-Regler Integralverstärkung",
+        "details": "Integralverstärkung des Spindel-PID-Reglers."
+      },
+      "82": {
+        "description": "Spindel-PID-Regler Differentialverstärkung",
+        "details": "Differentialverstärkung des Spindel-PID-Reglers."
+      },
+      "84": {
+        "description": "Spindel-PID max. Ausgangsfehler",
+        "details": "Maximaler Ausgangsfehler des Spindel-PID."
+      },
+      "85": {
+        "description": "Spindel-PID max. Ausgangsfehler",
+        "details": "Maximaler Integralfehler des Spindel-PID-Reglers."
+      },
+      "90": {
+        "description": "PID-Regler für spindelsynchrone Bewegung Proportionalverstärkung",
+        "details": "Proportionalverstärkung des PID-Reglers für spindelsynchrone Bewegung."
+      },
+      "91": {
+        "description": "PID-Regler für spindelsynchrone Bewegung Integralverstärkung",
+        "details": "Integralverstärkung des PID-Reglers für spindelsynchrone Bewegung."
+      },
+      "92": {
+        "description": "PID-Regler für spindelsynchrone Bewegung Differentialverstärkung",
+        "details": "Differentialverstärkung des PID-Reglers für spindelsynchrone Bewegung."
+      },
+      "100": {
+        "description": "Verfahrauflösung der X-Achse",
+        "details": "Verfahrauflösung der X-Achse in Schritten pro Millimeter."
+      },
+      "101": {
+        "description": "Verfahrauflösung der Y-Achse",
+        "details": "Verfahrauflösung der Y-Achse in Schritten pro Millimeter."
+      },
+      "102": {
+        "description": "Verfahrauflösung der Z-Achse",
+        "details": "Verfahrauflösung der Z-Achse in Schritten pro Millimeter."
+      },
+      "110": {
+        "description": "Maximalgeschwindigkeit der X-Achse",
+        "details": "Maximalgeschwindigkeit der X-Achse. Wird als G0-Eilganggeschwindigkeit verwendet."
+      },
+      "111": {
+        "description": "Maximalgeschwindigkeit der Y-Achse",
+        "details": "Maximalgeschwindigkeit der Y-Achse. Wird als G0-Eilganggeschwindigkeit verwendet."
+      },
+      "112": {
+        "description": "Maximalgeschwindigkeit der Z-Achse",
+        "details": "Maximalgeschwindigkeit der Z-Achse. Wird als G0-Eilganggeschwindigkeit verwendet."
+      },
+      "120": {
+        "description": "Beschleunigung der X-Achse",
+        "details": "Beschleunigung der X-Achse. Wird für die Bewegungsplanung verwendet, damit das Motordrehmoment nicht überschritten wird und keine Schritte verloren gehen."
+      },
+      "121": {
+        "description": "Beschleunigung der Y-Achse",
+        "details": "Beschleunigung der Y-Achse. Wird für die Bewegungsplanung verwendet, damit das Motordrehmoment nicht überschritten wird und keine Schritte verloren gehen."
+      },
+      "122": {
+        "description": "Beschleunigung der Z-Achse",
+        "details": "Beschleunigung der Z-Achse. Wird für die Bewegungsplanung verwendet, damit das Motordrehmoment nicht überschritten wird und keine Schritte verloren gehen."
+      },
+      "130": {
+        "description": "Maximaler Verfahrweg der X-Achse",
+        "details": "Maximaler Verfahrweg der X-Achse vom Referenzschalter. Bestimmt den gültigen Maschinenraum für Software-Endlagen und die Suchwege der Referenzfahrt."
+      },
+      "131": {
+        "description": "Maximaler Verfahrweg der Y-Achse",
+        "details": "Maximaler Verfahrweg der Y-Achse vom Referenzschalter. Bestimmt den gültigen Maschinenraum für Software-Endlagen und die Suchwege der Referenzfahrt."
+      },
+      "132": {
+        "description": "Maximaler Verfahrweg der Z-Achse",
+        "details": "Maximaler Verfahrweg der Z-Achse vom Referenzschalter. Bestimmt den gültigen Maschinenraum für Software-Endlagen und die Suchwege der Referenzfahrt."
+      },
+      "340": {
+        "description": "Toleranz für Spindeldrehzahl erreicht",
+        "details": "Verfügbar für Treiber und Plugins, die die Funktion „Spindeldrehzahl erreicht“ unterstützen. Bei einem Wert > 0 wird Alarm 14 ausgelöst, wenn die Spindeldrehzahl innerhalb einer Zeitüberschreitung nicht im Toleranzbereich liegt."
+      },
+      "341": {
+        "description": "Modus für manuellen Werkzeugwechsel",
+        "details": "Verfügbar für Treiber und Plugins, die die Funktion „Spindeldrehzahl erreicht“ unterstützen. Bei einem Wert > 0 wird Alarm 14 ausgelöst, wenn die Spindeldrehzahl innerhalb einer Zeitüberschreitung nicht im Toleranzbereich liegt."
+      },
+      "342": {
+        "description": "Antastweg",
+        "details": "Wird in Modus 1 und 2 beim Ausführen des Befehls $TPW sowie in Modus 3 verwendet."
+      },
+      "343": {
+        "description": "Langsamer Antastvorschub",
+        "details": "Wird in Modus 1 und 2 beim Ausführen des Befehls $TPW sowie in Modus 3 verwendet, um einen genauen Werkzeugversatz zu ermitteln."
+      },
+      "344": {
+        "description": "Such-Antastvorschub",
+        "details": "Wird in Modus 1 und 2 beim Ausführen des Befehls $TPW sowie in Modus 3 verwendet, um einen ersten Werkzeugversatz zu ermitteln. Bei Erfolg wird das Werkzeug etwas zurückgezogen und das Antasten mit dem langsamen Vorschub aus $343 wiederholt."
+      },
+      "3x0": {
+        "description": "Hostname",
+        "details": "Hostname."
+      },
+      "3x1": {
+        "description": "IP-Modus",
+        "details": "IP-Modus der Schnittstelle."
+      },
+      "3x2": {
+        "description": "Gateway-Adresse der Schnittstelle",
+        "details": "Gateway-Adresse der Schnittstelle. IPv4- oder IPv6-Adresse, bis zu 16 Oktette. Kann eine IPv4-Adresse binär oder als Text enthalten."
+      },
+      "3x3": {
+        "description": "Netzmaske der Schnittstelle",
+        "details": "Netzmaske der Schnittstelle. IPv4- oder IPv6-Adresse, bis zu 16 Oktette. Kann eine IPv4-Adresse binär oder als Text enthalten."
+      },
+      "3x4": {
+        "description": "Netzmaske der Schnittstelle",
+        "details": "Netzmaske der Schnittstelle. IPv4- oder IPv6-Adresse, bis zu 16 Oktette. Kann eine IPv4-Adresse binär oder als Text enthalten."
+      },
+      "3x5": {
+        "description": "Telnet-Port",
+        "details": "Port für die serielle Kommunikation, entweder über das Telnet-Protokoll oder einen einfachen Socket-Stream."
+      },
+      "3x6": {
+        "description": "HTTP-Port",
+        "details": "Port des Webservers."
+      },
+      "3x7": {
+        "description": "Websocket-Port",
+        "details": "Port für bidirektionale Kommunikation, typischerweise mit einem Webbrowser. Wird von Grbl meist für die serielle Kommunikation verwendet."
+      }
+    }
+  }
+}

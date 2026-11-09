@@ -36,6 +36,7 @@ import {
 } from '@sienci/gviewer/viewer';
 import type { BBox } from 'app/definitions/general';
 import type { OverlayMarker } from 'app/features/Plugins/types';
+import { i18n } from 'app/i18n';
 import type { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import controller from 'app/lib/controller';
 import { isLaserMode } from 'app/lib/laserMode';
@@ -1353,7 +1354,7 @@ class GcodeViewer extends Component<Props> {
         if (this.outlineRunning) {
             return;
         }
-        toast.info('Generating outline g-code...');
+        toast.info(i18n.t('notifications:jobControl.outlineGenerating'));
         this.outlineRunning = true;
 
         const positionChunks = this.getToolpathHull();
@@ -1389,7 +1390,7 @@ class GcodeViewer extends Component<Props> {
 
             maxRuntime = setTimeout(() => {
                 outlineWorker.terminate();
-                toast.error('Outline generation timed out. Please try again.');
+                toast.error(i18n.t('notifications:jobControl.outlineTimedOut'));
                 this.outlineRunning = false;
             }, 15000);
 
@@ -1404,7 +1405,7 @@ class GcodeViewer extends Component<Props> {
                 clearTimeout(maxRuntime);
                 outlineWorker.terminate();
                 console.error('Outline worker failed', event);
-                toast.error('Outline generation failed. Please try again.');
+                toast.error(i18n.t('notifications:jobControl.outlineFailed'));
                 this.outlineRunning = false;
             };
             outlineWorker.onerror = onWorkerError;

@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import api from 'app/api';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { getAvailableLanguages, i18n, LANGUAGE_SYSTEM, tk } from 'app/i18n';
 import {
     GRBL,
     GRBLHAL,
@@ -50,11 +51,7 @@ import controller from 'app/lib/controller.ts';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import { round, roundMetric } from 'app/lib/rounding';
 import { toast } from 'app/lib/toaster';
-import {
-    TOASTER_DISABLED,
-    TOASTER_LONG,
-    TOASTER_UNTIL_CLOSE,
-} from 'app/lib/toaster/ToasterLib';
+import { TOASTER_DISABLED, TOASTER_LONG } from 'app/lib/toaster/ToasterLib';
 import { convertToImperial } from 'app/lib/units';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
@@ -116,6 +113,8 @@ export interface gSenderSetting {
     key?: string;
     description?: string;
     options?: string[] | number[];
+    /** Display text for each option (tk() keys); options stay the stored values. */
+    labels?: string[];
     unit?: string;
     eID?: EEPROM;
     globalIndex?: number;
@@ -174,41 +173,59 @@ export interface gSenderEEPROMSettingSection {
 
 export const SettingsMenu: SettingsMenuSection[] = [
     {
-        label: 'Basics',
+        label: tk('config:basics.title'),
         icon: FaCog,
         settings: [
             {
                 label: '',
                 settings: [
                     {
-                        label: 'Carve screen units',
+                        label: tk('common:language.label'),
+                        key: 'workspace.language',
+                        type: 'select',
+                        description: tk('common:language.description'),
+                        options: [
+                            LANGUAGE_SYSTEM,
+                            ...getAvailableLanguages().map((l) => l.code),
+                        ],
+                        // Native names are shown as-is in every language.
+                        labels: [
+                            tk('common:language.systemDefault'),
+                            ...getAvailableLanguages().map((l) => l.nativeName),
+                        ],
+                        defaultValue: LANGUAGE_SYSTEM,
+                    },
+                    {
+                        label: tk('config:basics.carveScreenUnits.label'),
                         key: 'workspace.units',
                         type: 'radio',
-                        description:
-                            'What units would you prefer to see on the carve screen? Config will always be metric since all common CNC firmware requires metric values as input.',
+                        description: tk(
+                            'config:basics.carveScreenUnits.description',
+                        ),
                         options: ['mm', 'in'],
                     },
                     {
-                        label: 'Reconnect automatically',
+                        label: tk('config:basics.reconnectAutomatically.label'),
                         key: 'widgets.connection.autoReconnect',
                         type: 'boolean',
-                        description:
-                            'Automatically reconnect to the last machine you used when you open gSender.',
+                        description: tk(
+                            'config:basics.reconnectAutomatically.description',
+                        ),
                     },
                     {
-                        label: 'Firmware fallback',
+                        label: tk('config:basics.firmwareFallback.label'),
                         type: 'select',
                         key: 'workspace.defaultFirmware',
-                        description:
-                            'The firmware gSender will resort to using if automatic detection fails.',
+                        description: tk(
+                            'config:basics.firmwareFallback.description',
+                        ),
                         options: [GRBL, GRBLHAL],
                     },
                     {
-                        label: 'Baud rate',
+                        label: tk('config:basics.baudRate.label'),
                         key: 'widgets.connection.baudrate',
                         type: 'select',
-                        description:
-                            'Needs to match up with the value your CNC uses. (Serial transmission speed, Default 115200)',
+                        description: tk('config:basics.baudRate.description'),
                         options: [
                             '250000',
                             '115200',
@@ -223,50 +240,60 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Safe height',
+                        label: tk('config:basics.safeHeight.label'),
                         key: 'workspace.safeRetractHeight',
                         type: 'number',
                         unit: 'variable',
-                        description:
-                            "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)",
+                        description: tk('config:basics.safeHeight.description'),
                     },
                     {
-                        label: 'Check file on load',
+                        label: tk('config:basics.checkFileOnLoad.label'),
                         key: 'widgets.visualizer.checkFile',
-                        description:
-                            'Runs Check Mode ($C) anytime a new g-code file is loaded.',
+                        description: tk(
+                            'config:basics.checkFileOnLoad.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Outline style',
+                        label: tk('config:basics.outlineStyle.label'),
                         key: 'workspace.outlineMode',
                         type: 'select',
-                        description:
-                            'Choose how your files will be outlined. (Detailed takes longer and follows more closely, Square traces a simple bounding box, Rapidless Square does the same but ignores rapid/G0 moves, Default Detailed)',
+                        description: tk(
+                            'config:basics.outlineStyle.description',
+                        ),
                         options: OUTLINE_MODES,
+                        labels: [
+                            tk('config:options.outline.detailed'),
+                            tk('config:options.outline.square'),
+                            tk('config:options.outline.rapidlessSquare'),
+                        ],
                     },
                     {
-                        label: 'Outline speed',
+                        label: tk('config:basics.outlineSpeed.label'),
                         key: 'workspace.outlineSpeed',
                         type: 'number',
                         unit: 'mm/min',
-                        description:
-                            'Set the feed rate used when outlining. (Lower values provide more controlled movements, Default 0 runs outline at maximum/G0 speed)',
+                        description: tk(
+                            'config:basics.outlineSpeed.description',
+                        ),
                     },
                     {
-                        label: 'Revert workspace',
+                        label: tk('config:basics.revertWorkspace.label'),
                         key: 'workspace.revertWorkspace',
                         type: 'boolean',
                         defaultValue: false,
-                        description:
-                            "Allow g-code 'job finishing' commands like M2 and M30 to reset your CNCs workspace back to G54 at the end of each job.",
+                        description: tk(
+                            'config:basics.revertWorkspace.description',
+                        ),
                         options: OUTLINE_MODES,
                     },
                     {
-                        label: 'Power Saving',
+                        label: tk('config:basics.powerSaving.label'),
                         key: 'workspace.powerSaving',
                         type: 'boolean',
-                        description: 'Allow screen to blank/sleep.',
+                        description: tk(
+                            'config:basics.powerSaving.description',
+                        ),
                         onEnable: () => {
                             if (isElectron()) {
                                 (window as any).ipcRenderer.send(
@@ -285,11 +312,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Prompt on exit',
+                        label: tk('config:basics.promptOnExit.label'),
                         key: 'workspace.promptExit',
                         type: 'boolean',
-                        description:
-                            'Pop up a confirmation window when exiting the program.',
+                        description: tk(
+                            'config:basics.promptOnExit.description',
+                        ),
                         onEnable: () => {
                             if (isElectron()) {
                                 (window as any).ipcRenderer.send(
@@ -308,12 +336,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Allow gCAM to send files',
+                        label: tk('config:basics.allowGcamToSendFiles.label'),
                         key: 'workspace.allowGcamHandoff',
                         type: 'boolean',
                         defaultValue: true,
-                        description:
-                            'Let gCAM running on this computer load programs directly into gSender with "Send to gSender". Files are refused while a job is running.',
+                        description: tk(
+                            'config:basics.allowGcamToSendFiles.description',
+                        ),
                         hidden: () => !isElectron(),
                         onEnable: () => {
                             if (isElectron()) {
@@ -333,32 +362,43 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Run settings backup',
+                        label: tk('config:basics.runSettingsBackup.label'),
                         key: 'workspace.backupFreq',
                         type: 'select',
-                        description:
-                            'Choose how often gSender will backup your settings. Useful in case you need to revert them in the future.',
+                        description: tk(
+                            'config:basics.runSettingsBackup.description',
+                        ),
                         options: ['On Update', 'Daily', 'Weekly', 'Monthly'],
+                        labels: [
+                            tk('config:options.backupFrequency.onUpdate'),
+                            tk('config:options.backupFrequency.daily'),
+                            tk('config:options.backupFrequency.weekly'),
+                            tk('config:options.backupFrequency.monthly'),
+                        ],
                         hidden: () => {
                             return !isElectron();
                         },
                     },
                     {
-                        label: 'Settings backup location',
+                        label: tk('config:basics.settingsBackupLocation.label'),
                         key: 'workspace.backupLoc',
                         type: 'path',
-                        description:
-                            "Choose the location to backup your settings to. Default: your OS's appData location.",
+                        description: tk(
+                            'config:basics.settingsBackupLocation.description',
+                        ),
                         hidden: () => {
                             return !isElectron();
                         },
                     },
                     {
-                        label: 'Imported plugins location',
+                        label: tk(
+                            'config:basics.importedPluginsLocation.label',
+                        ),
                         key: 'workspace.userPluginsDir',
                         type: 'path',
-                        description:
-                            "Choose the location to import your plugins to. Default: your OS's userData location.",
+                        description: tk(
+                            'config:basics.importedPluginsLocation.description',
+                        ),
                         onApply: () => {
                             const value = store.get(
                                 'workspace.userPluginsDir',
@@ -377,15 +417,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                         previousUserPluginsDir !==
                                             res.data.userPluginsDir;
                                     const message = abandonedPreviousDir
-                                        ? `Restart gSender to load plugins from the new location. Plugins in "${previousUserPluginsDir}" will no longer be scanned until you set this back.`
-                                        : 'Restart gSender to load plugins from the new location.';
+                                        ? i18n.t(
+                                              'config:basics.importedPluginsLocation.restartAbandoned',
+                                              { previousUserPluginsDir },
+                                          )
+                                        : i18n.t(
+                                              'config:basics.importedPluginsLocation.restart',
+                                          );
                                     toast.info(message, {
                                         duration: TOASTER_LONG,
                                     });
                                 })
                                 .catch(() => {
                                     toast.error(
-                                        'Failed to update the plugins location. Please try again.',
+                                        i18n.t(
+                                            'config:basics.importedPluginsLocation.updateFailed',
+                                        ),
                                     );
                                 });
                         },
@@ -394,10 +441,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Collect usage data',
+                        label: tk('config:basics.collectUsageData.label'),
                         key: 'workspace.collectUsageDataStatus',
-                        description:
-                            'This info is collected anonymously to help us improve gSender by seeing how people use it.',
+                        description: tk(
+                            'config:basics.collectUsageData.description',
+                        ),
                         type: 'boolean',
                         valueTransform: (v: any) =>
                             v === 'accepted' || v === true,
@@ -425,20 +473,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'UI Options',
+                label: tk('config:basics.uiOptionsGroup'),
                 settings: [
                     {
-                        label: 'Dark mode',
+                        label: tk('config:basics.darkMode.label'),
                         key: 'workspace.enableDarkMode',
-                        description:
-                            'Change the app colours for reduced eye strain, better contrast, or just for fun!',
+                        description: tk('config:basics.darkMode.description'),
                         type: 'boolean',
                     },
                     {
-                        label: 'Use pendant view as default UI',
+                        label: tk(
+                            'config:basics.usePendantViewAsDefault.label',
+                        ),
                         key: 'workspace.usePendantViewAsDefault',
-                        description:
-                            'Launch directly into the touch-friendly pendant interface in fullscreen kiosk mode instead of the standard desktop UI. Requires an app restart to take effect.',
+                        description: tk(
+                            'config:basics.usePendantViewAsDefault.description',
+                        ),
                         type: 'boolean',
                         onChange: (value: boolean) => {
                             store.set(
@@ -447,12 +497,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             );
                             if (isElectron()) {
                                 Confirm({
-                                    title: 'Restart Required',
+                                    title: i18n.t(
+                                        'config:basics.usePendantViewAsDefault.restartTitle',
+                                    ),
                                     content: value
-                                        ? 'gSender needs to restart to switch to the pendant view.'
-                                        : 'gSender needs to restart to switch back to the desktop view.',
-                                    confirmLabel: 'Restart Now',
-                                    cancelLabel: 'Later',
+                                        ? i18n.t(
+                                              'config:basics.usePendantViewAsDefault.restartToPendant',
+                                          )
+                                        : i18n.t(
+                                              'config:basics.usePendantViewAsDefault.restartToDesktop',
+                                          ),
+                                    confirmLabel: i18n.t(
+                                        'config:basics.usePendantViewAsDefault.restartNow',
+                                    ),
+                                    cancelLabel: i18n.t(
+                                        'config:basics.usePendantViewAsDefault.restartLater',
+                                    ),
                                     onConfirm: () => {
                                         (window as any).ipcRenderer.send(
                                             'remoteMode-restart',
@@ -463,10 +523,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'DRO zeros',
+                        label: tk('config:basics.droZeros.label'),
                         key: 'workspace.customDecimalPlaces',
-                        description:
-                            'Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)',
+                        description: tk('config:basics.droZeros.description'),
                         type: 'number',
                         min: 0,
                         max: 4,
@@ -474,13 +533,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Visualizer options',
+                label: tk('config:basics.visualizerOptionsGroup'),
                 settings: [
                     {
-                        label: 'Visualizer theme',
+                        label: tk('config:basics.visualizerTheme.label'),
                         key: 'widgets.visualizer.theme',
-                        description:
-                            'Independent colour control for the visualizer.',
+                        description: tk(
+                            'config:basics.visualizerTheme.description',
+                        ),
                         type: 'select',
                         options: [
                             THEMES.LIGHT_THEME,
@@ -496,22 +556,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Camera projection',
+                        label: tk('config:basics.cameraProjection.label'),
                         key: 'widgets.visualizer.projection',
-                        description:
-                            'Perspective (default) shows depth like a normal camera view. Orthographic removes that depth distortion, keeping parallel lines parallel — useful for lining up toolpaths precisely.',
+                        description: tk(
+                            'config:basics.cameraProjection.description',
+                        ),
                         type: 'select',
                         options: ['Perspective', 'Orthographic'],
+                        labels: [
+                            tk('config:options.projection.perspective'),
+                            tk('config:options.projection.orthographic'),
+                        ],
                         onChange: (value: string) => {
                             store.set('widgets.visualizer.projection', value);
                             pubsub.publish('visualizer:settings');
                         },
                     },
                     {
-                        label: 'Show bounding box',
+                        label: tk('config:basics.showBoundingBox.label'),
                         key: 'widgets.visualizer.objects.limits.visible',
-                        description:
-                            'Draw a wireframe around the extents of the loaded G-code file.',
+                        description: tk(
+                            'config:basics.showBoundingBox.description',
+                        ),
                         type: 'boolean',
                         onChange: (value: boolean) => {
                             store.set(
@@ -522,10 +588,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Show bounding box labels',
+                        label: tk('config:basics.showBoundingBoxLabels.label'),
                         key: 'widgets.visualizer.boundingBoxLabels',
-                        description:
-                            'Show X/Y/Z dimension labels on the bounding box.',
+                        description: tk(
+                            'config:basics.showBoundingBoxLabels.description',
+                        ),
                         type: 'boolean',
                         onChange: (value: boolean) => {
                             store.set(
@@ -536,10 +603,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Show machine bed indicator',
+                        label: tk(
+                            'config:basics.showMachineBedIndicator.label',
+                        ),
                         key: 'widgets.visualizer.objects.machineBed.visible',
-                        description:
-                            "Draw an outline of the machine's homed work area once homing is complete.",
+                        description: tk(
+                            'config:basics.showMachineBedIndicator.description',
+                        ),
                         type: 'boolean',
                         defaultValue: false,
                         onChange: (value: boolean) => {
@@ -551,10 +621,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Trim grid to machine bed',
+                        label: tk('config:basics.trimGridToMachineBed.label'),
                         key: 'widgets.visualizer.objects.machineBed.trimGridToBed',
-                        description:
-                            "When the machine bed indicator is shown, clip the background grid to just past the bed's edges instead of a fixed square.",
+                        description: tk(
+                            'config:basics.trimGridToMachineBed.description',
+                        ),
                         type: 'boolean',
                         defaultValue: false,
                         onChange: (value: boolean) => {
@@ -566,24 +637,27 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Hide processed lines',
+                        label: tk('config:basics.hideProcessedLines.label'),
                         key: 'widgets.visualizer.hideProcessedLines',
-                        description:
-                            'Hide processed g-code lines in the visualizer.',
+                        description: tk(
+                            'config:basics.hideProcessedLines.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Show planned lines',
+                        label: tk('config:basics.showPlannedLines.label'),
                         key: 'widgets.visualizer.showPlannedLines',
-                        description:
-                            'While a job runs, highlight the toolpath between the bit and the last line sent to the controller.',
+                        description: tk(
+                            'config:basics.showPlannedLines.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Animate planned lines',
+                        label: tk('config:basics.animatePlannedLines.label'),
                         key: 'widgets.visualizer.animatePlannedLines',
-                        description:
-                            'A pulse runs along the planned lines in the order they will be cut.',
+                        description: tk(
+                            'config:basics.animatePlannedLines.description',
+                        ),
                         type: 'boolean',
                         defaultValue: false,
                         onChange: (value: boolean) => {
@@ -595,96 +669,109 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Lightweight options',
+                        label: tk('config:basics.lightweightOptions.label'),
                         key: 'widgets.visualizer.liteOption',
-                        description:
-                            'Enable with the feather when big files are slowing down your computer. (Light turns off 3D file view, Everything disables the visualizer)',
+                        description: tk(
+                            'config:basics.lightweightOptions.description',
+                        ),
                         type: 'select',
                         options: [
                             LIGHTWEIGHT_OPTIONS.LIGHT,
                             LIGHTWEIGHT_OPTIONS.EVERYTHING,
                         ],
+                        labels: [
+                            tk('config:options.lightweight.light'),
+                            tk('config:options.lightweight.everything'),
+                        ],
                     },
                     {
-                        label: 'Follow tool during runtime',
+                        label: tk(
+                            'config:basics.followToolDuringRuntime.label',
+                        ),
                         key: 'widgets.visualizer.followToolDuringRuntime',
-                        description:
-                            'While a job is running, pan the camera to track the tool in X/Y, keeping the same viewing angle and height.',
+                        description: tk(
+                            'config:basics.followToolDuringRuntime.description',
+                        ),
                         type: 'boolean',
                         defaultValue: false,
                     },
                     {
-                        label: 'Portrait macro bar',
+                        label: tk('config:basics.portraitMacroBar.label'),
                         key: 'workspace.portraitMacroBar',
-                        description:
-                            'Show a quick-access macro bar at the bottom of the screen in portrait mode.',
+                        description: tk(
+                            'config:basics.portraitMacroBar.description',
+                        ),
                         type: 'boolean',
                         defaultValue: false,
                     },
                 ],
             },
             {
-                label: 'Jogging Presets',
+                label: tk('config:basics.joggingPresetsGroup'),
                 settings: [
                     {
-                        label: 'Rapid',
+                        label: tk('config:basics.rapid.label'),
                         type: 'jog',
                         description: '',
                         key: 'widgets.axes.jog.rapid',
                     },
                     {
-                        label: 'Normal',
+                        label: tk('config:basics.normal.label'),
                         type: 'jog',
-                        description:
-                            'Set the movement distances and speeds used for each jogging preset.',
+                        description: tk('config:basics.normal.description'),
                         key: 'widgets.axes.jog.normal',
                     },
                     {
-                        label: 'Precise',
+                        label: tk('config:basics.precise.label'),
                         type: 'jog',
                         description: '',
                         key: 'widgets.axes.jog.precise',
                     },
                     {
-                        label: 'Continuous jog delay',
+                        label: tk('config:basics.continuousJogDelay.label'),
                         type: 'number',
                         unit: 'ms',
-                        description:
-                            'Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 250)',
+                        description: tk(
+                            'config:basics.continuousJogDelay.description',
+                        ),
                         key: 'widgets.axes.jog.threshold',
                         min: 50,
                     },
                 ],
             },
             {
-                label: 'Notifications',
+                label: tk('config:basics.notificationsGroup'),
                 settings: [
                     {
-                        label: 'Warn if bad file',
+                        label: tk('config:basics.warnIfBadFile.label'),
                         key: 'widgets.visualizer.showWarning',
-                        description:
-                            'Warns if any invalid commands are found when a file is opened.',
+                        description: tk(
+                            'config:basics.warnIfBadFile.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Warn on bad line',
+                        label: tk('config:basics.warnOnBadLine.label'),
                         key: 'widgets.visualizer.showLineWarnings',
-                        description:
-                            'Warns if any invalid commands are found when running a job.',
+                        description: tk(
+                            'config:basics.warnOnBadLine.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Warn when setting zero',
+                        label: tk('config:basics.warnWhenSettingZero.label'),
                         key: 'workspace.shouldWarnZero',
-                        description:
-                            'Useful if you tend to set zero accidentally.',
+                        description: tk(
+                            'config:basics.warnWhenSettingZero.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Warn if beyond soft limits',
+                        label: tk('config:basics.warnIfBeyondSoftLimits.label'),
                         key: 'widgets.visualizer.showSoftLimitWarning',
-                        description:
-                            'Warns if your file exceeds your machine limits based on the current zero point. (Homing and soft limits must be enabled)',
+                        description: tk(
+                            'config:basics.warnIfBeyondSoftLimits.description',
+                        ),
                         type: 'boolean',
                         disabled: () => {
                             const connected = controller.portOpen;
@@ -701,23 +788,32 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Job end notifications',
+                        label: tk('config:basics.jobEndNotifications.label'),
                         key: 'widgets.visualizer.jobEndModal',
-                        description:
-                            'Show a carving summary at the end of each job.',
+                        description: tk(
+                            'config:basics.jobEndNotifications.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Maintenance notifications',
+                        label: tk(
+                            'config:basics.maintenanceNotifications.label',
+                        ),
                         key: 'widgets.visualizer.maintenanceTaskNotifications',
-                        description:
-                            'Show upcoming maintenance tasks at the end of each job.',
+                        description: tk(
+                            'config:basics.maintenanceNotifications.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Pop-up notification duration',
+                        label: tk(
+                            'config:basics.popUpNotificationDuration.label',
+                        ),
                         key: 'workspace.toastDuration',
-                        description: `How long notifications stay visible, in milliseconds, before auto-dismissing. (${TOASTER_UNTIL_CLOSE} keeps them up until manually dismissed, ${TOASTER_DISABLED} disables them, Default 0 keeps default duration)`,
+                        // Text mentions TOASTER_UNTIL_CLOSE (-1) and TOASTER_DISABLED (-2) literally.
+                        description: tk(
+                            'config:basics.popUpNotificationDuration.description',
+                        ),
                         type: 'number',
                         defaultValue: 0,
                         min: TOASTER_DISABLED,
@@ -726,33 +822,31 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Shortcuts',
+                label: tk('config:basics.shortcutsGroup'),
                 settings: [
                     {
-                        label: 'Keyboard',
+                        label: tk('config:basics.keyboard.label'),
                         type: 'wizard',
                         wizard: KeyboardLinkWizard,
-                        description:
-                            'Control your CNC and navigate through gSender using custom key combinations on any keyboard, numpad, or macro pad.',
+                        description: tk('config:basics.keyboard.description'),
                     },
                     {
-                        label: 'Gamepad',
+                        label: tk('config:basics.gamepad.label'),
                         type: 'wizard',
                         wizard: GamepadLinkWizard,
-                        description:
-                            'Easily jog, set zeros, start jobs, and more using most common gamepads. Create your own profile or use a pre-made one.',
+                        description: tk('config:basics.gamepad.description'),
                     },
                 ],
             },
         ],
     },
     {
-        label: 'Customize UI',
+        label: tk('config:customizeUi.title'),
         icon: MdSettingsApplications,
         settings: [],
     },
     {
-        label: 'Motors',
+        label: tk('config:motors.title'),
         icon: PiEngine,
         settings: [
             {
@@ -761,9 +855,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'wizard',
                         wizard: SquaringToolWizard,
-                        label: 'Square up CNC rails',
-                        description:
-                            'Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this.',
+                        label: tk('config:motors.squareUpCncRails.label'),
+                        description: tk(
+                            'config:motors.squareUpCncRails.description',
+                        ),
                         hidden: () => {
                             const connected = controller.portOpen;
                             return !connected;
@@ -784,13 +879,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'X-axis',
+                label: tk('config:motors.xAxisGroup'),
                 wizard: XJogWizard,
                 settings: [
                     {
                         type: 'eeprom',
                         eID: '$100',
-                        toolLink: 'Tune Correction',
+                        toolLink: tk('config:wizards.tuneCorrection'),
                         toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
@@ -808,7 +903,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Y-axis',
+                label: tk('config:motors.yAxisGroup'),
                 wizard: YJogWizard,
                 settings: [
                     {
@@ -818,7 +913,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$101',
-                        toolLink: 'Tune Correction',
+                        toolLink: tk('config:wizards.tuneCorrection'),
                         toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
@@ -836,13 +931,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Z-axis',
+                label: tk('config:motors.zAxisGroup'),
                 wizard: ZJogWizard,
                 settings: [
                     {
                         type: 'eeprom',
                         eID: '$102',
-                        toolLink: 'Tune Correction',
+                        toolLink: tk('config:wizards.tuneCorrection'),
                         toolLinkLabel: '/tools/movement-tuning',
                     },
                     {
@@ -862,7 +957,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Probe',
+        label: tk('config:probe.title'),
         icon: MdTouchApp,
         wizard: ProbePinStatus,
         settings: [
@@ -878,11 +973,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$668',
                     },
                     {
-                        label: 'Touch plate type',
+                        label: tk('config:probe.touchPlateType.label'),
                         key: 'workspace.probeProfile.touchplateType',
                         type: 'select',
-                        description:
-                            "Select the touch plate you're using with your machine. (Default Standard block)",
+                        description: tk(
+                            'config:probe.touchPlateType.description',
+                        ),
                         options: [
                             TOUCHPLATE_TYPE_STANDARD,
                             TOUCHPLATE_TYPE_AUTOZERO,
@@ -892,17 +988,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         ],
                     },
                     {
-                        label: 'Show touch plate switcher',
+                        label: tk('config:probe.showTouchPlateSwitcher.label'),
                         key: 'widgets.probe.touchplateTypeSwitcher',
-                        description:
-                            'Show a button on Probe tab to allow switching between touch plate types.',
+                        description: tk(
+                            'config:probe.showTouchPlateSwitcher.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Tip diameter',
+                        label: tk('config:probe.tipDiameter.label'),
                         key: 'widgets.probe.tipDiameter3D',
-                        description:
-                            'Diameter of probe tip where it touches off the material. (Default 2)',
+                        description: tk('config:probe.tipDiameter.description'),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -915,10 +1011,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Block thickness',
+                        label: tk('config:probe.blockThickness.label'),
                         key: 'workspace.probeProfile.zThickness.standardBlock',
-                        description:
-                            'Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)',
+                        description: tk(
+                            'config:probe.blockThickness.description',
+                        ),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -931,10 +1028,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'AutoZero thickness',
+                        label: tk('config:probe.autozeroThickness.label'),
                         key: 'workspace.probeProfile.zThickness.autoZero',
-                        description:
-                            'Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)',
+                        description: tk(
+                            'config:probe.autozeroThickness.description',
+                        ),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -947,10 +1045,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Puck thickness',
+                        label: tk('config:probe.puckThickness.label'),
                         key: 'workspace.probeProfile.zThickness.zProbe',
-                        description:
-                            'Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)',
+                        description: tk(
+                            'config:probe.puckThickness.description',
+                        ),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -963,10 +1062,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Z offset',
+                        label: tk('config:probe.zOffset.label'),
                         key: 'workspace.probeProfile.zThickness.probe3D',
-                        description:
-                            'Adjust to improve the Z zeroing accuracy of your probe. (Default 0)',
+                        description: tk('config:probe.zOffset.description'),
                         type: 'number',
                         unit: 'mm',
                         defaultValue: 0,
@@ -980,10 +1078,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'BitZero thickness (XYZ)',
+                        label: tk('config:probe.bitzeroThicknessXyz.label'),
                         key: 'workspace.probeProfile.zThickness.bitZero',
-                        description:
-                            'Plate thickness for XYZ probing where the bit touches the inset surface inside the bore. (Default 13)',
+                        description: tk(
+                            'config:probe.bitzeroThicknessXyz.description',
+                        ),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -996,10 +1095,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'BitZero thickness (Z-only)',
+                        label: tk('config:probe.bitzeroThicknessZOnly.label'),
                         key: 'workspace.probeProfile.zThickness.bitZeroZOnly',
-                        description:
-                            'Plate thickness for Z-only probing where the probe is placed flat on the surface. (Default 15.5)',
+                        description: tk(
+                            'config:probe.bitzeroThicknessZOnly.description',
+                        ),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -1012,10 +1112,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'XY thickness',
+                        label: tk('config:probe.xyThickness.label'),
                         key: 'workspace.probeProfile.xyThickness',
-                        description:
-                            'Plate thickness where the bit touches when X/Y-axis probing. (Default 10)',
+                        description: tk('config:probe.xyThickness.description'),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -1028,10 +1127,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'XY retract',
+                        label: tk('config:probe.xyRetract.label'),
                         key: 'widgets.probe.xyRetract3D',
-                        description:
-                            'How much extra to move off the surface when probing. (Default 10)',
+                        description: tk('config:probe.xyRetract.description'),
                         type: 'number',
                         unit: 'mm',
                         defaultValue: 10,
@@ -1045,10 +1143,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Z probe distance',
+                        label: tk('config:probe.zProbeDistance.label'),
                         key: 'widgets.probe.zProbeDistance',
-                        description:
-                            'Movement in Z before it gives up on probing. (Reduce this value if you get a soft limit alarm 2 when probing, Default 30)',
+                        description: tk(
+                            'config:probe.zProbeDistance.description',
+                        ),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -1064,10 +1163,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Fast find',
+                        label: tk('config:probe.fastFind.label'),
                         key: 'widgets.probe.probeFastFeedrate',
-                        description:
-                            'Probe speed before the first touch-off. (Default 150)',
+                        description: tk('config:probe.fastFind.description'),
                         type: 'number',
                         unit: 'mm/min',
                         hidden: (getPending) => {
@@ -1083,10 +1181,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Slow find',
+                        label: tk('config:probe.slowFind.label'),
                         key: 'widgets.probe.probeFeedrate',
-                        description:
-                            'Speed for the more accurate second touch-off. (Default 75)',
+                        description: tk('config:probe.slowFind.description'),
                         type: 'number',
                         unit: 'mm/min',
                         hidden: (getPending) => {
@@ -1102,10 +1199,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Retraction',
+                        label: tk('config:probe.retraction.label'),
                         key: 'widgets.probe.retractionDistance',
-                        description:
-                            'How far the bit moves away after a successful touch. (Default 2)',
+                        description: tk('config:probe.retraction.description'),
                         type: 'number',
                         unit: 'mm',
                         hidden: (getPending) => {
@@ -1121,10 +1217,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Probe Movement Speed',
+                        label: tk('config:probe.probeMovementSpeed.label'),
                         key: 'widgets.probe.probeMovementSpeed',
-                        description:
-                            'Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)',
+                        description: tk(
+                            'config:probe.probeMovementSpeed.description',
+                        ),
                         type: 'number',
                         min: 0,
                         unit: 'mm/min',
@@ -1138,10 +1235,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Final Z retract',
+                        label: tk('config:probe.finalZRetract.label'),
                         key: 'widgets.probe.zRetractNormal',
-                        description:
-                            'How far to move away in the Z-axis at the end of the routine. (Default 2)',
+                        description: tk(
+                            'config:probe.finalZRetract.description',
+                        ),
                         type: 'number',
                         min: 1,
                         unit: 'mm',
@@ -1158,10 +1256,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Final Z retract',
+                        label: tk('config:probe.finalZRetract2.label'),
                         key: 'widgets.probe.zRetractAuto',
-                        description:
-                            'How far to move away in the Z-axis at the end of the routine. (Default 1)',
+                        description: tk(
+                            'config:probe.finalZRetract2.description',
+                        ),
                         type: 'number',
                         min: 1,
                         unit: 'mm',
@@ -1175,10 +1274,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Connection test',
+                        label: tk('config:probe.connectionTest.label'),
                         key: 'widgets.probe.connectivityTest',
-                        description:
-                            'Safety check to make sure your probe is connected correctly.',
+                        description: tk(
+                            'config:probe.connectionTest.description',
+                        ),
                         type: 'boolean',
                     },
                 ],
@@ -1186,7 +1286,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Action Buttons',
+        label: tk('config:actionButtons.title'),
         icon: RxButton,
         settings: [
             {
@@ -1203,7 +1303,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Homing/Limits',
+        label: tk('config:homingLimits.title'),
         icon: FaHome,
         wizard: LimitSwitchIndicators,
         settings: [
@@ -1243,11 +1343,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$40',
                     },
                     {
-                        label: 'Stop jogging past limits',
+                        label: tk(
+                            'config:homingLimits.stopJoggingPastLimits.label',
+                        ),
                         key: 'workspace.preventJoggingPastLimits',
                         type: 'boolean',
-                        description:
-                            'Prevent jogging in a direction where a limit switch has already been triggered.',
+                        description: tk(
+                            'config:homingLimits.stopJoggingPastLimits.description',
+                        ),
                     },
                     {
                         type: 'eeprom',
@@ -1256,7 +1359,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Homing Behaviour',
+                label: tk('config:homingLimits.homingBehaviourGroup'),
                 settings: [
                     {
                         type: 'eeprom',
@@ -1378,22 +1481,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Parking',
+                label: tk('config:homingLimits.parkingGroup'),
                 settings: [
                     {
-                        label: 'Park location',
+                        label: tk('config:homingLimits.parkLocation.label'),
                         key: 'workspace.park',
                         type: 'location',
                         unit: 'mm',
-                        description:
-                            'The P on the main Carve page will always take you to this convenient parking spot. (Homing must be enabled)',
+                        description: tk(
+                            'config:homingLimits.parkLocation.description',
+                        ),
                     },
                 ],
             },
         ],
     },
     {
-        label: 'Spindle/Laser',
+        label: tk('config:spindleLaser.title'),
         icon: GiTargetLaser,
         wizard: SpindleWizard,
         settings: [
@@ -1402,9 +1506,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Spindle/laser controls',
-                        description:
-                            'Show the Spindle/Laser tab and related functions on the main Carve page.',
+                        label: tk(
+                            'config:spindleLaser.spindleLaserControls.label',
+                        ),
+                        description: tk(
+                            'config:spindleLaser.spindleLaserControls.description',
+                        ),
                         key: 'workspace.spindleFunctions',
                         onUpdate: () => {
                             const spindleFunctions = store.get(
@@ -1656,10 +1763,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$392',
                     },
                     {
-                        label: 'Insert dwell for spindle commands',
+                        label: tk(
+                            'config:spindleLaser.insertDwellForSpindleCommands.label',
+                        ),
                         key: 'widgets.spindle.delay',
-                        description:
-                            'Adds a delay to give the spindle time to spin up.  This will insert a G4 command on every M3/M4 within the file, and is unnecessary if your firmware otherwise handles spindle-at-speed operations. (Default 0)',
+                        description: tk(
+                            'config:spindleLaser.insertDwellForSpindleCommands.description',
+                        ),
                         type: 'number',
                         unit: 's',
                         defaultValue: 0,
@@ -1680,20 +1790,26 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$539',
                     },
                     {
-                        label: 'Minimum spindle speed',
+                        label: tk(
+                            'config:spindleLaser.minimumSpindleSpeed.label',
+                        ),
                         key: 'widgets.spindle.spindleMin',
-                        description:
-                            'Match this to the minimum speed of your spindle. ($31, Default 10000)',
+                        description: tk(
+                            'config:spindleLaser.minimumSpindleSpeed.description',
+                        ),
                         type: 'hybrid',
                         eID: '$31',
                         forceEEPROM: true,
                         unit: 'rpm',
                     },
                     {
-                        label: 'Maximum spindle speed',
+                        label: tk(
+                            'config:spindleLaser.maximumSpindleSpeed.label',
+                        ),
                         key: 'widgets.spindle.spindleMax',
-                        description:
-                            'Match this to the maximum speed of your spindle. ($30, Default 30000)',
+                        description: tk(
+                            'config:spindleLaser.maximumSpindleSpeed.description',
+                        ),
                         type: 'hybrid',
                         eID: '$30',
                         forceEEPROM: true,
@@ -1734,7 +1850,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Spindle PWM',
+                label: tk('config:spindleLaser.spindlePwmGroup'),
                 settings: [
                     {
                         type: 'eeprom',
@@ -1767,7 +1883,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Spindle Modbus',
+                label: tk('config:spindleLaser.spindleModbusGroup'),
                 settings: [
                     {
                         type: 'eeprom',
@@ -1844,7 +1960,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Laser',
+                label: tk('config:spindleLaser.laserGroup'),
                 wizard: LaserWizard,
                 settings: [
                     {
@@ -1853,45 +1969,56 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         remap: '$716',
                     },
                     {
-                        label: 'Minimum laser power',
+                        label: tk(
+                            'config:spindleLaser.minimumLaserPower.label',
+                        ),
                         key: 'widgets.spindle.laser.minPower',
-                        description:
-                            'Match this to the minimum S word setting in your laser CAM software. ($731, Default 0)',
+                        description: tk(
+                            'config:spindleLaser.minimumLaserPower.description',
+                        ),
                         type: 'hybrid',
                         eID: '$731',
                         unit: '',
                     },
                     {
-                        label: 'Maximum laser power',
+                        label: tk(
+                            'config:spindleLaser.maximumLaserPower.label',
+                        ),
                         key: 'widgets.spindle.laser.maxPower',
-                        description:
-                            'Match this to the maximum S word setting in your laser CAM software. ($730, Default 255.000)',
+                        description: tk(
+                            'config:spindleLaser.maximumLaserPower.description',
+                        ),
                         type: 'hybrid',
                         eID: '$730',
                         unit: '',
                     },
                     {
-                        label: 'Laser on during outline',
+                        label: tk(
+                            'config:spindleLaser.laserOnDuringOutline.label',
+                        ),
                         key: 'widgets.spindle.laser.laserOnOutline',
                         type: 'boolean',
-                        description:
-                            "Turn on the laser at it's lowest power to see the job position better.",
+                        description: tk(
+                            'config:spindleLaser.laserOnDuringOutline.description',
+                        ),
                     },
                     {
-                        label: 'Laser X offset',
+                        label: tk('config:spindleLaser.laserXOffset.label'),
                         key: 'widgets.spindle.laser.xOffset',
-                        description:
-                            'X-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $741, Default 0)',
+                        description: tk(
+                            'config:spindleLaser.laserXOffset.description',
+                        ),
                         type: 'hybrid',
                         eID: '$741',
                         remap: '$770',
                         unit: 'mm',
                     },
                     {
-                        label: 'Laser Y offset',
+                        label: tk('config:spindleLaser.laserYOffset.label'),
                         key: 'widgets.spindle.laser.yOffset',
-                        description:
-                            'Y-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $742, Default 0)',
+                        description: tk(
+                            'config:spindleLaser.laserYOffset.description',
+                        ),
                         type: 'hybrid',
                         eID: '$742',
                         remap: '$771',
@@ -1918,7 +2045,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Accessory Outputs',
+        label: tk('config:accessoryOutputs.title'),
         icon: CiMapPin,
         wizard: AccessoryOutputWizard,
         settings: [
@@ -1926,10 +2053,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'Coolant controls',
+                        label: tk(
+                            'config:accessoryOutputs.coolantControls.label',
+                        ),
                         key: 'workspace.coolantFunctions',
-                        description:
-                            'Show the coolant tab and related functions on the main Carve page.',
+                        description: tk(
+                            'config:accessoryOutputs.coolantControls.description',
+                        ),
                         type: 'boolean',
                     },
                     {
@@ -1961,7 +2091,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Rotary',
+        label: tk('config:rotary.title'),
         icon: FaArrowsSpin,
         wizard: AJogWizard,
         settings: [
@@ -1969,10 +2099,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 label: '',
                 settings: [
                     {
-                        label: 'Rotary controls',
+                        label: tk('config:rotary.rotaryControls.label'),
                         key: 'widgets.rotary.tab.show',
-                        description:
-                            'Show the Rotary tab and related functions on the main Carve page.',
+                        description: tk(
+                            'config:rotary.rotaryControls.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             // when tab is turned off, turn off rotary mode
@@ -1987,36 +2118,36 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     { type: 'eeprom', eID: '$376' },
                     {
-                        label: 'Resolution',
+                        label: tk('config:rotary.resolution.label'),
                         key: 'workspace.rotaryAxis.firmwareSettings.$101',
-                        description:
-                            'Travel resolution in steps per degree. ($103, Default 19.75308642)',
+                        description: tk('config:rotary.resolution.description'),
                         type: 'hybrid',
                         eID: '$103',
                         unit: 'step/deg',
                     },
                     {
-                        label: 'Max speed',
+                        label: tk('config:rotary.maxSpeed.label'),
                         key: 'workspace.rotaryAxis.firmwareSettings.$111',
-                        description:
-                            'Max axis speed, also used for G0 rapids. ($113, Default 8000)',
+                        description: tk('config:rotary.maxSpeed.description'),
                         type: 'hybrid',
                         eID: '$113',
                         unit: 'deg/min',
                     },
                     { type: 'eeprom', eID: '$123' },
                     {
-                        label: 'Force soft limits',
+                        label: tk('config:rotary.forceSoftLimits.label'),
                         key: 'workspace.rotaryAxis.firmwareSettings.$20',
-                        description:
-                            'Enable soft limits when toggling into rotary mode. (grbl only)',
+                        description: tk(
+                            'config:rotary.forceSoftLimits.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Force hard limits',
+                        label: tk('config:rotary.forceHardLimits.label'),
                         key: 'workspace.rotaryAxis.firmwareSettings.$21',
-                        description:
-                            'Enable hard limits when toggling into rotary mode. (grbl only)',
+                        description: tk(
+                            'config:rotary.forceHardLimits.description',
+                        ),
                         type: 'boolean',
                     },
                     {
@@ -2024,17 +2155,21 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$538',
                     },
                     {
-                        label: 'Visualize non-center zeros',
+                        label: tk(
+                            'config:rotary.visualizeNonCenterZeros.label',
+                        ),
                         key: 'widgets.visualizer.rotaryDiameterOffsetEnabled',
-                        description:
-                            "For any rotary files that aren't zeroed to the centerpoint, apply an offset when a cylinder diameter is found in the file.",
+                        description: tk(
+                            'config:rotary.visualizeNonCenterZeros.description',
+                        ),
                         type: 'boolean',
                     },
                     {
-                        label: 'Use A-axis for grbl',
+                        label: tk('config:rotary.useAAxisForGrbl.label'),
                         type: 'boolean',
-                        description:
-                            'Enables A-axis controls and commands to be sent for devices running modified 4-axis grbl, rather than translating A into Y. (grbl only)',
+                        description: tk(
+                            'config:rotary.useAAxisForGrbl.description',
+                        ),
                         key: 'workspace.rotaryAxis.useAaxisForGrbl',
                         onUpdate: () => {
                             const useAaxisForGrbl = store.get(
@@ -2051,46 +2186,50 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Automations',
+        label: tk('config:automations.title'),
         icon: FaRobot,
         settings: [
             {
                 label: '',
                 settings: [
                     {
-                        label: 'File start',
+                        label: tk('config:automations.fileStart.label'),
                         type: 'event',
                         eventType: 'gcode:start',
-                        description:
-                            'Runs when you start a job, before the file itself runs.',
+                        description: tk(
+                            'config:automations.fileStart.description',
+                        ),
                     },
                     {
-                        label: 'File pause',
+                        label: tk('config:automations.filePause.label'),
                         type: 'event',
                         eventType: 'gcode:pause',
-                        description:
-                            "If you'd like to stop accessories or move out of the way when you pause during a job.",
+                        description: tk(
+                            'config:automations.filePause.description',
+                        ),
                     },
                     {
-                        label: 'File resume',
+                        label: tk('config:automations.fileResume.label'),
                         type: 'event',
                         eventType: 'gcode:resume',
-                        description:
-                            'Ensure that anything you set up for File pause is undone when you resume.',
+                        description: tk(
+                            'config:automations.fileResume.description',
+                        ),
                     },
                     {
-                        label: 'File stop/end',
+                        label: tk('config:automations.fileStopEnd.label'),
                         type: 'event',
                         eventType: 'gcode:stop',
-                        description:
-                            'A catch-all to ensure that stopped or ended jobs always safely turn everything off.',
+                        description: tk(
+                            'config:automations.fileStopEnd.description',
+                        ),
                     },
                 ],
             },
         ],
     },
     {
-        label: 'Tool Changing',
+        label: tk('config:toolChanging.title'),
         icon: IoIosSwap,
         settings: [
             {
@@ -2098,25 +2237,31 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Enable ATC Controls',
+                        label: tk(
+                            'config:toolChanging.enableAtcControls.label',
+                        ),
                         key: 'workspace.atcEnabled',
-                        description: 'Enable ATC Controls',
+                        description: tk(
+                            'config:toolChanging.enableAtcControls.description',
+                        ),
                     },
                     {
-                        label: 'Passthrough',
+                        label: tk('config:toolChanging.passthrough.label'),
                         type: 'boolean',
                         key: 'workspace.toolChange.passthrough',
-                        description:
-                            'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands.',
+                        description: tk(
+                            'config:toolChanging.passthrough.description',
+                        ),
                         onApply: () => {
                             updateToolchangeContext();
                         },
                     },
                     {
-                        label: 'gSender strategy',
+                        label: tk('config:toolChanging.gsenderStrategy.label'),
                         type: 'select',
-                        description:
-                            'Standard wizard will guide you through the steps to manually set up a new tool and resume cutting.\n\nFlexible is similar but uses a touch plate like a tool length sensor.\n\nFixed is also guided but fully automated, moving around and measuring tools for you. Homing and TLS required.\n\nCode is for fully custom setups.',
+                        description: tk(
+                            'config:toolChanging.gsenderStrategy.description',
+                        ),
                         options: [
                             'Ignore',
                             'Pause',
@@ -2125,22 +2270,40 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Fixed Tool Sensor',
                             'Code',
                         ],
+                        labels: [
+                            tk('config:options.toolChangeStrategy.ignore'),
+                            tk('config:options.toolChangeStrategy.pause'),
+                            tk(
+                                'config:options.toolChangeStrategy.standardRezero',
+                            ),
+                            tk(
+                                'config:options.toolChangeStrategy.flexibleRezero',
+                            ),
+                            tk(
+                                'config:options.toolChangeStrategy.fixedToolSensor',
+                            ),
+                            tk('config:options.toolChangeStrategy.code'),
+                        ],
                         key: 'workspace.toolChangeOption',
                     },
                     {
-                        label: 'Skip dialog',
+                        label: tk('config:toolChanging.skipDialog.label'),
                         type: 'boolean',
                         key: 'workspace.toolChange.skipDialog',
-                        description:
-                            "Won't prompt on Pause, and won't pause between Code blocks.",
+                        description: tk(
+                            'config:toolChanging.skipDialog.description',
+                        ),
                     },
                     {
-                        label: 'Fixed sensor location',
+                        label: tk(
+                            'config:toolChanging.fixedSensorLocation.label',
+                        ),
                         type: 'location',
                         key: 'workspace.toolChangePosition',
                         unit: 'mm',
-                        description:
-                            'The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)',
+                        description: tk(
+                            'config:toolChanging.fixedSensorLocation.description',
+                        ),
                         hidden: (getPending) => {
                             const strategy = getPending(
                                 'workspace.toolChangeOption',
@@ -2150,15 +2313,29 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'First tool behaviour',
+                        label: tk(
+                            'config:toolChanging.firstToolBehaviour.label',
+                        ),
                         type: 'select',
                         key: 'workspace.toolChange.firstToolBehaviour',
-                        description:
-                            'Control how the first tool change is handled. Many CAM programs add an initial tool change command even when you already have the tool loaded.\n\n"Always run full wizard" runs the complete tool change process.\n\n"Prompt for first tool" asks whether to run the full wizard or just probe the current tool length.\n\n"Always probe length only" skips the tool change and only measures the current tool.',
+                        description: tk(
+                            'config:toolChanging.firstToolBehaviour.description',
+                        ),
                         options: [
                             'Always run full wizard',
                             'Prompt for first tool',
                             'Always probe length only',
+                        ],
+                        labels: [
+                            tk(
+                                'config:options.firstToolBehaviour.alwaysRunFullWizard',
+                            ),
+                            tk(
+                                'config:options.firstToolBehaviour.promptForFirstTool',
+                            ),
+                            tk(
+                                'config:options.firstToolBehaviour.alwaysProbeLengthOnly',
+                            ),
                         ],
                         defaultValue: 'Always run full wizard',
                         hidden: (getPending) => {
@@ -2170,11 +2347,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Set tool change location',
+                        label: tk(
+                            'config:toolChanging.setToolChangeLocation.label',
+                        ),
                         type: 'boolean',
                         key: 'workspace.toolChange.moveToManualPosition',
-                        description:
-                            'Move the CNC to a more convenient location for manual tool changes instead of prompting to change over the sensor.',
+                        description: tk(
+                            'config:toolChanging.setToolChangeLocation.description',
+                        ),
                         hidden: (getPending) => {
                             const strategy = getPending(
                                 'workspace.toolChangeOption',
@@ -2184,12 +2364,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Manual tool change location',
+                        label: tk(
+                            'config:toolChanging.manualToolChangeLocation.label',
+                        ),
                         type: 'location',
                         key: 'workspace.toolChange.manualPosition',
                         unit: 'mm',
-                        description:
-                            'The location to move to when manually changing tools.',
+                        description: tk(
+                            'config:toolChanging.manualToolChangeLocation.description',
+                        ),
                         hidden: (getPending) => {
                             const strategy = getPending(
                                 'workspace.toolChangeOption',
@@ -2206,11 +2389,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Before tool change',
+                        label: tk('config:toolChanging.beforeToolChange.label'),
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.preHook',
-                        description:
-                            'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
+                        description: tk(
+                            'config:toolChanging.beforeToolChange.description',
+                        ),
                         hidden: (getPending) => {
                             const strategy = getPending(
                                 'workspace.toolChangeOption',
@@ -2220,11 +2404,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'After tool change',
+                        label: tk('config:toolChanging.afterToolChange.label'),
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.postHook',
-                        description:
-                            'When using the Code strategy, this code is run after a tool change is completed.',
+                        description: tk(
+                            'config:toolChanging.afterToolChange.description',
+                        ),
                         hidden: (getPending) => {
                             const strategy = getPending(
                                 'workspace.toolChangeOption',
@@ -2240,13 +2425,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Keepout',
+                label: tk('config:toolChanging.keepoutGroup'),
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Warn on home',
-                        description:
-                            'Warn when homing that the keepout area is disabled and collisions are possible depending on the homing cycle.',
+                        label: tk('config:toolChanging.warnOnHome.label'),
+                        description: tk(
+                            'config:toolChanging.warnOnHome.description',
+                        ),
                         key: 'widgets.atc.warnOnHome',
                     },
                     { type: 'eeprom', eID: '$683' },
@@ -2261,24 +2447,26 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Ethernet',
+        label: tk('config:ethernet.title'),
         icon: BsEthernet,
         settings: [
             {
                 label: '',
                 settings: [
                     {
-                        label: 'Connect to IP',
+                        label: tk('config:ethernet.connectToIp.label'),
                         key: 'widgets.connection.ip',
-                        description:
-                            'IP address used to connect to CNCs over Ethernet and other network scanning. (Default 192.168.5.1)',
+                        description: tk(
+                            'config:ethernet.connectToIp.description',
+                        ),
                         type: 'ip',
                     },
                     {
-                        label: 'Ethernet port',
+                        label: tk('config:ethernet.ethernetPort.label'),
                         key: 'widgets.connection.ethernetPort',
-                        description:
-                            'The port exposed by the controller for Ethernet connectivity. (Used when attempting to connect over Ethernet, Default 23)',
+                        description: tk(
+                            'config:ethernet.ethernetPort.description',
+                        ),
                         type: 'number',
                     },
                     { type: 'eeprom', eID: '$301' },
@@ -2296,7 +2484,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Status Lights',
+        label: tk('config:statusLights.title'),
         icon: CiLight,
         settings: [
             {
@@ -2317,7 +2505,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Advanced Motors',
+        label: tk('config:advancedMotors.title'),
         icon: SiCoronaengine,
         settings: [
             {
@@ -2371,7 +2559,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'More Settings',
+        label: tk('config:moreSettings.title'),
         icon: MdOutlineReadMore,
         settings: [
             {
@@ -2424,37 +2612,42 @@ export const SettingsMenu: SettingsMenuSection[] = [
         ],
     },
     {
-        label: 'Accessibility',
+        label: tk('config:accessibility.title'),
         icon: MdAccessibility,
         settings: [
             {
-                label: 'Announcements',
+                label: tk('config:accessibility.announcementsGroup'),
                 settings: [
                     {
-                        label: 'Machine status',
+                        label: tk('config:accessibility.machineStatus.label'),
                         key: 'workspace.accessibility.statusAnnouncements',
-                        description:
-                            'Automatically announce machine status changes using screen readers. (Idle, Running, Alarm, etc.)',
+                        description: tk(
+                            'config:accessibility.machineStatus.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Job progress',
+                        label: tk('config:accessibility.jobProgress.label'),
                         key: 'workspace.accessibility.jobProgressAnnouncements',
-                        description:
-                            'Periodically announce job completion percentage.',
+                        description: tk(
+                            'config:accessibility.jobProgress.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Progress increment',
+                        label: tk(
+                            'config:accessibility.progressIncrement.label',
+                        ),
                         key: 'workspace.accessibility.jobProgressIncrement',
-                        description:
-                            'The percentage increment at which to announce job progress. (Default 10%)',
+                        description: tk(
+                            'config:accessibility.progressIncrement.description',
+                        ),
                         type: 'number',
                         min: 1,
                         max: 50,
@@ -2470,22 +2663,27 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Audio Cues',
+                label: tk('config:accessibility.audioCuesGroup'),
                 settings: [
                     {
-                        label: 'Enable audio cues',
+                        label: tk('config:accessibility.enableAudioCues.label'),
                         key: 'workspace.accessibility.audioCues.enabled',
-                        description:
-                            'Play short sounds for specific machine events.',
+                        description: tk(
+                            'config:accessibility.enableAudioCues.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Job complete sound',
+                        label: tk(
+                            'config:accessibility.jobCompleteSound.label',
+                        ),
                         key: 'workspace.accessibility.audioCues.jobComplete',
-                        description: 'Play sound when a job finishes.',
+                        description: tk(
+                            'config:accessibility.jobCompleteSound.description',
+                        ),
                         type: 'boolean',
                         hidden: () =>
                             !store.get(
@@ -2496,10 +2694,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Alarm sound',
+                        label: tk('config:accessibility.alarmSound.label'),
                         key: 'workspace.accessibility.audioCues.alarmTriggered',
-                        description:
-                            'Play sound when the machine enters an alarm state.',
+                        description: tk(
+                            'config:accessibility.alarmSound.description',
+                        ),
                         type: 'boolean',
                         hidden: () =>
                             !store.get(
@@ -2510,10 +2709,11 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Tool change sound',
+                        label: tk('config:accessibility.toolChangeSound.label'),
                         key: 'workspace.accessibility.audioCues.toolChange',
-                        description:
-                            'Play sound when a tool change is required.',
+                        description: tk(
+                            'config:accessibility.toolChangeSound.description',
+                        ),
                         type: 'boolean',
                         hidden: () =>
                             !store.get(
@@ -2524,9 +2724,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Probe success sound',
+                        label: tk(
+                            'config:accessibility.probeSuccessSound.label',
+                        ),
                         key: 'workspace.accessibility.audioCues.probeSuccess',
-                        description: 'Play sound after a successful probe.',
+                        description: tk(
+                            'config:accessibility.probeSuccessSound.description',
+                        ),
                         type: 'boolean',
                         hidden: () =>
                             !store.get(
@@ -2539,49 +2743,59 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Navigation & Visuals',
+                label: tk('config:accessibility.navigationAndVisualsGroup'),
                 settings: [
                     {
-                        label: 'Focus rings',
+                        label: tk('config:accessibility.focusRings.label'),
                         key: 'workspace.accessibility.focusRings',
-                        description:
-                            'Show a high-contrast ring around the currently focused element for better keyboard navigation visibility.',
+                        description: tk(
+                            'config:accessibility.focusRings.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Focus trapping',
+                        label: tk('config:accessibility.focusTrapping.label'),
                         key: 'workspace.accessibility.focusTrapping',
-                        description:
-                            'Keep keyboard focus within modals and dialogs when they are open.',
+                        description: tk(
+                            'config:accessibility.focusTrapping.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Reduced motion',
+                        label: tk('config:accessibility.reducedMotion.label'),
                         key: 'workspace.accessibility.reducedMotion',
-                        description:
-                            'Minimize animations and UI transitions for improved visibility and accessibility.',
+                        description: tk(
+                            'config:accessibility.reducedMotion.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Spindle speed input type',
+                        label: tk(
+                            'config:accessibility.spindleSpeedInputType.label',
+                        ),
                         key: 'widgets.spindle.inputType',
                         type: 'select',
-                        description:
-                            'Choose between a slider or a number input for adjusting spindle speed.',
+                        description: tk(
+                            'config:accessibility.spindleSpeedInputType.description',
+                        ),
                         options: ['Slider', 'Number'],
+                        labels: [
+                            tk('config:options.spindleInputType.slider'),
+                            tk('config:options.spindleInputType.number'),
+                        ],
                         defaultValue: 'Slider',
                     },
                     {
-                        label: 'App display scale',
+                        label: tk('config:accessibility.appDisplayScale.label'),
                         key: 'workspace.accessibility.displayScaleFactor',
                         type: 'select',
                         options: [
@@ -2595,8 +2809,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             '200%',
                         ],
                         defaultValue: '100%',
-                        description:
-                            "Override the app's display scale independently of your OS' DPI settings.",
+                        description: tk(
+                            'config:accessibility.appDisplayScale.description',
+                        ),
                         hidden: () => !isElectron(),
                         onUpdate: () => {
                             if (isElectron()) {
@@ -2618,33 +2833,38 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Visualizer',
+                label: tk('config:accessibility.visualizerGroup'),
                 settings: [
                     {
-                        label: 'Keyboard control',
+                        label: tk('config:accessibility.keyboardControl.label'),
                         key: 'workspace.accessibility.visualizerKeyboardControl',
-                        description:
-                            'Allow orbiting, panning, and zooming of the 3D visualizer using arrow keys and hotkeys.',
+                        description: tk(
+                            'config:accessibility.keyboardControl.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Job summary',
+                        label: tk('config:accessibility.jobSummary.label'),
                         key: 'workspace.accessibility.gcodeSummary.enabled',
-                        description:
-                            'Provide a text summary of the loaded g-code file for screen readers.',
+                        description: tk(
+                            'config:accessibility.jobSummary.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
                     },
                     {
-                        label: 'Show summary visually',
+                        label: tk(
+                            'config:accessibility.showSummaryVisually.label',
+                        ),
                         key: 'workspace.accessibility.gcodeSummary.showVisually',
-                        description:
-                            'Display the g-code summary text visually above the visualizer.',
+                        description: tk(
+                            'config:accessibility.showSummaryVisually.description',
+                        ),
                         type: 'boolean',
                         hidden: () =>
                             !store.get(
@@ -2657,13 +2877,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Keyboard Map',
+                label: tk('config:accessibility.keyboardMapGroup'),
                 settings: [
                     {
-                        label: 'Show keyboard shortcut map',
+                        label: tk(
+                            'config:accessibility.showKeyboardShortcutMap.label',
+                        ),
                         key: 'workspace.accessibility.showKeyboardMap',
-                        description:
-                            'Show an overlay with active keyboard shortcuts.',
+                        description: tk(
+                            'config:accessibility.showKeyboardShortcutMap.description',
+                        ),
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');

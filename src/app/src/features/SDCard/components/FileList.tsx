@@ -11,6 +11,7 @@ import {
     ACCEPTED_EXTENSIONS,
     validateSDFilename,
 } from 'app/features/SDCard/components/UploadModal.tsx';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -71,8 +72,10 @@ export const FileList: React.FC = () => {
 
     function handleDelete(fileName: string) {
         Confirm({
-            title: 'Delete File',
-            content: `Are you sure you want to delete ${fileName}?`,
+            title: i18n.t('notifications:sdCard.deleteFile.title'),
+            content: i18n.t('notifications:sdCard.deleteFile.content', {
+                fileName,
+            }),
             onConfirm: () => {
                 controller.command('sdcard:delete', fileName);
                 reduxStore.dispatch(clearSDCardFiles({ path: fileName }));
@@ -90,7 +93,11 @@ export const FileList: React.FC = () => {
             const extension = '.' + file.name.split('.').pop()?.toLowerCase();
 
             if (!ACCEPTED_EXTENSIONS.includes(extension)) {
-                errors.push(`${file.name}: Invalid file type`);
+                errors.push(
+                    i18n.t('notifications:sdCard.invalidFileType', {
+                        fileName: file.name,
+                    }),
+                );
                 return;
             }
 
@@ -104,7 +111,11 @@ export const FileList: React.FC = () => {
         });
 
         if (errors.length > 0) {
-            toast.error(`Some files were rejected:\n${errors.join('\n')}`);
+            toast.error(
+                i18n.t('notifications:sdCard.filesRejected', {
+                    errors: errors.join('\n'),
+                }),
+            );
         }
 
         if (validFiles.length > 0) {

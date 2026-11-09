@@ -66,6 +66,7 @@ import type {
     Job,
     MaintenanceTask,
 } from 'app/features/Stats/utils/StatContext';
+import { i18n } from 'app/i18n';
 import { connectToLastDevice } from 'app/lib/connection';
 import controller from 'app/lib/controller';
 import type { TOOL } from 'app/lib/definitions/gcode_virtualization';
@@ -855,12 +856,15 @@ export function* initialize(): Generator<null, void, unknown> {
                 );
                 const msg =
                     homingEnabled === '1'
-                        ? 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
-                          'home, and choose which line to continue from, press Resume.'
-                        : 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
-                          'press Resume. After that, you can set your Workspace 0 and use the Start From Line function to continue the job. ' +
-                          'Suggested line to start from: ' +
-                          currentLineRunning;
+                        ? i18n.t(
+                              'notifications:controller.portDisconnected.contentHoming',
+                          )
+                        : i18n.t(
+                              'notifications:controller.portDisconnected.content',
+                              {
+                                  line: currentLineRunning,
+                              },
+                          );
 
                 const content = (
                     <div>
@@ -869,10 +873,12 @@ export function* initialize(): Generator<null, void, unknown> {
                 );
 
                 Confirm({
-                    title: 'Port Disconnected',
+                    title: i18n.t(
+                        'notifications:controller.portDisconnected.title',
+                    ),
                     content,
-                    confirmLabel: 'Resume',
-                    cancelLabel: 'Close',
+                    confirmLabel: i18n.t('notifications:controller.resume'),
+                    cancelLabel: i18n.t('common:actions.close'),
                     onConfirm: () => {
                         // TODO: add this back in
                         connectToLastDevice(() => {
@@ -915,7 +921,12 @@ export function* initialize(): Generator<null, void, unknown> {
 
             const { option, count } = context;
             if (option === 'Pause') {
-                const msg = `Toolchange pause${comment ? ` - ${comment}` : ''}`;
+                const msg = comment
+                    ? i18n.t(
+                          'notifications:controller.toolchangePauseWithComment',
+                          { comment },
+                      )
+                    : i18n.t('notifications:controller.toolchangePause');
                 if (!skipDialog) {
                     toast.info(msg, { position: 'bottom-right' });
                 }
@@ -962,22 +973,25 @@ export function* initialize(): Generator<null, void, unknown> {
             comment.length > 0 ? (
                 <div>
                     <p>
-                        A toolchange command (M6) was found - click confirm to
-                        verify the tool has been changed and run your
-                        post-toolchange code.
+                        {i18n.t(
+                            'notifications:controller.confirmToolchange.content',
+                        )}
                     </p>
                     <p>
-                        Comment: <b>{comment}</b>
+                        {i18n.t('notifications:controller.commentLabel')}{' '}
+                        <b>{comment}</b>
                     </p>
                 </div>
             ) : (
-                'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.'
+                i18n.t('notifications:controller.confirmToolchange.content')
             );
 
         Confirm({
-            title: 'Confirm Toolchange',
+            title: i18n.t('notifications:controller.confirmToolchange.title'),
             content,
-            confirmLabel: 'Confirm toolchange',
+            confirmLabel: i18n.t(
+                'notifications:controller.confirmToolchange.confirm',
+            ),
             onConfirm: onConfirmhandler,
         });
     });
@@ -1016,24 +1030,29 @@ export function* initialize(): Generator<null, void, unknown> {
     controller.addListener(
         'feeder:pause',
         (payload: { data: string; comment: string }) => {
-            const msg = 'Press Resume to continue.';
+            const msg = i18n.t('notifications:controller.feederPause.content');
             const content =
                 payload.comment.length > 0 ? (
                     <div>
                         <p>{msg}</p>
                         <p>
-                            Comment: <b>{payload.comment}</b>
+                            {i18n.t('notifications:controller.commentLabel')}{' '}
+                            <b>{payload.comment}</b>
                         </p>
                     </div>
                 ) : (
                     msg
                 );
             Confirm({
-                title: `${payload.data} pause detected`,
-                confirmLabel: 'Resume',
+                title: i18n.t('notifications:controller.feederPause.title', {
+                    command: payload.data,
+                }),
+                confirmLabel: i18n.t('notifications:controller.resume'),
                 content,
 
-                cancelLabel: 'Stop',
+                cancelLabel: i18n.t(
+                    'notifications:controller.feederPause.stop',
+                ),
                 onConfirm: () => {
                     controller.command('feeder:start');
                 },
@@ -1130,7 +1149,7 @@ export function* initialize(): Generator<null, void, unknown> {
         const { data } = opts;
 
         toast.info(
-            `'${data}' pause command found in file - press "Resume Job" to continue running.`,
+            i18n.t('notifications:controller.workflowPause', { command: data }),
             { position: 'bottom-right' },
         );
     });
@@ -1139,15 +1158,15 @@ export function* initialize(): Generator<null, void, unknown> {
         'sender:M0M1',
         (opts: { comment: string; ignoreEvent: boolean }) => {
             const { comment = '', ignoreEvent = false } = opts;
-            const msg =
-                'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
+            const msg = i18n.t('notifications:controller.programPause.content');
 
             const content =
                 comment.length > 0 ? (
                     <div>
                         <p>{msg}</p>
                         <p>
-                            Comment: <b>{comment}</b>
+                            {i18n.t('notifications:controller.commentLabel')}{' '}
+                            <b>{comment}</b>
                         </p>
                     </div>
                 ) : (
@@ -1155,10 +1174,14 @@ export function* initialize(): Generator<null, void, unknown> {
                 );
 
             Confirm({
-                title: 'M0/M1 Pause',
+                title: i18n.t('notifications:controller.programPause.title'),
                 content,
-                confirmLabel: 'Resume Job',
-                cancelLabel: 'Close Window',
+                confirmLabel: i18n.t(
+                    'notifications:controller.programPause.confirm',
+                ),
+                cancelLabel: i18n.t(
+                    'notifications:controller.programPause.cancel',
+                ),
                 onConfirm: () => {
                     controller.command('gcode:resume', ignoreEvent);
                 },
@@ -1167,7 +1190,9 @@ export function* initialize(): Generator<null, void, unknown> {
     );
 
     controller.addListener('outline:start', () => {
-        toast.success('Running file outline', { position: 'bottom-right' });
+        toast.success(i18n.t('notifications:jobControl.outlineRunning'), {
+            position: 'bottom-right',
+        });
     });
 
     controller.addListener('homing:flag', (flag: boolean) => {
@@ -1219,7 +1244,15 @@ export function* initialize(): Generator<null, void, unknown> {
         ) {
             updateAlarmsErrors(error);
             toast.error(
-                `${error.type === ALARM ? 'Alarm' : 'Error'} ${error.code}: ${error.description}`,
+                error.type === ALARM
+                    ? i18n.t('notifications:controller.alarm', {
+                          code: error.code,
+                          description: error.description,
+                      })
+                    : i18n.t('notifications:controller.error', {
+                          code: error.code,
+                          description: error.description,
+                      }),
                 { position: 'bottom-right' },
             );
 
@@ -1259,11 +1292,16 @@ export function* initialize(): Generator<null, void, unknown> {
 
             if (workspaceMode !== WORKSPACE_MODE.ROTARY) {
                 Confirm({
-                    title: 'Rotary File Loaded',
-                    content:
-                        'G-Code contains A-axis command, please enable Rotary mode if your machine is equipped with a rotary axis unit.',
-                    confirmLabel: 'Enable Rotary Mode',
-                    cancelLabel: 'Close',
+                    title: i18n.t(
+                        'notifications:controller.rotaryFileLoaded.title',
+                    ),
+                    content: i18n.t(
+                        'notifications:controller.rotaryFileLoaded.content',
+                    ),
+                    confirmLabel: i18n.t(
+                        'notifications:controller.rotaryFileLoaded.confirm',
+                    ),
+                    cancelLabel: i18n.t('common:actions.close'),
                     onConfirm: () => {
                         updateWorkspaceMode(WORKSPACE_MODE.ROTARY);
                     },
@@ -1273,11 +1311,14 @@ export function* initialize(): Generator<null, void, unknown> {
 
         if (type === FILE_TYPE.FOUR_AXIS && controller.type === GRBL) {
             Confirm({
-                title: '4 Axis File Loaded',
-                content:
-                    'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
-                confirmLabel: 'OK',
-                cancelLabel: 'Close',
+                title: i18n.t(
+                    'notifications:controller.fourAxisFileLoaded.title',
+                ),
+                content: i18n.t(
+                    'notifications:controller.fourAxisFileLoaded.content',
+                ),
+                confirmLabel: i18n.t('common:actions.ok'),
+                cancelLabel: i18n.t('common:actions.close'),
             });
         }
     });
@@ -1410,8 +1451,8 @@ export function* initialize(): Generator<null, void, unknown> {
                 Confirm({
                     title: payload.message,
                     content: payload.description,
-                    confirmLabel: 'Resume',
-                    cancelLabel: 'Reset',
+                    confirmLabel: i18n.t('notifications:atc.dialog.resume'),
+                    cancelLabel: i18n.t('common:actions.reset'),
                     onConfirm: () => {
                         controller.command('cyclestart');
                     },
@@ -1423,8 +1464,8 @@ export function* initialize(): Generator<null, void, unknown> {
                 Confirm({
                     title: payload.message,
                     content: payload.description,
-                    confirmLabel: 'OK',
-                    cancelLabel: 'Reset',
+                    confirmLabel: i18n.t('common:actions.ok'),
+                    cancelLabel: i18n.t('common:actions.reset'),
                     onConfirm: () => {
                         controller.command('cyclestart');
                     },
@@ -1434,7 +1475,7 @@ export function* initialize(): Generator<null, void, unknown> {
                 Confirm({
                     title: payload.message,
                     content: payload.description,
-                    confirmLabel: 'Reset',
+                    confirmLabel: i18n.t('common:actions.reset'),
                     onConfirm: () => {
                         controller.command('reset');
                     },
@@ -1462,10 +1503,10 @@ export function* initialize(): Generator<null, void, unknown> {
                 });
             } else {
                 Confirm({
-                    title: 'ATC requested a dialog.',
-                    content: 'Continue to unhold, Reset to stop action.',
-                    confirmLabel: 'Continue',
-                    cancelLabel: 'Reset',
+                    title: i18n.t('notifications:atc.dialog.title'),
+                    content: i18n.t('notifications:atc.dialog.content'),
+                    confirmLabel: i18n.t('common:actions.continue'),
+                    cancelLabel: i18n.t('common:actions.reset'),
                 });
             }
         },

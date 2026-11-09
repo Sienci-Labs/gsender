@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import { useWizardAPI } from 'app/features/Helper/context';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import store from 'app/store';
@@ -51,21 +52,44 @@ const normalizeWithControllerState = (payload: HelperPayload) => {
     });
 };
 
+// A normalized message plus the payload it came from, so it can be
+// normalized again when the language changes
+interface QueuedMessage {
+    payload: HelperPayload;
+    message: NormalizedHelperMessage;
+}
+
+// Re-translates a message; falls back to the original if it can no longer be
+// normalized (e.g. dismissed in the meantime)
+const renormalize = (entry: QueuedMessage): QueuedMessage => ({
+    payload: entry.payload,
+    message: normalizeWithControllerState(entry.payload) ?? entry.message,
+});
+
 const HelperWrapper = () => {
     const { load, updateSubstepOverlay } = useWizardAPI();
+    const { i18n } = useAppTranslation();
     const [infoMessage, setInfoMessage] =
         useState<NormalizedHelperMessage | null>(null);
-    const currentRef = useRef<NormalizedHelperMessage | null>(null);
+    const currentRef = useRef<QueuedMessage | null>(null);
     // Lower-severity messages that arrived while another was open
-    const queueRef = useRef<NormalizedHelperMessage[]>([]);
+    const queueRef = useRef<QueuedMessage[]>([]);
     const infoHelperMinimized = useTypedSelector(
         (state: RootState) => state.helper.infoHelperMinimized,
     );
 
-    const showMessage = (message: NormalizedHelperMessage | null) => {
-        currentRef.current = message;
-        setInfoMessage(message);
+    const showMessage = (entry: QueuedMessage | null) => {
+        currentRef.current = entry;
+        setInfoMessage(entry?.message ?? null);
     };
+
+    // Message text is resolved when normalized, so redo it on a language change
+    // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on language change only
+    useEffect(() => {
+        if (currentRef.current) {
+            showMessage(renormalize(currentRef.current));
+        }
+    }, [i18n.language]);
 
     useEffect(() => {
         const tokens = [
@@ -83,15 +107,15 @@ const HelperWrapper = () => {
                 if (!message) {
                     return;
                 }
-                const current = currentRef.current;
+                const current = currentRef.current?.message;
                 if (
                     current &&
                     KIND_META[message.kind].rank < KIND_META[current.kind].rank
                 ) {
-                    queueRef.current.push(message);
+                    queueRef.current.push({ payload, message });
                     return;
                 }
-                showMessage(message);
+                showMessage({ payload, message });
                 reduxStore.dispatch(enableInfoHelper());
             }),
         ];
@@ -106,7 +130,7 @@ const HelperWrapper = () => {
     const closeInfoHelper = () => {
         const next = queueRef.current.shift();
         if (next) {
-            showMessage(next);
+            showMessage(renormalize(next));
             return;
         }
         showMessage(null);

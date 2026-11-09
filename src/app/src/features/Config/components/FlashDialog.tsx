@@ -18,6 +18,7 @@ import {
 import { FlashingProgress } from 'app/features/Config/components/FlashingProgress.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller.ts';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 
@@ -62,10 +63,9 @@ function startFlash({
     firmwareType = 'hex',
 }: startFlashOptions) {
     if (!port) {
-        toast.error(
-            'No port specified - please connect to the device to determine what is being flashed.',
-            { position: 'bottom-right' },
-        );
+        toast.error(i18n.t('config:flash.noPort'), {
+            position: 'bottom-right',
+        });
     }
 
     const selectedProfile = store.get('workspace.machineProfile', {});
@@ -78,6 +78,7 @@ function startFlash({
 const CONTROLLER_TYPES = ['grbl', 'grblHAL'];
 
 export function FlashDialog({ show, toggleShow }: flashDialogProps) {
+    const { t } = useAppTranslation();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [controllerType, setControllerType] = useState('grbl');
     const [port, setPort] = useState('');
@@ -207,12 +208,11 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
         <Dialog open={show} onOpenChange={toggleShow}>
             <DialogContent className="bg-gray-100 w-[650px] min-h-[450px] flex flex-col">
                 <DialogHeader>
-                    <DialogTitle>Flash Firmware</DialogTitle>
+                    <DialogTitle>{t('config:flash.title')}</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
                     <p className="text-sm text-gray-700 dark:text-content-primary">
-                        This feature exists to flash firmware onto a compatible
-                        SLB or Arduino-based device.
+                        {t('config:flash.intro')}
                     </p>
                     <div
                         className={cn('flex flex-col gap-4', {
@@ -221,7 +221,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                     >
                         <div className="flex flex-col">
                             <h2 className="text-gray-600 text-sm dark:text-content-primary">
-                                Port
+                                {t('config:flash.port')}
                             </h2>
                             <Select
                                 onValueChange={handlePortSelect}
@@ -234,7 +234,9 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                     {ports.length > 0 && (
                                         <SelectGroup>
                                             <SelectLabel className="text-gray-600 text-sm">
-                                                Recognized Ports
+                                                {t(
+                                                    'config:flash.recognizedPorts',
+                                                )}
                                             </SelectLabel>
                                             {ports.map((p) => (
                                                 <SelectItem
@@ -252,7 +254,9 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                     {unrecognizedPorts.length > 0 && (
                                         <SelectGroup>
                                             <SelectLabel className="text-gray-600 text-sm">
-                                                Unrecognized Ports
+                                                {t(
+                                                    'config:flash.unrecognizedPorts',
+                                                )}
                                             </SelectLabel>
                                             {unrecognizedPorts.map((p) => (
                                                 <SelectItem
@@ -269,14 +273,18 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         </div>
                         <div className="flex flex-col">
                             <h2 className="text-gray-600 text-sm dark:text-content-primary">
-                                Controller Type
+                                {t('config:flash.controllerType')}
                             </h2>
                             <Select
                                 onValueChange={handleTypeSelect}
                                 value={controllerType}
                             >
                                 <SelectTrigger className="bg-white bg-opacity-100">
-                                    <SelectValue placeholder="Select board type" />
+                                    <SelectValue
+                                        placeholder={t(
+                                            'config:flash.selectBoardType',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white bg-opacity-100 z-[10000]">
                                     {CONTROLLER_TYPES.map((p) => (
@@ -293,7 +301,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                             })}
                         >
                             <h2 className="text-gray-600 text-sm dark:text-content-primary">
-                                Firmware File
+                                {t('config:flash.firmwareFile')}
                             </h2>
                             <input
                                 type="file"
@@ -314,21 +322,20 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         )}
                     >
                         <p className="text-sm text-gray-600 text-center dark:text-content-primary">
-                            This process will disconnect your machine, and may
-                            take a couple of minutes to complete.
+                            {t('config:flash.warning')}
                             <br />
-                            <b>Continue?</b>
+                            <b>{t('config:flash.continuePrompt')}</b>
                         </p>
                         <div className="flex flex-row gap-4 items-center justify-center">
                             <Button onClick={() => toggleShow(false)}>
-                                No
+                                {t('common:actions.no')}
                             </Button>
                             <Button
                                 variant="primary"
                                 disabled={!canClickFlash()}
                                 onClick={flashPort}
                             >
-                                Yes
+                                {t('common:actions.yes')}
                             </Button>
                         </div>
                     </div>
@@ -354,7 +361,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                             variant="primary"
                             onClick={() => toggleShow(false)}
                         >
-                            Close
+                            {t('common:actions.close')}
                         </Button>
                     </div>
                 </div>

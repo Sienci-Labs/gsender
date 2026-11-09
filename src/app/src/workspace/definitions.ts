@@ -35,6 +35,8 @@ export interface Workspace {
     coolantFunctions: boolean;
     atcEnabled: boolean;
     portraitMacroBar: boolean;
+    /** UI language code, or 'system' to follow the OS. See app/i18n. */
+    language: string;
     collectUsageDataStatus: 'accepted' | 'denied' | 'pending';
     safeRetractHeight: number;
     customDecimalPlaces: number;

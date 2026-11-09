@@ -1,5 +1,6 @@
 import { Widget } from 'app/components/Widget';
 import { VISUALIZER_PRIMARY } from 'app/constants';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -49,7 +50,7 @@ const FileControl = () => {
                 ) => {
                     if (!fileMetaData) {
                         toast.error(
-                            'Error loading recent file, it may have been deleted or moved to a different folder.',
+                            i18n.t('notifications:files.recentLoadFailed'),
                             { position: 'bottom-right' },
                         );
 

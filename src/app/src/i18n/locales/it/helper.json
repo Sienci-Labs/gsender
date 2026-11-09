@@ -1,0 +1,236 @@
+{
+  "kinds": {
+    "info": "Info",
+    "reminder": "Promemoria",
+    "maintenance": "Manutenzione",
+    "tip": "Suggerimento"
+  },
+  "message": {
+    "noDescription": "Nessuna descrizione corrispondente trovata",
+    "legacyResource": "Risorse Sienci",
+    "tryThis": "Prova così",
+    "dontRemind": "Non ricordarmelo più",
+    "dontShowTips": "Non mostrare suggerimenti",
+    "dismiss": "Ignora",
+    "gotIt": "Ho capito",
+    "openGuide": "Apri guida",
+    "scanToOpen": "Scansiona per aprire sul telefono",
+    "scanOnPhone": "Scansiona con il telefono",
+    "scanCodeToOpen": "Scansiona il codice per aprire questa guida sul telefono.",
+    "learnMore": "Per saperne di più"
+  },
+  "resources": {
+    "alarmCodes": "Codici di allarme ed errore",
+    "homing": "Homing e coordinate macchina",
+    "limitAlarms": "Allarme 1 e 2: finecorsa hardware e limiti software",
+    "probeFail": "Allarme 4 e 5: errore di tastatura",
+    "homingFail": "Allarme 6, 8 e 9: errore di homing",
+    "safetyDoor": "Attivazione della porta di sicurezza",
+    "estop": "Allarme 10: arresto di emergenza",
+    "spindleComms": "Allarme 14 e 19: comunicazione con il mandrino",
+    "motorFault": "Allarme 17: guasto motore",
+    "alarm18": "Allarme 18",
+    "alarm20": "Allarme 20"
+  },
+  "alarm": {
+    "homingRequired": {
+      "title": "Homing richiesto",
+      "description": "La macchina non ha alcun problema. L'homing è attivo nelle impostazioni, quindi il controller attende che venga eseguito prima di muoversi. L'homing usa i finecorsa per trovare lo zero macchina, così gSender sa esattamente dove si trova la macchina all'interno della sua corsa e può usare i limiti software per impedirle di superare la fine di un asse.",
+      "steps": {
+        "0": "Assicurati che nulla ostacoli il portale, poi fai clic su \"Click to Run Homing\". La macchina si sposta fino ai finecorsa e imposta lo zero macchina.",
+        "1": "Al termine dell'homing, muovi la macchina ed esegui i lavori normalmente. Dovrai ripetere l'homing solo dopo aver acceso o resettato il controller.",
+        "2": "Se la macchina non ha finecorsa, disattiva Config ➜ Homing/Limits ➜ Homing cycle enable. Nota che i limiti software richiedono l'homing per funzionare."
+      }
+    },
+    "1": {
+      "title": "Finecorsa hardware attivato",
+      "description": "È scattato un finecorsa, quindi la macchina si è fermata immediatamente per proteggersi. Di solito accade quando un movimento porta la macchina oltre la sua corsa fisica, perciò la posizione esatta della macchina potrebbe essere andata persa.",
+      "steps": {
+        "0": "Cancella l'allarme, poi esegui l'homing della macchina in modo che gSender ristabilisca una posizione nota.",
+        "1": "Verifica che le impostazioni di corsa del firmware (Config ➜ Homing/Limits) corrispondano alle dimensioni reali della macchina.",
+        "2": "Se succede spesso durante il jog, prova incrementi più piccoli. Durante la spianatura puoi disattivare temporaneamente i finecorsa hardware in Config ➜ Homing/Limits."
+      }
+    },
+    "2": {
+      "title": "Limite software raggiunto",
+      "description": "Il movimento richiesto avrebbe portato la macchina oltre i limiti di corsa impostati nel firmware. La posizione macchina viene mantenuta, quindi puoi sbloccare e continuare in sicurezza.",
+      "steps": {
+        "0": "Sblocca l'allarme: la posizione macchina non viene persa.",
+        "1": "Verifica che l'origine del lavoro e il posizionamento del grezzo corrispondano al tuo punto zero fisico e che le unità del file (mm/in) corrispondano alla macchina.",
+        "2": "Verifica che le impostazioni di corsa del firmware (Config ➜ Homing/Limits) corrispondano alle dimensioni reali della macchina."
+      }
+    },
+    "probeFail": {
+      "steps": {
+        "0": "Inizia la tastatura da circa 1/2\" (5mm) sopra la piastra di tastatura, posizionandoti sopra il quadrato interno (piastre AutoZero) o sopra il logo (piastre standard).",
+        "1": "Se la sonda risulta attivata nell'istante in cui parte il ciclo, anche senza che nulla la tocchi, probabilmente l'ingresso della sonda è invertito: in Config ➜ Probe, attiva/disattiva \"Invert Probe Inputs ($6)\", applica le impostazioni, quindi spegni e riaccendi il controller."
+      }
+    },
+    "4": {
+      "title": "Errore di tastatura: già attivata",
+      "description": "Il circuito della sonda risultava attivato prima ancora dell'avvio del ciclo di tastatura, quindi gSender non può capire quando l'utensile tocca davvero la piastra."
+    },
+    "5": {
+      "title": "Errore di tastatura: nessun contatto rilevato",
+      "description": "La sonda non ha rilevato alcun contatto con la piastra di tastatura entro la distanza di corsa prevista."
+    },
+    "homingFail": {
+      "steps": {
+        "0": "Verifica che i giunti siano ben serrati sia sugli alberi dei motori sia sulle viti a ricircolo di sfere/viti trapezie di ogni asse.",
+        "1": "Assicurati che ogni finecorsa sia montato saldamente e ben appoggiato al proprio fermo.",
+        "2": "In Config ➜ Homing/Limits, verifica che il profilo macchina corrisponda al tuo modello di CNC e ripristina le impostazioni di homing evidenziate in giallo (non predefinite) con il pulsante circolare di ripristino.",
+        "3": "Applica le impostazioni, quindi spegni e riaccendi il controller."
+      }
+    },
+    "6": {
+      "title": "Errore di homing: ciclo resettato",
+      "description": "Il ciclo di homing in corso è stato resettato prima di poter terminare."
+    },
+    "7": {
+      "title": "Errore di homing: porta di sicurezza aperta",
+      "description": "Il controller ritiene che la porta di sicurezza sia aperta, quindi ha interrotto il ciclo di homing. Sui controller SLB/SLB-EXT può succedere anche senza nulla collegato all'ingresso DOOR, se l'impostazione della porta è stata invertita.",
+      "steps": {
+        "0": "Se all'ingresso DOOR non è collegato nulla, collega tra loro i due pin della porta con un ponticello per simulare una porta chiusa.",
+        "1": "Digita $RST=$ nella console ed eseguilo per ripristinare l'impostazione invertita.",
+        "2": "Spegni e riaccendi il controller."
+      }
+    },
+    "8": {
+      "title": "Errore di homing: l'arretramento non ha rilasciato il finecorsa",
+      "description": "Dopo l'homing, il movimento di arretramento non è stato sufficiente a rilasciare il finecorsa."
+    },
+    "9": {
+      "title": "Errore di homing: finecorsa non trovato",
+      "description": "La macchina non ha trovato un finecorsa entro la distanza di ricerca prevista."
+    },
+    "10": {
+      "title": "Arresto di emergenza attivo",
+      "description": "Il controller rileva il segnale di arresto di emergenza come attivo, quindi resta bloccato finché il circuito di emergenza non viene liberato.",
+      "steps": {
+        "0": "Premi il pulsante di emergenza, poi ruotalo in senso orario per sbloccarlo e fai clic su \"Click to Unlock Machine\". Fallo ogni volta che ti connetti.",
+        "1": "Se l'allarme persiste, controlla nella console eventuali avvisi di errore motore e verifica che la spia blu del relè sull'SLB-EXT si accenda dopo lo sblocco dell'emergenza; se non si accende, un cortocircuito in un motore potrebbe mantenerla attivata.",
+        "2": "Cortocircuita i pin di bypass dell'emergenza sulla scheda di controllo: se il LED rosso HALT si spegne, la scheda funziona ed è il pulsante di emergenza a dover essere sostituito.",
+        "3": "Controlla il cablaggio dell'emergenza e entrambi i LED rossi sul pulsante: collegamenti allentati o LED che non si accendono o spengono correttamente indicano che il pulsante va sostituito."
+      }
+    },
+    "spindleComms": {
+      "title": "Timeout di comunicazione con il mandrino",
+      "description": "Il controller ha perso la comunicazione con l'inverter (VFD) del mandrino. Compare come allarme 14 sui firmware meno recenti, oppure come allarme 19 sui firmware più recenti, AltMill 4x8, SLB Lite e SLB-EXT V2.0.",
+      "steps": {
+        "0": "Accendi prima il mandrino/VFD, poi il controller: così i due possono stabilire correttamente la comunicazione.",
+        "1": "Controlla i LED di comunicazione RS485: sia RX sia TX devono lampeggiare. Se ne lampeggia solo uno (o nessuno), controlla il cavo e i collegamenti.",
+        "2": "Esegui il file di configurazione AltMill o LongMill tramite gSender per ripristinare i valori EEPROM del VFD alle impostazioni di fabbrica.",
+        "3": "Verifica che il cavo RS485 sia nella porta corretta sopra l'interruttore di alimentazione, con il filo rosso su RS485- e il nero su RS485+ lato VFD.",
+        "4": "Confronta i codici funzione del VFD con la tabella dei parametri, in particolare l'indirizzo di comunicazione (F163) e la modalità (F165)."
+      }
+    },
+    "17": {
+      "title": "Guasto motore",
+      "description": "Un motore passo-passo a circuito chiuso si è fermato, di solito per uno stallo all'avvio, durante l'homing o il jog, un inceppamento meccanico, un problema di cablaggio o un problema ai finecorsa. Cerca un avviso \"Motor Error\" nella console e controlla se c'è un LED rosso lampeggiante sul motore o una spia di stallo (STL) accesa sulla scheda di controllo per capire quale asse è coinvolto.",
+      "steps": {
+        "0": "Disattiva i finecorsa hardware e controlla i sensori di finecorsa; non usare il fermo integrato sull'asse Z. Regola i sensori finché la spia rossa si accende, poi allentali di circa 1/4 di giro.",
+        "1": "Con il controller spento, verifica il serraggio dei giunti dei motori e ruota a mano ogni vite a ricircolo di sfere: deve girare liberamente, senza impuntamenti nelle guide lineari o nel cuscinetto della vite.",
+        "2": "Controlla il cablaggio dei motori (LED lampeggiante oppure fisso/spento) e, se la spia blu del relè del controller resta spenta all'avvio, scollega i motori uno alla volta per isolare quello guasto."
+      }
+    },
+    "18": {
+      "title": "Errore di homing: passate di homing configurate in modo errato",
+      "description": "Il ciclo di homing non è stato completato a causa di come sono configurate le passate di homing degli assi.",
+      "steps": {
+        "0": "In Config ➜ Homing/Limits, verifica che il profilo macchina corrisponda al tuo modello di CNC.",
+        "1": "Controlla le quattro impostazioni delle passate di homing degli assi ($44-$47): lasciale ai valori predefiniti a meno che tu non usi finecorsa personalizzati.",
+        "2": "Ripristina ai valori predefiniti le impostazioni evidenziate in giallo con il pulsante circolare di ripristino.",
+        "3": "Applica le impostazioni, quindi spegni e riaccendi il controller."
+      }
+    },
+    "20": {
+      "title": "Comunicazione con l'espansione I/O non riuscita",
+      "description": "Il controller non riesce a comunicare con l'espansione I/O sul modulo ATC (il componente preassemblato di un mandrino ATC).",
+      "steps": {
+        "0": "Verifica che il modulo ATC sia collegato correttamente e inserito a fondo.",
+        "1": "Ispeziona il modulo per individuare danni fisici o segni di guasto.",
+        "2": "Se il collegamento sembra saldo e integro, contatta l'assistenza Sienci Labs (sienci.com/contact-us) per ulteriori verifiche o una sostituzione."
+      }
+    }
+  },
+  "wizard": {
+    "next": "Avanti",
+    "complete": "Completa",
+    "restore": "Ripristina procedura guidata",
+    "minimise": "Riduci procedura guidata",
+    "cancel": {
+      "label": "Annulla procedura guidata",
+      "title": "Annulla procedura di cambio utensile",
+      "content": "Vuoi davvero annullare la procedura guidata di cambio utensile? Tutti i passaggi andranno persi."
+    },
+    "step": "Passaggio {{number}}",
+    "firstRunOnly": "Solo alla prima esecuzione",
+    "oneTimeSetup": "<bold>Configurazione una tantum:</bold> misura l'utensile iniziale in modo che gli utensili successivi possano essere confrontati con esso.",
+    "runGcode": "Esegui G-code",
+    "or": "oppure",
+    "running": "In esecuzione…",
+    "run": "Esegui",
+    "installNewTool": "Monta il nuovo utensile",
+    "doNotInterrupt": "Non interrompere la macchina durante questa fase",
+    "pendingToolchange": {
+      "eyebrow": "Cambio utensile in attesa",
+      "title": "In attesa del termine dei movimenti di taglio",
+      "description": "Il cambio utensile riprenderà automaticamente al termine di tutti i movimenti di taglio in sospeso."
+    },
+    "resumingJob": {
+      "eyebrow": "Ripresa del lavoro",
+      "title": "Il lavoro sta riprendendo",
+      "description": "La macchina deve tornare in posizione e potrebbe dover riportare il mandrino alla velocità. Il lavoro proseguirà automaticamente al termine."
+    }
+  },
+  "toggle": {
+    "label": "Assistente di aiuto"
+  },
+  "keyboardMap": {
+    "title": "Scorciatoie da tastiera attive",
+    "subtitle": "Mappa dinamica delle scorciatoie attualmente disponibili",
+    "close": "Chiudi mappa della tastiera"
+  },
+  "announcer": {
+    "statusChanged": "Stato della macchina cambiato in {{state}}",
+    "progress": "Avanzamento del lavoro: {{percent}}%",
+    "complete": "Lavoro completato: 100%",
+    "summaryTitle": "Riepilogo del lavoro",
+    "time": {
+      "seconds_one": "{{count}} secondo",
+      "seconds_other": "{{count}} secondi",
+      "minutes_one": "{{count}} minuto",
+      "minutes_other": "{{count}} minuti",
+      "hours_one": "{{count}} ora",
+      "hours_other": "{{count}} ore",
+      "and": "{{first}} e {{second}}",
+      "seconds_many": "{{count}} secondi",
+      "minutes_many": "{{count}} minuti",
+      "hours_many": "{{count}} ore"
+    },
+    "summary": {
+      "fileLoaded": "File caricato: {{name}}.",
+      "dimensions": "Dimensioni: {{x}} di larghezza, {{y}} di profondità e {{z}} di altezza, in {{units}}.",
+      "xRange": "X va da {{min}} a {{max}}.",
+      "yRange": "Y va da {{min}} a {{max}}.",
+      "minZ": "L'altezza Z minima è {{z}} {{units}}.",
+      "estimatedTime": "Tempo stimato: {{time}}.",
+      "tools_one": "Usa {{count}} utensile: {{tools}}.",
+      "tools_other": "Usa {{count}} utensili: {{tools}}.",
+      "metadata": "Metadati del lavoro: {{metadata}}.",
+      "programStops_one": "Contiene {{count}} arresto programma (M0/M1).",
+      "programStops_other": "Contiene {{count}} arresti programma (M0/M1).",
+      "coolant": "Il file richiede il refrigerante (M7/M8).",
+      "spindleSpeed": "Velocità del mandrino: {{speed}} RPM.",
+      "spindleSpeedRange": "Intervallo di velocità del mandrino: da {{min}} a {{max}} RPM.",
+      "feedrate": "Velocità di avanzamento: {{feed}} {{units}}/min.",
+      "feedrateRange": "Intervallo di avanzamento: da {{min}} a {{max}} {{units}}/min.",
+      "axes": "Assi attivi: {{axes}}.",
+      "invalidGcode_one": "ATTENZIONE: rilevata {{count}} riga di G-code non valida.",
+      "invalidGcode_other": "ATTENZIONE: rilevate {{count}} righe di G-code non valide.",
+      "tools_many": "Usa {{count}} utensili: {{tools}}.",
+      "programStops_many": "Contiene {{count}} arresti programma (M0/M1).",
+      "invalidGcode_many": "ATTENZIONE: rilevate {{count}} righe di G-code non valide."
+    }
+  }
+}

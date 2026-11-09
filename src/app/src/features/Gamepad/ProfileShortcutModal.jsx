@@ -6,6 +6,7 @@ import {
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
 import { Input } from 'app/components/shadcn/Input';
+import { i18n } from 'app/i18n';
 import gamepad, { shortcutComboBuilder } from 'app/lib/gamepad';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { toast } from 'app/lib/toaster';
@@ -127,7 +128,9 @@ const ProfileShortcutModal = ({
 
         onClose();
 
-        toast.success('Updated Gamepad Action Shortcut', { duration: 2000 });
+        toast.success(i18n.t('notifications:gamepad.actionShortcutUpdated'), {
+            duration: 2000,
+        });
     };
 
     return (

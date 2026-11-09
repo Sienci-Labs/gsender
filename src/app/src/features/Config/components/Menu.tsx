@@ -1,4 +1,5 @@
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 import type React from 'react';
 import type { MouseEventHandler } from 'react';
@@ -74,7 +75,7 @@ function MenuItem({
                         : 'text-gray-600 group-hover:text-blue-600 hover:text-blue-600 dark:text-content-primary',
                 })}
             </span>
-            <span>{label}</span>
+            <span>{translateKey(label)}</span>
         </button>
     );
 }
@@ -91,7 +92,7 @@ function SubMenuItem({ label, active, onClick }: SubMenuItemProps) {
             )}
             onClick={onClick}
         >
-            {label}
+            {translateKey(label)}
         </button>
     );
 }
@@ -104,6 +105,8 @@ export function Menu({
     activeSubsection,
 }: MenuProps) {
     const { settingsFilter } = useSettings();
+    // Re-render when the language changes.
+    useAppTranslation();
 
     const originalMenuLength = menu.length;
 

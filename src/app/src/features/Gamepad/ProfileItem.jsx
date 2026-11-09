@@ -1,5 +1,6 @@
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import ToolCard from 'app/components/ToolCard';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
@@ -17,15 +18,17 @@ const ProfileItem = ({ title, icon, id }) => {
         e.stopPropagation(); //Prevents bubbling that will fire the parent div's onclick first
 
         Confirm({
-            content: 'Are you sure you want to delete this gamepad profile?',
-            title: 'Delete Gamepad Profile',
+            content: i18n.t('notifications:gamepad.deleteProfile.content'),
+            title: i18n.t('notifications:gamepad.deleteProfile.title'),
             onConfirm: () => deleteProfile(id),
         });
     };
 
     const deleteProfile = (id) => {
         dispatch(removeGamepadProfileFromList(id));
-        toast.info('Removed Gamepad Profile', { position: 'bottom-right' });
+        toast.info(i18n.t('notifications:gamepad.profileRemoved'), {
+            position: 'bottom-right',
+        });
     };
 
     const setCurrentProfile = (profileID) => {

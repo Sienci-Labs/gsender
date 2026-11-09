@@ -21,6 +21,7 @@ import type { EEPROM } from 'app/definitions/firmware';
 import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { getThemeCssColor } from 'app/lib/getThemeCssColor';
 import { toFixedIfNecessary } from 'app/lib/rounding';
@@ -117,7 +118,9 @@ const Steps = () => {
 
         controller.command('gcode', [`${eepromKey}=${newStepsPerMM}`, '$$']);
 
-        toast.info('Updated steps-per-mm value', { position: 'bottom-right' });
+        toast.info(i18n.t('notifications:movementTuning.stepsUpdated'), {
+            position: 'bottom-right',
+        });
     };
 
     const eepromKey = getEEPROMSettingKey(selectedAxis);

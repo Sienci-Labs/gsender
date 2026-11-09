@@ -1,13 +1,21 @@
+import { useAppTranslation } from 'app/i18n';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 
 export function GamepadLinkWizard() {
-    return <ToolLink label="Configure Gamepad" link={'/tools/gamepad'} />;
+    const { t } = useAppTranslation();
+    return (
+        <ToolLink
+            label={t('config:wizards.configureGamepad')}
+            link={'/tools/gamepad'}
+        />
+    );
 }
 
 export function KeyboardLinkWizard() {
+    const { t } = useAppTranslation();
     return (
         <ToolLink
-            label="Configure Keyboard"
+            label={t('config:wizards.configureKeyboard')}
             link={'/tools/keyboard-shortcuts'}
         />
     );

@@ -10,6 +10,7 @@ import {
 } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -665,14 +666,16 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             await navigator.clipboard.writeText(textToCopy);
             toast.info(
                 selectedLines.size > 0
-                    ? `${selectedLines.size} line(s) copied to clipboard`
-                    : 'G-code has been copied to your clipboard',
+                    ? i18n.t('notifications:gcode.linesCopied', {
+                          count: selectedLines.size,
+                      })
+                    : i18n.t('notifications:gcode.copied'),
                 {
                     position: 'bottom-right',
                 },
             );
         } catch (_err) {
-            toast.error('Could not copy G-code to clipboard', {
+            toast.error(i18n.t('notifications:gcode.copyFailed'), {
                 position: 'bottom-right',
             });
         }
@@ -680,7 +683,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 
     const handleRevert = useCallback(() => {
         if (isJobRunning) {
-            toast.error('Cannot revert while job is running', {
+            toast.error(i18n.t('notifications:gcode.revertBlockedByJob'), {
                 position: 'bottom-right',
             });
             return;
@@ -690,7 +693,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             setHasChanges(false);
             setSelectedLines(new Set());
             setLastSelectedIndex(null);
-            toast.info('Reverted to original content', {
+            toast.info(i18n.t('notifications:gcode.reverted'), {
                 position: 'bottom-right',
             });
         }
@@ -698,7 +701,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 
     const handleSave = async () => {
         if (isJobRunning) {
-            toast.error('Cannot save while job is running', {
+            toast.error(i18n.t('notifications:gcode.saveBlockedByJob'), {
                 position: 'bottom-right',
             });
             return;
@@ -726,11 +729,11 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             // Update original lines after successful save
             setOriginalLines([...gcodeLines]);
             setHasChanges(false);
-            toast.success('G-code saved successfully', {
+            toast.success(i18n.t('notifications:gcode.saved'), {
                 position: 'bottom-right',
             });
         } catch (_err) {
-            toast.error('Failed to save G-code', {
+            toast.error(i18n.t('notifications:gcode.saveFailed'), {
                 position: 'bottom-right',
             });
         }

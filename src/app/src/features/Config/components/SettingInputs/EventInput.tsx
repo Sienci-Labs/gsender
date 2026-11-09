@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import api from 'app/api';
 import { Switch } from 'app/components/shadcn/Switch';
 import MacroForm from 'app/features/Macros/MacroForm';
@@ -19,6 +20,7 @@ interface EventData {
 }
 
 export function EventInput({ eventType }: EventInputProps): React.ReactElement {
+    const { t } = useAppTranslation();
     const [eventData, setEventData] = useState<EventData | null>(null);
     const [eventCommands, setCommands] = useState('');
     const [isEditing, setIsEditing] = useState(false);
@@ -71,7 +73,7 @@ export function EventInput({ eventType }: EventInputProps): React.ReactElement {
         };
 
         fetchCall().catch(() => {
-            toast.error(`Unable to fetch event data ${eventType}`, {
+            toast.error(t('config:inputs.eventFetchFailed', { eventType }), {
                 position: 'bottom-right',
             });
         });
@@ -82,15 +84,17 @@ export function EventInput({ eventType }: EventInputProps): React.ReactElement {
             {isEditing && (
                 <MacroForm
                     macroContent={eventCommands}
-                    title="Edit Event"
-                    dialogDescription="Enter the G-code commands to run for this event."
+                    title={t('config:inputs.eventEditTitle')}
+                    dialogDescription={t(
+                        'config:inputs.eventDialogDescription',
+                    )}
                     showNameField={false}
                     showDescriptionField={false}
                     allowEmptyContent
-                    submitLabel="Save"
+                    submitLabel={t('common:actions.save')}
                     onSubmit={({ content }) => {
                         saveCommands(content).catch(() => {
-                            toast.error('Unable to save event commands', {
+                            toast.error(t('config:inputs.eventSaveFailed'), {
                                 position: 'bottom-right',
                             });
                         });
@@ -100,7 +104,7 @@ export function EventInput({ eventType }: EventInputProps): React.ReactElement {
                 />
             )}
             <div className="flex flex-row justify-between items-center">
-                <span>Enabled:</span>
+                <span>{t('config:inputs.eventEnabled')}</span>
                 <Switch
                     checked={eventData?.enabled ?? false}
                     onChange={toggleEvent}
@@ -110,14 +114,14 @@ export function EventInput({ eventType }: EventInputProps): React.ReactElement {
                 readOnly
                 tabIndex={-1}
                 rows={4}
-                value={eventCommands || '; No commands set'}
+                value={eventCommands || t('config:inputs.eventNoCommands')}
                 className="ring-1 ring-gray-300 rounded-md font-mono block w-full p-2 text-sm bg-gray-50 text-gray-600 resize-none pointer-events-none dark:bg-surface-sunken dark:text-content-muted dark:ring-outline"
             />
             <button
                 className="bg-white shadow p-2 text-sm rounded border border-blue-500 text-gray-700 hover:bg-gray-100 dark:bg-surface-raised dark:text-content-primary dark:hover:bg-surface-hover"
                 onClick={() => setIsEditing(true)}
             >
-                Edit Event
+                {t('config:inputs.eventEdit')}
             </button>
         </div>
     );

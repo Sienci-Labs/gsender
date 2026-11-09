@@ -21,9 +21,11 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import { Clock, Wrench } from 'lucide-react';
 
 const PendingToolchangeNotice = () => {
+    const { t } = useAppTranslation();
     return (
         <div className="flex-1 flex items-center justify-center">
             <div className="max-w-sm w-full bg-white dark:bg-surface-raised border border-gray-200 dark:border-outline-subtle rounded-xl p-8 text-center">
@@ -66,14 +68,13 @@ const PendingToolchangeNotice = () => {
                 </div>
 
                 <div className="text-xs font-medium tracking-widest uppercase text-gray-400 dark:text-content-muted">
-                    Toolchange pending
+                    {t('helper:wizard.pendingToolchange.eyebrow')}
                 </div>
                 <div className="text-lg font-medium mt-1 mb-3 text-gray-900 dark:text-content-primary">
-                    Waiting for cutting motions to finish
+                    {t('helper:wizard.pendingToolchange.title')}
                 </div>
                 <div className="text-sm leading-relaxed mb-6 text-gray-600 dark:text-content-muted">
-                    The toolchange process will resume automatically once all
-                    pending cutting motions are complete.
+                    {t('helper:wizard.pendingToolchange.description')}
                 </div>
 
                 <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800">
@@ -82,7 +83,7 @@ const PendingToolchangeNotice = () => {
                         className="shrink-0 text-orange-500 dark:text-orange-400"
                     />
                     <span className="text-sm text-orange-800 dark:text-orange-300">
-                        Do not interrupt the machine during this phase
+                        {t('helper:wizard.doNotInterrupt')}
                     </span>
                 </div>
             </div>

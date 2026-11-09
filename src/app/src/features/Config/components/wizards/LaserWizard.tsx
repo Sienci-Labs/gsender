@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import Button from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 
@@ -9,13 +10,14 @@ function stopLaser() {
 }
 
 export function LaserWizard() {
+    const { t } = useAppTranslation();
     return (
         <div className="flex flex-row gap-2 items-center">
             <Button variant="primary" onClick={startLaser}>
-                Laser On
+                {t('config:wizards.laserOn')}
             </Button>
             <Button variant="primary" onClick={stopLaser}>
-                Laser Off
+                {t('config:wizards.laserOff')}
             </Button>
         </div>
     );

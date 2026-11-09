@@ -26,6 +26,7 @@ import { Widget } from 'app/components/Widget';
 import { getSafeXYMoveCode } from 'app/features/DRO/utils/SafeMove';
 import PluginVisualizerOverlayHost from 'app/features/Plugins/components/PluginVisualizerOverlayHost';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
+import { i18n } from 'app/i18n';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import type { CommandKeys } from 'app/lib/definitions/shortcuts';
@@ -708,15 +709,21 @@ class Visualizer extends Component {
                 return;
             }
             if (handle.isRotaryFile()) {
-                toast.info("Move To Here isn't available for rotary files", {
-                    position: 'bottom-right',
-                });
+                toast.info(
+                    i18n.t('notifications:visualizer.moveToHereRotary'),
+                    {
+                        position: 'bottom-right',
+                    },
+                );
                 return;
             }
             if (!this.actions.moveToHereMachineReady()) {
-                toast.info('Machine must be connected and idle to move', {
-                    position: 'bottom-right',
-                });
+                toast.info(
+                    i18n.t('notifications:visualizer.mustBeIdleToMove'),
+                    {
+                        position: 'bottom-right',
+                    },
+                );
                 return;
             }
             handle.armPick('hold', this.actions.handleMoveToHerePick);
@@ -745,9 +752,12 @@ class Visualizer extends Component {
             world: { x: number; y: number; z: number };
         }) => {
             if (!this.actions.moveToHereMachineReady()) {
-                toast.info('Machine must be connected and idle to move', {
-                    position: 'bottom-right',
-                });
+                toast.info(
+                    i18n.t('notifications:visualizer.mustBeIdleToMove'),
+                    {
+                        position: 'bottom-right',
+                    },
+                );
                 this.actions.disarmMoveToHere();
                 return;
             }
@@ -761,9 +771,15 @@ class Visualizer extends Component {
                 unitModal,
             );
 
-            toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
-                position: 'bottom-right',
-            });
+            toast.success(
+                i18n.t('notifications:visualizer.movingTo', {
+                    x: x.toFixed(2),
+                    y: y.toFixed(2),
+                }),
+                {
+                    position: 'bottom-right',
+                },
+            );
 
             // Auto-disarm after a successful move.
             this.actions.disarmMoveToHere();
@@ -860,7 +876,9 @@ class Visualizer extends Component {
             }));
             if (this.state.invalidGcode.shouldShow) {
                 toast.info(
-                    `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                    i18n.t('notifications:visualizer.unsupportedGcode', {
+                        count: invalidGcode.size,
+                    }),
                     { position: 'bottom-right' },
                 );
             }
@@ -1146,7 +1164,7 @@ class Visualizer extends Component {
 
     showToast = _.throttle(
         () => {
-            toast.info('Unable to activate GrblHAL ONLY shortcut', {
+            toast.info(i18n.t('notifications:visualizer.grblHalOnlyShortcut'), {
                 position: 'bottom-right',
             });
         },

@@ -1,0 +1,285 @@
+{
+  "confirm": {
+    "defaultContent": "Sei sicuro di voler procedere?"
+  },
+  "accessories": {
+    "restartController": {
+      "title": "Riavvia il controller",
+      "content": "Riavvia manualmente il controller CNC (spegnilo e riaccendilo) e ricollegati a gSender affinché queste impostazioni abbiano effetto."
+    }
+  },
+  "atc": {
+    "unimplemented": "Non implementato :(",
+    "toolsOutOfRange_one": "Questo file usa l'utensile {{list}}, che supera la tabella utensili da {{size}} posizioni. Riassegnalo nella timeline utensili prima dell'esecuzione.",
+    "toolsOutOfRange_other": "Questo file usa gli utensili {{list}}, che superano la tabella utensili da {{size}} posizioni. Riassegnali nella timeline utensili prima dell'esecuzione.",
+    "dialog": {
+      "title": "L'ATC ha richiesto una finestra di dialogo.",
+      "content": "Continua per rilasciare la sospensione, Reimposta per interrompere l'azione.",
+      "resume": "Riprendi"
+    },
+    "toolsOutOfRange_many": "Questo file usa gli utensili {{list}}, che superano la tabella utensili da {{size}} posizioni. Riassegnali nella timeline utensili prima dell'esecuzione."
+  },
+  "connection": {
+    "reconnectFailed": "Impossibile riconnettersi a {{port}} - {{reason}}"
+  },
+  "console": {
+    "cleared": "Console svuotata",
+    "commandsCopied_one": "Ultimo {{count}} comando copiato negli appunti",
+    "commandsCopied_other": "Ultimi {{count}} comandi copiati negli appunti",
+    "copyFailed": "Impossibile copiare i comandi negli appunti",
+    "webViewUnavailable": "Questa funzionalità non è disponibile nella visualizzazione web.",
+    "commandsCopied_many": "Ultimi {{count}} comandi copiati negli appunti"
+  },
+  "controller": {
+    "alarm": "Allarme {{code}}: {{description}}",
+    "error": "Errore {{code}}: {{description}}",
+    "commentLabel": "Commento:",
+    "resume": "Riprendi",
+    "portDisconnected": {
+      "title": "Porta disconnessa",
+      "contentHoming": "La connessione alla macchina si è interrotta. Per tentare di riconnetterti all'ultima porta attiva, eseguire l'homing e scegliere la riga da cui riprendere, premi Riprendi.",
+      "content": "La connessione alla macchina si è interrotta. Per tentare di riconnetterti all'ultima porta attiva, premi Riprendi. Successivamente potrai impostare lo zero di lavoro e usare la funzione Avvia dalla riga per continuare il lavoro. Riga suggerita da cui ripartire: {{line}}"
+    },
+    "toolchangePause": "Pausa per cambio utensile",
+    "toolchangePauseWithComment": "Pausa per cambio utensile - {{comment}}",
+    "confirmToolchange": {
+      "title": "Conferma cambio utensile",
+      "content": "È stato trovato un comando di cambio utensile (M6): fai clic su Conferma per verificare che l'utensile sia stato cambiato ed eseguire il codice post-cambio utensile.",
+      "confirm": "Conferma cambio utensile"
+    },
+    "feederPause": {
+      "title": "Rilevata pausa {{command}}",
+      "content": "Premi Riprendi per continuare.",
+      "stop": "Arresta"
+    },
+    "workflowPause": "Comando di pausa '{{command}}' trovato nel file: premi \"Riprendi lavoro\" per continuare.",
+    "programPause": {
+      "title": "Pausa M0/M1",
+      "content": "Premi ‘Chiudi finestra’ se vuoi cambiare utensile, muovere gli assi, impostare un nuovo zero o eseguire qualsiasi altra operazione, poi premi il normale pulsante ‘Riprendi lavoro’ per continuare a tagliare quando sei pronto.",
+      "confirm": "Riprendi lavoro",
+      "cancel": "Chiudi finestra"
+    },
+    "rotaryFileLoaded": {
+      "title": "File rotativo caricato",
+      "content": "Il G-code contiene comandi dell'asse A: attiva la modalità rotativa se la tua macchina è dotata di un asse rotativo.",
+      "confirm": "Attiva modalità rotativa"
+    },
+    "fourAxisFileLoaded": {
+      "title": "File a 4 assi caricato",
+      "content": "Il G-code contiene comandi simultanei su 4 assi, che al momento non sono supportati e non possono essere eseguiti."
+    }
+  },
+  "diagnostics": {
+    "downloaded": "File di diagnostica scaricato correttamente!",
+    "generateFailed": "Impossibile generare il file di diagnostica"
+  },
+  "dro": {
+    "machineLimitsMissing": "Impossibile trovare i limiti della macchina: assicurati che siano impostati nelle preferenze",
+    "invalidPositionArgs": "Impossibile calcolare i movimenti di posizione dai dati inseriti: controlla gli argomenti passati"
+  },
+  "files": {
+    "closed": "File G-code chiuso",
+    "recentLoadFailed": "Errore durante il caricamento del file recente: potrebbe essere stato eliminato o spostato in un'altra cartella.",
+    "loadFailed": "Impossibile caricare il file: potrebbe essere stato spostato o eliminato."
+  },
+  "gamepad": {
+    "connected": "{{name}} connesso",
+    "newConnected": "Nuovo gamepad connesso: aggiungilo come profilo nelle preferenze",
+    "disconnected": "Gamepad disconnesso",
+    "profileRenamed": "Nome del profilo aggiornato",
+    "profileExported": "Profilo gamepad esportato correttamente!",
+    "profileExportFailed": "Impossibile esportare il profilo gamepad.",
+    "profileImported": "Profilo gamepad importato correttamente!",
+    "profileImportFailed": "Impossibile importare il profilo gamepad. Controlla il formato del file.",
+    "profileRemoved": "Profilo gamepad rimosso",
+    "profileCreated": "Nuovo profilo gamepad creato",
+    "actionShortcutUpdated": "Scorciatoia azione del gamepad aggiornata",
+    "buttonShortcutSet": "Scorciatoia del pulsante impostata",
+    "deleteProfile": {
+      "title": "Elimina profilo gamepad",
+      "content": "Sei sicuro di voler eliminare questo profilo gamepad?"
+    }
+  },
+  "gcode": {
+    "copiedToClipboard": "G-code copiato negli appunti",
+    "copied": "Il G-code è stato copiato negli appunti",
+    "copyFailed": "Impossibile copiare il G-code negli appunti",
+    "linesCopied_one": "{{count}} riga copiata negli appunti",
+    "linesCopied_other": "{{count}} righe copiate negli appunti",
+    "revertBlockedByJob": "Impossibile ripristinare mentre è in esecuzione un lavoro",
+    "reverted": "Contenuto originale ripristinato",
+    "saveBlockedByJob": "Impossibile salvare mentre è in esecuzione un lavoro",
+    "saved": "G-code salvato correttamente",
+    "saveFailed": "Impossibile salvare il G-code",
+    "linesCopied_many": "{{count}} righe copiate negli appunti"
+  },
+  "jobControl": {
+    "outlineGenerating": "Generazione del G-code del contorno...",
+    "outlineRunning": "Esecuzione del contorno del file",
+    "outlineTimedOut": "Timeout nella generazione del contorno. Riprova.",
+    "outlineFailed": "Generazione del contorno non riuscita. Riprova.",
+    "startFromLineRunning": "Esecuzione del comando Avvia da una riga specifica"
+  },
+  "keyboard": {
+    "shortcutUpdated": "Scorciatoia aggiornata",
+    "shortcutCleared": "Scorciatoia rimossa",
+    "exported": "Scorciatoie esportate correttamente!",
+    "exportFailed": "Impossibile esportare le scorciatoie.",
+    "imported": "Scorciatoie importate correttamente!",
+    "importFailed": "Impossibile importare le scorciatoie. Controlla il formato del file.",
+    "printDocumentFailed": "Impossibile creare il documento di stampa.",
+    "printFailed": "Impossibile stampare le scorciatoie."
+  },
+  "macros": {
+    "added": "Nuova macro aggiunta",
+    "addFailed": "Impossibile aggiungere la macro",
+    "deleted": "Macro eliminata",
+    "updated": "Macro '{{name}}' aggiornata",
+    "nothingToExport": "Nessuna macro da esportare",
+    "imported_one": "{{count}} macro importata correttamente",
+    "imported_other": "{{count}} macro importate correttamente",
+    "importedAndUpdated_one": "{{count}} macro importata correttamente, {{updated}} macro esistente/i aggiornata/e",
+    "importedAndUpdated_other": "{{count}} macro importate correttamente, {{updated}} macro esistente/i aggiornata/e",
+    "updatedExisting_one": "{{count}} macro esistente aggiornata",
+    "updatedExisting_other": "{{count}} macro esistenti aggiornate",
+    "importFailed": "Errore durante l'importazione delle macro",
+    "started": "Avviata l'esecuzione della macro '{{name}}'!",
+    "startedQuoted": "Avviata l'esecuzione della macro \"{{name}}\"!",
+    "runFailed": "Impossibile eseguire la macro \"{{name}}\"",
+    "deleteMacro": {
+      "title": "Elimina macro",
+      "content": "Sei sicuro di voler eliminare questa macro?"
+    },
+    "imported_many": "{{count}} macro importate correttamente",
+    "importedAndUpdated_many": "{{count}} macro importate correttamente, {{updated}} macro esistente/i aggiornata/e",
+    "updatedExisting_many": "{{count}} macro esistenti aggiornate"
+  },
+  "maintenance": {
+    "timersReset": "Timer azzerati correttamente",
+    "timersResetFailed": "Impossibile azzerare i timer.",
+    "timersResetFailedDescription": "Vai alla pagina Statistiche per azzerarli manualmente."
+  },
+  "movementTuning": {
+    "stepsUpdated": "Valore passi per mm aggiornato"
+  },
+  "navigation": {
+    "unsavedChanges": {
+      "title": "Modifiche non salvate",
+      "content": "Sei sicuro di voler uscire senza salvare?"
+    }
+  },
+  "pendant": {
+    "quit": {
+      "title": "Uscire da gSender?",
+      "content": "Sei sicuro di voler uscire da gSender?",
+      "confirm": "Esci"
+    }
+  },
+  "plugins": {
+    "removed": "{{name}} è stato rimosso.",
+    "removeFailed": "Impossibile rimuovere il plugin. Riprova."
+  },
+  "probe": {
+    "confirmedManually": "Sonda confermata manualmente",
+    "cycleStarted": "Ciclo di tastatura avviato",
+    "pendantCycleStarted": "Ciclo di tastatura avviato: {{corner}}, {{diameter}}, {{command}}"
+  },
+  "remoteMode": {
+    "linkCopied": "Link copiato negli appunti",
+    "linkCopyFailed": "Si è verificato un errore durante la copia del link negli appunti; copialo manualmente.",
+    "invalidPort": "Numero di porta non valido: deve essere compreso tra 1025 e 65535",
+    "invalidIp": "Indirizzo IP non valido: {{ip}} non sembra un indirizzo IPv4 valido",
+    "settingsUpdated": "Impostazioni del controllo wireless aggiornate",
+    "saveSettings": {
+      "title": "Salva impostazioni CNC wireless",
+      "content": "Sei sicuro di voler salvare queste impostazioni? L'applicazione verrà riavviata.",
+      "confirm": "Salva impostazioni"
+    }
+  },
+  "rotary": {
+    "enabled": "Modalità rotativa attivata",
+    "mountingMacroLoaded": "Macro di configurazione del montaggio rotativo caricata",
+    "probingRunning": "Esecuzione dei comandi di tastatura {{name}}",
+    "runProbing": {
+      "title": "Tastatura {{name}}",
+      "content": "Fai clic su 'Esegui' per avviare il ciclo di tastatura {{name}}",
+      "confirm": "Esegui"
+    },
+    "enable": {
+      "title": "Attiva modalità rotativa",
+      "intro": "L'attivazione della modalità rotativa eseguirà le seguenti azioni:",
+      "zeroY": "Azzerare l'asse Y nella posizione attuale",
+      "limitsOff": "Disattivare i limiti software e hardware, se attivi",
+      "updateFirmwareValues": "Aggiornare i seguenti valori del firmware:",
+      "yTravelResolution": "{{setting}} (risoluzione di corsa dell'asse Y)",
+      "yMaximumRate": "{{setting}} (velocità massima dell'asse Y)",
+      "checkWiring": "Assicurati di aver modificato il cablaggio per la nuova configurazione.",
+      "swapAxisSettings": "Scambiare queste impostazioni degli assi A e Y:",
+      "travelResolution": "{{y}} e {{a}} (risoluzione di corsa)",
+      "maximumRate": "{{y}} e {{a}} (velocità massima)",
+      "acceleration": "{{y}} e {{a}} (accelerazione)",
+      "travelAmount": "{{y}} e {{a}} (corsa)"
+    }
+  },
+  "sdCard": {
+    "invalidFileType": "{{fileName}}: tipo di file non valido",
+    "filesRejected": "Alcuni file sono stati rifiutati:\n{{errors}}",
+    "uploadFailed": "Errore durante il caricamento del file - {{error}}.",
+    "deleteFile": {
+      "title": "Elimina file",
+      "content": "Sei sicuro di voler eliminare {{fileName}}?"
+    }
+  },
+  "settings": {
+    "restored": "Impostazioni ripristinate",
+    "loadFailed": "Impossibile caricare le impostazioni dal server gSender. Vengono mostrati i valori predefiniti e le modifiche non verranno salvate finché non ricarichi."
+  },
+  "squaring": {
+    "eepromUpdated": "Valori EEPROM aggiornati"
+  },
+  "stats": {
+    "deleteAlarmHistory": {
+      "title": "Elimina cronologia",
+      "content": "Sei sicuro di voler eliminare tutta la cronologia di allarmi ed errori?"
+    },
+    "deleteJobHistory": {
+      "title": "Elimina cronologia lavori",
+      "content": "Sei sicuro di voler eliminare tutta la cronologia dei lavori?"
+    },
+    "resetAllTasks": {
+      "title": "Azzera tutte le attività",
+      "content": "Sei sicuro di voler azzerare i tempi di tutte le attività di manutenzione?"
+    }
+  },
+  "toolchange": {
+    "firstToolchange": {
+      "title": "Rilevato primo cambio utensile",
+      "detected": "È stato rilevato un comando di cambio utensile all'inizio del file.",
+      "content": "Se hai già installato l'utensile corretto, devi solo tastare l'utensile iniziale. In caso contrario, esegui la routine di cambio utensile per installare e configurare l'utensile iniziale.",
+      "confirm": "Esegui la routine completa di cambio utensile",
+      "cancel": "Tasta solo la lunghezza utensile"
+    }
+  },
+  "unlock": {
+    "homingNotComplete": {
+      "title": "Homing non completato",
+      "content": "L'ultimo ciclo di homing non è riuscito, quindi la posizione della macchina è sconosciuta. Esegui di nuovo l'homing prima di continuare. Sbloccare senza rieseguire l'homing può far superare i finecorsa durante il jog o un lavoro.",
+      "limitSwitchFault": "ALARM:8 e ALARM:9 indicano che un finecorsa non è stato trovato o non si è rilasciato, quindi l'homing continuerà a non riuscire finché l'interruttore o il suo cablaggio non verranno riparati. Per usare la macchina senza homing nel frattempo: scegli Sblocca comunque, apri Configurazione > Homing/Limiti, disattiva {{setting}} e fai clic su Applica impostazioni.",
+      "confirm": "Ripeti homing",
+      "cancel": "Sblocca comunque"
+    }
+  },
+  "visualizer": {
+    "moveToHereRotary": "Sposta qui non è disponibile per i file rotativi",
+    "mustBeIdleToMove": "La macchina deve essere connessa e inattiva per muoversi",
+    "movingTo": "Spostamento a X{{x}} Y{{y}}",
+    "unsupportedGcode_one": "Trovata {{count}} riga di G-code non supportato da GRBL in questo file. Il lavoro potrebbe non essere eseguito correttamente.",
+    "unsupportedGcode_other": "Trovate {{count}} righe di G-code non supportato da GRBL in questo file. Il lavoro potrebbe non essere eseguito correttamente.",
+    "grblHalOnlyShortcut": "Impossibile attivare la scorciatoia riservata a grblHAL",
+    "unsupportedGcode_many": "Trovate {{count}} righe di G-code non supportato da GRBL in questo file. Il lavoro potrebbe non essere eseguito correttamente."
+  },
+  "workspace": {
+    "modeSetDefault": "Modalità area di lavoro impostata su Predefinita",
+    "modeSetRotary": "Modalità area di lavoro impostata su Rotativa"
+  }
+}

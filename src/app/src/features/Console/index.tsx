@@ -1,5 +1,6 @@
 import { usePostHog } from '@posthog/react';
 import type { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import isElectron from 'is-electron';
@@ -75,7 +76,9 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
     const handleClear = () => {
         clearConsole();
 
-        toast.info('Console cleared', { position: 'bottom-right' });
+        toast.info(i18n.t('notifications:console.cleared'), {
+            position: 'bottom-right',
+        });
 
         posthog?.capture('console_cleared');
     };
@@ -95,7 +98,9 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
             );
 
             toast.success(
-                `Copied last ${lastMessages.length} commands to clipboard`,
+                i18n.t('notifications:console.commandsCopied', {
+                    count: lastMessages.length,
+                }),
                 {
                     duration: 3000,
                     position: 'bottom-right',
@@ -106,7 +111,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
                 commands: lastMessages.map((item) => item.message),
             });
         } catch (error) {
-            toast.error('Failed to copy commands to clipboard', {
+            toast.error(i18n.t('notifications:console.copyFailed'), {
                 duration: 3000,
                 position: 'bottom-right',
             });
@@ -116,7 +121,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
 
     const handlePopout = () => {
         if (!isElectron()) {
-            toast.info('This functionality is not available on web view.', {
+            toast.info(i18n.t('notifications:console.webViewUnavailable'), {
                 position: 'bottom-right',
             });
             return;

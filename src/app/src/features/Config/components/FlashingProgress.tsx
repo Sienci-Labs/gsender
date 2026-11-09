@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { ProgressBar } from 'app/components/ProgressBar';
 import controller from 'app/lib/controller.ts';
 import cn from 'classnames';
@@ -10,7 +11,15 @@ interface FlashMessage {
     timestamp: string;
 }
 
+const LOG_TYPE_KEYS = {
+    Info: 'config:flash.logType.info',
+    Success: 'config:flash.logType.success',
+    Warning: 'config:flash.logType.warning',
+    Error: 'config:flash.logType.error',
+} as const;
+
 export function FlashingProgress({ type }: { type: string }) {
+    const { t } = useAppTranslation();
     const [curValue, setCurValue] = useState(0);
     const [totalSize, setTotalSize] = useState(0);
     const [notifications, setNotifications] = useState<FlashMessage[]>([]);
@@ -19,10 +28,10 @@ export function FlashingProgress({ type }: { type: string }) {
         return notifications
             .map(
                 (message) =>
-                    `[${message.timestamp}] ${message.type}: ${message.content}`,
+                    `[${message.timestamp}] ${t(LOG_TYPE_KEYS[message.type])}: ${message.content}`,
             )
             .join('\n');
-    }, [notifications]);
+    }, [notifications, t]);
 
     function addNotification(message: FlashMessage) {
         setNotifications((prev) => [message, ...prev]);
@@ -56,7 +65,7 @@ export function FlashingProgress({ type }: { type: string }) {
         controller.addListener('flash:end', () => {
             addNotification({
                 type: 'Success',
-                content: 'Flash completed, please reconnect to your device.',
+                content: t('config:flash.completed'),
                 timestamp: getTimestamp(),
             });
         });
@@ -92,11 +101,13 @@ export function FlashingProgress({ type }: { type: string }) {
             />
             <div className="border rounded bg-white text-sm">
                 <div className="px-3 py-2 border-b text-gray-600">
-                    Flash log
+                    {t('config:flash.logTitle')}
                 </div>
                 <div className="px-3 py-2 h-40 overflow-y-auto">
                     {notifications.length === 0 ? (
-                        <div className="text-gray-600">Waiting for logs...</div>
+                        <div className="text-gray-600">
+                            {t('config:flash.logWaiting')}
+                        </div>
                     ) : (
                         notifications.map((message, index) => {
                             const typeClass = {
@@ -111,7 +122,7 @@ export function FlashingProgress({ type }: { type: string }) {
                                         [{message.timestamp}]
                                     </span>{' '}
                                     <span className={typeClass}>
-                                        {message.type}:
+                                        {t(LOG_TYPE_KEYS[message.type])}:
                                     </span>{' '}
                                     <span className="text-gray-800">
                                         {message.content}

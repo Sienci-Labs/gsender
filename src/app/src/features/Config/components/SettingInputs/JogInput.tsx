@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { IMPERIAL_UNITS } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
@@ -11,6 +12,7 @@ export interface JogInputProps {
 }
 
 export function JogInput({ unit, value, index, onChange }: JogInputProps) {
+    const { t } = useAppTranslation();
     const { units } = useWorkspaceState();
     const needsConvert = units === IMPERIAL_UNITS;
     let convertedValue = value;
@@ -67,7 +69,9 @@ export function JogInput({ unit, value, index, onChange }: JogInputProps) {
                 />
             </div>
             <div className="flex flex-row gap-2 justify-between items-center">
-                <span className="min-w-[7ch]">Speed:</span>
+                <span className="min-w-[7ch]">
+                    {t('config:inputs.jogSpeed')}
+                </span>
                 <ControlledInput
                     type="number"
                     onChange={(e) => customJogUpdater(e, 'feedrate')}

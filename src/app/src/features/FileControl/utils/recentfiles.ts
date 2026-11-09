@@ -21,6 +21,7 @@
  *
  */
 
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 
 import store from 'app/store';
@@ -75,12 +76,9 @@ export const updateRecentFileDate = (
 
 export const addRecentFile = (fileMetaData: RecentFile) => {
     if (fileMetaData === null) {
-        toast.error(
-            'Unable to load file - file may have been moved or deleted.',
-            {
-                position: 'bottom-right',
-            },
-        );
+        toast.error(i18n.t('notifications:files.loadFailed'), {
+            position: 'bottom-right',
+        });
         return;
     }
     const recentFiles = getRecentFiles();

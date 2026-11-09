@@ -1,5 +1,6 @@
 import api from 'app/api';
 import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import { i18n } from 'app/i18n';
 import {
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
@@ -680,9 +681,7 @@ const reportLoadFailure = (err: unknown): void => {
     setTimeout(() => {
         import('sonner')
             .then(({ toast }) =>
-                toast.error(
-                    'Could not load your settings from the gSender server. Defaults are shown and changes will not be saved until you reload.',
-                ),
+                toast.error(i18n.t('notifications:settings.loadFailed')),
             )
             .catch((e) => log.error(e));
     }, 2000);

@@ -1,0 +1,1231 @@
+{
+  "basics": {
+    "title": "Basics",
+    "carveScreenUnits": {
+      "label": "Carve screen units",
+      "description": "What units would you prefer to see on the carve screen? Config will always be metric since all common CNC firmware requires metric values as input."
+    },
+    "reconnectAutomatically": {
+      "label": "Reconnect automatically",
+      "description": "Automatically reconnect to the last machine you used when you open gSender."
+    },
+    "firmwareFallback": {
+      "label": "Firmware fallback",
+      "description": "The firmware gSender will resort to using if automatic detection fails."
+    },
+    "baudRate": {
+      "label": "Baud rate",
+      "description": "Needs to match up with the value your CNC uses. (Serial transmission speed, Default 115200)"
+    },
+    "safeHeight": {
+      "label": "Safe height",
+      "description": "Amount Z-axis will move up before moving in X/Y/A using go tos. (Doesn't apply to files, corner-movements, or parking, if homing is enabled this value becomes an offset from the top of the Z-axis, Default 0)"
+    },
+    "checkFileOnLoad": {
+      "label": "Check file on load",
+      "description": "Runs Check Mode ($C) anytime a new g-code file is loaded."
+    },
+    "outlineStyle": {
+      "label": "Outline style",
+      "description": "Choose how your files will be outlined. (Detailed takes longer and follows more closely, Square traces a simple bounding box, Rapidless Square does the same but ignores rapid/G0 moves, Default Detailed)"
+    },
+    "outlineSpeed": {
+      "label": "Outline speed",
+      "description": "Set the feed rate used when outlining. (Lower values provide more controlled movements, Default 0 runs outline at maximum/G0 speed)"
+    },
+    "revertWorkspace": {
+      "label": "Revert workspace",
+      "description": "Allow g-code 'job finishing' commands like M2 and M30 to reset your CNCs workspace back to G54 at the end of each job."
+    },
+    "powerSaving": {
+      "label": "Power Saving",
+      "description": "Allow screen to blank/sleep."
+    },
+    "promptOnExit": {
+      "label": "Prompt on exit",
+      "description": "Pop up a confirmation window when exiting the program."
+    },
+    "allowGcamToSendFiles": {
+      "label": "Allow gCAM to send files",
+      "description": "Let gCAM running on this computer load programs directly into gSender with \"Send to gSender\". Files are refused while a job is running."
+    },
+    "runSettingsBackup": {
+      "label": "Run settings backup",
+      "description": "Choose how often gSender will backup your settings. Useful in case you need to revert them in the future."
+    },
+    "settingsBackupLocation": {
+      "label": "Settings backup location",
+      "description": "Choose the location to backup your settings to. Default: your OS's appData location."
+    },
+    "importedPluginsLocation": {
+      "label": "Imported plugins location",
+      "description": "Choose the location to import your plugins to. Default: your OS's userData location.",
+      "restart": "Restart gSender to load plugins from the new location.",
+      "restartAbandoned": "Restart gSender to load plugins from the new location. Plugins in \"{{previousUserPluginsDir}}\" will no longer be scanned until you set this back.",
+      "updateFailed": "Failed to update the plugins location. Please try again."
+    },
+    "collectUsageData": {
+      "label": "Collect usage data",
+      "description": "This info is collected anonymously to help us improve gSender by seeing how people use it."
+    },
+    "uiOptionsGroup": "UI Options",
+    "darkMode": {
+      "label": "Dark mode",
+      "description": "Change the app colours for reduced eye strain, better contrast, or just for fun!"
+    },
+    "usePendantViewAsDefault": {
+      "label": "Use pendant view as default UI",
+      "description": "Launch directly into the touch-friendly pendant interface in fullscreen kiosk mode instead of the standard desktop UI. Requires an app restart to take effect.",
+      "restartTitle": "Restart Required",
+      "restartToPendant": "gSender needs to restart to switch to the pendant view.",
+      "restartToDesktop": "gSender needs to restart to switch back to the desktop view.",
+      "restartNow": "Restart Now",
+      "restartLater": "Later"
+    },
+    "droZeros": {
+      "label": "DRO zeros",
+      "description": "Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)"
+    },
+    "visualizerOptionsGroup": "Visualizer options",
+    "visualizerTheme": {
+      "label": "Visualizer theme",
+      "description": "Independent colour control for the visualizer."
+    },
+    "cameraProjection": {
+      "label": "Camera projection",
+      "description": "Perspective (default) shows depth like a normal camera view. Orthographic removes that depth distortion, keeping parallel lines parallel — useful for lining up toolpaths precisely."
+    },
+    "showBoundingBox": {
+      "label": "Show bounding box",
+      "description": "Draw a wireframe around the extents of the loaded G-code file."
+    },
+    "showBoundingBoxLabels": {
+      "label": "Show bounding box labels",
+      "description": "Show X/Y/Z dimension labels on the bounding box."
+    },
+    "showMachineBedIndicator": {
+      "label": "Show machine bed indicator",
+      "description": "Draw an outline of the machine's homed work area once homing is complete."
+    },
+    "trimGridToMachineBed": {
+      "label": "Trim grid to machine bed",
+      "description": "When the machine bed indicator is shown, clip the background grid to just past the bed's edges instead of a fixed square."
+    },
+    "hideProcessedLines": {
+      "label": "Hide processed lines",
+      "description": "Hide processed g-code lines in the visualizer."
+    },
+    "showPlannedLines": {
+      "label": "Show planned lines",
+      "description": "While a job runs, highlight the toolpath between the bit and the last line sent to the controller."
+    },
+    "animatePlannedLines": {
+      "label": "Animate planned lines",
+      "description": "A pulse runs along the planned lines in the order they will be cut."
+    },
+    "lightweightOptions": {
+      "label": "Lightweight options",
+      "description": "Enable with the feather when big files are slowing down your computer. (Light turns off 3D file view, Everything disables the visualizer)"
+    },
+    "followToolDuringRuntime": {
+      "label": "Follow tool during runtime",
+      "description": "While a job is running, pan the camera to track the tool in X/Y, keeping the same viewing angle and height."
+    },
+    "portraitMacroBar": {
+      "label": "Portrait macro bar",
+      "description": "Show a quick-access macro bar at the bottom of the screen in portrait mode."
+    },
+    "joggingPresetsGroup": "Jogging Presets",
+    "rapid": {
+      "label": "Rapid"
+    },
+    "normal": {
+      "label": "Normal",
+      "description": "Set the movement distances and speeds used for each jogging preset."
+    },
+    "precise": {
+      "label": "Precise"
+    },
+    "continuousJogDelay": {
+      "label": "Continuous jog delay",
+      "description": "Where regular presses or clicks make single movements, hold for this long to begin jogging continuously. Some might prefer a longer delay like 700. (Default 250)"
+    },
+    "notificationsGroup": "Notifications",
+    "warnIfBadFile": {
+      "label": "Warn if bad file",
+      "description": "Warns if any invalid commands are found when a file is opened."
+    },
+    "warnOnBadLine": {
+      "label": "Warn on bad line",
+      "description": "Warns if any invalid commands are found when running a job."
+    },
+    "warnWhenSettingZero": {
+      "label": "Warn when setting zero",
+      "description": "Useful if you tend to set zero accidentally."
+    },
+    "warnIfBeyondSoftLimits": {
+      "label": "Warn if beyond soft limits",
+      "description": "Warns if your file exceeds your machine limits based on the current zero point. (Homing and soft limits must be enabled)"
+    },
+    "jobEndNotifications": {
+      "label": "Job end notifications",
+      "description": "Show a carving summary at the end of each job."
+    },
+    "maintenanceNotifications": {
+      "label": "Maintenance notifications",
+      "description": "Show upcoming maintenance tasks at the end of each job."
+    },
+    "popUpNotificationDuration": {
+      "label": "Pop-up notification duration",
+      "description": "How long notifications stay visible, in milliseconds, before auto-dismissing. (-1 keeps them up until manually dismissed, -2 disables them, Default 0 keeps default duration)"
+    },
+    "shortcutsGroup": "Shortcuts",
+    "keyboard": {
+      "label": "Keyboard",
+      "description": "Control your CNC and navigate through gSender using custom key combinations on any keyboard, numpad, or macro pad."
+    },
+    "gamepad": {
+      "label": "Gamepad",
+      "description": "Easily jog, set zeros, start jobs, and more using most common gamepads. Create your own profile or use a pre-made one."
+    }
+  },
+  "customizeUi": {
+    "title": "Customize UI"
+  },
+  "motors": {
+    "title": "Motors",
+    "squareUpCncRails": {
+      "label": "Square up CNC rails",
+      "description": "Misaligned rails can cause 90 degree cuts to come out skewed, the wizard will help fix this."
+    },
+    "xAxisGroup": "X-axis",
+    "yAxisGroup": "Y-axis",
+    "zAxisGroup": "Z-axis"
+  },
+  "probe": {
+    "title": "Probe",
+    "touchPlateType": {
+      "label": "Touch plate type",
+      "description": "Select the touch plate you're using with your machine. (Default Standard block)"
+    },
+    "showTouchPlateSwitcher": {
+      "label": "Show touch plate switcher",
+      "description": "Show a button on Probe tab to allow switching between touch plate types."
+    },
+    "tipDiameter": {
+      "label": "Tip diameter",
+      "description": "Diameter of probe tip where it touches off the material. (Default 2)"
+    },
+    "blockThickness": {
+      "label": "Block thickness",
+      "description": "Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)"
+    },
+    "autozeroThickness": {
+      "label": "AutoZero thickness",
+      "description": "Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)"
+    },
+    "puckThickness": {
+      "label": "Puck thickness",
+      "description": "Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)"
+    },
+    "zOffset": {
+      "label": "Z offset",
+      "description": "Adjust to improve the Z zeroing accuracy of your probe. (Default 0)"
+    },
+    "bitzeroThicknessXyz": {
+      "label": "BitZero thickness (XYZ)",
+      "description": "Plate thickness for XYZ probing where the bit touches the inset surface inside the bore. (Default 13)"
+    },
+    "bitzeroThicknessZOnly": {
+      "label": "BitZero thickness (Z-only)",
+      "description": "Plate thickness for Z-only probing where the probe is placed flat on the surface. (Default 15.5)"
+    },
+    "xyThickness": {
+      "label": "XY thickness",
+      "description": "Plate thickness where the bit touches when X/Y-axis probing. (Default 10)"
+    },
+    "xyRetract": {
+      "label": "XY retract",
+      "description": "How much extra to move off the surface when probing. (Default 10)"
+    },
+    "zProbeDistance": {
+      "label": "Z probe distance",
+      "description": "Movement in Z before it gives up on probing. (Reduce this value if you get a soft limit alarm 2 when probing, Default 30)"
+    },
+    "fastFind": {
+      "label": "Fast find",
+      "description": "Probe speed before the first touch-off. (Default 150)"
+    },
+    "slowFind": {
+      "label": "Slow find",
+      "description": "Speed for the more accurate second touch-off. (Default 75)"
+    },
+    "retraction": {
+      "label": "Retraction",
+      "description": "How far the bit moves away after a successful touch. (Default 2)"
+    },
+    "probeMovementSpeed": {
+      "label": "Probe Movement Speed",
+      "description": "Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)"
+    },
+    "finalZRetract": {
+      "label": "Final Z retract",
+      "description": "How far to move away in the Z-axis at the end of the routine. (Default 2)"
+    },
+    "finalZRetract2": {
+      "label": "Final Z retract",
+      "description": "How far to move away in the Z-axis at the end of the routine. (Default 1)"
+    },
+    "connectionTest": {
+      "label": "Connection test",
+      "description": "Safety check to make sure your probe is connected correctly."
+    }
+  },
+  "actionButtons": {
+    "title": "Action Buttons"
+  },
+  "homingLimits": {
+    "title": "Homing/Limits",
+    "stopJoggingPastLimits": {
+      "label": "Stop jogging past limits",
+      "description": "Prevent jogging in a direction where a limit switch has already been triggered."
+    },
+    "homingBehaviourGroup": "Homing Behaviour",
+    "parkingGroup": "Parking",
+    "parkLocation": {
+      "label": "Park location",
+      "description": "The P on the main Carve page will always take you to this convenient parking spot. (Homing must be enabled)"
+    }
+  },
+  "spindleLaser": {
+    "title": "Spindle/Laser",
+    "spindleLaserControls": {
+      "label": "Spindle/laser controls",
+      "description": "Show the Spindle/Laser tab and related functions on the main Carve page."
+    },
+    "insertDwellForSpindleCommands": {
+      "label": "Insert dwell for spindle commands",
+      "description": "Adds a delay to give the spindle time to spin up.  This will insert a G4 command on every M3/M4 within the file, and is unnecessary if your firmware otherwise handles spindle-at-speed operations. (Default 0)"
+    },
+    "minimumSpindleSpeed": {
+      "label": "Minimum spindle speed",
+      "description": "Match this to the minimum speed of your spindle. ($31, Default 10000)"
+    },
+    "maximumSpindleSpeed": {
+      "label": "Maximum spindle speed",
+      "description": "Match this to the maximum speed of your spindle. ($30, Default 30000)"
+    },
+    "spindlePwmGroup": "Spindle PWM",
+    "spindleModbusGroup": "Spindle Modbus",
+    "laserGroup": "Laser",
+    "minimumLaserPower": {
+      "label": "Minimum laser power",
+      "description": "Match this to the minimum S word setting in your laser CAM software. ($731, Default 0)"
+    },
+    "maximumLaserPower": {
+      "label": "Maximum laser power",
+      "description": "Match this to the maximum S word setting in your laser CAM software. ($730, Default 255.000)"
+    },
+    "laserOnDuringOutline": {
+      "label": "Laser on during outline",
+      "description": "Turn on the laser at it's lowest power to see the job position better."
+    },
+    "laserXOffset": {
+      "label": "Laser X offset",
+      "description": "X-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $741, Default 0)"
+    },
+    "laserYOffset": {
+      "label": "Laser Y offset",
+      "description": "Y-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $742, Default 0)"
+    }
+  },
+  "accessoryOutputs": {
+    "title": "Accessory Outputs",
+    "coolantControls": {
+      "label": "Coolant controls",
+      "description": "Show the coolant tab and related functions on the main Carve page."
+    }
+  },
+  "rotary": {
+    "title": "Rotary",
+    "rotaryControls": {
+      "label": "Rotary controls",
+      "description": "Show the Rotary tab and related functions on the main Carve page."
+    },
+    "resolution": {
+      "label": "Resolution",
+      "description": "Travel resolution in steps per degree. ($103, Default 19.75308642)"
+    },
+    "maxSpeed": {
+      "label": "Max speed",
+      "description": "Max axis speed, also used for G0 rapids. ($113, Default 8000)"
+    },
+    "forceSoftLimits": {
+      "label": "Force soft limits",
+      "description": "Enable soft limits when toggling into rotary mode. (grbl only)"
+    },
+    "forceHardLimits": {
+      "label": "Force hard limits",
+      "description": "Enable hard limits when toggling into rotary mode. (grbl only)"
+    },
+    "visualizeNonCenterZeros": {
+      "label": "Visualize non-center zeros",
+      "description": "For any rotary files that aren't zeroed to the centerpoint, apply an offset when a cylinder diameter is found in the file."
+    },
+    "useAAxisForGrbl": {
+      "label": "Use A-axis for grbl",
+      "description": "Enables A-axis controls and commands to be sent for devices running modified 4-axis grbl, rather than translating A into Y. (grbl only)"
+    }
+  },
+  "automations": {
+    "title": "Automations",
+    "fileStart": {
+      "label": "File start",
+      "description": "Runs when you start a job, before the file itself runs."
+    },
+    "filePause": {
+      "label": "File pause",
+      "description": "If you'd like to stop accessories or move out of the way when you pause during a job."
+    },
+    "fileResume": {
+      "label": "File resume",
+      "description": "Ensure that anything you set up for File pause is undone when you resume."
+    },
+    "fileStopEnd": {
+      "label": "File stop/end",
+      "description": "A catch-all to ensure that stopped or ended jobs always safely turn everything off."
+    }
+  },
+  "toolChanging": {
+    "title": "Tool Changing",
+    "enableAtcControls": {
+      "label": "Enable ATC Controls",
+      "description": "Enable ATC Controls"
+    },
+    "passthrough": {
+      "label": "Passthrough",
+      "description": "Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands."
+    },
+    "gsenderStrategy": {
+      "label": "gSender strategy",
+      "description": "Standard wizard will guide you through the steps to manually set up a new tool and resume cutting.\n\nFlexible is similar but uses a touch plate like a tool length sensor.\n\nFixed is also guided but fully automated, moving around and measuring tools for you. Homing and TLS required.\n\nCode is for fully custom setups."
+    },
+    "skipDialog": {
+      "label": "Skip dialog",
+      "description": "Won't prompt on Pause, and won't pause between Code blocks."
+    },
+    "fixedSensorLocation": {
+      "label": "Fixed sensor location",
+      "description": "The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)"
+    },
+    "firstToolBehaviour": {
+      "label": "First tool behaviour",
+      "description": "Control how the first tool change is handled. Many CAM programs add an initial tool change command even when you already have the tool loaded.\n\n\"Always run full wizard\" runs the complete tool change process.\n\n\"Prompt for first tool\" asks whether to run the full wizard or just probe the current tool length.\n\n\"Always probe length only\" skips the tool change and only measures the current tool."
+    },
+    "setToolChangeLocation": {
+      "label": "Set tool change location",
+      "description": "Move the CNC to a more convenient location for manual tool changes instead of prompting to change over the sensor."
+    },
+    "manualToolChangeLocation": {
+      "label": "Manual tool change location",
+      "description": "The location to move to when manually changing tools."
+    },
+    "beforeToolChange": {
+      "label": "Before tool change",
+      "description": "When using the Code strategy, this code is run as soon as an M6 command is encountered."
+    },
+    "afterToolChange": {
+      "label": "After tool change",
+      "description": "When using the Code strategy, this code is run after a tool change is completed."
+    },
+    "keepoutGroup": "Keepout",
+    "warnOnHome": {
+      "label": "Warn on home",
+      "description": "Warn when homing that the keepout area is disabled and collisions are possible depending on the homing cycle."
+    }
+  },
+  "ethernet": {
+    "title": "Ethernet",
+    "connectToIp": {
+      "label": "Connect to IP",
+      "description": "IP address used to connect to CNCs over Ethernet and other network scanning. (Default 192.168.5.1)"
+    },
+    "ethernetPort": {
+      "label": "Ethernet port",
+      "description": "The port exposed by the controller for Ethernet connectivity. (Used when attempting to connect over Ethernet, Default 23)"
+    }
+  },
+  "statusLights": {
+    "title": "Status Lights"
+  },
+  "advancedMotors": {
+    "title": "Advanced Motors"
+  },
+  "moreSettings": {
+    "title": "More Settings"
+  },
+  "accessibility": {
+    "title": "Accessibility",
+    "announcementsGroup": "Announcements",
+    "machineStatus": {
+      "label": "Machine status",
+      "description": "Automatically announce machine status changes using screen readers. (Idle, Running, Alarm, etc.)"
+    },
+    "jobProgress": {
+      "label": "Job progress",
+      "description": "Periodically announce job completion percentage."
+    },
+    "progressIncrement": {
+      "label": "Progress increment",
+      "description": "The percentage increment at which to announce job progress. (Default 10%)"
+    },
+    "audioCuesGroup": "Audio Cues",
+    "enableAudioCues": {
+      "label": "Enable audio cues",
+      "description": "Play short sounds for specific machine events."
+    },
+    "jobCompleteSound": {
+      "label": "Job complete sound",
+      "description": "Play sound when a job finishes."
+    },
+    "alarmSound": {
+      "label": "Alarm sound",
+      "description": "Play sound when the machine enters an alarm state."
+    },
+    "toolChangeSound": {
+      "label": "Tool change sound",
+      "description": "Play sound when a tool change is required."
+    },
+    "probeSuccessSound": {
+      "label": "Probe success sound",
+      "description": "Play sound after a successful probe."
+    },
+    "navigationAndVisualsGroup": "Navigation & Visuals",
+    "focusRings": {
+      "label": "Focus rings",
+      "description": "Show a high-contrast ring around the currently focused element for better keyboard navigation visibility."
+    },
+    "focusTrapping": {
+      "label": "Focus trapping",
+      "description": "Keep keyboard focus within modals and dialogs when they are open."
+    },
+    "reducedMotion": {
+      "label": "Reduced motion",
+      "description": "Minimize animations and UI transitions for improved visibility and accessibility."
+    },
+    "spindleSpeedInputType": {
+      "label": "Spindle speed input type",
+      "description": "Choose between a slider or a number input for adjusting spindle speed."
+    },
+    "appDisplayScale": {
+      "label": "App display scale",
+      "description": "Override the app's display scale independently of your OS' DPI settings."
+    },
+    "visualizerGroup": "Visualizer",
+    "keyboardControl": {
+      "label": "Keyboard control",
+      "description": "Allow orbiting, panning, and zooming of the 3D visualizer using arrow keys and hotkeys."
+    },
+    "jobSummary": {
+      "label": "Job summary",
+      "description": "Provide a text summary of the loaded g-code file for screen readers."
+    },
+    "showSummaryVisually": {
+      "label": "Show summary visually",
+      "description": "Display the g-code summary text visually above the visualizer."
+    },
+    "keyboardMapGroup": "Keyboard Map",
+    "showKeyboardShortcutMap": {
+      "label": "Show keyboard shortcut map",
+      "description": "Show an overlay with active keyboard shortcuts."
+    }
+  },
+  "options": {
+    "outline": {
+      "detailed": "Detailed",
+      "square": "Square",
+      "rapidlessSquare": "Rapidless Square"
+    },
+    "backupFrequency": {
+      "onUpdate": "On Update",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "projection": {
+      "perspective": "Perspective",
+      "orthographic": "Orthographic"
+    },
+    "lightweight": {
+      "light": "Light",
+      "everything": "Everything"
+    },
+    "toolChangeStrategy": {
+      "ignore": "Ignore",
+      "pause": "Pause",
+      "standardRezero": "Standard Re-zero",
+      "flexibleRezero": "Flexible Re-zero",
+      "fixedToolSensor": "Fixed Tool Sensor",
+      "code": "Code"
+    },
+    "firstToolBehaviour": {
+      "alwaysRunFullWizard": "Always run full wizard",
+      "promptForFirstTool": "Prompt for first tool",
+      "alwaysProbeLengthOnly": "Always probe length only"
+    },
+    "spindleInputType": {
+      "slider": "Slider",
+      "number": "Number"
+    }
+  },
+  "row": {
+    "resetTooltip": "Reset to default value",
+    "resetTitle": "Reset setting",
+    "resetConfirm": "Are you sure you want to reset this value to default?",
+    "resetPluginsDirIntro": "Resetting this will stop gSender from scanning:",
+    "resetPluginsDirWarning": "Plugins imported there will disappear from the Plugin Manager until you set this back. Are you sure you want to reset this value to default?",
+    "restored": "Restored {{setting}} to default value of {{value}}",
+    "noDefault": "No default found for {{setting}}."
+  },
+  "page": {
+    "allConfigTab": "All Config",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search Config",
+    "searchClear": "Clear",
+    "viewModified": "View Modified",
+    "modified": "Modified",
+    "viewModifiedAria": "View only modified settings",
+    "disconnected": "Disconnected",
+    "disconnectedTitle": "Disconnected!",
+    "disconnectedMessage": "Some settings may not appear unless connected to a machine.",
+    "emptySection": "Check your search filter or connect to your machine to see more options."
+  },
+  "preferences": {
+    "legend": "gSender Preferences",
+    "import": "Import",
+    "export": "Export",
+    "importTitle": "Import Settings",
+    "importConfirm": "All your current settings will be replaced. Are you sure you want to import your settings on gSender?",
+    "importAction": "Import Settings",
+    "restoreTitle": "Restore Settings",
+    "restoreConfirm": "All your current settings will be removed. Are you sure you want to restore default settings on gSender?",
+    "restoreAction": "Restore Settings",
+    "importFailed": "Failed to import settings. Please check the file format.",
+    "settingsUpdated_one": "Updated {{count}} setting.",
+    "settingsUpdated_other": "Updated {{count}} settings."
+  },
+  "profileBar": {
+    "flash": "Flash",
+    "import": "Import",
+    "export": "Export",
+    "apply": "Apply",
+    "applySettings": "Apply Settings",
+    "eepromImported": "EEPROM Settings imported",
+    "importFailed": "Failed to import settings. Please check the file format.",
+    "importUnable": "Unable to import settings",
+    "eepromUpdated_one": "Updated {{count}} EEPROM value.",
+    "eepromUpdated_other": "Updated {{count}} EEPROM values."
+  },
+  "restoreDefaults": {
+    "button": "Defaults",
+    "title": "Restore Defaults",
+    "confirm": "Are you sure you want to restore your <1>{{machineName}}</1> back to its default state?",
+    "action": "Restore Defaults",
+    "tooltip": "Make sure you click to apply your defaults to your controller",
+    "restored": "Restored default settings for your machine."
+  },
+  "flash": {
+    "title": "Flash Firmware",
+    "intro": "This feature exists to flash firmware onto a compatible SLB or Arduino-based device.",
+    "port": "Port",
+    "recognizedPorts": "Recognized Ports",
+    "unrecognizedPorts": "Unrecognized Ports",
+    "controllerType": "Controller Type",
+    "selectBoardType": "Select board type",
+    "firmwareFile": "Firmware File",
+    "warning": "This process will disconnect your machine, and may take a couple of minutes to complete.",
+    "continuePrompt": "Continue?",
+    "noPort": "No port specified - please connect to the device to determine what is being flashed.",
+    "logTitle": "Flash log",
+    "logWaiting": "Waiting for logs...",
+    "completed": "Flash completed, please reconnect to your device.",
+    "logType": {
+      "info": "Info",
+      "success": "Success",
+      "warning": "Warning",
+      "error": "Error"
+    }
+  },
+  "eepromRow": {
+    "resetTitle": "Reset Single EEPROM Value",
+    "machineSetting": "Machine setting",
+    "settingDefault": "({{setting}}, Default {{value}})"
+  },
+  "wizards": {
+    "configureGamepad": "Configure Gamepad",
+    "configureKeyboard": "Configure Keyboard",
+    "squareXY": "Square XY",
+    "tuneCorrection": "Tune Correction",
+    "jogMinus": "Jog {{axis}}-",
+    "jogPlus": "Jog {{axis}}+",
+    "laserOn": "Laser On",
+    "laserOff": "Laser Off",
+    "spindleForward": "For",
+    "spindleReverse": "Rev",
+    "spindleStop": "Stop",
+    "setupAutoSpin": "Setup AutoSpin",
+    "autoSpinIcon": "AutoSpin Icon",
+    "probePin": "Probe/TLS:",
+    "configureAtci": "Configure Sienci ATCi",
+    "atciRequiresGrblHal": "ATCi is only supported by boards running grblHAL.",
+    "atciMinVersion": "ATCi is only supported by grblHAL version {{version}} or above.",
+    "atciRestartTitle": "ATCi - Restart your Controller",
+    "atciRestartMessage": "Please manually restart your CNC controller (power cycle) and reconnect to gSender for these settings to take effect."
+  },
+  "inputs": {
+    "eventEditTitle": "Edit Event",
+    "eventDialogDescription": "Enter the G-code commands to run for this event.",
+    "eventEnabled": "Enabled:",
+    "eventNoCommands": "; No commands set",
+    "eventEdit": "Edit Event",
+    "eventFetchFailed": "Unable to fetch event data {{eventType}}",
+    "eventSaveFailed": "Unable to save event commands",
+    "locationGrab": "Grab",
+    "locationGoTo": "Go To",
+    "jogSpeed": "Speed:",
+    "chooseFolder": "Choose Folder",
+    "bit": "Bit {{bit}}: {{label}}"
+  },
+  "firmware": {
+    "grbl": {
+      "0": {
+        "description": "Step pulse time",
+        "details": "Sets time length per step. Minimum 3usec."
+      },
+      "1": {
+        "description": "Step idle delay",
+        "details": "Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay."
+      },
+      "2": {
+        "description": "Step pulse invert",
+        "details": "Inverts the step signal. Set axis bit to invert (00000ZYX)."
+      },
+      "3": {
+        "description": "Step direction invert",
+        "details": "Inverts the direction signal. Set axis bit to invert (00000ZYX)."
+      },
+      "4": {
+        "description": "Invert step enable pin",
+        "details": "Inverts the stepper driver enable pin signal."
+      },
+      "5": {
+        "description": "Invert limit pins",
+        "details": "Inverts the all of the limit input pins."
+      },
+      "6": {
+        "description": "Invert probe pin",
+        "details": "Inverts the probe input pin signal."
+      },
+      "10": {
+        "description": "Status report options",
+        "details": "Alters data included in status reports."
+      },
+      "11": {
+        "description": "Junction deviation",
+        "details": "Sets how fast Grbl travels through consecutive motions. Lower value slows it down."
+      },
+      "12": {
+        "description": "Arc tolerance",
+        "details": "Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance."
+      },
+      "13": {
+        "description": "Report in inches",
+        "details": "Enables inch units when returning any position and rate value that is not a settings value."
+      },
+      "20": {
+        "description": "Soft limits enable",
+        "details": "Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing."
+      },
+      "21": {
+        "description": "Hard limits enable",
+        "details": "Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered."
+      },
+      "22": {
+        "description": "Homing cycle enable",
+        "details": "Enables homing cycle. Requires limit switches on all axes."
+      },
+      "23": {
+        "description": "Homing direction invert",
+        "details": "Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction."
+      },
+      "24": {
+        "description": "Homing locate feed rate",
+        "details": "Feed rate to slowly engage limit switch to determine its location accurately."
+      },
+      "25": {
+        "description": "Homing search seek rate",
+        "details": "Seek rate to quickly find the limit switch before the slower locating phase."
+      },
+      "26": {
+        "description": "Homing switch debounce delay",
+        "details": "Sets a short delay between phases of homing cycle to let a switch debounce."
+      },
+      "27": {
+        "description": "Homing switch pull-off distance",
+        "details": "Retract distance after triggering switch to disengage it. Homing will fail if switch isn't cleared."
+      },
+      "30": {
+        "description": "Maximum spindle speed",
+        "details": "Maximum spindle speed. Sets PWM to 100% duty cycle."
+      },
+      "31": {
+        "description": "Minimum spindle speed",
+        "details": "Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle."
+      },
+      "32": {
+        "description": "Laser-mode enabled as spindle",
+        "details": "Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed."
+      },
+      "100": {
+        "description": "X-axis travel resolution",
+        "details": "X-axis travel resolution in steps per millimeter."
+      },
+      "101": {
+        "description": "Y-axis travel resolution",
+        "details": "Y-axis travel resolution in steps per millimeter."
+      },
+      "102": {
+        "description": "Z-axis travel resolution",
+        "details": "Z-axis travel resolution in steps per millimeter."
+      },
+      "110": {
+        "description": "X-axis maximum rate",
+        "details": "X-axis maximum rate. Used as G0 rapid rate."
+      },
+      "111": {
+        "description": "Y-axis maximum rate",
+        "details": "Y-axis maximum rate. Used as G0 rapid rate."
+      },
+      "112": {
+        "description": "Z-axis maximum rate",
+        "details": "Z-axis maximum rate. Used as G0 rapid rate."
+      },
+      "120": {
+        "description": "X-axis acceleration",
+        "details": "X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps."
+      },
+      "121": {
+        "description": "Y-axis acceleration",
+        "details": "Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps."
+      },
+      "122": {
+        "description": "Z-axis acceleration",
+        "details": "Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps."
+      },
+      "130": {
+        "description": "X-axis maximum travel",
+        "details": "Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances."
+      },
+      "131": {
+        "description": "Y-axis maximum travel",
+        "details": "Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances."
+      },
+      "132": {
+        "description": "Z-axis maximum travel",
+        "details": "Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances."
+      }
+    },
+    "grblhal": {
+      "0": {
+        "description": "Step pulse time",
+        "details": "Sets time length per step. Minimum 3usec."
+      },
+      "1": {
+        "description": "Step idle delay",
+        "details": "Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay."
+      },
+      "2": {
+        "description": "Step pulse invert",
+        "details": "Inverts the step signal. Set axis bit to invert (00000ZYX)."
+      },
+      "3": {
+        "description": "Step direction invert",
+        "details": "Inverts the direction signal. Set axis bit to invert (00000ZYX)."
+      },
+      "4": {
+        "description": "Invert step enable pin",
+        "details": "Inverts the stepper driver enable pin signal."
+      },
+      "5": {
+        "description": "Invert limit pins",
+        "details": "Inverts the all of the limit input pins."
+      },
+      "6": {
+        "description": "Invert probe pin",
+        "details": "Inverts the probe input pin signal."
+      },
+      "10": {
+        "description": "Status report options",
+        "details": "Alters data included in status reports."
+      },
+      "11": {
+        "description": "Junction deviation",
+        "details": "Sets how fast Grbl travels through consecutive motions. Lower value slows it down."
+      },
+      "12": {
+        "description": "Arc tolerance",
+        "details": "Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance."
+      },
+      "13": {
+        "description": "Report in inches",
+        "details": "Enables inch units when returning any position and rate value that is not a settings value."
+      },
+      "20": {
+        "description": "Soft limits enable",
+        "details": "Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing."
+      },
+      "21": {
+        "description": "Hard limits enable",
+        "details": "Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.",
+        "bits": {
+          "0": "Enable Hard Limits",
+          "1": "Enable Strict Mode when Hard Limits enabled"
+        }
+      },
+      "22": {
+        "description": "Homing cycle enable",
+        "details": "Enables homing cycle. Requires limit switches on all axes.",
+        "bits": {
+          "0": "Enable homing.",
+          "1": "Enable single axis homing commands.",
+          "2": "Homing on startup required.",
+          "3": "Set machine origin to 0.",
+          "4": "Two switches shares one input pin.",
+          "5": "Allow manual homing of axes not automatically homed.",
+          "6": "Override locks, allow reset to clear homing on startup required alarm.",
+          "7": "Keep homed status on reset if possible."
+        }
+      },
+      "23": {
+        "description": "Homing direction invert",
+        "details": "Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction."
+      },
+      "24": {
+        "description": "Homing locate feed rate",
+        "details": "Feed rate to slowly engage limit switch to determine its location accurately."
+      },
+      "25": {
+        "description": "Homing search seek rate",
+        "details": "Seek rate to quickly find the limit switch before the slower locating phase."
+      },
+      "26": {
+        "description": "Homing switch debounce delay",
+        "details": "Sets a short delay between phases of homing cycle to let a switch debounce."
+      },
+      "27": {
+        "description": "Homing switch pull-off distance",
+        "details": "Retract distance after triggering switch to disengage it. Homing will fail if switch isn't cleared."
+      },
+      "28": {
+        "description": "G73 pull-off distance",
+        "details": "Specifies G73 retract distance in mm."
+      },
+      "29": {
+        "description": "Step Pulse Delay",
+        "details": "Stepper pulse delay in microseconds."
+      },
+      "30": {
+        "description": "Maximum spindle speed",
+        "details": "Maximum spindle speed. Sets PWM to 100% duty cycle."
+      },
+      "31": {
+        "description": "Spindle Mode",
+        "details": "Specifies Spindle/Laser/Lathe mode"
+      },
+      "32": {
+        "description": "Laser-mode enabled as spindle",
+        "details": "Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed."
+      },
+      "33": {
+        "description": "Spindle Frequency",
+        "details": "Spindle PWM frequency in Hz"
+      },
+      "34": {
+        "description": "Spindle Duty Cycle",
+        "details": "Spindle off PWM duty cycle in percent"
+      },
+      "35": {
+        "description": "Minimum spindle speed",
+        "details": "Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle."
+      },
+      "36": {
+        "description": "Maximum spindle speed",
+        "details": "Maximum spindle speed."
+      },
+      "37": {
+        "description": "Deenergized Steppers",
+        "details": "Defines which steppers is to be deenergized when motion completes."
+      },
+      "38": {
+        "description": "Encoder Pulses",
+        "details": "Spindle encoder pulses per revolution."
+      },
+      "39": {
+        "description": "Printable Command Characters",
+        "details": "Enable printable realtime command characters."
+      },
+      "40": {
+        "description": "Soft Limits Jogging",
+        "details": "Enable soft limits for jogging. When enabled jog targets will be limited to machine travel limits for homed axes."
+      },
+      "43": {
+        "description": "Homing Locate Cycle",
+        "details": "Number of homing locate cycles."
+      },
+      "44": {
+        "description": "Axis Mask",
+        "details": "Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc."
+      },
+      "45": {
+        "description": "Axis Mask",
+        "details": "Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc."
+      },
+      "46": {
+        "description": "Axis Mask",
+        "details": "Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc."
+      },
+      "47": {
+        "description": "Axis Mask",
+        "details": "Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc."
+      },
+      "48": {
+        "description": "Axis Mask",
+        "details": "Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc."
+      },
+      "49": {
+        "description": "Axis Mask",
+        "details": "Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc."
+      },
+      "50": {
+        "description": "Jogging Step Speed",
+        "details": "Jogging step speed in mm/min. Used by driver/sender"
+      },
+      "51": {
+        "description": "Jogging Slow Speed",
+        "details": "Jogging slow speed in mm/min. Used by driver/sender"
+      },
+      "52": {
+        "description": "Jogging Fast Speed",
+        "details": "Jogging fast speed in mm/min. Used by driver/sender"
+      },
+      "53": {
+        "description": "Jogging Step Distance",
+        "details": "Jogging step distance in mm. Used by driver/sender"
+      },
+      "54": {
+        "description": "Jogging Slow Distance",
+        "details": "Jogging slow distance in mm. Used by driver/sender"
+      },
+      "55": {
+        "description": "Jogging Fast Distance",
+        "details": "Jogging fast distance in mm. Used by driver/sender"
+      },
+      "60": {
+        "description": "Restore Default Overrides",
+        "details": "Restore default overrides when program ends."
+      },
+      "61": {
+        "description": "Ignore Safety Door Signal",
+        "details": "Ignore safety door signal when idle. If on only the spindle (laser) will be switched off. May be useful if positioning a laser head with the lid open is needed."
+      },
+      "62": {
+        "description": "Sleep Function",
+        "details": "Enable sleep function."
+      },
+      "63": {
+        "description": "Disable Laser on Hold",
+        "details": "Disable laser during hold."
+      },
+      "64": {
+        "description": "Alarm on Startup",
+        "details": "Force grbl to enter alarm mode on startup."
+      },
+      "65": {
+        "description": "Allow Feedrate Override",
+        "details": "Allow feed rate override during probing."
+      },
+      "70": {
+        "description": "Network Service",
+        "details": "Specify Network Service."
+      },
+      "71": {
+        "description": "Bluetooth Device",
+        "details": "Bluetooth device name."
+      },
+      "72": {
+        "description": "Bluetooth Service",
+        "details": "Bluetooth service name."
+      },
+      "73": {
+        "description": "Wi-Fi Mode",
+        "details": "Wi-Fi Mode."
+      },
+      "74": {
+        "description": "Wi-Fi STA SSID",
+        "details": "WiFi STA (Station) SSID."
+      },
+      "75": {
+        "description": "Wi-Fi STA Password",
+        "details": "WiFi STA (Station) password."
+      },
+      "76": {
+        "description": "Wi-Fi AP SSID",
+        "details": "WiFi AP (Access Point) SSID."
+      },
+      "77": {
+        "description": "Wi-Fi AP Password",
+        "details": "WiFi AP (Access Point) password."
+      },
+      "78": {
+        "description": "Wi-Fi Country",
+        "details": "WiFi AP Country (Access Point)."
+      },
+      "79": {
+        "description": "Wi-Fi AP Channel Password",
+        "details": "WiFi AP Channel (Access Point) password."
+      },
+      "80": {
+        "description": "Spindle PID Regulator Proportional Gain",
+        "details": "Spindle PID regulator proportional gain."
+      },
+      "81": {
+        "description": "Spindle PID Regulator Integral Gain",
+        "details": "Spindle PID regulator integral gain."
+      },
+      "82": {
+        "description": "Spindle PID Regulator Derivative Gain",
+        "details": "Spindle PID regulator derivative gain."
+      },
+      "84": {
+        "description": "Spindle PID Max Output Error",
+        "details": "Spindle PID max output error."
+      },
+      "85": {
+        "description": "Spindle PID Max Output Error",
+        "details": "Spindle PID regulator max integral error."
+      },
+      "90": {
+        "description": "Spindle Sunced Motion PID Regulator Proportional Gain",
+        "details": "Spindle synced motion PID regulator proportional gain."
+      },
+      "91": {
+        "description": "Spindle Sunced Motion PID Regulator Integral Gain",
+        "details": "Spindle synced motion PID regulator integral gain."
+      },
+      "92": {
+        "description": "Spindle Sunced Motion PID Regulator Derivative Gain",
+        "details": "Spindle synced motion PID regulator derivative gain."
+      },
+      "100": {
+        "description": "X-axis travel resolution",
+        "details": "X-axis travel resolution in steps per millimeter."
+      },
+      "101": {
+        "description": "Y-axis travel resolution",
+        "details": "Y-axis travel resolution in steps per millimeter."
+      },
+      "102": {
+        "description": "Z-axis travel resolution",
+        "details": "Z-axis travel resolution in steps per millimeter."
+      },
+      "110": {
+        "description": "X-axis maximum rate",
+        "details": "X-axis maximum rate. Used as G0 rapid rate."
+      },
+      "111": {
+        "description": "Y-axis maximum rate",
+        "details": "Y-axis maximum rate. Used as G0 rapid rate."
+      },
+      "112": {
+        "description": "Z-axis maximum rate",
+        "details": "Z-axis maximum rate. Used as G0 rapid rate."
+      },
+      "120": {
+        "description": "X-axis acceleration",
+        "details": "X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps."
+      },
+      "121": {
+        "description": "Y-axis acceleration",
+        "details": "Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps."
+      },
+      "122": {
+        "description": "Z-axis acceleration",
+        "details": "Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps."
+      },
+      "130": {
+        "description": "X-axis maximum travel",
+        "details": "Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances."
+      },
+      "131": {
+        "description": "Y-axis maximum travel",
+        "details": "Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances."
+      },
+      "132": {
+        "description": "Z-axis maximum travel",
+        "details": "Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances."
+      },
+      "340": {
+        "description": "Spindle at speed tolerance",
+        "details": "Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay."
+      },
+      "341": {
+        "description": "Manual tool change mode",
+        "details": "Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay."
+      },
+      "342": {
+        "description": "Probing distance",
+        "details": "Used in mode 1 and 2 when $TPW command is issued and in mode 3."
+      },
+      "343": {
+        "description": "Probing slow feed rate",
+        "details": "Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an accurate tool offset."
+      },
+      "344": {
+        "description": "Probing seek feed rate",
+        "details": "Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an initial tool offset. If successful tool is backed off a bit and probing is redone with the slow feed rate from $343."
+      },
+      "3x0": {
+        "description": "Hostname",
+        "details": "Hostname."
+      },
+      "3x1": {
+        "description": "IP Mode",
+        "details": "Interface IP mode."
+      },
+      "3x2": {
+        "description": "Interface Gateway Address",
+        "details": "Interface gateway address. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text."
+      },
+      "3x3": {
+        "description": "Interface Netmask",
+        "details": "Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text."
+      },
+      "3x4": {
+        "description": "Interface Netmask",
+        "details": "Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text."
+      },
+      "3x5": {
+        "description": "Telnet port",
+        "details": "Port for serial communication, may be telnet protocol or a simple socket stream."
+      },
+      "3x6": {
+        "description": "HTTP port",
+        "details": "Web server port."
+      },
+      "3x7": {
+        "description": "Websocket port",
+        "details": "Port for two way communication, typically with web browser. Usually used for serial communication by grbl."
+      }
+    }
+  }
+}

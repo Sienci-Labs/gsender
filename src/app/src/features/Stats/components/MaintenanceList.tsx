@@ -19,6 +19,7 @@ import {
     type MaintenanceTask,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
+import { i18n } from 'app/i18n';
 import { AlertCircle, CheckCircle, Pen } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 
@@ -210,11 +211,10 @@ export function MaintenanceList() {
 
     function onResetAll() {
         Confirm({
-            title: 'Reset All Tasks',
-            content:
-                'Are you sure you want to reset the times for every Maintenance Task?',
-            confirmLabel: 'Reset',
-            cancelLabel: 'Cancel',
+            title: i18n.t('notifications:stats.resetAllTasks.title'),
+            content: i18n.t('notifications:stats.resetAllTasks.content'),
+            confirmLabel: i18n.t('common:actions.reset'),
+            cancelLabel: i18n.t('common:actions.cancel'),
             onConfirm: () => {
                 const updatedTasks = maintenanceTasks.map((task, _i) => {
                     task.currentTime = 0;

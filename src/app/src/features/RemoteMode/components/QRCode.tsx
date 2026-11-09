@@ -1,4 +1,5 @@
 import Button from 'app/components/Button';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import { FaCopy } from 'react-icons/fa';
 import QRCode from 'react-qr-code';
@@ -10,13 +11,11 @@ export function QRCodeDisplay({ address = '192.168.0.10:8000' }) {
         const { success } = await copyToClipboard(address);
 
         if (success) {
-            toast.success('Copied link to clipboard');
+            toast.success(i18n.t('notifications:remoteMode.linkCopied'));
             return;
         }
 
-        toast.error(
-            'There was an error copying the link to the clipboard, please copy it manually.',
-        );
+        toast.error(i18n.t('notifications:remoteMode.linkCopyFailed'));
     };
 
     const webAddress = `${address}`;

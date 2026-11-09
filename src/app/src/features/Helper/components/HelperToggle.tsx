@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { TOOLBAR_CATEGORY } from 'app/constants';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
@@ -17,6 +18,7 @@ interface HelperToggleProps {
 }
 
 export function HelperToggle({ minimized }: HelperToggleProps) {
+    const { t } = useAppTranslation();
     const {
         wizardActive,
         infoHelperActive,
@@ -74,7 +76,7 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
             type="button"
             disabled={!helperEnabled}
             onClick={handleToggle}
-            aria-label={helperTitle || 'Help Assistant'}
+            aria-label={helperTitle || t('helper:toggle.label')}
             className={cn(
                 'flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-600 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent dark:text-content-muted',
                 {

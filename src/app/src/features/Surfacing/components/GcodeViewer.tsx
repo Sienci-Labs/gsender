@@ -1,4 +1,5 @@
 import { Button } from 'app/components/Button';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import { Copy } from 'lucide-react';
 import React from 'react';
@@ -13,11 +14,11 @@ export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(gcode);
-            toast.info('G-code has been copied to your clipboard', {
+            toast.info(i18n.t('notifications:gcode.copied'), {
                 position: 'bottom-right',
             });
         } catch (err) {
-            toast.error('Could not copy G-code to clipboard', {
+            toast.error(i18n.t('notifications:gcode.copyFailed'), {
                 position: 'bottom-right',
             });
         }

@@ -6,6 +6,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import { File, Upload, X } from 'lucide-react';
 import type React from 'react';
@@ -60,7 +61,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
             const extension = '.' + file.name.split('.').pop()?.toLowerCase();
 
             if (!ACCEPTED_EXTENSIONS.includes(extension)) {
-                errors.push(`${file.name}: Invalid file type`);
+                errors.push(
+                    i18n.t('notifications:sdCard.invalidFileType', {
+                        fileName: file.name,
+                    }),
+                );
                 return;
             }
 
@@ -74,7 +79,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         });
 
         if (errors.length > 0) {
-            toast.error(`Some files were rejected:\n${errors.join('\n')}`);
+            toast.error(
+                i18n.t('notifications:sdCard.filesRejected', {
+                    errors: errors.join('\n'),
+                }),
+            );
         }
 
         setSelectedFiles((prev) => [...prev, ...validFiles]);

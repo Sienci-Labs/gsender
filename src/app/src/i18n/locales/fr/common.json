@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "apply": "Appliquer",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "continue": "Continuer",
+    "delete": "Supprimer",
+    "no": "Non",
+    "ok": "OK",
+    "reset": "Réinitialiser",
+    "save": "Enregistrer",
+    "yes": "Oui"
+  },
+  "language": {
+    "label": "Langue",
+    "description": "Langue de l'interface de gSender. Les textes provenant du micrologiciel de votre contrôleur restent en anglais.",
+    "systemDefault": "Langue du système"
+  },
+  "nav": {
+    "carve": "Usinage",
+    "stats": "Statistiques",
+    "tools": "Outils",
+    "config": "Configuration",
+    "mainNavigation": "Navigation principale"
+  }
+}

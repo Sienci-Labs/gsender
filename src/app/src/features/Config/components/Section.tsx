@@ -5,6 +5,7 @@ import type {
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingSection } from 'app/features/Config/components/SettingSection.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 import React, { useMemo } from 'react';
 import { InView } from 'react-intersection-observer';
@@ -38,6 +39,8 @@ export const Section = React.forwardRef(
         ref,
     ) => {
         const { settingsFilter } = useSettings();
+        // Re-render when the language changes.
+        useAppTranslation();
 
         // Must be capitalized so React treats it as a component (gives it its own
         // fiber/hook registry). Calling wizard() inline would attribute any hooks
@@ -88,7 +91,7 @@ export const Section = React.forwardRef(
                         id={`h-${id}`}
                         ref={ref}
                     >
-                        {title}
+                        {translateKey(title)}
                     </h1>
                     {connected && Wizard && <Wizard />}
                 </div>

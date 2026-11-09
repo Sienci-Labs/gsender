@@ -29,6 +29,7 @@ import {
     TOOLBAR_CATEGORY,
     VISUALIZER_CATEGORY,
 } from 'app/constants';
+import { i18n } from 'app/i18n';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { toast } from 'app/lib/toaster';
 import { cn } from 'app/lib/utils';
@@ -89,7 +90,9 @@ const SetShortcut = () => {
 
         closeModal();
 
-        toast.info('Button Shortcut Set', { duration: 3000 });
+        toast.info(i18n.t('notifications:gamepad.buttonShortcutSet'), {
+            duration: 3000,
+        });
     };
 
     const handleActionPress = (action) => {

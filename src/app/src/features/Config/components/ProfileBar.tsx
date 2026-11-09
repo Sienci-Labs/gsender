@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import type { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
@@ -23,6 +24,7 @@ import {
 import { useSelector } from 'react-redux';
 
 export function ProfileBar() {
+    const { t } = useAppTranslation();
     const {
         settingsAreDirty,
         setSettingsAreDirty,
@@ -105,21 +107,18 @@ export function ProfileBar() {
                     code.push('$$');
 
                     controller.command('gcode', code);
-                    toast.success('EEPROM Settings imported', {
+                    toast.success(t('config:profileBar.eepromImported'), {
                         position: 'bottom-right',
                     });
                 } catch (error) {
                     console.error('Import error:', error);
-                    toast.error(
-                        'Failed to import settings. Please check the file format.',
-                        {
-                            position: 'bottom-right',
-                        },
-                    );
+                    toast.error(t('config:profileBar.importFailed'), {
+                        position: 'bottom-right',
+                    });
                 }
             });
         } catch (e) {
-            toast.error('Unable to import settings', {
+            toast.error(t('config:profileBar.importUnable'), {
                 position: 'bottom-right',
             });
         }
@@ -139,12 +138,12 @@ export function ProfileBar() {
                     />
                     <ActionButton
                         icon={<PiLightning />}
-                        label="Flash"
+                        label={t('config:profileBar.flash')}
                         onClick={toggleFlash}
                     />
                     <ActionButton
                         icon={<PiDownloadSimpleBold />}
-                        label="Import"
+                        label={t('config:profileBar.import')}
                         onClick={() => {
                             inputRef.current.click();
                             inputRef.current.value = null;
@@ -154,7 +153,7 @@ export function ProfileBar() {
                     />
                     <ActionButton
                         icon={<PiUploadSimpleBold />}
-                        label="Export"
+                        label={t('config:profileBar.export')}
                         onClick={() => exportFirmwareSettings(rawEEPROM)}
                         disabled={!connected}
                         testId="firmware-settings-export-button"
@@ -182,7 +181,12 @@ export function ProfileBar() {
                     disabled={!settingsAreDirty}
                     onClick={updateSettingsHandler}
                 >
-                    Apply<span className="max-xl:hidden"> Settings</span>
+                    <span className="max-xl:hidden">
+                        {t('config:profileBar.applySettings')}
+                    </span>
+                    <span className="hidden max-xl:inline">
+                        {t('config:profileBar.apply')}
+                    </span>
                 </button>
                 {settingsAreDirty && (
                     <span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl"></span>

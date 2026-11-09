@@ -35,6 +35,11 @@ module.exports = {
         '^react-dom$': '<rootDir>/node_modules/react-dom',
         '^react-dom/(.*)$': '<rootDir>/node_modules/react-dom/$1',
         '^react-redux$': '<rootDir>/node_modules/react-redux',
+        // import.meta.glob isn't available under babel-jest
+        '(^|/)i18n/loadLocale$':
+            '<rootDir>/src/app/src/__mocks__/i18nLoadLocaleMock.js',
+        '^\\./loadLocale$':
+            '<rootDir>/src/app/src/__mocks__/i18nLoadLocaleMock.js',
         '^@react-pdf/renderer$':
             '<rootDir>/src/app/src/__mocks__/reactPdfMock.js',
     },

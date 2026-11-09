@@ -1,6 +1,7 @@
 import type { gSenderSetting } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 import React, { type JSX, useCallback } from 'react';
 
@@ -26,6 +27,8 @@ export const SettingSection = React.memo(
             ref,
         ): JSX.Element {
             const { setSettingsValues, setSettingsAreDirty } = useSettings();
+            // Re-render when the language changes.
+            useAppTranslation();
 
             const Wizard = wizard;
 
@@ -83,7 +86,7 @@ export const SettingSection = React.memo(
                     {label && !showEEPROMOnly && (
                         <legend className="flex flex-row gap-8 mt-4 py-2 px-2 items-center">
                             <span className="text-blue-600 dark:text-blue-400  text-xl">
-                                {label}
+                                {translateKey(label)}
                             </span>
                             {connected && Wizard && <Wizard />}
                         </legend>

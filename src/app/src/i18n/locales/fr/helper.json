@@ -1,0 +1,236 @@
+{
+  "kinds": {
+    "info": "Info",
+    "reminder": "Rappel",
+    "maintenance": "Maintenance",
+    "tip": "Astuce"
+  },
+  "message": {
+    "noDescription": "Aucune description correspondante",
+    "legacyResource": "Ressources Sienci",
+    "tryThis": "Essayez ceci",
+    "dontRemind": "Ne plus me le rappeler",
+    "dontShowTips": "Ne plus afficher les astuces",
+    "dismiss": "Ignorer",
+    "gotIt": "Compris",
+    "openGuide": "Ouvrir le guide",
+    "scanToOpen": "Scannez pour l’ouvrir sur votre téléphone",
+    "scanOnPhone": "Scanner avec le téléphone",
+    "scanCodeToOpen": "Scannez le code pour ouvrir ce guide sur votre téléphone.",
+    "learnMore": "En savoir plus"
+  },
+  "resources": {
+    "alarmCodes": "Codes d’alarme et d’erreur",
+    "homing": "Prise d’origine et coordonnées machine",
+    "limitAlarms": "Alarme 1 et 2 : limites matérielles et logicielles",
+    "probeFail": "Alarme 4 et 5 : échec du palpage",
+    "homingFail": "Alarme 6, 8 et 9 : échec de la prise d’origine",
+    "safetyDoor": "Déclenchement de la porte de sécurité",
+    "estop": "Alarme 10 : arrêt d’urgence",
+    "spindleComms": "Alarme 14 et 19 : communication avec la broche",
+    "motorFault": "Alarme 17 : défaut moteur",
+    "alarm18": "Alarme 18",
+    "alarm20": "Alarme 20"
+  },
+  "alarm": {
+    "homingRequired": {
+      "title": "Prise d’origine requise",
+      "description": "Votre machine n’a aucun problème. La prise d’origine est activée dans vos paramètres, donc le contrôleur attend que vous la fassiez avant tout déplacement. La prise d’origine utilise vos fins de course pour trouver l’origine machine : gSender sait ainsi exactement où se trouve la machine dans sa course et peut utiliser les limites logicielles pour l’empêcher de dépasser l’extrémité d’un axe.",
+      "steps": {
+        "0": "Assurez-vous que rien ne gêne le portique, puis cliquez sur \"Click to Run Homing\". La machine se déplace jusqu’à ses fins de course et définit l’origine machine.",
+        "1": "Une fois la prise d’origine terminée, déplacez la machine et lancez vos travaux normalement. Il suffit de la refaire après une mise sous tension ou une réinitialisation du contrôleur.",
+        "2": "Si votre machine n’a pas de fins de course, désactivez Config ➜ Homing/Limits ➜ Homing cycle enable. Notez que les limites logicielles nécessitent la prise d’origine pour fonctionner."
+      }
+    },
+    "1": {
+      "title": "Limite matérielle déclenchée",
+      "description": "Un fin de course a été déclenché, la machine s’est donc arrêtée immédiatement pour se protéger. Cela arrive généralement lorsqu’un mouvement emmène la machine au-delà de sa course physique ; sa position exacte peut donc être perdue.",
+      "steps": {
+        "0": "Effacez l’alarme, puis faites une prise d’origine pour que gSender retrouve une position connue.",
+        "1": "Vérifiez que les paramètres de course du firmware (Config ➜ Homing/Limits) correspondent aux dimensions réelles de votre machine.",
+        "2": "Si cela se reproduit pendant les déplacements manuels (jog), essayez des pas plus petits. Pendant le surfaçage, vous pouvez désactiver temporairement les limites matérielles dans Config ➜ Homing/Limits."
+      }
+    },
+    "2": {
+      "title": "Limite logicielle déclenchée",
+      "description": "Le mouvement demandé aurait emmené la machine au-delà des limites de course définies dans son firmware. La position machine est conservée, vous pouvez donc déverrouiller et continuer en toute sécurité.",
+      "steps": {
+        "0": "Déverrouillez l’alarme : la position machine n’est pas perdue.",
+        "1": "Vérifiez que l’origine du travail et la position du brut correspondent à votre point zéro physique, et que les unités du fichier (mm/in) correspondent à votre machine.",
+        "2": "Vérifiez que les paramètres de course du firmware (Config ➜ Homing/Limits) correspondent aux dimensions réelles de votre machine."
+      }
+    },
+    "probeFail": {
+      "steps": {
+        "0": "Commencez le palpage à environ 1/2\" (5mm) au-dessus de la plaque de palpage, au-dessus du carré intérieur (plaques AutoZero) ou du logo (plaques standard).",
+        "1": "Si la sonde apparaît déclenchée dès le début du cycle alors que rien ne la touche, l’entrée de la sonde est probablement inversée : dans Config ➜ Probe, basculez \"Invert Probe Inputs ($6)\", appliquez les paramètres, puis éteignez et rallumez le contrôleur."
+      }
+    },
+    "4": {
+      "title": "Échec du palpage — déjà déclenchée",
+      "description": "Le circuit de la sonde était déclenché avant même le début du cycle de palpage, gSender ne peut donc pas savoir quand l’outil touche réellement la plaque."
+    },
+    "5": {
+      "title": "Échec du palpage — aucun contact détecté",
+      "description": "La sonde n’a détecté aucun contact avec la plaque de palpage dans la distance de course prévue."
+    },
+    "homingFail": {
+      "steps": {
+        "0": "Vérifiez que les accouplements sont bien serrés à la fois sur les arbres moteurs et sur les vis à billes/vis trapézoïdales de chaque axe.",
+        "1": "Assurez-vous que chaque fin de course est solidement fixé et bien en appui contre sa butée.",
+        "2": "Dans Config ➜ Homing/Limits, vérifiez que le profil machine correspond à votre modèle de CNC et réinitialisez les paramètres de prise d’origine surlignés en jaune (non par défaut) avec le bouton circulaire de réinitialisation.",
+        "3": "Appliquez les paramètres, puis éteignez et rallumez le contrôleur."
+      }
+    },
+    "6": {
+      "title": "Échec de la prise d’origine — cycle réinitialisé",
+      "description": "Le cycle de prise d’origine en cours a été réinitialisé avant de pouvoir se terminer."
+    },
+    "7": {
+      "title": "Échec de la prise d’origine — porte de sécurité ouverte",
+      "description": "Le contrôleur considère que la porte de sécurité est ouverte et a donc arrêté le cycle de prise d’origine. Sur les contrôleurs SLB/SLB-EXT, cela peut arriver même si rien n’est branché sur l’entrée DOOR, si le paramètre de la porte a été inversé.",
+      "steps": {
+        "0": "Si rien n’est branché sur l’entrée DOOR, reliez les deux broches de la porte avec un cavalier pour simuler une porte fermée.",
+        "1": "Saisissez $RST=$ dans la console et exécutez-le pour réinitialiser le paramètre inversé.",
+        "2": "Éteignez et rallumez le contrôleur."
+      }
+    },
+    "8": {
+      "title": "Échec de la prise d’origine — le dégagement n’a pas libéré le contact",
+      "description": "Après la prise d’origine, le mouvement de dégagement n’est pas allé assez loin pour libérer le fin de course."
+    },
+    "9": {
+      "title": "Échec de la prise d’origine — fin de course introuvable",
+      "description": "La machine n’a trouvé aucun fin de course dans la distance de recherche prévue."
+    },
+    "10": {
+      "title": "Arrêt d’urgence enclenché",
+      "description": "Le contrôleur voit le signal d’arrêt d’urgence comme actif et reste donc verrouillé tant que le circuit d’arrêt d’urgence n’est pas libéré.",
+      "steps": {
+        "0": "Enfoncez le bouton d’arrêt d’urgence, puis tournez-le dans le sens horaire pour le libérer, et cliquez sur \"Click to Unlock Machine\". Faites-le à chaque connexion.",
+        "1": "Si l’alarme persiste, recherchez des avertissements d’erreur moteur dans la console et vérifiez que le voyant bleu du relais du SLB-EXT s’allume après la libération de l’arrêt d’urgence ; sinon, un court-circuit moteur le maintient peut-être déclenché.",
+        "2": "Pontez les broches de contournement de l’arrêt d’urgence sur la carte de commande : si la LED rouge HALT s’éteint, la carte fonctionne et c’est le bouton d’arrêt d’urgence qui doit être remplacé.",
+        "3": "Vérifiez le câblage de l’arrêt d’urgence et les deux LED rouges du bouton : des connexions desserrées ou des LED qui ne s’allument ou ne s’éteignent pas correctement signifient que le bouton doit être remplacé."
+      }
+    },
+    "spindleComms": {
+      "title": "Délai de communication avec la broche dépassé",
+      "description": "Le contrôleur a perdu la communication avec le variateur (VFD) de la broche. Cela apparaît comme alarme 14 sur les anciens firmwares, ou alarme 19 sur les firmwares récents, AltMill 4x8, SLB Lite et SLB-EXT V2.0.",
+      "steps": {
+        "0": "Allumez d’abord la broche/le VFD, puis le contrôleur : ils peuvent ainsi établir correctement la communication.",
+        "1": "Vérifiez les LED de communication RS485 : RX et TX doivent clignoter toutes les deux. Si une seule clignote (ou aucune), vérifiez le câble et les connexions.",
+        "2": "Exécutez le fichier de configuration AltMill ou LongMill via gSender pour remettre les valeurs EEPROM du VFD aux réglages d’usine.",
+        "3": "Vérifiez que le câble RS485 est branché sur le bon port au-dessus de l’interrupteur d’alimentation, fil rouge sur RS485- et fil noir sur RS485+ côté VFD.",
+        "4": "Comparez les codes de fonction du VFD au tableau des paramètres, en particulier l’adresse de communication (F163) et le mode (F165)."
+      }
+    },
+    "17": {
+      "title": "Défaut moteur",
+      "description": "Un moteur pas à pas en boucle fermée s’est arrêté — généralement à cause d’un décrochage au démarrage, pendant la prise d’origine ou le déplacement manuel, d’un blocage mécanique, d’un problème de câblage ou d’un problème de fin de course. Recherchez un avertissement \"Motor Error\" dans la console, ainsi qu’une LED rouge clignotante sur le moteur ou un voyant de décrochage (STL) allumé sur la carte de commande pour savoir quel axe est concerné.",
+      "steps": {
+        "0": "Désactivez les limites matérielles et vérifiez les capteurs de fin de course — n’utilisez pas la butée intégrée sur l’axe Z ; réglez les capteurs pour que le voyant rouge s’allume, puis desserrez d’environ 1/4 de tour.",
+        "1": "Contrôleur éteint, vérifiez le serrage des accouplements moteur et tournez chaque vis à billes à la main — elle doit tourner librement, sans point dur dans les guidages linéaires ni dans le roulement de la vis.",
+        "2": "Vérifiez le câblage des moteurs (LED clignotante ou fixe/éteinte) et, si le voyant bleu du relais du contrôleur reste éteint au démarrage, débranchez les moteurs un par un pour isoler celui qui est défectueux."
+      }
+    },
+    "18": {
+      "title": "Échec de la prise d’origine — passes de prise d’origine mal configurées",
+      "description": "Le cycle de prise d’origine n’a pas pu se terminer à cause de la configuration des passes de prise d’origine des axes.",
+      "steps": {
+        "0": "Dans Config ➜ Homing/Limits, vérifiez que le profil machine correspond à votre modèle de CNC.",
+        "1": "Vérifiez les quatre paramètres de passes de prise d’origine par axe ($44-$47) — laissez-les par défaut, sauf si vous utilisez des fins de course personnalisés.",
+        "2": "Remettez à leur valeur par défaut les paramètres surlignés en jaune avec le bouton circulaire de réinitialisation.",
+        "3": "Appliquez les paramètres, puis éteignez et rallumez le contrôleur."
+      }
+    },
+    "20": {
+      "title": "Échec de communication avec l’extension d’E/S",
+      "description": "Le contrôleur ne parvient pas à communiquer avec l’extension d’E/S du module ATC (le composant pré-assemblé d’une broche ATC).",
+      "steps": {
+        "0": "Vérifiez que le module ATC est correctement branché et bien enfoncé.",
+        "1": "Inspectez le module pour détecter tout dommage physique ou signe de défaillance.",
+        "2": "Si la connexion semble sûre et intacte, contactez le support Sienci Labs (sienci.com/contact-us) pour un diagnostic plus poussé ou un remplacement."
+      }
+    }
+  },
+  "wizard": {
+    "next": "Suivant",
+    "complete": "Terminer",
+    "restore": "Restaurer l’assistant",
+    "minimise": "Réduire l’assistant",
+    "cancel": {
+      "label": "Annuler l’assistant",
+      "title": "Annuler l’assistant de changement d’outil",
+      "content": "Voulez-vous vraiment annuler l’assistant de changement d’outil ? Toutes les étapes seront perdues."
+    },
+    "step": "Étape {{number}}",
+    "firstRunOnly": "Premier passage uniquement",
+    "oneTimeSetup": "<bold>Configuration unique :</bold> mesure l’outil initial afin que les outils suivants puissent lui être comparés.",
+    "runGcode": "Exécuter le G-code",
+    "or": "ou",
+    "running": "En cours…",
+    "run": "Exécuter",
+    "installNewTool": "Installez le nouvel outil",
+    "doNotInterrupt": "N’interrompez pas la machine pendant cette phase",
+    "pendingToolchange": {
+      "eyebrow": "Changement d’outil en attente",
+      "title": "En attente de la fin des mouvements de coupe",
+      "description": "Le changement d’outil reprendra automatiquement une fois tous les mouvements de coupe en attente terminés."
+    },
+    "resumingJob": {
+      "eyebrow": "Reprise du travail",
+      "title": "Reprise du travail",
+      "description": "La machine doit revenir en position et devra peut-être remettre la broche à sa vitesse. Le travail reprendra automatiquement une fois cette étape terminée."
+    }
+  },
+  "toggle": {
+    "label": "Assistant d’aide"
+  },
+  "keyboardMap": {
+    "title": "Raccourcis clavier actifs",
+    "subtitle": "Carte dynamique des raccourcis actuellement disponibles",
+    "close": "Fermer la carte du clavier"
+  },
+  "announcer": {
+    "statusChanged": "État de la machine changé en {{state}}",
+    "progress": "Progression du travail : {{percent}} %",
+    "complete": "Travail terminé : 100 %",
+    "summaryTitle": "Résumé du travail",
+    "time": {
+      "seconds_one": "{{count}} seconde",
+      "seconds_other": "{{count}} secondes",
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "hours_one": "{{count}} heure",
+      "hours_other": "{{count}} heures",
+      "and": "{{first}} et {{second}}",
+      "seconds_many": "{{count}} secondes",
+      "minutes_many": "{{count}} minutes",
+      "hours_many": "{{count}} heures"
+    },
+    "summary": {
+      "fileLoaded": "Fichier chargé : {{name}}.",
+      "dimensions": "Dimensions : {{x}} de large, {{y}} de profondeur et {{z}} de haut, en {{units}}.",
+      "xRange": "X va de {{min}} à {{max}}.",
+      "yRange": "Y va de {{min}} à {{max}}.",
+      "minZ": "La hauteur Z minimale est de {{z}} {{units}}.",
+      "estimatedTime": "Durée estimée : {{time}}.",
+      "tools_one": "Utilise {{count}} outil : {{tools}}.",
+      "tools_other": "Utilise {{count}} outils : {{tools}}.",
+      "metadata": "Métadonnées du travail : {{metadata}}.",
+      "programStops_one": "Contient {{count}} arrêt programme (M0/M1).",
+      "programStops_other": "Contient {{count}} arrêts programme (M0/M1).",
+      "coolant": "Le fichier demande l’arrosage (M7/M8).",
+      "spindleSpeed": "Vitesse de broche : {{speed}} RPM.",
+      "spindleSpeedRange": "Plage de vitesse de broche : {{min}} à {{max}} RPM.",
+      "feedrate": "Vitesse d’avance : {{feed}} {{units}}/min.",
+      "feedrateRange": "Plage de vitesse d’avance : {{min}} à {{max}} {{units}}/min.",
+      "axes": "Axes actifs : {{axes}}.",
+      "invalidGcode_one": "AVERTISSEMENT : {{count}} ligne de G-code non valide détectée.",
+      "invalidGcode_other": "AVERTISSEMENT : {{count}} lignes de G-code non valides détectées.",
+      "tools_many": "Utilise {{count}} outils : {{tools}}.",
+      "programStops_many": "Contient {{count}} arrêts programme (M0/M1).",
+      "invalidGcode_many": "AVERTISSEMENT : {{count}} lignes de G-code non valides détectées."
+    }
+  }
+}

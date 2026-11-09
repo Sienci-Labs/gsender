@@ -34,6 +34,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { Button } from 'app/components/shadcn/Button';
 import type { MaintenanceTask } from 'app/features/Stats/utils/StatContext';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import chainedFunction from 'chained-function';
 import uniqueId from 'lodash/uniqueId';
@@ -101,15 +102,26 @@ const MaintenanceAlert: React.FC<Props> = ({
                                     .update(updatedTasks)
                                     .then((res) => {
                                         if (res.status === 200) {
-                                            toast('Reset Timers successfully', {
-                                                position: 'bottom-right',
-                                            });
+                                            toast(
+                                                i18n.t(
+                                                    'notifications:maintenance.timersReset',
+                                                ),
+                                                {
+                                                    position: 'bottom-right',
+                                                },
+                                            );
                                         } else {
-                                            toast('Failed to Reset Timers.', {
-                                                description:
-                                                    'Please go to the Stats Page to reset them manually.',
-                                                position: 'bottom-right',
-                                            });
+                                            toast(
+                                                i18n.t(
+                                                    'notifications:maintenance.timersResetFailed',
+                                                ),
+                                                {
+                                                    description: i18n.t(
+                                                        'notifications:maintenance.timersResetFailedDescription',
+                                                    ),
+                                                    position: 'bottom-right',
+                                                },
+                                            );
                                         }
                                     });
                             }, onClose)}

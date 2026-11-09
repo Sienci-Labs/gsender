@@ -1,7 +1,9 @@
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import { neutral } from '../../messages/styles';
 
 export function StepsList({ steps }: { steps: string[] }) {
+    const { t } = useAppTranslation();
     return (
         <div className="flex flex-col gap-2.5">
             <span
@@ -10,7 +12,7 @@ export function StepsList({ steps }: { steps: string[] }) {
                     neutral.muted,
                 )}
             >
-                Try this
+                {t('helper:message.tryThis')}
             </span>
             <ol className="m-0 flex list-none flex-col gap-2.5 p-0">
                 {steps.map((step, i) => (

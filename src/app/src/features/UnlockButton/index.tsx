@@ -4,6 +4,7 @@ import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import type { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { homeMachine } from 'app/features/DRO/utils/DRO';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
 import cx from 'classnames';
@@ -38,25 +39,24 @@ export function confirmUnlockAfterHomingFailure(
     onConfirm: () => void,
 ): void {
     Confirm({
-        title: 'Homing Not Complete',
+        title: i18n.t('notifications:unlock.homingNotComplete.title'),
         content: (
             <>
                 <p>
-                    {
-                        'The last homing cycle failed, so the machine position is unknown. Re-home the machine before continuing. Unlocking without re-homing may let jogging or a job run past the limit switches.'
-                    }
+                    {i18n.t('notifications:unlock.homingNotComplete.content')}
                 </p>
                 {isLimitSwitchFaultAlarm(code) && (
                     <p className="mt-2">
-                        {
-                            'ALARM:8 and ALARM:9 mean a limit switch was not found or would not release, so re-homing will keep failing until the switch or its wiring is fixed. To use the machine without homing until then: choose Unlock Anyway, open Config > Homing/Limits, turn off "Homing cycle enable" ($22) and click Apply Settings.'
-                        }
+                        {i18n.t(
+                            'notifications:unlock.homingNotComplete.limitSwitchFault',
+                            { setting: '"Homing cycle enable" ($22)' },
+                        )}
                     </p>
                 )}
             </>
         ),
-        confirmLabel: 'Rehome',
-        cancelLabel: 'Unlock Anyway',
+        confirmLabel: i18n.t('notifications:unlock.homingNotComplete.confirm'),
+        cancelLabel: i18n.t('notifications:unlock.homingNotComplete.cancel'),
         onConfirm: homeMachine,
         onClose: onConfirm,
     });

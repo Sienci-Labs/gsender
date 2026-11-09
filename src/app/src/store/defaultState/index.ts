@@ -50,6 +50,8 @@ const defaultState: State = {
         token: '',
     },
     workspace: {
+        // 'system' follows the OS language. See app/i18n/languages.ts.
+        language: 'system',
         units: METRIC_UNITS,
         reverseWidgets: false,
         spindleFunctions: false,

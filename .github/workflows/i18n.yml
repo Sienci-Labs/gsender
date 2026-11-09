@@ -1,0 +1,30 @@
+name: Translations
+
+on:
+  pull_request:
+    paths:
+      - "src/app/src/**"
+      - "src/pendant/src/**"
+      - "i18next.config.ts"
+
+jobs:
+  i18n:
+    name: Check translation keys
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Keys used in code must exist in the locale files (run `yarn i18n:extract`).
+      - name: Keys in sync
+        run: npx -y i18next-cli@1.80.4 extract --ci --dry-run
+
+      # Placeholder mismatches and new hardcoded UI text (see TRANSLATING.md).
+      - name: Lint
+        run: npx -y i18next-cli@1.80.4 lint
+
+      - name: Coverage report
+        run: npx -y i18next-cli@1.80.4 status || true

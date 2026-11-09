@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import Button from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 
@@ -10,6 +11,7 @@ export function JogWizard({
     axis,
     disabled = false,
 }: JogWizardProps): JSX.Element {
+    const { t } = useAppTranslation();
     const jogPlus = () => {
         controller.command('gcode', `$J=G21G91${axis}10F1000`);
     };
@@ -19,10 +21,10 @@ export function JogWizard({
     return (
         <div className="flex flex-row gap-4 items-center">
             <Button variant="primary" disabled={disabled} onClick={jogMinus}>
-                Jog {axis}-
+                {t('config:wizards.jogMinus', { axis })}
             </Button>
             <Button variant="primary" disabled={disabled} onClick={jogPlus}>
-                Jog {axis}+
+                {t('config:wizards.jogPlus', { axis })}
             </Button>
         </div>
     );

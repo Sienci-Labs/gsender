@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
@@ -6,6 +7,7 @@ import type React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export const AccessibilityAnnouncer: React.FC = () => {
+    const { t } = useAppTranslation();
     const {
         statusAnnouncements,
         jobProgressAnnouncements,
@@ -86,7 +88,9 @@ export const AccessibilityAnnouncer: React.FC = () => {
     useEffect(() => {
         if (activeState && activeState !== prevStatus.current) {
             if (statusAnnouncements) {
-                setStatusMessage(`Machine status changed to ${activeState}`);
+                setStatusMessage(
+                    t('helper:announcer.statusChanged', { state: activeState }),
+                );
             }
 
             // Audio Cues
@@ -109,7 +113,7 @@ export const AccessibilityAnnouncer: React.FC = () => {
             const timer = setTimeout(() => setStatusMessage(''), 1000);
             return () => clearTimeout(timer);
         }
-    }, [activeState, statusAnnouncements, audioCues]);
+    }, [activeState, statusAnnouncements, audioCues, t]);
 
     // Probe Success Audio Cue
     useEffect(() => {
@@ -144,7 +148,9 @@ export const AccessibilityAnnouncer: React.FC = () => {
             lastAnnouncedProgress.current + jobProgressIncrement;
 
         if (currentProgress >= nextThreshold && currentProgress < 100) {
-            setProgressMessage(`Job progress: ${currentProgress}%`);
+            setProgressMessage(
+                t('helper:announcer.progress', { percent: currentProgress }),
+            );
             lastAnnouncedProgress.current =
                 Math.floor(currentProgress / jobProgressIncrement) *
                 jobProgressIncrement;
@@ -152,12 +158,12 @@ export const AccessibilityAnnouncer: React.FC = () => {
             currentProgress === 100 &&
             lastAnnouncedProgress.current !== 100
         ) {
-            setProgressMessage('Job complete: 100%');
+            setProgressMessage(t('helper:announcer.complete'));
             lastAnnouncedProgress.current = 100;
         } else if (currentProgress < lastAnnouncedProgress.current) {
             lastAnnouncedProgress.current = 0;
         }
-    }, [progress, jobProgressAnnouncements, jobProgressIncrement]);
+    }, [progress, jobProgressAnnouncements, jobProgressIncrement, t]);
 
     // G-Code Summary
     const { units } = useTypedSelector(
@@ -182,42 +188,84 @@ export const AccessibilityAnnouncer: React.FC = () => {
         } = file;
 
         const formatTime = (seconds: number): string => {
-            if (seconds < 60) return `${Math.ceil(seconds)} seconds`;
-            if (seconds < 3600)
-                return `${Math.floor(seconds / 60)} minutes and ${Math.ceil(seconds % 60)} seconds`;
-            return `${Math.floor(seconds / 3600)} hours and ${Math.floor((seconds % 3600) / 60)} minutes`;
+            if (seconds < 60) {
+                return t('helper:announcer.time.seconds', {
+                    count: Math.ceil(seconds),
+                });
+            }
+            if (seconds < 3600) {
+                return t('helper:announcer.time.and', {
+                    first: t('helper:announcer.time.minutes', {
+                        count: Math.floor(seconds / 60),
+                    }),
+                    second: t('helper:announcer.time.seconds', {
+                        count: Math.ceil(seconds % 60),
+                    }),
+                });
+            }
+            return t('helper:announcer.time.and', {
+                first: t('helper:announcer.time.hours', {
+                    count: Math.floor(seconds / 3600),
+                }),
+                second: t('helper:announcer.time.minutes', {
+                    count: Math.floor((seconds % 3600) / 60),
+                }),
+            });
         };
 
-        const summaryParts: string[] = [`File loaded: ${name}.`];
+        const summaryParts: string[] = [
+            t('helper:announcer.summary.fileLoaded', { name }),
+        ];
 
         if (bbox && bbox.min && bbox.max) {
             const dx = (bbox.max.x - bbox.min.x).toFixed(2);
             const dy = (bbox.max.y - bbox.min.y).toFixed(2);
             const dz = (bbox.max.z - bbox.min.z).toFixed(2);
             summaryParts.push(
-                `Dimensions: ${dx} wide, ${dy} deep, and ${dz} high ${units}.`,
+                t('helper:announcer.summary.dimensions', {
+                    x: dx,
+                    y: dy,
+                    z: dz,
+                    units,
+                }),
             );
             summaryParts.push(
-                `X ranges from ${bbox.min.x.toFixed(2)} to ${bbox.max.x.toFixed(2)}.`,
+                t('helper:announcer.summary.xRange', {
+                    min: bbox.min.x.toFixed(2),
+                    max: bbox.max.x.toFixed(2),
+                }),
             );
             summaryParts.push(
-                `Y ranges from ${bbox.min.y.toFixed(2)} to ${bbox.max.y.toFixed(2)}.`,
+                t('helper:announcer.summary.yRange', {
+                    min: bbox.min.y.toFixed(2),
+                    max: bbox.max.y.toFixed(2),
+                }),
             );
             summaryParts.push(
-                `Minimum Z height is ${bbox.min.z.toFixed(2)} ${units}.`,
+                t('helper:announcer.summary.minZ', {
+                    z: bbox.min.z.toFixed(2),
+                    units,
+                }),
             );
         }
 
         if (estimatedTime > 0) {
             summaryParts.push(
-                `Estimated completion time: ${formatTime(estimatedTime)}.`,
+                t('helper:announcer.summary.estimatedTime', {
+                    time: formatTime(estimatedTime),
+                }),
             );
         }
 
         if (toolSet && toolSet.length > 0) {
-            const tools = toolSet.map((t) => t.replace('T', '')).join(', ');
+            const tools = toolSet
+                .map((tool) => tool.replace('T', ''))
+                .join(', ');
             summaryParts.push(
-                `Uses ${toolSet.length} tool${toolSet.length > 1 ? 's' : ''}: ${tools}.`,
+                t('helper:announcer.summary.tools', {
+                    count: toolSet.length,
+                    tools,
+                }),
             );
         }
 
@@ -243,19 +291,25 @@ export const AccessibilityAnnouncer: React.FC = () => {
         });
 
         if (camMetadata.length > 0) {
-            summaryParts.push(`Job metadata: ${camMetadata.join(', ')}.`);
+            summaryParts.push(
+                t('helper:announcer.summary.metadata', {
+                    metadata: camMetadata.join(', '),
+                }),
+            );
         }
 
         const stopCount = (content.match(/^M0|^M1/gm) || []).length;
         if (stopCount > 0) {
             summaryParts.push(
-                `Contains ${stopCount} program stop${stopCount > 1 ? 's' : ''} (M0/M1).`,
+                t('helper:announcer.summary.programStops', {
+                    count: stopCount,
+                }),
             );
         }
 
         const hasCoolant = content.match(/M7|M8/i);
         if (hasCoolant) {
-            summaryParts.push(`File requests coolant (M7/M8).`);
+            summaryParts.push(t('helper:announcer.summary.coolant'));
         }
 
         if (spindleSet && spindleSet.length > 0) {
@@ -263,10 +317,17 @@ export const AccessibilityAnnouncer: React.FC = () => {
                 .map((s) => Number(s.replace('S', '')))
                 .sort((a, b) => a - b);
             if (speeds[0] === speeds[speeds.length - 1]) {
-                summaryParts.push(`Spindle speed: ${speeds[0]} RPM.`);
+                summaryParts.push(
+                    t('helper:announcer.summary.spindleSpeed', {
+                        speed: speeds[0],
+                    }),
+                );
             } else {
                 summaryParts.push(
-                    `Spindle speed range: ${speeds[0]} to ${speeds[speeds.length - 1]} RPM.`,
+                    t('helper:announcer.summary.spindleSpeedRange', {
+                        min: speeds[0],
+                        max: speeds[speeds.length - 1],
+                    }),
                 );
             }
         }
@@ -276,28 +337,41 @@ export const AccessibilityAnnouncer: React.FC = () => {
                 .map((f) => Number(f.replace('F', '')))
                 .sort((a, b) => a - b);
             if (feeds[0] === feeds[feeds.length - 1]) {
-                summaryParts.push(`Feedrate: ${feeds[0]} ${units}/min.`);
+                summaryParts.push(
+                    t('helper:announcer.summary.feedrate', {
+                        feed: feeds[0],
+                        units,
+                    }),
+                );
             } else {
                 summaryParts.push(
-                    `Feedrate range: ${feeds[0]} to ${feeds[feeds.length - 1]} ${units}/min.`,
+                    t('helper:announcer.summary.feedrateRange', {
+                        min: feeds[0],
+                        max: feeds[feeds.length - 1],
+                        units,
+                    }),
                 );
             }
         }
 
         if (usedAxes && usedAxes.length > 0) {
             summaryParts.push(
-                `Active axes: ${usedAxes.join(', ').toUpperCase()}.`,
+                t('helper:announcer.summary.axes', {
+                    axes: usedAxes.join(', ').toUpperCase(),
+                }),
             );
         }
 
         if (invalidGcode && invalidGcode.length > 0) {
             summaryParts.push(
-                `WARNING: ${invalidGcode.length} invalid G-code lines detected.`,
+                t('helper:announcer.summary.invalidGcode', {
+                    count: invalidGcode.length,
+                }),
             );
         }
 
         setSummaryMessage(summaryParts.join(' '));
-    }, [file, gcodeSummary.enabled, units]);
+    }, [file, gcodeSummary.enabled, units, t]);
 
     // Reduced Motion effect
     useEffect(() => {
@@ -319,7 +393,9 @@ export const AccessibilityAnnouncer: React.FC = () => {
                 gcodeSummary.showVisually &&
                 summaryMessage && (
                     <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 p-4 mb-4 mx-4 rounded-r-md text-sm text-blue-700 dark:text-blue-200">
-                        <p className="font-bold">Job Summary</p>
+                        <p className="font-bold">
+                            {t('helper:announcer.summaryTitle')}
+                        </p>
                         <p>{summaryMessage}</p>
                     </div>
                 )}

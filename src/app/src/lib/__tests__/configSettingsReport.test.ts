@@ -2,6 +2,7 @@ import {
     SettingsMenu,
     type SettingsMenuSection,
 } from 'app/features/Config/assets/SettingsMenu.ts';
+import { toEnglish } from 'app/i18n';
 import {
     buildConfigSettingsReport,
     type ConfigReportSource,
@@ -179,7 +180,10 @@ describe('buildConfigSettingsReport', () => {
             events: {},
         });
 
-        const menuLabels = SettingsMenu.map((section) => section.label);
+        // Menu labels are translation keys; the report is always in English.
+        const menuLabels = SettingsMenu.map((section) =>
+            toEnglish(section.label),
+        );
         const reportLabels = report.map((section) => section.label);
         expect(reportLabels).not.toContain('Customize UI');
         let previousIndex = -1;

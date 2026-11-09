@@ -8,6 +8,7 @@ import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRo
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import controller from 'app/lib/controller.ts';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import type { RootState } from 'app/store/redux';
 import get from 'lodash/get';
@@ -56,7 +57,7 @@ export function EEPROMSection({
             return updated;
         });
         controller.command('gcode', [`${setting}=${value}`, '$$']);
-        toast.success(`Restored ${setting} to default value of ${value}`, {
+        toast.success(i18n.t('config:row.restored', { setting, value }), {
             position: 'bottom-right',
         });
     }

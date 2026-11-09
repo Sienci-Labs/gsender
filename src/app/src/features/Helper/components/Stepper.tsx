@@ -21,12 +21,14 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import { useWizardContext } from 'app/features/Helper/context';
 import cx from 'classnames';
 import { Check } from 'lucide-react';
 import React from 'react';
 
 const Stepper = () => {
+    const { t } = useAppTranslation();
     const { steps, activeStep, activeSubstep } = useWizardContext();
 
     return (
@@ -66,7 +68,7 @@ const Stepper = () => {
                                 </span>
                                 {step.firstRunOnly && (
                                     <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-[#2a1e00] text-amber-800 dark:text-amber-400">
-                                        First run only
+                                        {t('helper:wizard.firstRunOnly')}
                                     </span>
                                 )}
                             </div>

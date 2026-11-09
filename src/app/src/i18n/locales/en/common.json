@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "apply": "Apply",
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "delete": "Delete",
+    "no": "No",
+    "ok": "OK",
+    "reset": "Reset",
+    "save": "Save",
+    "yes": "Yes"
+  },
+  "language": {
+    "label": "Language",
+    "description": "Language used for gSender's interface. Text that comes from your controller's firmware stays in English.",
+    "systemDefault": "System default"
+  },
+  "nav": {
+    "carve": "Carve",
+    "stats": "Stats",
+    "tools": "Tools",
+    "config": "Config",
+    "mainNavigation": "Main Navigation"
+  }
+}

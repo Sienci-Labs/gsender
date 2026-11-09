@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import React from 'react';
 
 interface ToolRequirementBannerProps {
@@ -32,6 +33,7 @@ const ToolRequirementBanner = ({
     toolLabel,
     comment,
 }: ToolRequirementBannerProps) => {
+    const { t } = useAppTranslation();
     if (!toolLabel) {
         return null;
     }
@@ -41,7 +43,7 @@ const ToolRequirementBanner = ({
     return (
         <div className="self-center w-full max-w-[320px] rounded-[8px] border border-emerald-300/80 bg-emerald-50 px-5 py-4 text-center shadow-sm dark:border-emerald-700/60 dark:bg-[#0d2518]">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">
-                Install New Tool
+                {t('helper:wizard.installNewTool')}
             </div>
             <div className="mt-2 text-5xl font-semibold leading-none text-emerald-700 dark:text-emerald-300">
                 {toolLabel}

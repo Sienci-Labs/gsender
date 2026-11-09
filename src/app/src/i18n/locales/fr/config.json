@@ -1,0 +1,1233 @@
+{
+  "basics": {
+    "title": "Général",
+    "carveScreenUnits": {
+      "label": "Unités de l'écran Usinage",
+      "description": "Quelles unités préférez-vous voir sur l'écran Usinage ? La configuration reste toujours en métrique, car tous les micrologiciels CNC courants exigent des valeurs métriques en entrée."
+    },
+    "reconnectAutomatically": {
+      "label": "Reconnexion automatique",
+      "description": "Se reconnecter automatiquement à la dernière machine utilisée à l'ouverture de gSender."
+    },
+    "firmwareFallback": {
+      "label": "Micrologiciel par défaut",
+      "description": "Le micrologiciel que gSender utilisera si la détection automatique échoue."
+    },
+    "baudRate": {
+      "label": "Débit en bauds",
+      "description": "Doit correspondre à la valeur utilisée par votre CNC. (Vitesse de transmission série, 115200 par défaut)"
+    },
+    "safeHeight": {
+      "label": "Hauteur de sécurité",
+      "description": "Distance de remontée de l'axe Z avant un déplacement en X/Y/A lors des « Aller à ». (Ne s'applique pas aux fichiers, aux déplacements vers les coins ni au stationnement ; si la prise d'origine est activée, cette valeur devient un décalage par rapport au sommet de l'axe Z, 0 par défaut)"
+    },
+    "checkFileOnLoad": {
+      "label": "Vérifier le fichier au chargement",
+      "description": "Exécute le mode de vérification ($C) à chaque chargement d'un nouveau fichier G-code."
+    },
+    "outlineStyle": {
+      "label": "Style de contour",
+      "description": "Choisissez comment le contour de vos fichiers sera tracé. (Détaillé prend plus de temps et suit le tracé de plus près, Carré trace un simple cadre englobant, Carré sans rapides fait de même mais ignore les déplacements rapides/G0, Détaillé par défaut)"
+    },
+    "outlineSpeed": {
+      "label": "Vitesse du contour",
+      "description": "Définit la vitesse d'avance utilisée pour le tracé du contour. (Des valeurs plus faibles donnent des mouvements plus contrôlés ; 0 par défaut trace le contour à la vitesse maximale/G0)"
+    },
+    "revertWorkspace": {
+      "label": "Rétablir l'espace de travail",
+      "description": "Permet aux commandes G-code de « fin de travail » comme M2 et M30 de rétablir l'espace de travail de votre CNC sur G54 à la fin de chaque travail."
+    },
+    "powerSaving": {
+      "label": "Économie d'énergie",
+      "description": "Autoriser la mise en veille de l'écran."
+    },
+    "promptOnExit": {
+      "label": "Confirmer à la fermeture",
+      "description": "Afficher une fenêtre de confirmation lors de la fermeture du programme."
+    },
+    "allowGcamToSendFiles": {
+      "label": "Autoriser gCAM à envoyer des fichiers",
+      "description": "Permet à gCAM, exécuté sur cet ordinateur, de charger des programmes directement dans gSender via « Envoyer vers gSender ». Les fichiers sont refusés pendant l'exécution d'un travail."
+    },
+    "runSettingsBackup": {
+      "label": "Sauvegarde des paramètres",
+      "description": "Choisissez la fréquence à laquelle gSender sauvegarde vos paramètres. Utile si vous devez les rétablir ultérieurement."
+    },
+    "settingsBackupLocation": {
+      "label": "Emplacement de sauvegarde des paramètres",
+      "description": "Choisissez l'emplacement où sauvegarder vos paramètres. Par défaut : le dossier appData de votre système d'exploitation."
+    },
+    "importedPluginsLocation": {
+      "label": "Emplacement des plugins importés",
+      "description": "Choisissez l'emplacement où importer vos plugins. Par défaut : le dossier userData de votre système d'exploitation.",
+      "restart": "Redémarrez gSender pour charger les plugins depuis le nouvel emplacement.",
+      "restartAbandoned": "Redémarrez gSender pour charger les plugins depuis le nouvel emplacement. Les plugins situés dans « {{previousUserPluginsDir}} » ne seront plus analysés tant que vous n'aurez pas rétabli ce paramètre.",
+      "updateFailed": "Échec de la mise à jour de l'emplacement des plugins. Veuillez réessayer."
+    },
+    "collectUsageData": {
+      "label": "Collecter les données d'utilisation",
+      "description": "Ces informations sont collectées de façon anonyme pour nous aider à améliorer gSender en observant la manière dont il est utilisé."
+    },
+    "uiOptionsGroup": "Options de l'interface",
+    "darkMode": {
+      "label": "Mode sombre",
+      "description": "Modifiez les couleurs de l'application pour réduire la fatigue visuelle, améliorer le contraste ou simplement pour le plaisir !"
+    },
+    "usePendantViewAsDefault": {
+      "label": "Utiliser la vue pendentif par défaut",
+      "description": "Démarrer directement dans l'interface pendentif tactile en mode kiosque plein écran au lieu de l'interface de bureau standard. Nécessite un redémarrage de l'application pour prendre effet.",
+      "restartTitle": "Redémarrage requis",
+      "restartToPendant": "gSender doit redémarrer pour passer à la vue pendentif.",
+      "restartToDesktop": "gSender doit redémarrer pour revenir à la vue bureau.",
+      "restartNow": "Redémarrer maintenant",
+      "restartLater": "Plus tard"
+    },
+    "droZeros": {
+      "label": "Décimales du DRO",
+      "description": "Définit le nombre de décimales affichées, entre 1 et 4. (0 par défaut affiche 2 décimales en mm et 3 en pouces)"
+    },
+    "visualizerOptionsGroup": "Options du visualiseur",
+    "visualizerTheme": {
+      "label": "Thème du visualiseur",
+      "description": "Réglage indépendant des couleurs du visualiseur."
+    },
+    "cameraProjection": {
+      "label": "Projection de la caméra",
+      "description": "Perspective (par défaut) montre la profondeur comme une vue de caméra normale. Orthographique supprime cette distorsion de profondeur et conserve les lignes parallèles parallèles — utile pour aligner précisément les parcours d'outil."
+    },
+    "showBoundingBox": {
+      "label": "Afficher le cadre englobant",
+      "description": "Dessine un cadre filaire autour des limites du fichier G-code chargé."
+    },
+    "showBoundingBoxLabels": {
+      "label": "Afficher les cotes du cadre englobant",
+      "description": "Affiche les cotes X/Y/Z sur le cadre englobant."
+    },
+    "showMachineBedIndicator": {
+      "label": "Afficher l'indicateur de table",
+      "description": "Dessine le contour de la zone de travail de la machine une fois la prise d'origine terminée."
+    },
+    "trimGridToMachineBed": {
+      "label": "Limiter la grille à la table",
+      "description": "Lorsque l'indicateur de table est affiché, la grille d'arrière-plan s'arrête juste au-delà des bords de la table au lieu de former un carré fixe."
+    },
+    "hideProcessedLines": {
+      "label": "Masquer les lignes traitées",
+      "description": "Masque les lignes G-code déjà traitées dans le visualiseur."
+    },
+    "showPlannedLines": {
+      "label": "Afficher les lignes planifiées",
+      "description": "Pendant l'exécution d'un travail, met en évidence le parcours d'outil entre la fraise et la dernière ligne envoyée au contrôleur."
+    },
+    "animatePlannedLines": {
+      "label": "Animer les lignes planifiées",
+      "description": "Une impulsion parcourt les lignes planifiées dans l'ordre où elles seront usinées."
+    },
+    "lightweightOptions": {
+      "label": "Options allégées",
+      "description": "Activez-les avec la plume lorsque de gros fichiers ralentissent votre ordinateur. (Léger désactive la vue 3D du fichier, Tout désactive le visualiseur)"
+    },
+    "followToolDuringRuntime": {
+      "label": "Suivre l'outil pendant l'exécution",
+      "description": "Pendant l'exécution d'un travail, la caméra suit l'outil en X/Y en conservant le même angle de vue et la même hauteur."
+    },
+    "portraitMacroBar": {
+      "label": "Barre de macros en portrait",
+      "description": "Affiche une barre de macros à accès rapide en bas de l'écran en mode portrait."
+    },
+    "joggingPresetsGroup": "Préréglages de déplacement manuel",
+    "rapid": {
+      "label": "Rapide"
+    },
+    "normal": {
+      "label": "Normal",
+      "description": "Définissez les distances et vitesses de déplacement utilisées pour chaque préréglage de déplacement manuel (jog)."
+    },
+    "precise": {
+      "label": "Précis"
+    },
+    "continuousJogDelay": {
+      "label": "Délai du jog continu",
+      "description": "Un appui ou un clic simple produit un déplacement unique ; maintenez pendant cette durée pour lancer un déplacement continu. Certains préféreront un délai plus long, comme 700. (250 par défaut)"
+    },
+    "notificationsGroup": "Notifications",
+    "warnIfBadFile": {
+      "label": "Avertir si fichier invalide",
+      "description": "Avertit si des commandes invalides sont détectées à l'ouverture d'un fichier."
+    },
+    "warnOnBadLine": {
+      "label": "Avertir si ligne invalide",
+      "description": "Avertit si des commandes invalides sont détectées pendant l'exécution d'un travail."
+    },
+    "warnWhenSettingZero": {
+      "label": "Avertir lors de la mise à zéro",
+      "description": "Utile si vous avez tendance à définir le zéro par accident."
+    },
+    "warnIfBeyondSoftLimits": {
+      "label": "Avertir si hors limites logicielles",
+      "description": "Avertit si votre fichier dépasse les limites de votre machine en fonction du point zéro actuel. (La prise d'origine et les limites logicielles doivent être activées)"
+    },
+    "jobEndNotifications": {
+      "label": "Notifications de fin de travail",
+      "description": "Affiche un résumé de l'usinage à la fin de chaque travail."
+    },
+    "maintenanceNotifications": {
+      "label": "Notifications d'entretien",
+      "description": "Affiche les tâches d'entretien à venir à la fin de chaque travail."
+    },
+    "popUpNotificationDuration": {
+      "label": "Durée des notifications",
+      "description": "Durée d'affichage des notifications, en millisecondes, avant leur fermeture automatique. (-1 les garde affichées jusqu'à leur fermeture manuelle, -2 les désactive, 0 par défaut conserve la durée standard)"
+    },
+    "shortcutsGroup": "Raccourcis",
+    "keyboard": {
+      "label": "Clavier",
+      "description": "Contrôlez votre CNC et naviguez dans gSender à l'aide de combinaisons de touches personnalisées sur n'importe quel clavier, pavé numérique ou pavé de macros."
+    },
+    "gamepad": {
+      "label": "Manette",
+      "description": "Déplacez la machine, définissez les zéros, lancez des travaux et plus encore avec la plupart des manettes courantes. Créez votre propre profil ou utilisez un profil prédéfini."
+    }
+  },
+  "customizeUi": {
+    "title": "Personnaliser l'interface"
+  },
+  "motors": {
+    "title": "Moteurs",
+    "squareUpCncRails": {
+      "label": "Mettre les rails de la CNC d'équerre",
+      "description": "Des rails mal alignés peuvent fausser les coupes à 90 degrés ; l'assistant vous aidera à corriger ce problème."
+    },
+    "xAxisGroup": "Axe X",
+    "yAxisGroup": "Axe Y",
+    "zAxisGroup": "Axe Z"
+  },
+  "probe": {
+    "title": "Palpeur",
+    "touchPlateType": {
+      "label": "Type de plaque de palpage",
+      "description": "Sélectionnez la plaque de palpage utilisée avec votre machine. (Bloc standard par défaut)"
+    },
+    "showTouchPlateSwitcher": {
+      "label": "Afficher le sélecteur de plaque",
+      "description": "Affiche un bouton dans l'onglet Palpeur permettant de changer de type de plaque de palpage."
+    },
+    "tipDiameter": {
+      "label": "Diamètre de la pointe",
+      "description": "Diamètre de la pointe du palpeur à l'endroit où elle touche le matériau. (2 par défaut)"
+    },
+    "blockThickness": {
+      "label": "Épaisseur du bloc",
+      "description": "Épaisseur de la plaque à l'endroit touché par la fraise lors du palpage en Z avec la plaque Bloc standard. (15 par défaut)"
+    },
+    "autozeroThickness": {
+      "label": "Épaisseur AutoZero",
+      "description": "Épaisseur de la plaque à l'endroit touché par la fraise lors du palpage en Z avec la plaque AutoZero. (5 par défaut)"
+    },
+    "puckThickness": {
+      "label": "Épaisseur du palet",
+      "description": "Épaisseur de la plaque à l'endroit touché par la fraise lors du palpage en Z avec la plaque Z Probe. (15 par défaut)"
+    },
+    "zOffset": {
+      "label": "Décalage Z",
+      "description": "Ajustez-le pour améliorer la précision de la mise à zéro en Z de votre palpeur. (0 par défaut)"
+    },
+    "bitzeroThicknessXyz": {
+      "label": "Épaisseur BitZero (XYZ)",
+      "description": "Épaisseur de la plaque pour le palpage XYZ, à l'endroit où la fraise touche la surface en retrait à l'intérieur de l'alésage. (13 par défaut)"
+    },
+    "bitzeroThicknessZOnly": {
+      "label": "Épaisseur BitZero (Z seul)",
+      "description": "Épaisseur de la plaque pour le palpage en Z seul, lorsque le palpeur est posé à plat sur la surface. (15.5 par défaut)"
+    },
+    "xyThickness": {
+      "label": "Épaisseur XY",
+      "description": "Épaisseur de la plaque à l'endroit touché par la fraise lors du palpage en X/Y. (10 par défaut)"
+    },
+    "xyRetract": {
+      "label": "Dégagement XY",
+      "description": "Distance supplémentaire de dégagement par rapport à la surface lors du palpage. (10 par défaut)"
+    },
+    "zProbeDistance": {
+      "label": "Distance de palpage Z",
+      "description": "Déplacement en Z avant l'abandon du palpage. (Réduisez cette valeur si vous obtenez une alarme 2 de limite logicielle lors du palpage, 30 par défaut)"
+    },
+    "fastFind": {
+      "label": "Recherche rapide",
+      "description": "Vitesse de palpage avant le premier contact. (150 par défaut)"
+    },
+    "slowFind": {
+      "label": "Recherche lente",
+      "description": "Vitesse du second contact, plus précis. (75 par défaut)"
+    },
+    "retraction": {
+      "label": "Rétraction",
+      "description": "Distance de recul de la fraise après un contact réussi. (2 par défaut)"
+    },
+    "probeMovementSpeed": {
+      "label": "Vitesse de déplacement du palpage",
+      "description": "Vitesse d'avance des mouvements de rétraction/repositionnement pendant le palpage. Si 0, ces mouvements utilisent le déplacement rapide (G0). Si elle est définie, ils utilisent un mouvement d'avance contrôlé (G1) à cette vitesse. (0 par défaut)"
+    },
+    "finalZRetract": {
+      "label": "Dégagement Z final",
+      "description": "Distance de dégagement sur l'axe Z à la fin de la routine. (2 par défaut)"
+    },
+    "finalZRetract2": {
+      "label": "Dégagement Z final",
+      "description": "Distance de dégagement sur l'axe Z à la fin de la routine. (1 par défaut)"
+    },
+    "connectionTest": {
+      "label": "Test de connexion",
+      "description": "Contrôle de sécurité pour vérifier que votre palpeur est correctement connecté."
+    }
+  },
+  "actionButtons": {
+    "title": "Boutons d'action"
+  },
+  "homingLimits": {
+    "title": "Origine/Limites",
+    "stopJoggingPastLimits": {
+      "label": "Bloquer le jog au-delà des limites",
+      "description": "Empêche le déplacement manuel dans une direction où un fin de course a déjà été déclenché."
+    },
+    "homingBehaviourGroup": "Comportement de la prise d'origine",
+    "parkingGroup": "Stationnement",
+    "parkLocation": {
+      "label": "Position de stationnement",
+      "description": "Le bouton P de la page Usinage vous amènera toujours à cette position de stationnement pratique. (La prise d'origine doit être activée)"
+    }
+  },
+  "spindleLaser": {
+    "title": "Broche/Laser",
+    "spindleLaserControls": {
+      "label": "Commandes broche/laser",
+      "description": "Affiche l'onglet Broche/Laser et les fonctions associées sur la page Usinage."
+    },
+    "insertDwellForSpindleCommands": {
+      "label": "Temporisation des commandes broche",
+      "description": "Ajoute un délai pour laisser à la broche le temps de monter en régime. Une commande G4 sera insérée après chaque M3/M4 du fichier ; inutile si votre micrologiciel gère déjà l'attente de la vitesse de broche. (0 par défaut)"
+    },
+    "minimumSpindleSpeed": {
+      "label": "Vitesse de broche minimale",
+      "description": "Faites-la correspondre à la vitesse minimale de votre broche. ($31, 10000 par défaut)"
+    },
+    "maximumSpindleSpeed": {
+      "label": "Vitesse de broche maximale",
+      "description": "Faites-la correspondre à la vitesse maximale de votre broche. ($30, 30000 par défaut)"
+    },
+    "spindlePwmGroup": "PWM de la broche",
+    "spindleModbusGroup": "Modbus de la broche",
+    "laserGroup": "Laser",
+    "minimumLaserPower": {
+      "label": "Puissance laser minimale",
+      "description": "Faites-la correspondre à la valeur S minimale définie dans votre logiciel de FAO laser. ($731, 0 par défaut)"
+    },
+    "maximumLaserPower": {
+      "label": "Puissance laser maximale",
+      "description": "Faites-la correspondre à la valeur S maximale définie dans votre logiciel de FAO laser. ($730, 255.000 par défaut)"
+    },
+    "laserOnDuringOutline": {
+      "label": "Laser allumé pendant le contour",
+      "description": "Allume le laser à sa puissance minimale pour mieux voir la position du travail."
+    },
+    "laserXOffset": {
+      "label": "Décalage X du laser",
+      "description": "Décalage sur l'axe X par rapport à la broche. (Faites une marque avec une fraise en V, puis déplacez le laser jusqu'à cette marque, $741, 0 par défaut)"
+    },
+    "laserYOffset": {
+      "label": "Décalage Y du laser",
+      "description": "Décalage sur l'axe Y par rapport à la broche. (Faites une marque avec une fraise en V, puis déplacez le laser jusqu'à cette marque, $742, 0 par défaut)"
+    }
+  },
+  "accessoryOutputs": {
+    "title": "Sorties accessoires",
+    "coolantControls": {
+      "label": "Commandes de refroidissement",
+      "description": "Affiche l'onglet Refroidissement et les fonctions associées sur la page Usinage."
+    }
+  },
+  "rotary": {
+    "title": "Rotatif",
+    "rotaryControls": {
+      "label": "Commandes rotatives",
+      "description": "Affiche l'onglet Rotatif et les fonctions associées sur la page Usinage."
+    },
+    "resolution": {
+      "label": "Résolution",
+      "description": "Résolution de déplacement en pas par degré. ($103, 19.75308642 par défaut)"
+    },
+    "maxSpeed": {
+      "label": "Vitesse max",
+      "description": "Vitesse maximale de l'axe, également utilisée pour les déplacements rapides G0. ($113, 8000 par défaut)"
+    },
+    "forceSoftLimits": {
+      "label": "Forcer les limites logicielles",
+      "description": "Active les limites logicielles lors du passage en mode rotatif. (Grbl uniquement)"
+    },
+    "forceHardLimits": {
+      "label": "Forcer les limites matérielles",
+      "description": "Active les limites matérielles lors du passage en mode rotatif. (Grbl uniquement)"
+    },
+    "visualizeNonCenterZeros": {
+      "label": "Visualiser les zéros hors centre",
+      "description": "Pour les fichiers rotatifs dont le zéro n'est pas au centre, applique un décalage lorsqu'un diamètre de cylindre est trouvé dans le fichier."
+    },
+    "useAAxisForGrbl": {
+      "label": "Utiliser l'axe A pour Grbl",
+      "description": "Active l'envoi des commandes et contrôles de l'axe A pour les appareils exécutant un Grbl 4 axes modifié, au lieu de convertir A en Y. (Grbl uniquement)"
+    }
+  },
+  "automations": {
+    "title": "Automatisations",
+    "fileStart": {
+      "label": "Début du fichier",
+      "description": "S'exécute au lancement d'un travail, avant le fichier lui-même."
+    },
+    "filePause": {
+      "label": "Pause du fichier",
+      "description": "Pour arrêter des accessoires ou dégager la machine lorsque vous mettez un travail en pause."
+    },
+    "fileResume": {
+      "label": "Reprise du fichier",
+      "description": "Assurez-vous que tout ce que vous avez configuré pour la pause du fichier est annulé à la reprise."
+    },
+    "fileStopEnd": {
+      "label": "Arrêt/fin du fichier",
+      "description": "Une sécurité générale pour que les travaux arrêtés ou terminés éteignent toujours tout en toute sécurité."
+    }
+  },
+  "toolChanging": {
+    "title": "Changement d'outil",
+    "enableAtcControls": {
+      "label": "Activer les commandes ATC",
+      "description": "Activer les commandes ATC"
+    },
+    "passthrough": {
+      "label": "Transmission directe",
+      "description": "Envoie les lignes de changement d'outil telles quelles, en supposant que votre CNC sait gérer correctement les commandes M6 et T."
+    },
+    "gsenderStrategy": {
+      "label": "Stratégie gSender",
+      "description": "L'assistant Standard vous guide à travers les étapes pour installer manuellement un nouvel outil et reprendre l'usinage.\n\nFlexible est similaire mais utilise une plaque de palpage comme capteur de longueur d'outil.\n\nFixe est également guidé mais entièrement automatisé : la machine se déplace et mesure les outils pour vous. Prise d'origine et TLS requis.\n\nCode est destiné aux configurations entièrement personnalisées."
+    },
+    "skipDialog": {
+      "label": "Ignorer la boîte de dialogue",
+      "description": "Aucune invite lors de la pause, et pas de pause entre les blocs de code."
+    },
+    "fixedSensorLocation": {
+      "label": "Position du capteur fixe",
+      "description": "La position de départ du palpage. Pour ne pas casser de fraises, définissez-la avec un outil long en laissant de la marge en Z au-dessus du capteur. (Z doit être négatif)"
+    },
+    "firstToolBehaviour": {
+      "label": "Comportement du premier outil",
+      "description": "Contrôle la gestion du premier changement d'outil. De nombreux logiciels de FAO ajoutent une commande de changement d'outil initiale même si l'outil est déjà en place.\n\n« Toujours lancer l'assistant complet » exécute l'intégralité du processus de changement d'outil.\n\n« Demander pour le premier outil » demande s'il faut lancer l'assistant complet ou simplement palper la longueur de l'outil actuel.\n\n« Toujours palper la longueur seule » ignore le changement d'outil et mesure uniquement l'outil actuel."
+    },
+    "setToolChangeLocation": {
+      "label": "Définir la position de changement d'outil",
+      "description": "Déplace la CNC vers une position plus pratique pour les changements d'outil manuels au lieu de demander le changement au-dessus du capteur."
+    },
+    "manualToolChangeLocation": {
+      "label": "Position de changement d'outil manuel",
+      "description": "La position vers laquelle se déplacer lors d'un changement d'outil manuel."
+    },
+    "beforeToolChange": {
+      "label": "Avant le changement d'outil",
+      "description": "Avec la stratégie Code, ce code est exécuté dès qu'une commande M6 est rencontrée."
+    },
+    "afterToolChange": {
+      "label": "Après le changement d'outil",
+      "description": "Avec la stratégie Code, ce code est exécuté une fois le changement d'outil terminé."
+    },
+    "keepoutGroup": "Zone d'exclusion",
+    "warnOnHome": {
+      "label": "Avertir à la prise d'origine",
+      "description": "Avertit lors de la prise d'origine que la zone d'exclusion est désactivée et que des collisions sont possibles selon le cycle de prise d'origine."
+    }
+  },
+  "ethernet": {
+    "title": "Ethernet",
+    "connectToIp": {
+      "label": "Se connecter à l'IP",
+      "description": "Adresse IP utilisée pour se connecter aux CNC via Ethernet et pour les autres analyses réseau. (192.168.5.1 par défaut)"
+    },
+    "ethernetPort": {
+      "label": "Port Ethernet",
+      "description": "Le port exposé par le contrôleur pour la connexion Ethernet. (Utilisé lors des tentatives de connexion via Ethernet, 23 par défaut)"
+    }
+  },
+  "statusLights": {
+    "title": "Voyants d'état"
+  },
+  "advancedMotors": {
+    "title": "Moteurs (avancé)"
+  },
+  "moreSettings": {
+    "title": "Autres paramètres"
+  },
+  "accessibility": {
+    "title": "Accessibilité",
+    "announcementsGroup": "Annonces",
+    "machineStatus": {
+      "label": "État de la machine",
+      "description": "Annonce automatiquement les changements d'état de la machine via les lecteurs d'écran. (Inactif, En cours, Alarme, etc.)"
+    },
+    "jobProgress": {
+      "label": "Progression du travail",
+      "description": "Annonce périodiquement le pourcentage d'avancement du travail."
+    },
+    "progressIncrement": {
+      "label": "Pas de progression",
+      "description": "L'intervalle en pourcentage auquel annoncer la progression du travail. (10% par défaut)"
+    },
+    "audioCuesGroup": "Signaux sonores",
+    "enableAudioCues": {
+      "label": "Activer les signaux sonores",
+      "description": "Joue de courts sons lors de certains événements de la machine."
+    },
+    "jobCompleteSound": {
+      "label": "Son de fin de travail",
+      "description": "Joue un son lorsqu'un travail se termine."
+    },
+    "alarmSound": {
+      "label": "Son d'alarme",
+      "description": "Joue un son lorsque la machine passe en état d'alarme."
+    },
+    "toolChangeSound": {
+      "label": "Son de changement d'outil",
+      "description": "Joue un son lorsqu'un changement d'outil est nécessaire."
+    },
+    "probeSuccessSound": {
+      "label": "Son de palpage réussi",
+      "description": "Joue un son après un palpage réussi."
+    },
+    "navigationAndVisualsGroup": "Navigation et affichage",
+    "focusRings": {
+      "label": "Anneaux de focus",
+      "description": "Affiche un anneau à contraste élevé autour de l'élément ayant le focus pour mieux suivre la navigation au clavier."
+    },
+    "focusTrapping": {
+      "label": "Confinement du focus",
+      "description": "Maintient le focus clavier dans les fenêtres modales et boîtes de dialogue lorsqu'elles sont ouvertes."
+    },
+    "reducedMotion": {
+      "label": "Animations réduites",
+      "description": "Réduit les animations et transitions de l'interface pour une meilleure visibilité et accessibilité."
+    },
+    "spindleSpeedInputType": {
+      "label": "Type de saisie de la vitesse de broche",
+      "description": "Choisissez entre un curseur et un champ numérique pour régler la vitesse de broche."
+    },
+    "appDisplayScale": {
+      "label": "Échelle d'affichage",
+      "description": "Remplace l'échelle d'affichage de l'application indépendamment des paramètres DPI de votre système d'exploitation."
+    },
+    "visualizerGroup": "Visualiseur",
+    "keyboardControl": {
+      "label": "Contrôle au clavier",
+      "description": "Permet de faire pivoter, déplacer et zoomer le visualiseur 3D avec les flèches et les raccourcis clavier."
+    },
+    "jobSummary": {
+      "label": "Résumé du travail",
+      "description": "Fournit un résumé textuel du fichier G-code chargé pour les lecteurs d'écran."
+    },
+    "showSummaryVisually": {
+      "label": "Afficher le résumé",
+      "description": "Affiche le texte du résumé G-code au-dessus du visualiseur."
+    },
+    "keyboardMapGroup": "Carte du clavier",
+    "showKeyboardShortcutMap": {
+      "label": "Afficher la carte des raccourcis",
+      "description": "Affiche une surcouche avec les raccourcis clavier actifs."
+    }
+  },
+  "options": {
+    "outline": {
+      "detailed": "Détaillé",
+      "square": "Carré",
+      "rapidlessSquare": "Carré sans rapides"
+    },
+    "backupFrequency": {
+      "onUpdate": "À la mise à jour",
+      "daily": "Quotidienne",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuelle"
+    },
+    "projection": {
+      "perspective": "Perspective",
+      "orthographic": "Orthographique"
+    },
+    "lightweight": {
+      "light": "Léger",
+      "everything": "Tout"
+    },
+    "toolChangeStrategy": {
+      "ignore": "Ignorer",
+      "pause": "Pause",
+      "standardRezero": "Remise à zéro standard",
+      "flexibleRezero": "Remise à zéro flexible",
+      "fixedToolSensor": "Capteur d'outil fixe",
+      "code": "Code"
+    },
+    "firstToolBehaviour": {
+      "alwaysRunFullWizard": "Toujours lancer l'assistant complet",
+      "promptForFirstTool": "Demander pour le premier outil",
+      "alwaysProbeLengthOnly": "Toujours palper la longueur seule"
+    },
+    "spindleInputType": {
+      "slider": "Curseur",
+      "number": "Nombre"
+    }
+  },
+  "row": {
+    "resetTooltip": "Rétablir la valeur par défaut",
+    "resetTitle": "Réinitialiser le paramètre",
+    "resetConfirm": "Voulez-vous vraiment rétablir la valeur par défaut ?",
+    "resetPluginsDirIntro": "Cette réinitialisation empêchera gSender d'analyser :",
+    "resetPluginsDirWarning": "Les plugins qui y ont été importés disparaîtront du gestionnaire de plugins jusqu'à ce que vous rétablissiez ce paramètre. Voulez-vous vraiment rétablir la valeur par défaut ?",
+    "restored": "{{setting}} rétabli à sa valeur par défaut de {{value}}",
+    "noDefault": "Aucune valeur par défaut trouvée pour {{setting}}."
+  },
+  "page": {
+    "allConfigTab": "Toute la configuration",
+    "searchLabel": "Rechercher",
+    "searchPlaceholder": "Rechercher dans la configuration",
+    "searchClear": "Effacer",
+    "viewModified": "Voir les modifiés",
+    "modified": "Modifié",
+    "viewModifiedAria": "Afficher uniquement les paramètres modifiés",
+    "disconnected": "Déconnecté",
+    "disconnectedTitle": "Déconnecté !",
+    "disconnectedMessage": "Certains paramètres peuvent ne pas apparaître sans connexion à une machine.",
+    "emptySection": "Vérifiez votre filtre de recherche ou connectez-vous à votre machine pour voir plus d'options."
+  },
+  "preferences": {
+    "legend": "Préférences de gSender",
+    "import": "Importer",
+    "export": "Exporter",
+    "importTitle": "Importer les paramètres",
+    "importConfirm": "Tous vos paramètres actuels seront remplacés. Voulez-vous vraiment importer vos paramètres dans gSender ?",
+    "importAction": "Importer les paramètres",
+    "restoreTitle": "Restaurer les paramètres",
+    "restoreConfirm": "Tous vos paramètres actuels seront supprimés. Voulez-vous vraiment restaurer les paramètres par défaut de gSender ?",
+    "restoreAction": "Restaurer les paramètres",
+    "importFailed": "Échec de l'importation des paramètres. Veuillez vérifier le format du fichier.",
+    "settingsUpdated_one": "{{count}} paramètre mis à jour.",
+    "settingsUpdated_other": "{{count}} paramètres mis à jour.",
+    "settingsUpdated_many": "{{count}} paramètres mis à jour."
+  },
+  "profileBar": {
+    "flash": "Flasher",
+    "import": "Importer",
+    "export": "Exporter",
+    "apply": "Appliquer",
+    "applySettings": "Appliquer les paramètres",
+    "eepromImported": "Paramètres EEPROM importés",
+    "importFailed": "Échec de l'importation des paramètres. Veuillez vérifier le format du fichier.",
+    "importUnable": "Impossible d'importer les paramètres",
+    "eepromUpdated_one": "{{count}} valeur EEPROM mise à jour.",
+    "eepromUpdated_other": "{{count}} valeurs EEPROM mises à jour.",
+    "eepromUpdated_many": "{{count}} valeurs EEPROM mises à jour."
+  },
+  "restoreDefaults": {
+    "button": "Par défaut",
+    "title": "Restaurer les valeurs par défaut",
+    "confirm": "Voulez-vous vraiment rétablir votre <1>{{machineName}}</1> à son état par défaut ?",
+    "action": "Restaurer les valeurs par défaut",
+    "tooltip": "N'oubliez pas de cliquer pour appliquer les valeurs par défaut à votre contrôleur",
+    "restored": "Paramètres par défaut de votre machine restaurés."
+  },
+  "flash": {
+    "title": "Flasher le micrologiciel",
+    "intro": "Cette fonction permet de flasher le micrologiciel sur un appareil SLB ou à base d'Arduino compatible.",
+    "port": "Port",
+    "recognizedPorts": "Ports reconnus",
+    "unrecognizedPorts": "Ports non reconnus",
+    "controllerType": "Type de contrôleur",
+    "selectBoardType": "Sélectionnez le type de carte",
+    "firmwareFile": "Fichier du micrologiciel",
+    "warning": "Ce processus déconnectera votre machine et peut prendre quelques minutes.",
+    "continuePrompt": "Continuer ?",
+    "noPort": "Aucun port spécifié - veuillez vous connecter à l'appareil pour déterminer ce qui sera flashé.",
+    "logTitle": "Journal du flashage",
+    "logWaiting": "En attente des journaux...",
+    "completed": "Flashage terminé, veuillez vous reconnecter à votre appareil.",
+    "logType": {
+      "info": "Info",
+      "success": "Succès",
+      "warning": "Avertissement",
+      "error": "Erreur"
+    }
+  },
+  "eepromRow": {
+    "resetTitle": "Réinitialiser une valeur EEPROM",
+    "machineSetting": "Paramètre machine",
+    "settingDefault": "({{setting}}, {{value}} par défaut)"
+  },
+  "wizards": {
+    "configureGamepad": "Configurer la manette",
+    "configureKeyboard": "Configurer le clavier",
+    "squareXY": "Équerrage XY",
+    "tuneCorrection": "Ajuster la correction",
+    "jogMinus": "Jog {{axis}}-",
+    "jogPlus": "Jog {{axis}}+",
+    "laserOn": "Laser allumé",
+    "laserOff": "Laser éteint",
+    "spindleForward": "Av.",
+    "spindleReverse": "Inv.",
+    "spindleStop": "Arrêt",
+    "setupAutoSpin": "Configurer AutoSpin",
+    "autoSpinIcon": "Icône AutoSpin",
+    "probePin": "Palpeur/TLS :",
+    "configureAtci": "Configurer Sienci ATCi",
+    "atciRequiresGrblHal": "ATCi n'est pris en charge que par les cartes exécutant grblHAL.",
+    "atciMinVersion": "ATCi n'est pris en charge que par grblHAL version {{version}} ou ultérieure.",
+    "atciRestartTitle": "ATCi - Redémarrez votre contrôleur",
+    "atciRestartMessage": "Veuillez redémarrer manuellement votre contrôleur CNC (couper puis rétablir l'alimentation) et vous reconnecter à gSender pour que ces paramètres prennent effet."
+  },
+  "inputs": {
+    "eventEditTitle": "Modifier l'événement",
+    "eventDialogDescription": "Saisissez les commandes G-code à exécuter pour cet événement.",
+    "eventEnabled": "Activé :",
+    "eventNoCommands": "; Aucune commande définie",
+    "eventEdit": "Modifier l'événement",
+    "eventFetchFailed": "Impossible de récupérer les données de l'événement {{eventType}}",
+    "eventSaveFailed": "Impossible d'enregistrer les commandes de l'événement",
+    "locationGrab": "Capturer",
+    "locationGoTo": "Aller à",
+    "jogSpeed": "Vitesse :",
+    "chooseFolder": "Choisir un dossier",
+    "bit": "Bit {{bit}} : {{label}}"
+  },
+  "firmware": {
+    "grbl": {
+      "0": {
+        "description": "Durée de l'impulsion de pas",
+        "details": "Définit la durée de chaque impulsion de pas. Minimum 3 μs."
+      },
+      "1": {
+        "description": "Délai d'inactivité des pas",
+        "details": "Définit un court délai de maintien à l'arrêt pour laisser la dynamique se stabiliser avant de désactiver les moteurs pas à pas. La valeur 255 maintient les moteurs activés sans délai."
+      },
+      "2": {
+        "description": "Inversion de l'impulsion de pas",
+        "details": "Inverse le signal de pas. Activez le bit de l'axe à inverser (00000ZYX)."
+      },
+      "3": {
+        "description": "Inversion de la direction de pas",
+        "details": "Inverse le signal de direction. Activez le bit de l'axe à inverser (00000ZYX)."
+      },
+      "4": {
+        "description": "Inverser la broche d'activation des pas",
+        "details": "Inverse le signal de la broche d'activation du pilote de moteur pas à pas."
+      },
+      "5": {
+        "description": "Inverser les entrées de fin de course",
+        "details": "Inverse toutes les entrées de fin de course."
+      },
+      "6": {
+        "description": "Inverser l'entrée du palpeur",
+        "details": "Inverse le signal de l'entrée du palpeur."
+      },
+      "10": {
+        "description": "Options du rapport d'état",
+        "details": "Modifie les données incluses dans les rapports d'état."
+      },
+      "11": {
+        "description": "Déviation de jonction",
+        "details": "Définit la vitesse à laquelle Grbl enchaîne les mouvements consécutifs. Une valeur plus faible le ralentit."
+      },
+      "12": {
+        "description": "Tolérance d'arc",
+        "details": "Définit la précision du tracé des arcs G2 et G3 en fonction de l'erreur radiale. Attention : une valeur très faible peut nuire aux performances."
+      },
+      "13": {
+        "description": "Rapport en pouces",
+        "details": "Active les unités en pouces pour toute valeur de position et de vitesse renvoyée qui n'est pas une valeur de paramètre."
+      },
+      "20": {
+        "description": "Activation des limites logicielles",
+        "details": "Active le contrôle des limites logicielles dans la course de la machine et déclenche une alarme en cas de dépassement. Nécessite la prise d'origine."
+      },
+      "21": {
+        "description": "Activation des limites matérielles",
+        "details": "Active les limites matérielles. Arrête immédiatement le mouvement et déclenche une alarme lorsqu'un fin de course est actionné."
+      },
+      "22": {
+        "description": "Activation du cycle de prise d'origine",
+        "details": "Active le cycle de prise d'origine. Nécessite des fins de course sur tous les axes."
+      },
+      "23": {
+        "description": "Inversion de la direction de prise d'origine",
+        "details": "La prise d'origine recherche un fin de course dans la direction positive. Activez le bit de l'axe (00000ZYX) pour rechercher dans la direction négative."
+      },
+      "24": {
+        "description": "Vitesse d'avance de localisation (origine)",
+        "details": "Vitesse d'avance pour approcher lentement le fin de course afin de déterminer précisément sa position."
+      },
+      "25": {
+        "description": "Vitesse de recherche (origine)",
+        "details": "Vitesse de recherche pour trouver rapidement le fin de course avant la phase de localisation plus lente."
+      },
+      "26": {
+        "description": "Délai anti-rebond du fin de course",
+        "details": "Définit un court délai entre les phases du cycle de prise d'origine pour laisser le contact se stabiliser (anti-rebond)."
+      },
+      "27": {
+        "description": "Distance de dégagement du fin de course",
+        "details": "Distance de recul après le déclenchement du fin de course pour le libérer. La prise d'origine échoue si le fin de course n'est pas libéré."
+      },
+      "30": {
+        "description": "Vitesse de broche maximale",
+        "details": "Vitesse de broche maximale. Règle le PWM à un rapport cyclique de 100%."
+      },
+      "31": {
+        "description": "Vitesse de broche minimale",
+        "details": "Vitesse de broche minimale. Règle le PWM à 0.4% ou au rapport cyclique le plus bas."
+      },
+      "32": {
+        "description": "Mode laser activé à la place de la broche",
+        "details": "Convertit les commandes de broche en mode laser. Les commandes G1/2/3 consécutives ne s'arrêtent pas lors d'un changement de vitesse de broche."
+      },
+      "100": {
+        "description": "Résolution de déplacement de l'axe X",
+        "details": "Résolution de déplacement de l'axe X en pas par millimètre."
+      },
+      "101": {
+        "description": "Résolution de déplacement de l'axe Y",
+        "details": "Résolution de déplacement de l'axe Y en pas par millimètre."
+      },
+      "102": {
+        "description": "Résolution de déplacement de l'axe Z",
+        "details": "Résolution de déplacement de l'axe Z en pas par millimètre."
+      },
+      "110": {
+        "description": "Vitesse maximale de l'axe X",
+        "details": "Vitesse maximale de l'axe X. Utilisée comme vitesse rapide G0."
+      },
+      "111": {
+        "description": "Vitesse maximale de l'axe Y",
+        "details": "Vitesse maximale de l'axe Y. Utilisée comme vitesse rapide G0."
+      },
+      "112": {
+        "description": "Vitesse maximale de l'axe Z",
+        "details": "Vitesse maximale de l'axe Z. Utilisée comme vitesse rapide G0."
+      },
+      "120": {
+        "description": "Accélération de l'axe X",
+        "details": "Accélération de l'axe X. Utilisée pour la planification des mouvements afin de ne pas dépasser le couple moteur et perdre des pas."
+      },
+      "121": {
+        "description": "Accélération de l'axe Y",
+        "details": "Accélération de l'axe Y. Utilisée pour la planification des mouvements afin de ne pas dépasser le couple moteur et perdre des pas."
+      },
+      "122": {
+        "description": "Accélération de l'axe Z",
+        "details": "Accélération de l'axe Z. Utilisée pour la planification des mouvements afin de ne pas dépasser le couple moteur et perdre des pas."
+      },
+      "130": {
+        "description": "Course maximale de l'axe X",
+        "details": "Distance de course maximale de l'axe X depuis le fin de course d'origine. Détermine l'espace machine valide pour les limites logicielles et les distances de recherche de la prise d'origine."
+      },
+      "131": {
+        "description": "Course maximale de l'axe Y",
+        "details": "Distance de course maximale de l'axe Y depuis le fin de course d'origine. Détermine l'espace machine valide pour les limites logicielles et les distances de recherche de la prise d'origine."
+      },
+      "132": {
+        "description": "Course maximale de l'axe Z",
+        "details": "Distance de course maximale de l'axe Z depuis le fin de course d'origine. Détermine l'espace machine valide pour les limites logicielles et les distances de recherche de la prise d'origine."
+      }
+    },
+    "grblhal": {
+      "0": {
+        "description": "Durée de l'impulsion de pas",
+        "details": "Définit la durée de chaque impulsion de pas. Minimum 3 μs."
+      },
+      "1": {
+        "description": "Délai d'inactivité des pas",
+        "details": "Définit un court délai de maintien à l'arrêt pour laisser la dynamique se stabiliser avant de désactiver les moteurs pas à pas. La valeur 255 maintient les moteurs activés sans délai."
+      },
+      "2": {
+        "description": "Inversion de l'impulsion de pas",
+        "details": "Inverse le signal de pas. Activez le bit de l'axe à inverser (00000ZYX)."
+      },
+      "3": {
+        "description": "Inversion de la direction de pas",
+        "details": "Inverse le signal de direction. Activez le bit de l'axe à inverser (00000ZYX)."
+      },
+      "4": {
+        "description": "Inverser la broche d'activation des pas",
+        "details": "Inverse le signal de la broche d'activation du pilote de moteur pas à pas."
+      },
+      "5": {
+        "description": "Inverser les entrées de fin de course",
+        "details": "Inverse toutes les entrées de fin de course."
+      },
+      "6": {
+        "description": "Inverser l'entrée du palpeur",
+        "details": "Inverse le signal de l'entrée du palpeur."
+      },
+      "10": {
+        "description": "Options du rapport d'état",
+        "details": "Modifie les données incluses dans les rapports d'état."
+      },
+      "11": {
+        "description": "Déviation de jonction",
+        "details": "Définit la vitesse à laquelle Grbl enchaîne les mouvements consécutifs. Une valeur plus faible le ralentit."
+      },
+      "12": {
+        "description": "Tolérance d'arc",
+        "details": "Définit la précision du tracé des arcs G2 et G3 en fonction de l'erreur radiale. Attention : une valeur très faible peut nuire aux performances."
+      },
+      "13": {
+        "description": "Rapport en pouces",
+        "details": "Active les unités en pouces pour toute valeur de position et de vitesse renvoyée qui n'est pas une valeur de paramètre."
+      },
+      "20": {
+        "description": "Activation des limites logicielles",
+        "details": "Active le contrôle des limites logicielles dans la course de la machine et déclenche une alarme en cas de dépassement. Nécessite la prise d'origine."
+      },
+      "21": {
+        "description": "Activation des limites matérielles",
+        "details": "Active les limites matérielles. Arrête immédiatement le mouvement et déclenche une alarme lorsqu'un fin de course est actionné.",
+        "bits": {
+          "0": "Activer les limites matérielles",
+          "1": "Activer le mode strict lorsque les limites matérielles sont activées"
+        }
+      },
+      "22": {
+        "description": "Activation du cycle de prise d'origine",
+        "details": "Active le cycle de prise d'origine. Nécessite des fins de course sur tous les axes.",
+        "bits": {
+          "0": "Activer la prise d'origine.",
+          "1": "Activer les commandes de prise d'origine axe par axe.",
+          "2": "Prise d'origine requise au démarrage.",
+          "3": "Définir l'origine machine à 0.",
+          "4": "Deux fins de course partagent une même entrée.",
+          "5": "Autoriser la prise d'origine manuelle des axes non référencés automatiquement.",
+          "6": "Ignorer les verrous, autoriser la réinitialisation à effacer l'alarme de prise d'origine requise au démarrage.",
+          "7": "Conserver l'état de prise d'origine lors d'une réinitialisation si possible."
+        }
+      },
+      "23": {
+        "description": "Inversion de la direction de prise d'origine",
+        "details": "La prise d'origine recherche un fin de course dans la direction positive. Activez le bit de l'axe (00000ZYX) pour rechercher dans la direction négative."
+      },
+      "24": {
+        "description": "Vitesse d'avance de localisation (origine)",
+        "details": "Vitesse d'avance pour approcher lentement le fin de course afin de déterminer précisément sa position."
+      },
+      "25": {
+        "description": "Vitesse de recherche (origine)",
+        "details": "Vitesse de recherche pour trouver rapidement le fin de course avant la phase de localisation plus lente."
+      },
+      "26": {
+        "description": "Délai anti-rebond du fin de course",
+        "details": "Définit un court délai entre les phases du cycle de prise d'origine pour laisser le contact se stabiliser (anti-rebond)."
+      },
+      "27": {
+        "description": "Distance de dégagement du fin de course",
+        "details": "Distance de recul après le déclenchement du fin de course pour le libérer. La prise d'origine échoue si le fin de course n'est pas libéré."
+      },
+      "28": {
+        "description": "Distance de dégagement G73",
+        "details": "Définit la distance de rétraction G73 en mm."
+      },
+      "29": {
+        "description": "Délai d'impulsion de pas",
+        "details": "Délai d'impulsion des moteurs pas à pas en microsecondes."
+      },
+      "30": {
+        "description": "Vitesse de broche maximale",
+        "details": "Vitesse de broche maximale. Règle le PWM à un rapport cyclique de 100%."
+      },
+      "31": {
+        "description": "Mode de la broche",
+        "details": "Définit le mode Broche/Laser/Tour"
+      },
+      "32": {
+        "description": "Mode laser activé à la place de la broche",
+        "details": "Convertit les commandes de broche en mode laser. Les commandes G1/2/3 consécutives ne s'arrêtent pas lors d'un changement de vitesse de broche."
+      },
+      "33": {
+        "description": "Fréquence de la broche",
+        "details": "Fréquence PWM de la broche en Hz"
+      },
+      "34": {
+        "description": "Rapport cyclique de la broche",
+        "details": "Rapport cyclique PWM de la broche à l'arrêt, en pourcentage"
+      },
+      "35": {
+        "description": "Vitesse de broche minimale",
+        "details": "Vitesse de broche minimale. Règle le PWM à 0.4% ou au rapport cyclique le plus bas."
+      },
+      "36": {
+        "description": "Vitesse de broche maximale",
+        "details": "Vitesse de broche maximale."
+      },
+      "37": {
+        "description": "Moteurs pas à pas désactivés",
+        "details": "Définit quels moteurs pas à pas sont mis hors tension à la fin d'un mouvement."
+      },
+      "38": {
+        "description": "Impulsions du codeur",
+        "details": "Nombre d'impulsions par tour du codeur de broche."
+      },
+      "39": {
+        "description": "Caractères de commande imprimables",
+        "details": "Active les caractères de commande en temps réel imprimables."
+      },
+      "40": {
+        "description": "Limites logicielles en jog",
+        "details": "Active les limites logicielles pour le déplacement manuel (jog). Lorsqu'elles sont activées, les cibles de jog sont limitées à la course de la machine pour les axes référencés."
+      },
+      "43": {
+        "description": "Cycles de localisation (origine)",
+        "details": "Nombre de cycles de localisation de la prise d'origine."
+      },
+      "44": {
+        "description": "Masque d'axes",
+        "details": "Priorité des axes pour la prise d'origine, le numéro le plus bas étant exécuté en premier ; le nombre de paramètres disponibles est égal au nombre d'axes pris en charge. Remplace #define HOMING_CYCLE_0, etc."
+      },
+      "45": {
+        "description": "Masque d'axes",
+        "details": "Priorité des axes pour la prise d'origine, le numéro le plus bas étant exécuté en premier ; le nombre de paramètres disponibles est égal au nombre d'axes pris en charge. Remplace #define HOMING_CYCLE_0, etc."
+      },
+      "46": {
+        "description": "Masque d'axes",
+        "details": "Priorité des axes pour la prise d'origine, le numéro le plus bas étant exécuté en premier ; le nombre de paramètres disponibles est égal au nombre d'axes pris en charge. Remplace #define HOMING_CYCLE_0, etc."
+      },
+      "47": {
+        "description": "Masque d'axes",
+        "details": "Priorité des axes pour la prise d'origine, le numéro le plus bas étant exécuté en premier ; le nombre de paramètres disponibles est égal au nombre d'axes pris en charge. Remplace #define HOMING_CYCLE_0, etc."
+      },
+      "48": {
+        "description": "Masque d'axes",
+        "details": "Priorité des axes pour la prise d'origine, le numéro le plus bas étant exécuté en premier ; le nombre de paramètres disponibles est égal au nombre d'axes pris en charge. Remplace #define HOMING_CYCLE_0, etc."
+      },
+      "49": {
+        "description": "Masque d'axes",
+        "details": "Priorité des axes pour la prise d'origine, le numéro le plus bas étant exécuté en premier ; le nombre de paramètres disponibles est égal au nombre d'axes pris en charge. Remplace #define HOMING_CYCLE_0, etc."
+      },
+      "50": {
+        "description": "Vitesse de jog pas à pas",
+        "details": "Vitesse de jog pas à pas en mm/min. Utilisée par le pilote/l'émetteur"
+      },
+      "51": {
+        "description": "Vitesse de jog lente",
+        "details": "Vitesse de jog lente en mm/min. Utilisée par le pilote/l'émetteur"
+      },
+      "52": {
+        "description": "Vitesse de jog rapide",
+        "details": "Vitesse de jog rapide en mm/min. Utilisée par le pilote/l'émetteur"
+      },
+      "53": {
+        "description": "Distance de jog pas à pas",
+        "details": "Distance de jog pas à pas en mm. Utilisée par le pilote/l'émetteur"
+      },
+      "54": {
+        "description": "Distance de jog lente",
+        "details": "Distance de jog lente en mm. Utilisée par le pilote/l'émetteur"
+      },
+      "55": {
+        "description": "Distance de jog rapide",
+        "details": "Distance de jog rapide en mm. Utilisée par le pilote/l'émetteur"
+      },
+      "60": {
+        "description": "Rétablir les surcharges par défaut",
+        "details": "Rétablit les surcharges par défaut à la fin du programme."
+      },
+      "61": {
+        "description": "Ignorer le signal de porte de sécurité",
+        "details": "Ignore le signal de porte de sécurité à l'arrêt. Si activé, seule la broche (laser) est éteinte. Peut être utile pour positionner une tête laser avec le capot ouvert."
+      },
+      "62": {
+        "description": "Fonction veille",
+        "details": "Active la fonction veille."
+      },
+      "63": {
+        "description": "Désactiver le laser en attente",
+        "details": "Désactive le laser pendant une mise en attente (hold)."
+      },
+      "64": {
+        "description": "Alarme au démarrage",
+        "details": "Force Grbl à passer en mode alarme au démarrage."
+      },
+      "65": {
+        "description": "Autoriser la surcharge de l'avance",
+        "details": "Autorise la surcharge de la vitesse d'avance pendant le palpage."
+      },
+      "70": {
+        "description": "Service réseau",
+        "details": "Définit le service réseau."
+      },
+      "71": {
+        "description": "Appareil Bluetooth",
+        "details": "Nom de l'appareil Bluetooth."
+      },
+      "72": {
+        "description": "Service Bluetooth",
+        "details": "Nom du service Bluetooth."
+      },
+      "73": {
+        "description": "Mode Wi-Fi",
+        "details": "Mode Wi-Fi."
+      },
+      "74": {
+        "description": "SSID Wi-Fi STA",
+        "details": "SSID Wi-Fi STA (station)."
+      },
+      "75": {
+        "description": "Mot de passe Wi-Fi STA",
+        "details": "Mot de passe Wi-Fi STA (station)."
+      },
+      "76": {
+        "description": "SSID Wi-Fi AP",
+        "details": "SSID Wi-Fi AP (point d'accès)."
+      },
+      "77": {
+        "description": "Mot de passe Wi-Fi AP",
+        "details": "Mot de passe Wi-Fi AP (point d'accès)."
+      },
+      "78": {
+        "description": "Pays Wi-Fi",
+        "details": "Pays du Wi-Fi AP (point d'accès)."
+      },
+      "79": {
+        "description": "Mot de passe du canal Wi-Fi AP",
+        "details": "Mot de passe du canal Wi-Fi AP (point d'accès)."
+      },
+      "80": {
+        "description": "Gain proportionnel du régulateur PID de la broche",
+        "details": "Gain proportionnel du régulateur PID de la broche."
+      },
+      "81": {
+        "description": "Gain intégral du régulateur PID de la broche",
+        "details": "Gain intégral du régulateur PID de la broche."
+      },
+      "82": {
+        "description": "Gain dérivé du régulateur PID de la broche",
+        "details": "Gain dérivé du régulateur PID de la broche."
+      },
+      "84": {
+        "description": "Erreur de sortie max du PID de la broche",
+        "details": "Erreur de sortie maximale du PID de la broche."
+      },
+      "85": {
+        "description": "Erreur de sortie max du PID de la broche",
+        "details": "Erreur intégrale maximale du régulateur PID de la broche."
+      },
+      "90": {
+        "description": "Gain proportionnel du régulateur PID de mouvement synchronisé à la broche",
+        "details": "Gain proportionnel du régulateur PID de mouvement synchronisé à la broche."
+      },
+      "91": {
+        "description": "Gain intégral du régulateur PID de mouvement synchronisé à la broche",
+        "details": "Gain intégral du régulateur PID de mouvement synchronisé à la broche."
+      },
+      "92": {
+        "description": "Gain dérivé du régulateur PID de mouvement synchronisé à la broche",
+        "details": "Gain dérivé du régulateur PID de mouvement synchronisé à la broche."
+      },
+      "100": {
+        "description": "Résolution de déplacement de l'axe X",
+        "details": "Résolution de déplacement de l'axe X en pas par millimètre."
+      },
+      "101": {
+        "description": "Résolution de déplacement de l'axe Y",
+        "details": "Résolution de déplacement de l'axe Y en pas par millimètre."
+      },
+      "102": {
+        "description": "Résolution de déplacement de l'axe Z",
+        "details": "Résolution de déplacement de l'axe Z en pas par millimètre."
+      },
+      "110": {
+        "description": "Vitesse maximale de l'axe X",
+        "details": "Vitesse maximale de l'axe X. Utilisée comme vitesse rapide G0."
+      },
+      "111": {
+        "description": "Vitesse maximale de l'axe Y",
+        "details": "Vitesse maximale de l'axe Y. Utilisée comme vitesse rapide G0."
+      },
+      "112": {
+        "description": "Vitesse maximale de l'axe Z",
+        "details": "Vitesse maximale de l'axe Z. Utilisée comme vitesse rapide G0."
+      },
+      "120": {
+        "description": "Accélération de l'axe X",
+        "details": "Accélération de l'axe X. Utilisée pour la planification des mouvements afin de ne pas dépasser le couple moteur et perdre des pas."
+      },
+      "121": {
+        "description": "Accélération de l'axe Y",
+        "details": "Accélération de l'axe Y. Utilisée pour la planification des mouvements afin de ne pas dépasser le couple moteur et perdre des pas."
+      },
+      "122": {
+        "description": "Accélération de l'axe Z",
+        "details": "Accélération de l'axe Z. Utilisée pour la planification des mouvements afin de ne pas dépasser le couple moteur et perdre des pas."
+      },
+      "130": {
+        "description": "Course maximale de l'axe X",
+        "details": "Distance de course maximale de l'axe X depuis le fin de course d'origine. Détermine l'espace machine valide pour les limites logicielles et les distances de recherche de la prise d'origine."
+      },
+      "131": {
+        "description": "Course maximale de l'axe Y",
+        "details": "Distance de course maximale de l'axe Y depuis le fin de course d'origine. Détermine l'espace machine valide pour les limites logicielles et les distances de recherche de la prise d'origine."
+      },
+      "132": {
+        "description": "Course maximale de l'axe Z",
+        "details": "Distance de course maximale de l'axe Z depuis le fin de course d'origine. Détermine l'espace machine valide pour les limites logicielles et les distances de recherche de la prise d'origine."
+      },
+      "340": {
+        "description": "Tolérance de vitesse de broche atteinte",
+        "details": "Disponible pour les pilotes et plugins prenant en charge la fonction de vitesse de broche atteinte. Si la valeur est > 0, l'alarme 14 est déclenchée si la vitesse de broche n'est pas dans la tolérance avant l'expiration du délai."
+      },
+      "341": {
+        "description": "Mode de changement d'outil manuel",
+        "details": "Disponible pour les pilotes et plugins prenant en charge la fonction de vitesse de broche atteinte. Si la valeur est > 0, l'alarme 14 est déclenchée si la vitesse de broche n'est pas dans la tolérance avant l'expiration du délai."
+      },
+      "342": {
+        "description": "Distance de palpage",
+        "details": "Utilisée dans les modes 1 et 2 lorsque la commande $TPW est émise, ainsi que dans le mode 3."
+      },
+      "343": {
+        "description": "Vitesse d'avance lente de palpage",
+        "details": "Utilisée dans les modes 1 et 2 lorsque la commande $TPW est émise, ainsi que dans le mode 3, pour obtenir un décalage d'outil précis."
+      },
+      "344": {
+        "description": "Vitesse d'avance de recherche de palpage",
+        "details": "Utilisée dans les modes 1 et 2 lorsque la commande $TPW est émise, ainsi que dans le mode 3, pour obtenir un décalage d'outil initial. En cas de succès, l'outil recule légèrement et le palpage est refait à la vitesse d'avance lente de $343."
+      },
+      "3x0": {
+        "description": "Nom d'hôte",
+        "details": "Nom d'hôte."
+      },
+      "3x1": {
+        "description": "Mode IP",
+        "details": "Mode IP de l'interface."
+      },
+      "3x2": {
+        "description": "Adresse de passerelle de l'interface",
+        "details": "Adresse de passerelle de l'interface. Adresse IPv4 ou IPv6, jusqu'à 16 octets. Peut contenir une adresse IPv4 au format binaire ou texte."
+      },
+      "3x3": {
+        "description": "Masque de sous-réseau de l'interface",
+        "details": "Masque de sous-réseau de l'interface. Adresse IPv4 ou IPv6, jusqu'à 16 octets. Peut contenir une adresse IPv4 au format binaire ou texte."
+      },
+      "3x4": {
+        "description": "Masque de sous-réseau de l'interface",
+        "details": "Masque de sous-réseau de l'interface. Adresse IPv4 ou IPv6, jusqu'à 16 octets. Peut contenir une adresse IPv4 au format binaire ou texte."
+      },
+      "3x5": {
+        "description": "Port Telnet",
+        "details": "Port de communication série, via le protocole Telnet ou un simple flux de socket."
+      },
+      "3x6": {
+        "description": "Port HTTP",
+        "details": "Port du serveur web."
+      },
+      "3x7": {
+        "description": "Port WebSocket",
+        "details": "Port de communication bidirectionnelle, généralement avec un navigateur web. Habituellement utilisé par Grbl pour la communication série."
+      }
+    }
+  }
+}

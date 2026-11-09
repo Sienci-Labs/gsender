@@ -22,6 +22,7 @@ import {
     AddressSummary,
 } from 'app/features/RemoteMode/components/AddressOption.tsx';
 import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { isIPv4 } from 'app/lib/utils';
@@ -126,21 +127,19 @@ export function RemoteModeDialog({
 
         // Validations
         if (Number(port) < 1025 || Number(port) > 65535) {
-            toast.error('Invalid Port Number - Must be between 1025 and 65535');
+            toast.error(i18n.t('notifications:remoteMode.invalidPort'));
             return;
         }
 
         if (!isIPv4(ip)) {
-            toast.error(
-                `Invalid IP Address - ${ip} does not look like a valid V4 IP address`,
-            );
+            toast.error(i18n.t('notifications:remoteMode.invalidIp', { ip }));
             return;
         }
 
         onClose(false);
         actions.saveSettings(payload);
         setHeadlessSettings(payload);
-        toast.success('Updated Wireless Control Settings', {
+        toast.success(i18n.t('notifications:remoteMode.settingsUpdated'), {
             position: 'bottom-right',
         });
     }
@@ -150,10 +149,11 @@ export function RemoteModeDialog({
 
         Confirm({
             onConfirm: onConfirmUpdate,
-            confirmLabel: 'Save Settings',
-            title: 'Save Wireless CNC Settings',
-            content:
-                'Are you sure you want to save these settings?  This will restart the application.',
+            confirmLabel: i18n.t(
+                'notifications:remoteMode.saveSettings.confirm',
+            ),
+            title: i18n.t('notifications:remoteMode.saveSettings.title'),
+            content: i18n.t('notifications:remoteMode.saveSettings.content'),
         });
     }
 

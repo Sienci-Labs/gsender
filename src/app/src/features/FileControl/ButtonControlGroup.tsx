@@ -31,6 +31,7 @@ import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileA
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -212,7 +213,9 @@ const ButtonControlGroup = () => {
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
-        toast('G-code File Closed', { position: 'bottom-right' });
+        toast(i18n.t('notifications:files.closed'), {
+            position: 'bottom-right',
+        });
 
         fileInputRef.current.value = '';
     }, 100);
