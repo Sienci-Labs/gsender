@@ -20,4 +20,4 @@ jobs:
                   version: 2.5.11
 
             - name: Fail if changed files are not formatted with biome.json
-              run: biome format --changed --since=origin/${{ github.base_ref }}
+              run: biome format --changed --since=origin/${{ github.base_ref }} --no-errors-on-unmatched
