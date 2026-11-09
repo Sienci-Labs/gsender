@@ -134,6 +134,14 @@ export interface ControllerStateState {
         probeActive: boolean;
         pinState: {
             P: boolean;
+            D: boolean;
+            S: boolean;
+            H: boolean;
+            R: boolean;
+            X: boolean;
+            Y: boolean;
+            Z: boolean;
+            A: boolean;
         };
         currentTool: number;
         hasHomed: boolean;

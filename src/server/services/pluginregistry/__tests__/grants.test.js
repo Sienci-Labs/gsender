@@ -78,6 +78,22 @@ describe("buildGrantFromScan", () => {
 		);
 	});
 
+	it("grants file:save for a 'file' import with no permission prompt or topic", () => {
+		const { permissions, capabilities } = buildGrantFromScan(["file"]);
+
+		expect(permissions).toEqual([]);
+		expect(capabilities.requestTypes).toEqual(["file:save"]);
+		expect(capabilities.topics).toEqual([]);
+	});
+
+	it("includes file:save in the 'gsender' aggregate and whole-module grants", () => {
+		for (const name of ["gsender", "*require-whole-module*"]) {
+			expect(buildGrantFromScan([name]).capabilities.requestTypes).toContain(
+				"file:save",
+			);
+		}
+	});
+
 	it("grants nothing for malformed input rather than throwing", () => {
 		for (const raw of [undefined, null, {}, "gcode", [42, null]]) {
 			const { permissions, capabilities } = buildGrantFromScan(raw);

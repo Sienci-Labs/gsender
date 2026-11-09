@@ -215,7 +215,21 @@ export type PluginBridgeRequestType =
     | 'storage:get:all'
     | 'storage:set:all'
     | 'storage:clear'
-    | 'app:navigate';
+    | 'app:navigate'
+    | 'file:save';
+
+/** Mirrors the SDK's FileSavePayload/FileSaveResult */
+export type FileSavePayload = {
+    content: string;
+    options: {
+        /** File name only; directory parts are never honoured. */
+        defaultFileName?: string;
+        title?: string;
+        filters?: { name: string; extensions: string[] }[];
+    };
+};
+
+export type FileSaveResult = { success: boolean; message: string };
 
 /** A serialized regex. Matchers cross postMessage and run server-side, so they
  * can never be functions. */

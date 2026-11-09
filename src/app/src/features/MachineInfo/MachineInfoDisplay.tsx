@@ -36,12 +36,11 @@ export function MachineInfoDisplay({
     const firmwareVersion = (() => {
         const disconnectedValue = 'disconnected';
 
-        if (!isConnected) {
-            return disconnectedValue;
-        }
+        if (!isConnected) return disconnectedValue;
 
         if (typeof reportedFirmwareVersion === 'string') {
-            const sanitizedVersion = reportedFirmwareVersion.trim();
+            const version = reportedFirmwareVersion as string;
+            const sanitizedVersion = version.trim();
             return sanitizedVersion || disconnectedValue;
         }
 

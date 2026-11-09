@@ -712,6 +712,43 @@ const main = () => {
                 return { success: true };
             });
 
+            ipcMain.handle('dialog:saveFile', async (_channel, fileData) => {
+                try {
+                    const { content, options } = fileData ?? {};
+
+                    if (typeof content !== 'string') {
+                        return {
+                            success: false,
+                            message: 'Invalid file content',
+                        };
+                    }
+
+                    // Plugins only get to suggest a file name, title and
+                    // filters; the folder is never plugin-controlled.
+                    const { defaultFileName, title, filters } = options ?? {};
+                    const { canceled, filePath } = await dialog.showSaveDialog(
+                        windowManager.getWindow(),
+                        {
+                            title,
+                            filters,
+                            defaultPath: defaultFileName
+                                ? path.basename(String(defaultFileName))
+                                : undefined,
+                        },
+                    );
+
+                    if (canceled || !filePath) {
+                        return { success: false, message: 'Save cancelled' };
+                    }
+
+                    await fs.promises.writeFile(filePath, content, 'utf-8');
+                    return { success: true, message: 'Saved successfully' };
+                } catch (error) {
+                    log.error(`Error in dialog:saveFile: ${error}`);
+                    return { success: false, message: error.message };
+                }
+            });
+
             ipcMain.handle('grblLog:fetch', async (channel) => {
                 const data = await getGRBLLog(logPath);
                 return data;

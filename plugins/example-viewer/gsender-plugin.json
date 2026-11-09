@@ -21,8 +21,8 @@
     "app:navigate"
   ],
   "capabilities": {
-    "requestTypes": ["gcode:load:to:visualizer", "app:navigate"],
+    "requestTypes": ["gcode:load:to:visualizer", "app:navigate", "file:save"],
     "topics": [],
-    "allowedFunctions": ["gcode", "navigation"]
+    "allowedFunctions": ["gcode", "navigation", "file"]
   }
 }

@@ -25,7 +25,8 @@ export type PluginBridgeRequestType =
     | 'viewer:pick:arm'
     | 'viewer:pick:disarm'
     | 'viewer:overlay:set'
-    | 'app:navigate';
+    | 'app:navigate'
+    | 'file:save';
 
 export type PluginBridgeTopic =
     | 'workspace'

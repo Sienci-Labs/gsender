@@ -1,4 +1,8 @@
-import { gcode as gcodeClient, navigation } from '@sienci/gsender-plugin-sdk';
+import {
+    file,
+    gcode as gcodeClient,
+    navigation,
+} from '@sienci/gsender-plugin-sdk';
 import { GCodeViewer } from '@sienci/gsender-plugin-sdk/viewer';
 
 import { SAMPLE_GCODE } from './sample-gcode.js';
@@ -9,6 +13,7 @@ const loadPreviewBtn = document.getElementById('load-preview');
 const loadMainBtn = document.getElementById('load-main');
 const goCarveBtn = document.getElementById('go-carve');
 const viewStatsBtn = document.getElementById('view-stats');
+const downloadBtn = document.getElementById('download-gcode');
 const statusEl = document.getElementById('status');
 const viewerContainer = document.getElementById('viewer-container');
 
@@ -18,6 +23,7 @@ if (
     !loadMainBtn ||
     !goCarveBtn ||
     !viewStatsBtn ||
+    !downloadBtn ||
     !viewerContainer
 ) {
     throw new Error('Missing required DOM elements');
@@ -108,6 +114,36 @@ const viewStats = async () => {
     }
 };
 
+const downloadGcode = async () => {
+    const gcode = getGcode();
+    if (!gcode) {
+        setStatus('Enter some G-code first.');
+        return;
+    }
+
+    try {
+        const result = await file.openSaveDialog({
+            content: gcode,
+            options: {
+                defaultFileName: 'viewer-demo.nc',
+                title: 'Save G-code',
+                filters: [
+                    {
+                        name: 'G-code',
+                        extensions: ['nc', 'gcode', 'gc', 'tap', 'cnc'],
+                    },
+                    { name: 'All Files', extensions: ['*'] },
+                ],
+            },
+        });
+        setStatus(result.message);
+    } catch (err) {
+        setStatus(
+            `Save failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+    }
+};
+
 loadPreviewBtn.addEventListener('click', () => {
     void loadPreview();
 });
@@ -122,6 +158,10 @@ goCarveBtn.addEventListener('click', () => {
 
 viewStatsBtn.addEventListener('click', () => {
     void viewStats();
+});
+
+downloadBtn.addEventListener('click', () => {
+    void downloadGcode();
 });
 
 void loadPreview();

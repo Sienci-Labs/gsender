@@ -11,7 +11,11 @@ type PageProps = {
     withBorder?: boolean;
     withPadding?: boolean;
     withFullPadding?: boolean;
+    // if you are making a tool, use this to force a certain page size that scrolls the content within it
+    // but keeps the tool's header fixed
     withFixedArea?: boolean;
+    // if you want only some of the page to be a scroll area, and other parts fixed, add this as well as withFixedArea
+    withFlexContent?: boolean;
     withGoBackButton?: boolean;
 };
 
@@ -23,6 +27,7 @@ const Page = ({
     withPadding = true,
     withFullPadding,
     withFixedArea,
+    withFlexContent,
     withGoBackButton,
 }: PageProps) => {
     const navigate = useNavigate();
@@ -67,8 +72,13 @@ const Page = ({
             </div>
             <div
                 className={cx(
-                    'w-full h-full',
-                    withFixedArea && 'overflow-y-auto overflow-x-hidden',
+                    'w-full',
+                    withFlexContent
+                        ? 'flex-1 min-h-0 flex flex-col overflow-hidden'
+                        : 'h-full',
+                    withFixedArea &&
+                        !withFlexContent &&
+                        'overflow-y-auto overflow-x-hidden',
                 )}
             >
                 {children}
