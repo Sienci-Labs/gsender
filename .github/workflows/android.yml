@@ -5,24 +5,27 @@
 # The Node.js runtime (android/node) is cross-compiled here and kept in the
 # Actions cache, keyed on android/node/**. A cache hit takes about a minute; a
 # miss (runtime change, or cache evicted after 7 days unused) takes 1–1.5 h.
+#
+# Android is not part of gSender releases: this workflow never runs for tags or
+# master and never publishes to GitHub Releases. APKs are Actions artifacts
+# only. Do not add a release upload step.
 name: Android
-run-name: "Android — ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.head_commit.message || github.ref_name }}"
+run-name: "Android — ${{ github.event.head_commit.message || github.ref_name }}"
 
 on:
   push:
-    branches: [master, dev, 'features/*', 'bugfix/*']
-    tags: ['*']
-  pull_request:
-    branches: [master]
+    branches: [dev, 'features/*', 'bugfix/*']
   workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  cancel-in-progress: true
 
 jobs:
   node-runtime:
     name: Node runtime arm64
+    # Belt and braces: a manual dispatch against a tag must not build either.
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
@@ -83,6 +86,7 @@ jobs:
   build:
     name: Build APK
     needs: node-runtime
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
