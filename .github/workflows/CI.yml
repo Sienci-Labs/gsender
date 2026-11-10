@@ -43,11 +43,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24.x'
-          cache: yarn
-          cache-dependency-path: yarn.lock
+      # No committed lockfile, so key the yarn download cache on package.json
+      # and fall back to the latest cache (resolution still happens fresh).
+      - name: Configure yarn cache
+        run: echo "YARN_CACHE_FOLDER=${{ runner.temp }}/yarn-cache" >> "$GITHUB_ENV"
+      - name: Cache yarn downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/yarn-cache
+          key: yarn-web-${{ hashFiles('package.json', 'src/app/package.json', 'src/pendant/package.json') }}
+          restore-keys: yarn-web-
       - name: Install dependencies
-        # TODO: add --frozen-lockfile once yarn.lock is back in sync with
-        # package.json (it currently isn't, so a frozen install fails).
         run: yarn install --prefer-offline
       - name: Sync package and install src deps
         run: |

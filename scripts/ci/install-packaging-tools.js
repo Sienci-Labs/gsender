@@ -5,9 +5,9 @@
  * an already-built dist/gsender (downloaded from the build-web job), instead of
  * a full root `yarn install`.
  *
- * Each tool is pinned to the version the root yarn.lock resolves it to, so
- * packaging uses the same electron-builder / electron versions as local builds.
- * (Their transitive deps are resolved fresh by npm.)
+ * Versions come from the ranges declared in the root package.json, the same
+ * way the previous full `yarn install` resolved them (the repo deliberately
+ * has no committed lockfile).
  *
  * The tools are installed into a scratch directory and its node_modules is then
  * moved to <root>/node_modules, so `yarn electron-builder`, `yarn github-release`,
@@ -33,25 +33,6 @@ const TOOLS = [
 ];
 
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
-const lock = fs.readFileSync(path.join(ROOT, 'yarn.lock'), 'utf8');
-
-// Map "name@range" -> resolved version from a yarn v1 lockfile.
-const resolved = new Map();
-for (const block of lock.split(/\r?\n\r?\n/)) {
-    const lines = block.split(/\r?\n/).filter((l) => l && !l.startsWith('#'));
-    if (lines.length < 2 || lines[0].startsWith(' ')) {
-        continue;
-    }
-    const version = lines
-        .map((l) => l.match(/^ {2}version "?([^"\s]+)"?$/))
-        .find(Boolean);
-    if (!version) {
-        continue;
-    }
-    for (const spec of lines[0].replace(/:$/, '').split(/,\s*/)) {
-        resolved.set(spec.replace(/^"|"$/g, ''), version[1]);
-    }
-}
 
 const dependencies = {};
 for (const name of TOOLS) {
@@ -60,11 +41,7 @@ for (const name of TOOLS) {
     if (!range) {
         throw new Error(`${name} is not declared in ${ROOT}/package.json`);
     }
-    const version = resolved.get(`${name}@${range}`);
-    if (!version) {
-        console.warn(`! ${name}@${range} not found in yarn.lock, using range`);
-    }
-    dependencies[name] = version || range;
+    dependencies[name] = range;
 }
 
 const targetModules = path.join(ROOT, 'node_modules');

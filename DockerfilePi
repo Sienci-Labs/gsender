@@ -13,10 +13,11 @@ WORKDIR /app
 
 RUN command -v yarn >/dev/null 2>&1 || npm install -g yarn
 
-# Install root deps from only the manifest + lockfile first, so this layer is
-# reused from the build cache until package.json / yarn.lock change. The yarn
-# cache mount keeps downloaded tarballs around even when it isn't reused.
-COPY package.json yarn.lock ./
+# Install root deps from only the manifest first, so this layer is reused from
+# the build cache until package.json changes (the repo has no committed
+# lockfile). The yarn cache mount keeps downloaded tarballs around even when
+# the layer itself isn't reused.
+COPY package.json ./
 RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
     yarn install --prefer-offline --non-interactive
 

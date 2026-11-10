@@ -7,31 +7,31 @@ description: >
 runs:
   using: composite
   steps:
-    # cache: yarn restores the yarn cache used by the dist/gsender production
-    # install inside scripts/electron-builder.sh (--prefer-offline). yarn 1.x
-    # is preinstalled on all GitHub-hosted images.
+    # yarn 1.x is preinstalled on all GitHub-hosted images.
     - name: Setup Node.js 24.x
       uses: actions/setup-node@v4
       with:
         node-version: '24.x'
-        cache: yarn
-        cache-dependency-path: yarn.lock
 
-    # Electron zips + electron-builder tooling (NSIS, AppImage, dmg-builder,
-    # fpm, ...) and the npm cache for the packaging tools install. One known
-    # directory keeps the cache path identical on every OS.
+    # The repo has no committed lockfile, so caches are keyed on package.json
+    # and fall back to the most recent cache for this OS (restore-keys); the
+    # caches only hold downloads, resolution still happens fresh each run.
+    #  - yarn: the dist/gsender production install in electron-builder.sh
+    #  - npm: the packaging tools install below
+    #  - electron / electron-builder: Electron zips + NSIS/AppImage/dmg/fpm tooling
     - name: Configure download caches
       shell: bash
       run: |
+        echo "YARN_CACHE_FOLDER=${{ runner.temp }}/pkg-cache/yarn" >> "$GITHUB_ENV"
+        echo "npm_config_cache=${{ runner.temp }}/pkg-cache/npm" >> "$GITHUB_ENV"
         echo "ELECTRON_CACHE=${{ runner.temp }}/pkg-cache/electron" >> "$GITHUB_ENV"
         echo "ELECTRON_BUILDER_CACHE=${{ runner.temp }}/pkg-cache/electron-builder" >> "$GITHUB_ENV"
-        echo "npm_config_cache=${{ runner.temp }}/pkg-cache/npm" >> "$GITHUB_ENV"
 
-    - name: Cache Electron + packaging tool downloads
+    - name: Cache downloads
       uses: actions/cache@v4
       with:
         path: ${{ runner.temp }}/pkg-cache
-        key: pkg-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        key: pkg-${{ runner.os }}-${{ hashFiles('package.json') }}
         restore-keys: pkg-${{ runner.os }}-
 
     - name: Install packaging tools
