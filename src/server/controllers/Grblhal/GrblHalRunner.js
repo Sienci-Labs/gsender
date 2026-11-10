@@ -580,6 +580,10 @@ class GrblHalRunner extends events.EventEmitter {
         this.state.parserstate.modal.tool = tool;
     }
 
+    setUnits(units) {
+        this.state.parserstate.modal.units = units;
+    }
+
     getToolTable(settings = this.settings) {
         return _.get(settings, 'toolTable', {});
     }
