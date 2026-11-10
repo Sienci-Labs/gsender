@@ -14,6 +14,7 @@ import {
     START_POSITION_CENTER,
     SPINDLE_MODES,
     SURFACING_DWELL_DURATION,
+    SURFACING_PLUNGE_FEED_RATIO,
 } from 'app/constants';
 import controller from 'app/lib/controller';
 import defaultState from 'app/store/defaultState';
@@ -56,10 +57,11 @@ export default class Generator {
         const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
         const m7 = mist ? ['M7'] : [];
         const m8 = flood ? ['M8'] : [];
-        const setUnits = {
-            [METRIC_UNITS]: 'G21 ;mm',
-            [IMPERIAL_UNITS]: 'G20 ;inches',
-        }[units] ?? 'G21 ;mm';
+        const setUnits =
+            {
+                [METRIC_UNITS]: 'G21 ;mm',
+                [IMPERIAL_UNITS]: 'G20 ;inches',
+            }[units] ?? 'G21 ;mm';
 
         const depth = skimDepth;
         const gcodeArr = [
@@ -69,8 +71,8 @@ export default class Generator {
             'G90',
             `${spindle} S${spindleRPM}`,
             ...dwell,
+            `G0 Z${z}`, // z move up before moving XY for safety reasons
             'G0 X0 Y0',
-            `G0 Z${z}`,
             ...m7,
             ...m8,
             `G1 F${feedrate}`,
@@ -556,13 +558,24 @@ export default class Generator {
         const zValue = toFixedValue(
             safeHeight - (depth - this.surfacing.skimDepth),
         );
+        const defaultSurfacingState = get(
+            defaultState,
+            'workspace.widgets.surfacing',
+        );
+        const { feedrate } = {
+            ...defaultSurfacingState,
+            ...this.surfacing,
+        };
+        const plungeFeed = toFixedValue(feedrate * SURFACING_PLUNGE_FEED_RATIO);
+
         const startFromCenterStartPosition = [
             '(Entering Start Position)',
+            `G0 Z${safeHeight}`, // retract fully before any XY move
             `G0 X${position.x} Y${position.y}`,
-            `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`,
-            'G91',
-            `G0 Z${Math.abs(depth) * -1 - safeHeight}`,
-            'G90',
+            `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`, // this height varies per layer, so -
+            // - don't try to guess where to move relatively. go straight to the depth we need to cut at
+            `G1 Z${toFixedValue(Math.abs(depth) * -1)} F${plungeFeed}`, // don't G0 down, go slower into the material
+            `G1 F${feedrate}`,
             '(End of Entering Start Position)',
             '',
         ];
