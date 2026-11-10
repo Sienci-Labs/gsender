@@ -12,7 +12,7 @@
   <a href="https://github.com/Sienci-Labs/gsender/releases/latest"><img src="https://img.shields.io/github/v/release/Sienci-Labs/gsender?style=flat-square" alt="Latest release" /></a>
   <a href="https://github.com/Sienci-Labs/gsender/releases"><img src="https://img.shields.io/github/downloads/Sienci-Labs/gsender/total?style=flat-square" alt="Total downloads" /></a>
   <a href="https://github.com/Sienci-Labs/gsender/stargazers"><img src="https://img.shields.io/github/stars/Sienci-Labs/gsender?style=flat-square" alt="GitHub stars" /></a>
-  <a href="https://github.com/Sienci-Labs/gsender/blob/master/LICENSE"><img src="https://img.shields.io/github/license/Sienci-Labs/gsender?style=flat-square" alt="License" /></a>
+  <a href="https://github.com/Sienci-Labs/gsender/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-blue?style=flat-square" alt="License: GPLv3" /></a>
 </p>
 
 gSender is a feature-packed CNC interface designed to be clean and easy to learn, with enough depth for advanced users. Development began in 2019 out of a passion for hobby CNC machines — **an interface reimagined for the at-home CNC user**.
@@ -28,7 +28,7 @@ gSender is a feature-packed CNC interface designed to be clean and easy to learn
 - **Designed to be generic** so any standard [grbl](https://github.com/gnea/grbl/releases) or [grblHAL](https://github.com/grblHAL/core) CNC will work
 - **Expands its UI to the needs of your CNC** by recognizing what features it supports
 - **Runs on a wide range of systems** — low-end PC to Raspberry Pi — via [Electron](https://www.electronjs.org/)
-- Originally based on [CNCjs](https://github.com/cncjs/cncjs); since mostly rewritten
+- Originally based on the popular [CNCjs](https://github.com/cncjs/cncjs) controller interface, but has since been mostly rewritten
 
 ### Development principles
 
