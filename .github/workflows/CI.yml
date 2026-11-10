@@ -35,6 +35,20 @@ jobs:
         uses: ./.github/actions/setup-build
       - name: Build Linux binaries
         run: yarn run build:linux
+      - name: Verify arm64 package has no host-arch native builds
+        shell: bash
+        run: |
+          # Native modules must load from their per-arch prebuilds/. A build/Release
+          # (compiled for the x64 runner) would shadow them and break arm64 users.
+          bad=$(find output/linux-arm64-unpacked -name '*.node' -path '*build/Release*' -print)
+          if [ -n "$bad" ]; then
+            echo "Host-arch native builds leaked into the arm64 package:"; echo "$bad"; exit 1
+          fi
+          if find output/linux-arm64-unpacked -name '*.node' -path '*linux-arm64*' -exec file {} + | grep -q 'x86-64'; then
+            echo "x86-64 binary found in arm64 prebuilds"; exit 1
+          fi
+          echo "Native modules in arm64 package:"
+          find output/linux-arm64-unpacked -name '*.node' -path '*linux-arm64*' -exec file {} +
       - name: Prepare release assets
         shell: bash
         run: |

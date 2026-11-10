@@ -89,21 +89,22 @@ fi
 
 popd
 
-# Check if electron-rebuild is needed
-REBUILD_MARKER="$DIST_DIR/.rebuild-${electron_version}"
-
-if [ ! -f "$REBUILD_MARKER" ]; then
-    echo "Rebuilding native modules for electron ${electron_version}"
-    yarn electron-rebuild -- \
-        --version=${electron_version:1} \
-        --module-dir=dist/gsender \
-        --which-module=serialport
-
-    # Mark that rebuild is done for this electron version
-    touch "$REBUILD_MARKER"
-else
-    echo "✓ Native modules already rebuilt for electron ${electron_version}, skipping..."
-fi
+# No electron-rebuild step. Every native dependency (@serialport/bindings-cpp,
+# the nested copy under @sienci/avrgirl-arduino, and usb) is an N-API
+# prebuildify module that ships prebuilds for every platform/arch we package,
+# and N-API binaries load in Electron as-is. electron-rebuild doesn't recognise
+# their prebuild filenames, so it compiled them from source for the *host* arch
+# into build/Release, which node-gyp-build prefers over prebuilds/. Because one
+# node_modules tree is packaged for several arches (e.g. --x64 --arm64), the
+# arm64 package ended up loading an x64 binary.
+#
+# Remove any build/Release left over from earlier rebuilds so the per-arch
+# prebuilds are always the ones that get loaded.
+echo "Removing locally compiled native builds so per-arch prebuilds are used"
+find "$NODE_MODULES_DIR" -type d -name build \
+    \( -path '*/@serialport/bindings-cpp/build' -o -path '*/node_modules/usb/build' \) \
+    -prune -exec rm -rf {} +
+rm -f "$DIST_DIR"/.rebuild-*
 
 # Run electron-builder with optimizations
 echo "Building with electron-builder..."
