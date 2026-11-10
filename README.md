@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Sienci-Labs/gsender/master/src/app/images/icon-git.png" alt="gSender logo" width="96" />
+  <img src="https://raw.githubusercontent.com/Sienci-Labs/gsender/master/src/app/images/icon-round.png" alt="gSender logo" width="128" />
 </p>
 
-# gSender
+<h1 align="center">gSender</h1>
 
 <p align="center">
   <strong>Connect to and control <a href="https://github.com/gnea/grbl/releases">grbl</a> and <a href="https://github.com/grblHAL/core">grblHAL</a> CNCs</strong>
