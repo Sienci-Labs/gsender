@@ -1,0 +1,45 @@
+name: Setup packaging
+description: >
+  Prepares a runner to package gSender with electron-builder from the
+  dist/gsender bundle produced once by the build-web job. Installs only the
+  packaging tools instead of the full root dependency tree.
+
+runs:
+  using: composite
+  steps:
+    # cache: yarn restores the yarn cache used by the dist/gsender production
+    # install inside scripts/electron-builder.sh (--prefer-offline). yarn 1.x
+    # is preinstalled on all GitHub-hosted images.
+    - name: Setup Node.js 24.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24.x'
+        cache: yarn
+        cache-dependency-path: yarn.lock
+
+    # Electron zips + electron-builder tooling (NSIS, AppImage, dmg-builder,
+    # fpm, ...) and the npm cache for the packaging tools install. One known
+    # directory keeps the cache path identical on every OS.
+    - name: Configure download caches
+      shell: bash
+      run: |
+        echo "ELECTRON_CACHE=${{ runner.temp }}/pkg-cache/electron" >> "$GITHUB_ENV"
+        echo "ELECTRON_BUILDER_CACHE=${{ runner.temp }}/pkg-cache/electron-builder" >> "$GITHUB_ENV"
+        echo "npm_config_cache=${{ runner.temp }}/pkg-cache/npm" >> "$GITHUB_ENV"
+
+    - name: Cache Electron + packaging tool downloads
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}/pkg-cache
+        key: pkg-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: pkg-${{ runner.os }}-
+
+    - name: Install packaging tools
+      shell: bash
+      run: node scripts/ci/install-packaging-tools.js
+
+    - name: Download web build
+      uses: actions/download-artifact@v4
+      with:
+        name: web-build
+        path: .

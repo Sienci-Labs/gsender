@@ -10,12 +10,21 @@ ARG GITHUB_REF_TYPE
 ARG GIT_COMMIT_LOG
 
 WORKDIR /app
+
+RUN command -v yarn >/dev/null 2>&1 || npm install -g yarn
+
+# Install root deps from only the manifest + lockfile first, so this layer is
+# reused from the build cache until package.json / yarn.lock change. The yarn
+# cache mount keeps downloaded tarballs around even when it isn't reused.
+COPY package.json yarn.lock ./
+RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
+    yarn install --prefer-offline --non-interactive
+
 COPY . .
 
-RUN npm install -g bun
-RUN npm install --legacy-peer-deps
 RUN npm run package-sync
-RUN npm install --prefix src --production --ignore-scripts --legacy-peer-deps
+RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
+    yarn --cwd src install --production --ignore-scripts --non-interactive --prefer-offline
 RUN if [ "$GITHUB_REF_TYPE" = "tag" ]; then npm run prebuild-prod; else npm run prebuild-latest; fi
 RUN if [ "$GITHUB_REF_TYPE" = "tag" ]; then npm run build; else npm run build-latest; fi
 RUN --mount=type=secret,id=GH_TOKEN \
