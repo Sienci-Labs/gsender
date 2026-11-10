@@ -191,7 +191,11 @@ function applyEEPROMDescriptions(
                         remapped = true;
                     }
                     if (ctrlType === GRBLHAL && eID) {
-                        eID = translateGrblCoreKey(eID as EEPROM, fwVersion, boardId);
+                        eID = translateGrblCoreKey(
+                            eID as EEPROM,
+                            fwVersion,
+                            boardId,
+                        );
                     }
                     if (!eID) {
                         return remapped ? { ...o, remapped: true } : o;
@@ -592,7 +596,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 : (settingData as FilteredEEPROM).setting;
         const lookupKey =
             controllerType === GRBLHAL
-                ? translateGrblCoreKey(settingKey as EEPROM, firmwareVersion, boardId)
+                ? translateGrblCoreKey(
+                      settingKey as EEPROM,
+                      firmwareVersion,
+                      boardId,
+                  )
                 : settingKey;
 
         const inputDefault = get(profileDefaults, lookupKey, '-');

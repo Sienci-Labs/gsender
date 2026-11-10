@@ -73,7 +73,10 @@ export interface ConfigState {
 }*/
 
 function buildConfigFromStore(): ConfigState {
-    const storedVariables = store.get('widgets.atc.templates.variables', {}) as Record<string, ATCIVariable>;
+    const storedVariables = store.get(
+        'widgets.atc.templates.variables',
+        {},
+    ) as Record<string, ATCIVariable>;
     return {
         variables: Object.fromEntries(
             Object.entries(storedVariables).map(([key, v]) => [
@@ -218,7 +221,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         const handleComplete = () => {
             controller.removeListener('ymodem:complete', handleComplete);
             controller.removeListener('ymodem:error', handleError);
-            setStatus({ type: 'success', message: 'Configuration applied successfully!' });
+            setStatus({
+                type: 'success',
+                message: 'Configuration applied successfully!',
+            });
             setTimeout(() => {
                 setStatus({ type: 'idle', message: '' });
             }, 5000);

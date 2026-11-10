@@ -20,10 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import {
-    getProbeSettings,
-    getToolString,
-} from 'app/lib/toolChangeUtils';
+import { getProbeSettings, getToolString } from 'app/lib/toolChangeUtils';
 
 const wizard = {
     intro: {
@@ -125,8 +122,8 @@ const wizard = {
                             gcodeLines: [
                                 '(Returning to initial position)',
                                 'G21',
-                                'G90 [global.toolchange.UNITS] G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
-                                'G90 [global.toolchange.UNITS] G0 Z[global.toolchange.ZPOS]',
+                                'G90 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                'G90 G0 Z[global.toolchange.ZPOS]',
                                 '(Restore initial modals)',
                                 '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
                                 '%toolchange_complete',

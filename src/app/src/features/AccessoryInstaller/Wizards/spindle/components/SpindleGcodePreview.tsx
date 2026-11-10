@@ -5,7 +5,9 @@ import { getGrblCoreGcode, sienciHalGcode } from './SpindleConfig.tsx';
 export function SpindleGcodePreview() {
     const isGrblCore = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
     const lines = isGrblCore ? getGrblCoreGcode() : sienciHalGcode;
-    const label = isGrblCore ? `grblHAL (>${ATCI_SUPPORTED_VERSION})` : `sienciHAL (< ${ATCI_SUPPORTED_VERSION})`;
+    const label = isGrblCore
+        ? `grblHAL (>${ATCI_SUPPORTED_VERSION})`
+        : `sienciHAL (< ${ATCI_SUPPORTED_VERSION})`;
 
     return (
         <div className="w-full h-full flex flex-col gap-3">

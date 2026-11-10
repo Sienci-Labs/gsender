@@ -29,11 +29,7 @@ const SCANNABLE_EXTENSIONS = new Set([
     '.cjs',
 ]);
 
-const INTERNAL_PREFIXES = [
-    'server/',
-    'app/',
-    'electron-app/',
-];
+const INTERNAL_PREFIXES = ['server/', 'app/', 'electron-app/'];
 
 const MANUAL_RUNTIME_DEPS = [
     '@electron/remote',
@@ -95,7 +91,11 @@ function normalizeModuleName(specifier) {
     if (!specifier) {
         return null;
     }
-    if (specifier.startsWith('.') || specifier.startsWith('/') || specifier.startsWith('node:')) {
+    if (
+        specifier.startsWith('.') ||
+        specifier.startsWith('/') ||
+        specifier.startsWith('node:')
+    ) {
         return null;
     }
     if (INTERNAL_PREFIXES.some((prefix) => specifier.startsWith(prefix))) {
@@ -134,7 +134,9 @@ function getRuntimeDependencyNames() {
     }
 
     const builtinModules = new Set(
-        Module.builtinModules.map((moduleName) => moduleName.replace(/^node:/, ''))
+        Module.builtinModules.map((moduleName) =>
+            moduleName.replace(/^node:/, ''),
+        ),
     );
 
     const runtimeDeps = new Set(MANUAL_RUNTIME_DEPS);
@@ -174,7 +176,7 @@ function selectDependencies(dependencyNames, dependencySources) {
 
     if (missing.length > 0) {
         throw new Error(
-            `Missing runtime dependency versions in root package.json: ${missing.join(', ')}`
+            `Missing runtime dependency versions in root package.json: ${missing.join(', ')}`,
         );
     }
 
@@ -192,7 +194,10 @@ pkgApp.license = pkg.license;
 pkgApp.repository = pkg.repository;
 
 // Copy only Node.js dependencies to application package.json
-pkgApp.dependencies = selectDependencies(runtimeDependencyNames, dependencySources);
+pkgApp.dependencies = selectDependencies(
+    runtimeDependencyNames,
+    dependencySources,
+);
 
 const target = path.resolve(__dirname, '../src/app/package.json');
 const secondTarget = path.resolve(__dirname, '../src/package.json');

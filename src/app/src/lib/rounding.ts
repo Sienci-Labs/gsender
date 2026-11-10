@@ -153,6 +153,9 @@ export const determineRoundedValue = (key: string, value: any): any => {
 
 // round up to decimalPoints only
 // https://stackoverflow.com/a/32229831
-export const toFixedIfNecessary = (value: string | number, decimalPoints: number) => {
+export const toFixedIfNecessary = (
+    value: string | number,
+    decimalPoints: number,
+) => {
     return +parseFloat(String(value)).toFixed(decimalPoints);
-}
+};

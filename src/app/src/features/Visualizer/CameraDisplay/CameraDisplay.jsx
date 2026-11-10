@@ -44,11 +44,11 @@ class CameraDisplay extends PureComponent {
 
         const handleChangeCameraView = (view) => {
             const cameraView = {
-                "Top": () => camera.toTopView(),
-                "Left": () => camera.toLeftSideView(),
-                "Front": () => camera.toFrontView(),
-                "3D": () => camera.to3DView(),
-                "Right": () => camera.toRightSideView(),
+                Top: () => camera.toTopView(),
+                Left: () => camera.toLeftSideView(),
+                Front: () => camera.toFrontView(),
+                '3D': () => camera.to3DView(),
+                Right: () => camera.toRightSideView(),
             };
             cameraView[view]();
             posthog?.capture('camera_view_changed', { view });

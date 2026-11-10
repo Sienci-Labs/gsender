@@ -113,7 +113,8 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
         ? 0
         : (currentLineRunning / total) * 100;
     const displayedPercentage = Math.min(100, Math.floor(percentageValue));
-    const isFinalizing = displayedPercentage >= 100 && Number(remainingTime) > 0;
+    const isFinalizing =
+        displayedPercentage >= 100 && Number(remainingTime) > 0;
 
     const timeSplit = convertSecondsToDHMS(Number(remainingTime));
     const timeComponent = getTimesHTML(timeSplit);
@@ -161,12 +162,16 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
                             <div className="flex flex-col  justify-center items-center w-32">
                                 {isFinalizing ? (
                                     <>
-                                        <span className="text-sm">Finalizing</span>
+                                        <span className="text-sm">
+                                            Finalizing
+                                        </span>
                                     </>
                                 ) : (
                                     <>
                                         {timeComponent}
-                                        <span className="text-sm">remaining</span>
+                                        <span className="text-sm">
+                                            remaining
+                                        </span>
                                     </>
                                 )}
                             </div>

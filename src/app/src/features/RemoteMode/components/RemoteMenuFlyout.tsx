@@ -15,7 +15,10 @@ export function NavFlyoutLink({
     label: string;
 }) {
     return (
-        <Link to={href} className="bg-gray-200 p-4 rounded-lg flex flex-row border border-gray-400">
+        <Link
+            to={href}
+            className="bg-gray-200 p-4 rounded-lg flex flex-row border border-gray-400"
+        >
             {label}
         </Link>
     );

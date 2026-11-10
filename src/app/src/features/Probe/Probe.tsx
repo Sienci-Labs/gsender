@@ -137,24 +137,31 @@ const Probe = ({ state, actions }: ProbeProps) => {
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
                 <div className="grid grid-rows-[1fr_1fr_1fr] gap-0.5 items-center justify-center">
-                    { touchplateTypeSwitcher &&
+                    {touchplateTypeSwitcher && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button  aria-label="Change Probe Type" size="sm">{touchplateType}</Button>
+                                <Button
+                                    aria-label="Change Probe Type"
+                                    size="sm"
+                                >
+                                    {touchplateType}
+                                </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 bg-white">
-                                { Object.values(TOUCHPLATE_TYPES).map((tpt) =>
+                                {Object.values(TOUCHPLATE_TYPES).map((tpt) => (
                                     <DropdownMenuItem
                                         key={tpt}
-                                        onClick={() => actions.changeTouchPlateType(tpt)}
+                                        onClick={() =>
+                                            actions.changeTouchPlateType(tpt)
+                                        }
                                         className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
                                     >
                                         {tpt}
-                                    </DropdownMenuItem>)
-                                }
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    }
+                    )}
                     <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
                             <Tooltip
@@ -168,7 +175,9 @@ const Probe = ({ state, actions }: ProbeProps) => {
                                     }
                                     size="icon"
                                     aria-label={`Select probing routine ${command.id}`}
-                                    aria-pressed={index === selectedProbeCommand}
+                                    aria-pressed={
+                                        index === selectedProbeCommand
+                                    }
                                     className={cx(
                                         'rounded-md relative h-[calc(4vh+3px)]',
                                         {

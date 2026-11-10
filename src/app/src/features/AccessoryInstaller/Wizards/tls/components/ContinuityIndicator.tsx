@@ -33,7 +33,10 @@ export function ContinuityIndicator({
                 className="continuity-indicator__shell"
                 style={{ width: size, height: size }}
             >
-                <svg className="continuity-indicator__svg" viewBox="0 0 160 160">
+                <svg
+                    className="continuity-indicator__svg"
+                    viewBox="0 0 160 160"
+                >
                     <circle
                         className="ci-bezel"
                         cx="80"

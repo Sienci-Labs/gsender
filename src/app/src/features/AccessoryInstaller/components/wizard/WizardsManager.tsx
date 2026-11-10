@@ -33,7 +33,8 @@ export function WizardsManager({
     }, [wizards, selectedWizard]);
 
     useEffect(() => {
-        if (hasAutoSelected.current || !initialWizardId || !wizards.length) return;
+        if (hasAutoSelected.current || !initialWizardId || !wizards.length)
+            return;
         const match = wizards.find((w) => w.id === initialWizardId);
         if (match) {
             setSelectedWizard(match);
