@@ -39,6 +39,7 @@ It takes every capture option below, plus:
 | `--no-machine` | Capture disconnected. |
 | `--header-states` | Also break out the header's menus: connection, machine info, notifications (see [Tabs, menus and popovers](#tabs-menus-and-popovers)). |
 | `--all-states` | Also break out the header's and sidebar's menus (see [Tabs, menus and popovers](#tabs-menus-and-popovers)). |
+| `--pendant` | Capture the pendant (tablet) UI instead of the desktop one (see [Pendant](#pendant)). |
 
 If nothing answers at the machine address, it says so and captures
 disconnected. If the backend is already connected to a machine (say you
@@ -145,6 +146,25 @@ yarn figma:capture --connect 9222
 
 Use `--target <text>` to pick a window by URL or title if there is more than one.
 
+### Pendant
+
+`--pendant` captures the pendant UI (`src/pendant`), the tablet app that is
+also what the desktop app shows with "use pendant view as default UI". It
+works in batch and live mode:
+
+```bash
+yarn figma --pendant
+yarn figma:live --pendant
+```
+
+It starts the pendant's dev server (`yarn vite:dev:pendant`, port 5174)
+instead of the desktop renderer, next to the same backend, and opens an
+800×1280 portrait window, the production pendant's size (`-w`/`-h` change
+it). The pendant switches screens in-app rather than by URL, so a batch
+capture records the screen it starts on; use live mode to capture the others.
+Connecting to the machine works the same way. Tabs and menus are broken out
+everywhere, since the pendant has no `<main>` area to limit them to.
+
 ### Without the CLI
 
 Paste the contents of `capture/serialize.js` into the DevTools console of any
@@ -204,7 +224,10 @@ click through:
   the whole tab area, including the tabs scrolled out of the strip. In Figma
   these become a component set with a **Tab** variant property (Probe,
   Macros, Coolant, …). The screen gets an instance of the tab that was
-  selected, so you can switch tabs from the instance's properties.
+  selected, so you can switch tabs from the instance's properties. The tab
+  area is the tabs plus the panel their `aria-controls` points at; tabs
+  without one (the pendant's setup tabs) take the nearest box that holds the
+  strip and other content.
 - **Menus, popovers, dropdowns and dialogs** (anything with `aria-haspopup`,
   or a `combobox`): it opens each one with a real mouse click, records it,
   and closes it with Escape. Each becomes a `Popover / <name>` component.

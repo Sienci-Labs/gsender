@@ -1573,6 +1573,20 @@
         return a;
     }
 
+    // Tabs that don't point at their panel (no aria-controls, as in the
+    // pendant): the panel is whatever else shows in the nearest box around
+    // the tab strip.
+    function tabsWithContent(list) {
+        for (let e = list; e.parentElement; e = e.parentElement) {
+            const box = e.parentElement;
+            if (box === document.body || box === document.documentElement)
+                break;
+            if ([...box.children].some((c) => c !== e && isShown(c)))
+                return box;
+        }
+        return list;
+    }
+
     // Marks tab groups and popup triggers with data attributes and returns
     // what the CLI should cycle through. `within` / `skip` are CSS selectors
     // that limit this to part of the page (e.g. only `main`, or not `header`).
@@ -1610,10 +1624,10 @@
                 ) || tabs[0];
             const panelId = selected.getAttribute('aria-controls');
             const panel = panelId && document.getElementById(panelId);
-            const group = commonAncestor(
-                list,
-                panel && isShown(panel) ? panel : null,
-            );
+            const group =
+                panel && isShown(panel)
+                    ? commonAncestor(list, panel)
+                    : tabsWithContent(list);
             const key = 't' + k++;
             group.setAttribute('data-l2f-state', key);
             tabs.forEach((t, i) =>

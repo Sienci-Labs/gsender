@@ -14,6 +14,7 @@
  *   yarn figma --live                            capture on demand (⌥⇧F)
  *   yarn figma --header-states                   also break out header menus
  *   yarn figma --all-states                      ...and the sidebar's too
+ *   yarn figma --pendant                         the pendant (tablet) UI
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -26,6 +27,10 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../..');
 const BACKEND_URL = 'http://localhost:8000/';
 const RENDERER_URL = 'http://localhost:5173/';
+// The pendant SPA (src/pendant) has its own dev server; it proxies /api and
+// /socket.io to the same backend. Its window is a portrait tablet.
+const PENDANT_URL = 'http://localhost:5174/';
+const PENDANT_SIZE = ['800', '1280'];
 const START_TIMEOUT = 5 * 60 * 1000; // a cold `yarn dev` builds first
 const isWindows = process.platform === 'win32';
 // grblHAL digital twin; gSender shows its full UI only with a machine attached.
@@ -43,6 +48,7 @@ const own = {
     live: false,
     allStates: false,
     headerStates: false,
+    pendant: false,
     machine: undefined, // default depends on the mode, see below
 };
 const passthrough = [];
@@ -53,6 +59,7 @@ for (let i = 0; i < args.length; i++) {
     else if (a === '--open') own.open = true;
     else if (a === '--all-states') own.allStates = true;
     else if (a === '--header-states') own.headerStates = true;
+    else if (a === '--pendant') own.pendant = true;
     else if (a === '--help') own.help = true;
     else if (a === '--no-machine') own.machine = null;
     else if (a === '--machine') own.machine = args[++i];
@@ -80,6 +87,8 @@ and stops the servers again.
   --no-machine          Capture disconnected
   --header-states       Also break out the header's menus (connection,
                         machine info, notifications)
+  --pendant             Capture the pendant (tablet) UI instead: starts its
+                        dev server on 5174 and uses an 800×1280 window
   --all-states          Also break out tabs and menus in the header and
                         sidebar (by default only the main area's are, same as
                         --states-in ${DEFAULT_STATES_IN})
@@ -104,7 +113,9 @@ try {
     let setup = [];
     if (!attaching) {
         await ensure('backend', BACKEND_URL, ['dev']);
-        await ensure('renderer', RENDERER_URL, ['vite:dev']);
+        if (own.pendant)
+            await ensure('pendant', PENDANT_URL, ['vite:dev:pendant']);
+        else await ensure('renderer', RENDERER_URL, ['vite:dev']);
         setup = await machineSetup(own.machine);
     }
     await runCapture(setup);
@@ -133,6 +144,7 @@ async function runCapture(setup) {
             path.join(HERE, captureScript()),
             ...setup,
             ...statesScope(),
+            ...pendantArgs(),
             ...passthrough,
         ],
         {
@@ -216,9 +228,14 @@ async function machineSetup(machine) {
         path.join(HERE, 'presets/gsender-connect.js'),
         'utf8',
     );
+    // The pendant reaches the app's modules through its `app` alias, which
+    // Vite serves from outside its root.
+    const appSrc = own.pendant
+        ? `/@fs${ROOT.split(path.sep).join('/').replace(/^(?=[A-Za-z]:)/, '/')}/src/app/src/`
+        : '/src/';
     return [
         '--setup',
-        `${preset}\nawait l2fConnectMachine(${JSON.stringify(host)}, ${port});`,
+        `${preset}\nawait l2fConnectMachine(${JSON.stringify(host)}, ${port}, ${JSON.stringify(appSrc)});`,
     ];
 }
 
@@ -226,11 +243,24 @@ function statesScope() {
     const custom = passthrough.some((a) =>
         /^--(states-in|states-skip|no-states)(=|$)/.test(a),
     );
-    if (own.allStates || custom) return [];
+    // The pendant has no <main>; its screens are small, so look everywhere.
+    if (own.allStates || own.pendant || custom) return [];
     const scope = own.headerStates
         ? `${DEFAULT_STATES_IN}, header`
         : DEFAULT_STATES_IN;
     return ['--states-in', scope];
+}
+
+// The pendant's URL and window size, unless given on the command line.
+function pendantArgs() {
+    if (!own.pendant) return [];
+    const out = [];
+    if (!passthrough.some((a) => /^(-w|--width)(=|$)/.test(a)))
+        out.push('--width', PENDANT_SIZE[0], '--height', PENDANT_SIZE[1]);
+    if (!passthrough.some((a) => /^https?:/.test(a)) &&
+        !passthrough.some((a) => /^--url(=|$)/.test(a)))
+        out.push(PENDANT_URL);
+    return out;
 }
 
 function isTcpOpen(host, port) {

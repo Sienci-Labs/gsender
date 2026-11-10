@@ -17,9 +17,11 @@ import {
     CDP,
     fileName,
     launchChrome,
+    pageIsBlank,
     pageTarget,
     serializePage,
     serveCaptures,
+    sleep,
     waitForStableDom,
 } from './lib.mjs';
 
@@ -160,6 +162,12 @@ async function capture(cdp) {
     try {
         await toast('Capturing…', true);
         const started = Date.now();
+        if (captureSize)
+            await cdp.send('Emulation.setDeviceMetricsOverride', {
+                ...captureSize,
+                deviceScaleFactor: 0,
+                mobile: false,
+            });
         const doc = await serializePage(cdp, {
             states: !opts['no-states'],
             statesIn: opts['states-in'],
@@ -180,11 +188,73 @@ async function capture(cdp) {
         console.error(`✖ Capture failed: ${e.message}`);
         await toast(`Capture failed: ${e.message}`);
     } finally {
+        if (captureSize)
+            await cdp
+                .send('Emulation.clearDeviceMetricsOverride')
+                .catch(() => {});
         busy = false;
     }
 }
 
 /* -------------------------------------------------------------------- */
+
+// A window taller than the screen (an 800×1280 pendant on a laptop) gets
+// shrunk by the OS, sometimes only after it first shows, or runs off the
+// bottom of the screen. Keep it on screen at whatever size fits, so the page
+// lays itself out to the window and nothing (the bottom nav, the Capture
+// button) is out of view. Captures still need the size asked for, so when it
+// didn't fit, `captureSize` tells capture() to lay the page out at that size
+// just while it records. (Scaling the live view down instead left the window
+// white.)
+let captureSize = null;
+
+async function keepOnScreen(cdp, width, height) {
+    let windowId;
+    try {
+        ({ windowId } = await cdp.send('Browser.getWindowForTarget'));
+    } catch {
+        return; // attached to a window we don't manage
+    }
+    const [screenL, screenT, screenW, screenH] = await cdp.evaluate(
+        '[screen.availLeft, screen.availTop, screen.availWidth, screen.availHeight]',
+    );
+    const check = async () => {
+        const { bounds } = await cdp.send('Browser.getWindowBounds', {
+            windowId,
+        });
+        const [innerW, innerH] = await cdp.evaluate('[innerWidth, innerHeight]');
+        const top = Math.max(bounds.top, screenT);
+        const left = Math.max(bounds.left, screenL);
+        const fitted = {
+            left,
+            top,
+            width: Math.min(bounds.width, screenL + screenW - left),
+            height: Math.min(bounds.height, screenT + screenH - top),
+        };
+        const off = ['left', 'top', 'width', 'height'].some(
+            (k) => Math.abs(bounds[k] - fitted[k]) > 1,
+        );
+        if (off)
+            await cdp.send('Browser.setWindowBounds', {
+                windowId,
+                bounds: fitted,
+            });
+        const frameH = bounds.height - innerH;
+        const shownH = fitted.height - (frameH >= 0 ? frameH : 28);
+        const shownW = fitted.width - Math.max(0, bounds.width - innerW);
+        if ((shownW < width - 1 || shownH < height - 1) && !captureSize) {
+            captureSize = { width, height };
+            console.log(
+                `  ${width}×${height} doesn't fit the screen; the window shows less, captures still record ${width}×${height}.`,
+            );
+        }
+    };
+    // The OS can resize the window a moment after it opens.
+    for (const wait of [0, 1000, 2500, 5000]) {
+        await sleep(wait);
+        await check().catch(() => {});
+    }
+}
 
 async function main() {
     fs.mkdirSync(OUT, { recursive: true });
@@ -206,6 +276,10 @@ async function main() {
     const cdp = await CDP.connect(page.webSocketDebuggerUrl);
     await cdp.send('Page.enable');
     await cdp.send('Runtime.enable');
+    if (browser)
+        keepOnScreen(cdp, Number(opts.width), Number(opts.height)).catch(
+            () => {},
+        );
     await cdp.send('Runtime.addBinding', { name: BINDING });
     await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
         source: OVERLAY,
@@ -226,7 +300,22 @@ async function main() {
     });
     process.on('SIGINT', shutdown);
 
-    await waitForStableDom(cdp);
+    // A dev server that has just started (the pendant's re-optimizes its
+    // dependencies on every start) serves first loads that never mount,
+    // leaving the window blank, until it has finished. Reload until the app
+    // shows up.
+    await waitForStableDom(cdp, 15000);
+    let rendered = !(await pageIsBlank(cdp));
+    for (let i = 0; !rendered && i < 12; i++) {
+        console.log(
+            '  The page is blank (the dev server may still be starting); reloading…',
+        );
+        await cdp.send('Page.reload', { ignoreCache: true });
+        await waitForStableDom(cdp, 10000);
+        rendered = !(await pageIsBlank(cdp));
+    }
+    if (!rendered)
+        console.log('  Still blank. Check the dev server log for a build error.');
     await cdp.evaluate(OVERLAY);
     if (opts.setup) {
         process.stdout.write('▶ Running setup… ');

@@ -226,6 +226,24 @@ export async function waitFor(cdp, selector, timeout = 30000) {
 
 // SPAs keep rendering after the load event; wait until the element count
 // has been unchanged for a second.
+// True when the body shows nothing: an app that failed to mount leaves only
+// its empty root and scripts (the pendant's blank page has 21 elements in
+// all, so counting them isn't enough).
+export async function pageIsBlank(cdp) {
+    return cdp.evaluate(`(() => {
+        const skip = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'LINK', 'META']);
+        let shown = 0;
+        for (const e of document.body ? document.body.querySelectorAll('*') : []) {
+            if (skip.has(e.tagName) || e.closest('[data-figma-ignore]')) continue;
+            const r = e.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0) shown++;
+        }
+        return shown < 3;
+    })()`);
+}
+
+// Resolves with the element count once it stops changing, or with the last
+// count when `timeout` runs out.
 export async function waitForStableDom(cdp, timeout = 30000, stableMs = 1000) {
     const start = Date.now();
     let last = -1;
@@ -238,10 +256,11 @@ export async function waitForStableDom(cdp, timeout = 30000, stableMs = 1000) {
             last = count;
             stableSince = Date.now();
         } else if (Date.now() - stableSince >= stableMs && count > 20) {
-            return;
+            return count;
         }
         await sleep(200);
     }
+    return last;
 }
 
 async function screenshotRasters(cdp, doc, fullPage) {

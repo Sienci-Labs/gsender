@@ -14,12 +14,16 @@ import {
     CDP,
     fileName,
     launchChrome,
+    pageIsBlank,
     pageTarget,
     serializePage,
     sleep,
     waitFor,
     waitForStableDom,
 } from './lib.mjs';
+
+// A --setup script (connecting to the machine) must not hang the capture.
+const SETUP_TIMEOUT = 60000;
 
 const HELP = `
 Usage: node tools/figma-layout/capture/cli.mjs [options] [url ...]
@@ -119,13 +123,39 @@ async function capturePage(cdp, { url, setup, theme }) {
     }
     if (opts['wait-for']) await waitFor(cdp, opts['wait-for']);
     else await waitForStableDom(cdp);
+    // A build error leaves an empty page; don't capture a blank frame.
+    if (await pageIsBlank(cdp))
+        throw new Error(
+            `${url || 'page'} didn't render. Check the dev server's log for a build error.`,
+        );
     if (theme) {
         await cdp.evaluate(
             `document.documentElement.classList.toggle('dark', ${theme === 'dark'})`,
         );
     }
     const scripts = [opts.setup, setup].filter(Boolean);
-    for (const js of scripts) await cdp.evaluate(`(async () => { ${js} })()`);
+    for (const js of scripts) {
+        let timer;
+        try {
+            await Promise.race([
+                cdp.evaluate(`(async () => { ${js} })()`),
+                new Promise((_, reject) => {
+                    timer = setTimeout(
+                        () =>
+                            reject(
+                                new Error(
+                                    `setup script didn't finish within ${SETUP_TIMEOUT / 1000}s`,
+                                ),
+                            ),
+                        SETUP_TIMEOUT,
+                    );
+                }),
+            ]);
+        } finally {
+            // Otherwise the timer keeps the process alive, then rejects.
+            clearTimeout(timer);
+        }
+    }
     // Whatever the scripts triggered (connecting, opening a dialog) renders
     // asynchronously; let it settle again.
     if (scripts.length) await waitForStableDom(cdp);
