@@ -22,6 +22,7 @@ import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -75,6 +76,9 @@ class MainActivity : Activity() {
 
     /** A gsender-pendant://pair link waiting for the pendant page to load. */
     private var pendingPairLink: String? = null
+
+    /** Recent renderer crash times, so a crash loop stops reloading. */
+    private val rendererCrashes = ArrayDeque<Long>()
     private val observer: (ServerState) -> Unit = { render(it) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -287,6 +291,16 @@ class MainActivity : Activity() {
         view.loadUrl("http://127.0.0.1:$port/pendant/")
     }
 
+    /** Records a renderer crash; false once they come too fast to keep reloading. */
+    private fun recordRendererCrash(): Boolean {
+        val now = System.currentTimeMillis()
+        rendererCrashes.addLast(now)
+        while (rendererCrashes.isNotEmpty() && now - rendererCrashes.first() > RENDERER_CRASH_WINDOW_MS) {
+            rendererCrashes.removeFirst()
+        }
+        return rendererCrashes.size < RENDERER_CRASH_LIMIT
+    }
+
     private fun dropWebView() {
         web?.let {
             webContainer.removeView(it)
@@ -323,6 +337,24 @@ class MainActivity : Activity() {
                 pageError = error.description?.toString() ?: "error ${error.errorCode}"
                 Log.w(ServerRuntime.TAG, "PAGE_ERROR ${error.errorCode} $pageError")
                 render(ServerRuntime.state)
+            }
+
+            // Without this, a renderer crash or OOM kill takes the whole app
+            // down. Drop the dead WebView and load the page again instead.
+            override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+                Log.e(ServerRuntime.TAG, "RENDERER_GONE crashed=${detail.didCrash()} priority=${detail.rendererPriorityAtExit()}")
+                if (view !== web) {
+                    // An old WebView we already dropped
+                    view.destroy()
+                    return true
+                }
+                dropWebView()
+                if (recordRendererCrash()) {
+                    render(ServerRuntime.state)
+                } else {
+                    showMessage(getString(R.string.error_page, getString(R.string.error_renderer_crash_loop)), R.string.action_retry, isError = true)
+                }
+                return true
             }
         }
         webChromeClient = object : WebChromeClient() {
@@ -544,5 +576,9 @@ class MainActivity : Activity() {
         private const val STAGE_INSTALLING = 0.3f
         private const val STAGE_STARTING = 0.55f
         private const val STAGE_CONNECTING = 0.8f
+
+        // Stop auto-reloading after this many renderer crashes in the window
+        private const val RENDERER_CRASH_LIMIT = 3
+        private const val RENDERER_CRASH_WINDOW_MS = 60_000L
     }
 }

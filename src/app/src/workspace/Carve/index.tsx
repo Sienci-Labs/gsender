@@ -1,5 +1,6 @@
 import { ToolTimelineWrapper } from 'app/features/ATC/components/ToolTimeline';
 import Visualizer from 'app/features/Visualizer';
+import { CarveVisibleContext } from 'app/hooks/useCarveVisible';
 import cx from 'classnames';
 import { useMediaQuery } from 'react-responsive';
 import { useLocation } from 'react-router';
@@ -14,52 +15,54 @@ export const Carve = () => {
     const shouldHide = pathname !== '/';
 
     return (
-        <div className={cx({ hidden: shouldHide }, 'relative h-full')}>
-            <div
-                className={cx(
-                    'flex',
-                    isPortrait
-                        ? 'h-[45%] max-h-[45%] pb-0 block portrait:h-[45%] portrait:max-h-[45%] portrait:pb-0 portrait:block'
-                        : 'h-[75%] max-xl:h-[76%] max-xl:max-h-[76%] max-h-[75%] pb-10 max-xl:pb-6',
-                )}
-            >
+        <CarveVisibleContext.Provider value={!shouldHide}>
+            <div className={cx({ hidden: shouldHide }, 'relative h-full')}>
                 <div
                     className={cx(
-                        'relative',
-                        isPortrait ? 'h-full w-full' : 'flex-grow',
+                        'flex',
+                        isPortrait
+                            ? 'h-[45%] max-h-[45%] pb-0 block portrait:h-[45%] portrait:max-h-[45%] portrait:pb-0 portrait:block'
+                            : 'h-[75%] max-xl:h-[76%] max-xl:max-h-[76%] max-h-[75%] pb-10 max-xl:pb-6',
                     )}
                 >
-                    <Visualizer timeline={<ToolTimelineWrapper />} />
-                </div>
-
-                {!isPortrait && (
-                    <div className="flex-shrink-0 w-[33%] max-w-md overflow-hidden flex flex-col h-full">
-                        <Column />
-                    </div>
-                )}
-            </div>
-
-            <div
-                className={cx(
-                    'flex flex-col',
-                    isPortrait
-                        ? 'h-[55%] min-h-0 max-h-[55%]'
-                        : 'h-[25%] max-xl:h-[24%] max-xl:max-h-[24%] max-h-[25%] min-h-48 max-xl:min-h-max',
-                )}
-            >
-                <div className="flex flex-1 min-h-0">
-                    <div className={isPortrait ? 'w-2/3' : 'w-full'}>
-                        <ToolArea />
+                    <div
+                        className={cx(
+                            'relative',
+                            isPortrait ? 'h-full w-full' : 'flex-grow',
+                        )}
+                    >
+                        <Visualizer timeline={<ToolTimelineWrapper />} />
                     </div>
 
-                    {isPortrait && (
-                        <div className="w-1/3 min-w-[400px]">
+                    {!isPortrait && (
+                        <div className="flex-shrink-0 w-[33%] max-w-md overflow-hidden flex flex-col h-full">
                             <Column />
                         </div>
                     )}
                 </div>
-                <PortraitMacroBar />
+
+                <div
+                    className={cx(
+                        'flex flex-col',
+                        isPortrait
+                            ? 'h-[55%] min-h-0 max-h-[55%]'
+                            : 'h-[25%] max-xl:h-[24%] max-xl:max-h-[24%] max-h-[25%] min-h-48 max-xl:min-h-max',
+                    )}
+                >
+                    <div className="flex flex-1 min-h-0">
+                        <div className={isPortrait ? 'w-2/3' : 'w-full'}>
+                            <ToolArea />
+                        </div>
+
+                        {isPortrait && (
+                            <div className="w-1/3 min-w-[400px]">
+                                <Column />
+                            </div>
+                        )}
+                    </div>
+                    <PortraitMacroBar />
+                </div>
             </div>
-        </div>
+        </CarveVisibleContext.Provider>
     );
 };

@@ -124,6 +124,21 @@ function mapFeedrateToFeedbackUnits(
     return $13 > 0 ? in2mm(feedrate) : feedrate;
 }
 
+// Flat comparison for the small position/modal objects built per status report
+function shallowEqual<T extends object>(a: T, b: T): boolean {
+    if (a === b) {
+        return true;
+    }
+    if (!a || !b) {
+        return false;
+    }
+    const aKeys = Object.keys(a) as (keyof T)[];
+    if (aKeys.length !== Object.keys(b).length) {
+        return false;
+    }
+    return aKeys.every((key) => Object.is(a[key], b[key]));
+}
+
 function consolidateModals(state: ControllerState): Modal {
     const defaultModals: Modal = {
         motion: 'G0',
@@ -249,10 +264,21 @@ const controllerSlice = createSlice({
                     feedrate: mappedFeedrate,
                 },
             };
-            state.modal = modal;
-            state.wpos = wpos;
-            state.mpos = mpos;
-            state.wco = wco;
+            // Status reports arrive several times a second; keep the existing
+            // references when nothing changed so selectors on these don't
+            // re-render
+            if (!shallowEqual(state.modal, modal)) {
+                state.modal = modal;
+            }
+            if (!shallowEqual(state.wpos, wpos)) {
+                state.wpos = wpos;
+            }
+            if (!shallowEqual(state.mpos, mpos)) {
+                state.mpos = mpos;
+            }
+            if (!shallowEqual(state.wco, wco)) {
+                state.wco = wco;
+            }
         },
 
         updateFeederStatus: (state, action: PayloadAction<Feeder>) => {

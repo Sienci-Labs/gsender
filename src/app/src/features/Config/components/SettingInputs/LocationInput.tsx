@@ -5,7 +5,7 @@ import controller from 'app/lib/controller.ts';
 import type { RootState } from 'app/store/redux';
 import { FaChartLine } from 'react-icons/fa';
 import { FiTarget } from 'react-icons/fi';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 
 export interface LocationInputProps {
     value: object;
@@ -22,7 +22,7 @@ export function LocationInput({
     onChange,
     unit,
 }: LocationInputProps) {
-    const mpos = useSelector((state: RootState) => state.controller.mpos);
+    const reduxStore = useStore<RootState>();
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -39,6 +39,8 @@ export function LocationInput({
     );
 
     function grabLocation() {
+        // Read at click time; subscribing to mpos re-renders on every report
+        const { mpos } = reduxStore.getState().controller;
         const location = {
             x: Number(mpos.x),
             y: Number(mpos.y),

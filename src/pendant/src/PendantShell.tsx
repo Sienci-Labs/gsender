@@ -3,6 +3,7 @@ import { Toaster } from 'app/components/shadcn/Sonner';
 import { WizardProvider } from 'app/features/Helper/context';
 import { installPluginBridgeListener } from 'app/features/Plugins/utils/pluginBridge';
 import type { ToolEntry } from 'app/features/ToolsPage/registry';
+import { CarveVisibleContext } from 'app/hooks/useCarveVisible';
 import { useDarkMode } from 'app/hooks/useDarkMode';
 import store from 'app/store';
 import { useEffect, useState } from 'react';
@@ -57,7 +58,9 @@ function RedesignedCarve({ activeTab }: { activeTab: NavTab }) {
                         : 'dark flex-1 flex flex-col min-h-0'
                 }
             >
-                <CarveScreen mode={mode} onOpenTool={setOpenTool} />
+                <CarveVisibleContext.Provider value={activeTab === 'carve'}>
+                    <CarveScreen mode={mode} onOpenTool={setOpenTool} />
+                </CarveVisibleContext.Provider>
             </div>
             {openTool && (
                 // Covers the carve body and bottom nav (top-14 clears the
@@ -80,6 +83,11 @@ function RedesignedCarve({ activeTab }: { activeTab: NavTab }) {
 export default function PendantShell() {
     const [activeTab, setActiveTab] = useState<NavTab>('carve');
     const [legacyCarve, setLegacyCarve] = useState(readLegacyCarve);
+    // Config mounts on first visit and then stays mounted (hidden)
+    const [configVisited, setConfigVisited] = useState(false);
+    if (activeTab === 'config' && !configVisited) {
+        setConfigVisited(true);
+    }
     useDarkMode(); // syncs workspace.enableDarkMode → <html class="dark">
 
     useEffect(() => {
@@ -118,7 +126,11 @@ export default function PendantShell() {
                                     : 'flex-1 flex flex-col min-h-0'
                             }
                         >
-                            <CarveView />
+                            <CarveVisibleContext.Provider
+                                value={activeTab === 'carve'}
+                            >
+                                <CarveView />
+                            </CarveVisibleContext.Provider>
                         </div>
                     </>
                 ) : (
@@ -132,7 +144,9 @@ export default function PendantShell() {
                         onShowCarve={() => setActiveTab('carve')}
                     />
                 )}
-                {activeTab === 'config' && <PendantConfigView />}
+                {configVisited && (
+                    <PendantConfigView active={activeTab === 'config'} />
+                )}
 
                 {legacyCarve ? (
                     <BottomNav active={activeTab} onChange={setActiveTab} />

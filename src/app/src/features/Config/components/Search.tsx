@@ -1,16 +1,30 @@
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import React, { useRef } from 'react';
+import debounce from 'lodash/debounce';
+import React, { useEffect, useMemo, useState } from 'react';
+
+// Each search re-filters every setting, so wait for a pause in typing
+const SEARCH_DEBOUNCE_MS = 200;
 
 export function Search() {
     const { searchTerm, setSearchTerm } = useSettings();
-    const inputRef = useRef<HTMLInputElement>(null);
+    const [inputValue, setInputValue] = useState(searchTerm);
 
-    function onSearchChange() {
-        setSearchTerm(inputRef.current.value);
+    const commitSearch = useMemo(
+        () => debounce(setSearchTerm, SEARCH_DEBOUNCE_MS),
+        [setSearchTerm],
+    );
+
+    useEffect(() => () => commitSearch.cancel(), [commitSearch]);
+
+    function onSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setInputValue(e.target.value);
+        commitSearch(e.target.value);
     }
 
     function onSearchClear(e) {
         e.preventDefault();
+        commitSearch.cancel();
+        setInputValue('');
         setSearchTerm('');
     }
 
@@ -46,10 +60,9 @@ export function Search() {
                     id="simple-search"
                     className="bg-gray-50 focus:outline-none border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-surface-elevated dark:border-outline dark:text-content-primary"
                     placeholder="Search Config"
-                    value={searchTerm}
+                    value={inputValue}
                     onChange={onSearchChange}
                     onSubmit={(e) => e.preventDefault()}
-                    ref={inputRef}
                 />
             </div>
             <button

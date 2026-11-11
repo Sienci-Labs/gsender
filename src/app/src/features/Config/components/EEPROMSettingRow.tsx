@@ -4,10 +4,7 @@ import { GRBLHAL } from 'app/constants';
 import { EEPROM } from 'app/definitions/firmware';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
-import {
-    resolveGrblCoreDefaults,
-    translateGrblCoreKey,
-} from 'app/features/Config/utils/grblCoreMigration.ts';
+import { translateGrblCoreKey } from 'app/features/Config/utils/grblCoreMigration.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { RootState } from 'app/store/redux';
 import cn from 'classnames';
@@ -42,8 +39,13 @@ export function EEPROMSettingRow({
     min,
     max,
 }: EEPROMSettingRowProps) {
-    const { EEPROM, eepromMap, machineProfile, firmwareType, eepromIsDefault } =
-        useSettings();
+    const {
+        EEPROM,
+        eepromMap,
+        profileDefaults,
+        firmwareType,
+        eepromIsDefault,
+    } = useSettings();
     const firmwareSemver = useSelector(
         (state: RootState) => state.controller.settings.version?.semver,
     );
@@ -62,14 +64,6 @@ export function EEPROMSettingRow({
 
     if (EEPROMData) {
         const isDefault = eepromIsDefault(EEPROMData);
-        const profileDefaults =
-            firmwareType === 'Grbl'
-                ? machineProfile.eepromSettings
-                : resolveGrblCoreDefaults({
-                      firmwareSemver,
-                      baseDefaults: machineProfile.grblHALeepromSettings || {},
-                      boardId,
-                  }).defaults;
 
         const InputElement = getDatatypeInput(
             EEPROMData.dataType,
