@@ -26,8 +26,9 @@ cd android && ./gradlew assembleDebug
 ```
 
 `yarn android:runtime` unpacks a prebuilt Node tarball from `dist/android/node-runtime/`. Cross-compiling Node takes 1–1.5 h, so locally:
-1. Download the `android-node-runtime-arm64` artifact from a recent run of the **Android** workflow.
-2. Extract it into `dist/android/node-runtime/`.
+```bash
+gh release download "$(bash android/scripts/node-runtime-tag.sh)" -R Sienci-Labs/node_24_APK -D dist/android/node-runtime
+```
 
 Alternatively, run `yarn android:runtime <dir>` with another directory, or build the tarballs on Linux with `android/node/build-node.sh`.
 
@@ -69,18 +70,13 @@ adb logcat -s GSenderPendant GSenderPendant-node GSenderPendant-web
 - **Files:** outside Electron the pendant uses `<input type="file">`. The WebView answers it with the system document picker.
 
 ## The Node runtime
-Node is cross-compiled once and reused from the GitHub Actions cache, not rebuilt on every build:
+Node is cross-compiled once in the private repo [Sienci-Labs/node_24_APK](https://github.com/Sienci-Labs/node_24_APK) and published there as a release, not rebuilt on every build:
 - `android/node/runtime.env` pins the Node version, the NDK, minSdk and a revision.
-- The **Node runtime** job in `android.yml` runs `android/node/build-node.sh`, which calls `patch-node-source.sh`, for arm64.
-- The resulting tarball is cached under a key that hashes everything in `android/node/`. A cache hit takes about a minute; a miss takes 1–1.5 h.
-- The job uploads the tarball as an artifact (`android-node-runtime-arm64`, kept for 14 days). `android/scripts/install-node-runtime.sh` checks its checksum and unpacks it.
+- `android/scripts/node-runtime-tag.sh` prints the release tag, e.g. `node-v24.21.0-r1-<hash>`. The hash covers everything in `android/node/`.
+- node_24_APK's **Build** workflow (manual, input `gsender_ref`) checks out gSender, runs `android/node/build-node.sh` (which calls `patch-node-source.sh`) for arm64 in 1–1.5 h, and publishes the tarball and its checksum under that tag. It skips the build if the release exists.
+- `android.yml` downloads the release using the `NODE_RUNTIME_TOKEN` secret (fine-grained PAT, Contents: read on node_24_APK). `android/scripts/install-node-runtime.sh` checks its checksum and unpacks it.
 
-When the cache misses:
-- **Changes:** any change in `android/node/`, e.g. bumping `NODE_VERSION`, or `RUNTIME_REVISION` to force a rebuild.
-- **Eviction:** GitHub evicts caches unused for 7 days. Branch builds then pay the full cross-compile again.
-- **Branch scope:** a cache saved on a feature branch is visible only to that branch, though every branch can read caches from the default branch. The first build on `dev` or `master` builds its own.
-
-Moving to prebuilt GitHub Release assets later would remove the eviction rebuilds. `build-node.sh` already writes release-ready tarballs with `.sha256` files.
+After any change in `android/node/` (e.g. bumping `NODE_VERSION`, or `RUNTIME_REVISION` to force a rebuild), run the Build workflow with `gsender_ref` set to that commit. Until the release exists, the Android workflow fails and names the missing tag.
 
 `patch-node-source.sh` carries two patches that Node's Android cross-compile needs; each one fails loudly if it stops applying. The binary is linked for 16 KB pages, and `build-node.sh` refuses to package it otherwise.
 
