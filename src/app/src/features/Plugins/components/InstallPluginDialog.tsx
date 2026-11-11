@@ -12,6 +12,7 @@ import {
 import { DialogOverlay } from 'app/components/shadcn/Dialog';
 import cx from 'classnames';
 import isElectron from 'is-electron';
+import { canRestartApp, restartApp } from 'app/lib/restartApp';
 import {
     AlertTriangle,
     ArrowDownCircle,
@@ -416,12 +417,6 @@ export const InstallPluginDialog = ({
         }
     };
 
-    const restartNow = () => {
-        (window as unknown as { ipcRenderer?: any }).ipcRenderer?.send(
-            'app-restart',
-        );
-    };
-
     const activeIndex = stepIndexFor(step);
 
     // Back on the left, primary on the right — the tool-change wizard's footer.
@@ -811,9 +806,9 @@ export const InstallPluginDialog = ({
                         <AlertDialogAction
                             onClick={(event) => {
                                 event.preventDefault();
-                                restartNow();
+                                restartApp();
                             }}
-                            disabled={!isElectron()}
+                            disabled={!canRestartApp()}
                         >
                             Restart now
                         </AlertDialogAction>

@@ -20,6 +20,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -61,6 +62,9 @@ class MainActivity : Activity() {
     private var pageLoaded = false
     private var pageError: String? = null
     private var launching = false
+
+    /** Set by [WebBridge.restartServer]: drop the page once the old server is gone. */
+    private var restartPending = false
 
     /** Until the service reports anything, show "starting" rather than "stopped". */
     private var awaitingServer = true
@@ -173,6 +177,12 @@ class MainActivity : Activity() {
 
     private fun render(state: ServerState) {
         if (state !is ServerState.Stopped) awaitingServer = false
+        // Wait for Starting/Installing (not the stale Ready still current when
+        // the restart was asked for) so the reload hits the new server.
+        if (restartPending && (state is ServerState.Starting || state is ServerState.Installing)) {
+            restartPending = false
+            dropWebView()
+        }
         when (state) {
             ServerState.Stopped -> if (awaitingServer) {
                 showProgress(R.string.status_starting, STAGE_WAITING)
@@ -294,6 +304,7 @@ class MainActivity : Activity() {
         // The pendant lays itself out for the screen; don't let the system
         // font scale reflow it.
         settings.textZoom = 100
+        addJavascriptInterface(WebBridge(), BRIDGE_NAME)
         webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 pageError = null
@@ -378,6 +389,22 @@ class MainActivity : Activity() {
                     filePathCallback = null
                     false
                 }
+            }
+        }
+    }
+
+    /**
+     * Exposed to the page as `window.GSenderAndroid` (src/app/src/lib/restartApp.ts).
+     * Plugin iframes are same-origin and can see it too, so it only offers a
+     * server restart - what plugin install/enable/remove need to remount routes.
+     */
+    private inner class WebBridge {
+        @JavascriptInterface
+        fun restartServer() {
+            runOnUiThread {
+                restartPending = true
+                showProgress(R.string.status_starting, STAGE_STARTING)
+                NodeService.start(this@MainActivity, restart = true)
             }
         }
     }
@@ -510,6 +537,7 @@ class MainActivity : Activity() {
         private const val REQUEST_CAMERA = 3
         private const val PAIR_SCHEME = "gsender-pendant"
         private const val WEB_LOG_TAG = "GSenderPendant-web"
+        private const val BRIDGE_NAME = "GSenderAndroid"
 
         // Rocket heights for each startup stage (see RocketLaunchView).
         private const val STAGE_WAITING = 0.1f
