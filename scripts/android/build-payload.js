@@ -167,7 +167,12 @@ async function buildServer(version) {
 function copyPluginSdk() {
     const dist = path.join(PLUGIN_SDK_DIR, 'dist');
     if (!PLUGIN_SDK_FILES.every((file) => fs.existsSync(path.join(dist, file)))) {
-        execFileSync('yarn', ['--cwd', path.relative(ROOT, PLUGIN_SDK_DIR), 'run', 'build'], { cwd: ROOT, stdio: 'inherit' });
+        const yarn = (args) =>
+            execFileSync('yarn', ['--cwd', path.relative(ROOT, PLUGIN_SDK_DIR), ...args], { cwd: ROOT, stdio: 'inherit' });
+        // The SDK isn't a root workspace, so a clean checkout (CI) has none of
+        // its build deps (tsup) until they're installed here.
+        if (!fs.existsSync(path.join(PLUGIN_SDK_DIR, 'node_modules'))) yarn(['install', '--non-interactive']);
+        yarn(['run', 'build']);
     }
     const dest = path.join(PAYLOAD, 'plugin-sdk');
     fs.mkdirSync(dest, { recursive: true });
