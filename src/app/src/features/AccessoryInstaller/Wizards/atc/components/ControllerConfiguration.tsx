@@ -1,5 +1,6 @@
 import { StepActionButton } from 'app/components/Wizard/StepActionButton.tsx';
 import type { StepProps } from 'app/components/Wizard/types';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 import { useState } from 'react';
@@ -15,6 +16,7 @@ export function ControllerConfiguration({ onComplete }: StepProps) {
         store.set('workspace.toolChangeOption', 'Ignore');
         store.set('workspace.spindleFunctions', true);
         store.set('workspace.toolChange.passthrough', true);
+        updateToolchangeContext();
         // Use macro for controller settings
         controller.command('gcode', 'G65 P999');
         setTimeout(() => {

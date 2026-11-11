@@ -11,7 +11,9 @@ import type {
     ControllerSettings,
     FIRMWARE_TYPES_T,
 } from 'app/definitions/firmware';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import controller from 'app/lib/controller';
+import store from 'app/store';
 import type { PortInfo, SDCardFile } from 'app/store/definitions';
 import { store as reduxStore } from 'app/store/redux';
 import {
@@ -43,6 +45,13 @@ import {
 } from './utils/gcodeProcessing';
 
 export function* initialize() {
+    // ── Tool change context ────────────────────────────────────────────────
+    // Desktop pushes this from FileControl, which the pendant never renders.
+    // Without it the server keeps an empty context and comments out every M6.
+    store.on('change', () => {
+        updateToolchangeContext();
+    });
+
     // ── Machine state ──────────────────────────────────────────────────────
     controller.addListener(
         'controller:settings',
@@ -120,6 +129,8 @@ export function* initialize() {
         'serialport:openController',
         (controllerType: FIRMWARE_TYPES_T) => {
             reduxStore.dispatch(updateControllerType({ type: controllerType }));
+            // Commands are dropped while disconnected, so resend on every connect
+            updateToolchangeContext();
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
             setTimeout(() => {
