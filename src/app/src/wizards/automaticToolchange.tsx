@@ -20,6 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { getProbeSettings, getToolString } from 'app/lib/toolChangeUtils';
 import store from 'app/store';
@@ -39,19 +40,20 @@ const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
     return (maxZTravel - curZPos - 2).toFixed(3);
 };
 
-const probeInitialToolStep = [
+const getProbeInitialToolStep = () => [
     {
-        title: 'Starting Off',
+        title: i18n.t('wizards:toolchange.startingOff'),
         firstRunOnly: true,
         substeps: [
             {
-                title: 'Safety First',
-                description:
-                    'Ensure that your router/spindle is turned off and has fully stopped spinning and prepare to check the length of the current, initial cutting tool.',
+                title: i18n.t('wizards:toolchange.safetyFirst'),
+                description: i18n.t(
+                    'wizards:automaticToolchange.safetyFirst.description',
+                ),
                 overlay: false,
                 actions: [
                     {
-                        label: 'Probe Initial Tool',
+                        label: i18n.t('wizards:toolchange.probeInitialTool'),
                         gcodeLines: [
                             'G91 G21',
                             'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
@@ -75,19 +77,21 @@ const probeInitialToolStep = [
 ];
 
 const getMoveToToolchangePositionSubstep = () => ({
-    title: 'Change Tool',
+    title: i18n.t('wizards:toolchange.changeTool'),
     description: () => (
         <div>
-            Ensure that your router/spindle is turned off and has fully stopped
-            spinning, and prepare to change over to the next tool (
-            {getToolString()}).
+            {i18n.t('wizards:automaticToolchange.changeTool.description', {
+                tool: getToolString(),
+            })}
         </div>
     ),
     overlay: false,
     toolBanner: true,
     actions: [
         {
-            label: 'Move to Tool Change Location',
+            label: i18n.t(
+                'wizards:automaticToolchange.changeTool.moveToLocation',
+            ),
             gcodeLines: [
                 '(Moving to manual toolchange location)',
                 'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
@@ -112,8 +116,7 @@ const createWizard = (count: number): WizardInstructions => {
     return {
         intro: {
             icon: 'fas fa-caution',
-            description:
-                'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!',
+            description: i18n.t('wizards:toolchange.intro'),
         },
         onStart: () => {
             const settings = getProbeSettings();
@@ -158,30 +161,39 @@ const createWizard = (count: number): WizardInstructions => {
             ]);
         },
         steps: [
-            ...(count === 1 ? probeInitialToolStep : []),
+            ...(count === 1 ? getProbeInitialToolStep() : []),
             {
-                title: 'Prepare New Tool',
+                title: i18n.t(
+                    'wizards:automaticToolchange.prepareNewTool.title',
+                ),
                 substeps: [
                     ...(hasManualToolchangePosition
                         ? [getMoveToToolchangePositionSubstep()]
                         : []),
                     {
-                        title: 'Measure New Tool',
+                        title: i18n.t(
+                            'wizards:automaticToolchange.measureNewTool.title',
+                        ),
                         description: () => (
                             <div>
-                                {hasManualToolchangePosition ||
-                                    'Ensure that your router/spindle is turned off and has fully stopped spinning. '}
-                                After you've switched to the new tool (
-                                {getToolString()}), click the button below to
-                                automatically probe and set the new tool's
-                                length offset.
+                                {hasManualToolchangePosition
+                                    ? i18n.t(
+                                          'wizards:automaticToolchange.measureNewTool.description',
+                                          { tool: getToolString() },
+                                      )
+                                    : i18n.t(
+                                          'wizards:automaticToolchange.measureNewTool.descriptionWithSafety',
+                                          { tool: getToolString() },
+                                      )}
                             </div>
                         ),
                         overlay: false,
                         toolBanner: !hasManualToolchangePosition,
                         actions: [
                             {
-                                label: 'Probe Changed Tool',
+                                label: i18n.t(
+                                    'wizards:toolchange.probeChangedTool',
+                                ),
                                 gcodeLines: [
                                     '(Moving back to configured location)',
                                     'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
@@ -204,16 +216,19 @@ const createWizard = (count: number): WizardInstructions => {
                 ],
             },
             {
-                title: 'Resume Job',
+                title: i18n.t('wizards:toolchange.resumeJob'),
                 substeps: [
                     {
-                        title: 'Resume Job',
-                        description:
-                            'If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Turn on your router if you have one.',
+                        title: i18n.t('wizards:toolchange.resumeJob'),
+                        description: i18n.t(
+                            'wizards:automaticToolchange.resumeJob.description',
+                        ),
                         overlay: false,
                         actions: [
                             {
-                                label: 'Resume Cutting',
+                                label: i18n.t(
+                                    'wizards:toolchange.resumeCutting',
+                                ),
                                 gcodeLines: [
                                     '(Restart Spindle)',
                                     '([global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])',

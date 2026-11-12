@@ -1,0 +1,58 @@
+{
+  "widget": {
+    "changeProbeType": "",
+    "probeUsing": "",
+    "selectRoutine": "",
+    "probe": ""
+  },
+  "circuit": {
+    "touchDetected": "",
+    "noTouch": "",
+    "noDevice": ""
+  },
+  "diameter": {
+    "auto": "",
+    "tip": "",
+    "noTools": "",
+    "deleteTool": "",
+    "selectTooltip": "",
+    "selectPlaceholder": "",
+    "customTooltip": "",
+    "customPlaceholder": "",
+    "add": ""
+  },
+  "image": {
+    "alt": ""
+  },
+  "run": {
+    "directions": {
+      "unknown": "",
+      "bottomLeft": "",
+      "topLeft": "",
+      "topRight": "",
+      "bottomRight": ""
+    },
+    "title": "",
+    "warning": "",
+    "directionWarning": "",
+    "verify": "",
+    "checkPosition": "",
+    "checkCircuit3D": "",
+    "checkCircuitPlate": "",
+    "holdPlate": "",
+    "start": "",
+    "waitingForCircuit": ""
+  },
+  "touchplateTypes": {
+    "standardBlock": "",
+    "zProbe": "",
+    "probe3D": ""
+  },
+  "routines": {
+    "xTouch": "",
+    "yTouch": "",
+    "xyTouch": "",
+    "zTouch": "",
+    "xyzTouch": ""
+  }
+}

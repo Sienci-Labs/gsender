@@ -1,3 +1,4 @@
+import { tk } from 'app/i18n';
 import type { ATCUnavailablePayload } from '../definitions';
 
 export const getATCUnavailablePayload = ({
@@ -12,18 +13,16 @@ export const getATCUnavailablePayload = ({
     if (!isConnected) {
         return {
             reason: 'machine_not_connected',
-            title: 'Machine Not Connected',
-            message:
-                'You must be connected to a device with ATC support to use this feature.',
+            title: tk('atc:unavailable.notConnected.title'),
+            message: tk('atc:unavailable.notConnected.message'),
         };
     }
     if (!isATCAvailable) {
         return {
             reason: 'firmware_not_compiled',
-            title: 'No ATC Flag',
-            message: 'Firmware did not report ATC=1 on startup.',
-            additionalInfo:
-                'Ensure the SD card is installed and mounted correctly, a TC.macro file exists, and the firmware has ATC support compiled in.',
+            title: tk('atc:unavailable.noAtcFlag.title'),
+            message: tk('atc:unavailable.noAtcFlag.message'),
+            additionalInfo: tk('atc:unavailable.noAtcFlag.additionalInfo'),
         };
     }
     /*if (!isHomed) {

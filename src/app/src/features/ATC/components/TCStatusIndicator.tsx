@@ -1,3 +1,4 @@
+import { i18n } from 'app/i18n';
 import cn from 'classnames';
 import { useEffect, useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
@@ -13,26 +14,26 @@ export enum TCStatus {
 function getStatusString(status: TCStatus) {
     switch (status) {
         case TCStatus.NO_OFFSET:
-            return 'Offset not found';
+            return i18n.t('atc:tcStatus.noOffset.label');
         case TCStatus.OFF_RACK:
-            return 'Off Rack';
+            return i18n.t('atc:tcStatus.offRack.label');
         case TCStatus.READY:
-            return 'Ready';
+            return i18n.t('atc:tcStatus.ready.label');
         case TCStatus.EMPTY:
-            return 'Empty';
+            return i18n.t('atc:toolState.empty');
     }
 }
 
 function getStatusDescription(status: TCStatus) {
     switch (status) {
         case TCStatus.NO_OFFSET:
-            return 'Make sure the tool is in the rack before proceeding.';
+            return i18n.t('atc:tcStatus.noOffset.description');
         case TCStatus.OFF_RACK:
-            return 'Off Rack tool selected.';
+            return i18n.t('atc:tcStatus.offRack.description');
         case TCStatus.READY:
-            return 'Tool is ready to be loaded.';
+            return i18n.t('atc:tcStatus.ready.description');
         case TCStatus.EMPTY:
-            return 'Tool is empty.';
+            return i18n.t('atc:tcStatus.empty.description');
     }
 }
 

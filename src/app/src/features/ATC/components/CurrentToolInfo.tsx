@@ -6,6 +6,7 @@ import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 import type { RootState } from 'app/store/redux';
@@ -15,6 +16,7 @@ import pubsub from 'pubsub-js';
 import { useEffect, useState } from 'react';
 
 export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
+    const { t } = useAppTranslation();
     const { rackSize, connected, atcAvailable } = useToolChange();
     const [spindleTool, setSpindleTool] = useState(0);
     const [toolMapVersion, setToolMapVersion] = useState(0);
@@ -153,18 +155,20 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                                     'font-semibold text-base dark:text-content-primary',
                                 )}
                             >
-                                {isEmptyTool ? 'Empty' : `T${selectedTool.id}`}
+                                {isEmptyTool
+                                    ? t('atc:toolState.empty')
+                                    : `T${selectedTool.id}`}
                             </span>
                             {!isEmptyTool && isRackTool && (
                                 <span className="text-gray-600 text-xs dark:text-content-secondary">
-                                    Rack
+                                    {t('atc:currentTool.rack')}
                                 </span>
                             )}
                             {!isEmptyTool &&
                                 !isRackTool &&
                                 allowManualBadge && (
                                     <span className="text-gray-600 text-xs dark:text-content-secondary">
-                                        Manual
+                                        {t('atc:currentTool.manual')}
                                     </span>
                                 )}
                         </div>
@@ -175,7 +179,7 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                             className={`${state.backgroundColor} ${state.borderColor} border-2 min-w-18 ${state.textColor} text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1`}
                         >
                             <EmptyIcon size={12} />
-                            {state.label}
+                            {translateKey(state.label)}
                         </Badge>
                     ) : (
                         <ToolStatusBadges
@@ -208,7 +212,7 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                         size="custom"
                         className="h-9 px-4 text-sm"
                     >
-                        Probe
+                        {t('atc:currentTool.probe')}
                     </Button>
                 </div>
             </div>

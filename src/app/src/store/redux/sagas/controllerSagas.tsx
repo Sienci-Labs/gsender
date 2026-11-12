@@ -66,7 +66,7 @@ import type {
     Job,
     MaintenanceTask,
 } from 'app/features/Stats/utils/StatContext';
-import { i18n } from 'app/i18n';
+import { i18n, TransKey, tk, translateKey } from 'app/i18n';
 import { connectToLastDevice } from 'app/lib/connection';
 import controller from 'app/lib/controller';
 import type { TOOL } from 'app/lib/definitions/gcode_virtualization';
@@ -151,6 +151,18 @@ import posthog from 'posthog-js';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { Spindle } from 'app/features/Spindle/definitions';
 import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle';
+
+// Display labels for the stored tool change strategy values.
+const TOOLCHANGE_STRATEGY_LABELS: Record<string, string> = {
+    Ignore: tk('config:options.toolChangeStrategy.ignore'),
+    Pause: tk('config:options.toolChangeStrategy.pause'),
+    'Standard Re-zero': tk('config:options.toolChangeStrategy.standardRezero'),
+    'Flexible Re-zero': tk('config:options.toolChangeStrategy.flexibleRezero'),
+    'Fixed Tool Sensor': tk(
+        'config:options.toolChangeStrategy.fixedToolSensor',
+    ),
+    Code: tk('config:options.toolChangeStrategy.code'),
+};
 
 interface Error {
     type: typeof ALARM | typeof ERROR;
@@ -243,37 +255,49 @@ export function* initialize(): Generator<null, void, unknown> {
         pubsub.publish('helper:info', {
             kind: 'reminder',
             weight: 'compact',
-            title: 'Controller is set up to handle tool changes',
+            title: i18n.t('notifications:atc.toolchangeConfig.title'),
             description: (
                 <>
-                    Your controller reported an ATC, but gSender's tool change
-                    settings will stop the ATC macros from running:
+                    {i18n.t('notifications:atc.toolchangeConfig.intro')}
                     <ul className="mt-2 list-disc list-inside">
                         {passthroughOff && (
                             <li>
-                                Passthrough is <b>off</b>, so M6 commands are
-                                being commented out and never reach the
-                                controller.
+                                <TransKey
+                                    i18nKey="notifications:atc.toolchangeConfig.passthroughOff"
+                                    components={{ bold: <b /> }}
+                                />
                             </li>
                         )}
                         {strategyWrong && (
                             <li>
-                                Tool change strategy is <b>{strategy}</b>, so
-                                gSender handles tool changes instead of the ATC
-                                macros.
+                                <TransKey
+                                    i18nKey="notifications:atc.toolchangeConfig.strategyWrong"
+                                    values={{
+                                        strategy: translateKey(
+                                            TOOLCHANGE_STRATEGY_LABELS[
+                                                strategy
+                                            ] ?? strategy,
+                                        ),
+                                    }}
+                                    components={{ bold: <b /> }}
+                                />
                             </li>
                         )}
                     </ul>
                     <p className="mt-2">
-                        Update gSender's tool change settings?
+                        {i18n.t('notifications:atc.toolchangeConfig.question')}
                     </p>
                 </>
             ),
             primaryAction: {
                 label:
                     passthroughOff && !strategyWrong
-                        ? 'Enable passthrough'
-                        : 'Update settings',
+                        ? i18n.t(
+                              'notifications:atc.toolchangeConfig.enablePassthrough',
+                          )
+                        : i18n.t(
+                              'notifications:atc.toolchangeConfig.updateSettings',
+                          ),
                 onClick: () => {
                     if (passthroughOff) {
                         store.set('workspace.toolChange.passthrough', true);
@@ -284,7 +308,11 @@ export function* initialize(): Generator<null, void, unknown> {
                     updateToolchangeContext();
                 },
             },
-            secondaryAction: { label: 'Keep current settings' },
+            secondaryAction: {
+                label: i18n.t(
+                    'notifications:atc.toolchangeConfig.keepSettings',
+                ),
+            },
             dismissKey: 'atc-toolchange-config',
         });
     };
@@ -934,13 +962,13 @@ export function* initialize(): Generator<null, void, unknown> {
                 let title: string, instructions: WizardInstructions;
 
                 if (option === 'Standard Re-zero') {
-                    title = 'Standard Re-zero Tool Change';
-                    instructions = manualToolChange;
+                    title = i18n.t('wizards:manualToolchange.title');
+                    instructions = manualToolChange();
                 } else if (option === 'Flexible Re-zero') {
-                    title = 'Flexible Re-zero Tool Change';
+                    title = i18n.t('wizards:semiautoToolchange.title');
                     instructions = semiautoToolChange(count as number);
                 } else if (option === 'Fixed Tool Sensor') {
-                    title = 'Fixed Tool Sensor Tool Change';
+                    title = i18n.t('wizards:automaticToolchange.title');
                     instructions = await determineFixedSensorInstructions(
                         count as number,
                         comment,
@@ -1225,7 +1253,7 @@ export function* initialize(): Generator<null, void, unknown> {
                 content: (
                     <div className="flex flex-col gap-2 dark:text-gray-200">
                         <p>
-                            The controller rejected this line:{' '}
+                            {i18n.t('notifications:controller.rejectedLine')}{' '}
                             <code className="font-mono font-bold">
                                 {error.line}
                             </code>
@@ -1484,19 +1512,22 @@ export function* initialize(): Generator<null, void, unknown> {
             } else if (payload.subtype === '10') {
                 pubsub.publish('helper:info', {
                     kind: 'info',
-                    title: 'Jogging inside keepout area',
-                    description:
-                        'You are attempting to jog inside the keepout area. Disable keepout using the switch below, then re-enable it to continue.',
+                    title: i18n.t('notifications:atc.keepout.title'),
+                    description: i18n.t(
+                        'notifications:atc.keepout.description',
+                    ),
                     content: (
                         <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-outline-subtle dark:bg-surface-base">
                             <span className="text-base font-bold text-gray-900 dark:text-content-primary">
-                                Keepout
+                                {i18n.t(
+                                    'notifications:atc.keepout.toggleLabel',
+                                )}
                             </span>
                             <KeepoutToggle />
                         </div>
                     ),
                     resource: {
-                        label: 'Keepout areas',
+                        label: i18n.t('notifications:atc.keepout.resource'),
                         url: 'https://resources.sienci.com/view/atc-final-checks/#troubleshooting',
                         qr: false,
                     },

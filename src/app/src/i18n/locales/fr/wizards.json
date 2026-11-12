@@ -1,0 +1,83 @@
+{
+  "manualToolchange": {
+    "title": "",
+    "safetyFirst": {
+      "description": ""
+    },
+    "changeBit": {
+      "title": "",
+      "description": ""
+    },
+    "resetZ": {
+      "title": "",
+      "description": "",
+      "probeZ": "",
+      "setZ0": ""
+    }
+  },
+  "semiautoToolchange": {
+    "title": "",
+    "setupProbe": {
+      "title": ""
+    },
+    "checkOffset": {
+      "title": "",
+      "description": ""
+    },
+    "safetyFirst": {
+      "descriptionProbeLocation": "",
+      "descriptionToolChangeLocation": ""
+    },
+    "changeTool": {
+      "descriptionFirst": "",
+      "description": ""
+    }
+  },
+  "automaticToolchange": {
+    "title": "",
+    "safetyFirst": {
+      "description": ""
+    },
+    "changeTool": {
+      "description": "",
+      "moveToLocation": ""
+    },
+    "prepareNewTool": {
+      "title": ""
+    },
+    "measureNewTool": {
+      "title": "",
+      "description": "",
+      "descriptionWithSafety": ""
+    },
+    "resumeJob": {
+      "description": ""
+    }
+  },
+  "toolchange": {
+    "startingOff": "",
+    "safetyFirst": "",
+    "probeInitialTool": "",
+    "changeTool": "",
+    "intro": "",
+    "probeChangedTool": "",
+    "resumeJob": "",
+    "resumeCutting": "",
+    "probeNewTool": "",
+    "resumeJobDescription": ""
+  },
+  "probeToolLength": {
+    "intro": "",
+    "measureToolLength": {
+      "title": "",
+      "description": "",
+      "action": ""
+    },
+    "resume": {
+      "title": "",
+      "substepTitle": "",
+      "description": "",
+      "action": ""
+    }
+  }
+}

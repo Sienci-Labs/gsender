@@ -1,5 +1,6 @@
 import type { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import type { BasicPosition, UNITS_EN } from 'app/definitions/general';
+import { tk } from 'app/i18n';
 import type { PROBE_TYPES, TOUCHPLATE_TYPES } from 'app/lib/constants';
 import type { probeDirections } from 'app/lib/Probing';
 
@@ -12,6 +13,31 @@ export type PROBE_TYPES_T = (typeof PROBE_TYPES)[keyof typeof PROBE_TYPES];
 
 export type TOUCHPLATE_TYPES_T =
     (typeof TOUCHPLATE_TYPES)[keyof typeof TOUCHPLATE_TYPES];
+
+// Display labels for stored/compared values. Values without an entry
+// (product names such as AutoZero and BitZero) are shown as-is.
+
+export const TOUCHPLATE_TYPE_LABELS: Record<string, string> = {
+    'Standard Block': tk('probe:touchplateTypes.standardBlock'),
+    'Z Probe': tk('probe:touchplateTypes.zProbe'),
+    '3D Probe': tk('probe:touchplateTypes.probe3D'),
+};
+
+export const PROBE_ROUTINE_LABELS: Record<string, string> = {
+    'X Touch': tk('probe:routines.xTouch'),
+    'Y Touch': tk('probe:routines.yTouch'),
+    'XY Touch': tk('probe:routines.xyTouch'),
+    'Z Touch': tk('probe:routines.zTouch'),
+    'XYZ Touch': tk('probe:routines.xyzTouch'),
+};
+
+// Indexed by probe direction (0-3).
+export const PROBE_DIRECTION_LABELS = [
+    tk('probe:run.directions.bottomLeft'),
+    tk('probe:run.directions.topLeft'),
+    tk('probe:run.directions.topRight'),
+    tk('probe:run.directions.bottomRight'),
+];
 
 // Interfaces
 

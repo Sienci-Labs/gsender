@@ -9,6 +9,7 @@ import {
     mapDefaultsToValues,
     useConfigContext,
 } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import { translateKey, tk, useAppTranslation } from 'app/i18n';
 import store from 'app/store';
 import cn from 'classnames';
 import {
@@ -117,7 +118,7 @@ export function TemplateManagerProvider({
         }
 
         if (!file.name.toLowerCase().endsWith('.json')) {
-            setUploadError('Please select a valid JSON file');
+            setUploadError(tk('atc:templates.invalidFileType'));
             input.value = '';
             return;
         }
@@ -150,7 +151,7 @@ export function TemplateManagerProvider({
                 setSelectedTemplateName(nextTemplates.macros[0]?.name ?? null);
                 setUploadError('');
             } catch {
-                setUploadError('Invalid JSON file or incorrect structure');
+                setUploadError(tk('atc:templates.invalidStructure'));
             } finally {
                 input.value = '';
             }
@@ -182,6 +183,7 @@ export function TemplateManagerProvider({
 }
 
 function TemplateManagerVersionInfo() {
+    const { t } = useAppTranslation();
     const { defaultVersion, templates } = useTemplateManagerContext();
     const localTemplateVersion = templates?.version ?? defaultVersion;
     const controllerTemplateVersion = templates?.sdVersion;
@@ -234,12 +236,12 @@ function TemplateManagerVersionInfo() {
 
     const syncStatusLabel =
         versionSyncState === 'controller_outdated'
-            ? 'Controller outdated'
+            ? t('atc:templates.sync.controllerOutdated')
             : versionSyncState === 'local_outdated'
-              ? 'Local outdated'
+              ? t('atc:templates.sync.localOutdated')
               : versionSyncState === 'in_sync'
-                ? 'In sync'
-                : 'Controller version unavailable';
+                ? t('atc:templates.sync.inSync')
+                : t('atc:templates.sync.unavailable');
     const syncStatusBadgeClass = cn(
         'h-6 min-w-[11rem] justify-center gap-1.5 border px-2.5 py-0 text-xs font-semibold shadow-sm',
         {
@@ -265,7 +267,7 @@ function TemplateManagerVersionInfo() {
             <div className="flex flex-wrap items-start gap-4">
                 <div className="flex items-center gap-2 min-w-[16rem]">
                     <span className="text-sm font-semibold dark:text-content-primary">
-                        Local Templates:
+                        {t('atc:templates.localTemplates')}
                     </span>
                     <Badge
                         variant="secondary"
@@ -276,7 +278,7 @@ function TemplateManagerVersionInfo() {
                 </div>
                 <div className="flex items-center gap-2 min-w-[16rem]">
                     <span className="text-sm font-semibold dark:text-content-primary">
-                        Controller Templates:
+                        {t('atc:templates.controllerTemplates')}
                     </span>
                     <Badge
                         variant="secondary"
@@ -289,7 +291,7 @@ function TemplateManagerVersionInfo() {
                 </div>
                 <div className="flex items-center gap-2 min-w-[14rem]">
                     <span className="text-sm font-semibold dark:text-content-primary">
-                        Status:
+                        {t('atc:templates.status')}
                     </span>
                     <Badge variant="secondary" className={syncStatusBadgeClass}>
                         <SyncStatusIcon className="h-3.5 w-3.5" />
@@ -302,6 +304,7 @@ function TemplateManagerVersionInfo() {
 }
 
 function TemplateManagerUploadSection() {
+    const { t } = useAppTranslation();
     const { handleUploadClick, uploadError } = useTemplateManagerContext();
 
     return (
@@ -311,12 +314,12 @@ function TemplateManagerUploadSection() {
                 className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
             >
                 <Upload className="h-4 w-4" />
-                Upload JSON Template File
+                {t('atc:templates.upload')}
             </Button>
             {uploadError && (
                 <div className="flex items-center gap-2 text-red-500 text-xs mt-2">
                     <AlertCircle className="h-4 w-4" />
-                    {uploadError}
+                    {translateKey(uploadError)}
                 </div>
             )}
         </div>
@@ -324,6 +327,7 @@ function TemplateManagerUploadSection() {
 }
 
 function TemplateViewer({ className = '' }: { className?: string }) {
+    const { t } = useAppTranslation();
     const { selectedTemplate } = useTemplateManagerContext();
 
     return (
@@ -334,7 +338,9 @@ function TemplateViewer({ className = '' }: { className?: string }) {
             )}
         >
             <h1 className="text-sm font-semibold p-2 text-blue-600 dark:text-blue-400">
-                {selectedTemplate ? selectedTemplate.name : 'Content'}
+                {selectedTemplate
+                    ? selectedTemplate.name
+                    : t('atc:templates.content')}
             </h1>
             <div className="flex-1 min-h-0 p-2 overflow-hidden">
                 <div className="border rounded h-full min-h-0 overflow-hidden dark:border-outline dark:bg-surface-sunken">
@@ -347,7 +353,7 @@ function TemplateViewer({ className = '' }: { className?: string }) {
                         </div>
                     ) : (
                         <div className="text-center text-muted-foreground text-sm py-8">
-                            Select a macro to view its contents
+                            {t('atc:templates.selectMacro')}
                         </div>
                     )}
                 </div>
@@ -363,6 +369,7 @@ export function TemplateManagerListContent({
     className?: string;
     showUploadButton?: boolean;
 }) {
+    const { t } = useAppTranslation();
     const { selectedTemplate, selectTemplate, sortedTemplates } =
         useTemplateManagerContext();
 
@@ -372,7 +379,9 @@ export function TemplateManagerListContent({
 
             <div className="border border-border bg-white dark:border-outline dark:bg-surface-raised flex flex-col min-h-0 flex-1 overflow-hidden">
                 <h1 className="text-sm font-semibold text-blue-600 dark:text-blue-400 p-2">
-                    Macros ({sortedTemplates.length})
+                    {t('atc:templates.macros', {
+                        total: sortedTemplates.length,
+                    })}
                 </h1>
                 <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
                     {sortedTemplates.map((template) => (

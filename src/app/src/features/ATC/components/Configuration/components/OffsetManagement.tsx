@@ -5,6 +5,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select';
+import { useAppTranslation } from 'app/i18n';
 import { useState } from 'react';
 
 interface OffsetManagementWidgetProps {
@@ -20,6 +21,7 @@ export default function OffsetManagementWidget({
     defaultValue = 0,
     disabled = false,
 }: OffsetManagementWidgetProps) {
+    const { t } = useAppTranslation();
     const [internalValue, setInternalValue] = useState(value);
 
     const currentValue = onChange ? value : internalValue;
@@ -50,17 +52,19 @@ export default function OffsetManagementWidget({
                         className="h-8 text-xs dark:border-outline dark:bg-surface-sunken dark:text-content-primary"
                         disabled={disabled}
                     >
-                        <SelectValue placeholder="Select mode" />
+                        <SelectValue
+                            placeholder={t('atc:config.offsetMode.placeholder')}
+                        />
                     </SelectTrigger>
                     <SelectContent className="z-[10001] bg-white dark:bg-surface-elevated dark:text-content-primary">
                         <SelectItem value="0">
-                            Probe new offset after loading
+                            {t('atc:config.offsetMode.probeNew')}
                         </SelectItem>
                         <SelectItem value="1">
-                            Use Tool Table without verification
+                            {t('atc:config.offsetMode.useTableWithoutVerify')}
                         </SelectItem>
                         <SelectItem value="2">
-                            Use Tool Table and probe to verify
+                            {t('atc:config.offsetMode.useTableAndVerify')}
                         </SelectItem>
                     </SelectContent>
                 </Select>

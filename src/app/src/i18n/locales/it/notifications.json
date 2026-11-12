@@ -17,7 +17,21 @@
       "content": "Continua per rilasciare la sospensione, Reimposta per interrompere l'azione.",
       "resume": "Riprendi"
     },
-    "toolsOutOfRange_many": "Questo file usa gli utensili {{list}}, che superano la tabella utensili da {{size}} posizioni. Riassegnali nella timeline utensili prima dell'esecuzione."
+    "toolsOutOfRange_many": "Questo file usa gli utensili {{list}}, che superano la tabella utensili da {{size}} posizioni. Riassegnali nella timeline utensili prima dell'esecuzione.",
+    "toolchangeConfig": {
+      "title": "",
+      "intro": "",
+      "question": "",
+      "enablePassthrough": "",
+      "updateSettings": "",
+      "keepSettings": ""
+    },
+    "keepout": {
+      "title": "",
+      "description": "",
+      "toggleLabel": "",
+      "resource": ""
+    }
   },
   "connection": {
     "reconnectFailed": "Impossibile riconnettersi a {{port}} - {{reason}}"
@@ -67,7 +81,8 @@
     "fourAxisFileLoaded": {
       "title": "File a 4 assi caricato",
       "content": "Il G-code contiene comandi simultanei su 4 assi, che al momento non sono supportati e non possono essere eseguiti."
-    }
+    },
+    "rejectedLine": ""
   },
   "diagnostics": {
     "downloaded": "File di diagnostica scaricato correttamente!",

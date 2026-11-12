@@ -5,9 +5,11 @@ import {
     unloadTool,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { useAppTranslation } from 'app/i18n';
 import { Download, Upload } from 'lucide-react';
 
 export function AdvancedOptions() {
+    const { t } = useAppTranslation();
     const { disabled, setLoadToolMode, setLoadToolOpen } = useToolChange();
 
     const handleManualLoad = () => {
@@ -29,14 +31,14 @@ export function AdvancedOptions() {
             <div className="flex flex-col gap-2 border-t border-gray-200 pt-3">
                 <LongPressButton
                     disabled={disabled}
-                    label="Load"
+                    label={t('atc:advancedOptions.load')}
                     icon={<Download className="h-5 w-5" />}
                     onClick={handleLoad}
                     onLongPress={handleManualLoad}
                 />
                 <LongPressButton
                     disabled={disabled}
-                    label="Unload"
+                    label={t('atc:advancedOptions.unload')}
                     icon={<Upload className="h-5 w-5" />}
                     onClick={unloadTool}
                     onLongPress={releaseToolFromSpindle}

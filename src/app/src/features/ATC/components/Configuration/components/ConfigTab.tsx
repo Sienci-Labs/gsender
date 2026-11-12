@@ -11,6 +11,7 @@ import { Spinner } from 'app/components/shadcn/Spinner';
 import { Switch } from 'app/components/shadcn/Switch';
 import OffsetManagementWidget from 'app/features/ATC/components/Configuration/components/OffsetManagement.tsx';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
+import { TransKey, translateKey, useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 import {
     AlertTriangle,
@@ -39,6 +40,7 @@ export const ConfigTab: React.FC = ({
     uploadError,
     macroReadFailed,
 }: ConfigTabProps) => {
+    const { t } = useAppTranslation();
     const navigate = useNavigate();
     const {
         config,
@@ -91,7 +93,7 @@ export const ConfigTab: React.FC = ({
                     <CardHeader className="px-4 py-3 border-b border-border dark:border-outline bg-muted/30 dark:bg-surface-elevated">
                         <div className="flex items-center justify-between gap-2 w-full">
                             <CardTitle className="text-sm font-semibold text-foreground">
-                                Tool Rack
+                                {t('atc:config.toolRack.title')}
                             </CardTitle>
                             <Crosshair className={`${iconClass} shrink-0`} />
                         </div>
@@ -107,13 +109,11 @@ export const ConfigTab: React.FC = ({
                                 )
                             }
                         >
-                            Go to ATC Setup
+                            {t('atc:config.toolRack.goToSetup')}
                             <ArrowRight className="h-4 w-4 ml-1" />
                         </Button>
                         <p className="text-sm text-gray-600 dark:text-content-secondary">
-                            Tool rack configuration is managed through the ATC
-                            setup process. Re-run setup to reconfigure your
-                            rack.
+                            {t('atc:config.toolRack.description')}
                         </p>
                     </CardContent>
                 </Card>
@@ -123,15 +123,19 @@ export const ConfigTab: React.FC = ({
                     <CardHeader className="px-4 py-3 border-b border-border dark:border-outline bg-muted/30 dark:bg-surface-elevated">
                         <div className="flex items-center justify-between gap-2 w-full">
                             <CardTitle className="text-sm font-semibold text-foreground">
-                                Tool Length Sensor
+                                {t('atc:config.toolLengthSensor.title')}
                             </CardTitle>
                             <Fingerprint className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
                     <CardContent className="p-5 !pt-4 min-h-[170px] flex flex-col justify-center gap-4">
-                        <Label className={labelClass}>Sensor Position</Label>
+                        <Label className={labelClass}>
+                            {t('atc:config.toolLengthSensor.sensorPosition')}
+                        </Label>
                         <PositionInput
-                            label="Tool Length Sensor Position"
+                            label={t(
+                                'atc:config.toolLengthSensor.positionLabel',
+                            )}
                             position={config.tlsPosition}
                             onPositionChange={(position) =>
                                 updatePosition(
@@ -141,7 +145,7 @@ export const ConfigTab: React.FC = ({
                             }
                             onUseCurrent={() => setWorkspacePosition('P9')}
                             disableZ
-                            actionLabel="Set Manually"
+                            actionLabel={t('atc:config.setManually')}
                             hideLabel
                         />
                     </CardContent>
@@ -153,7 +157,7 @@ export const ConfigTab: React.FC = ({
                 <CardHeader className="px-4 py-3 border-b border-border dark:border-outline bg-muted/30 dark:bg-surface-elevated">
                     <div className="flex items-center justify-between gap-2 w-full">
                         <CardTitle className="text-sm font-semibold text-foreground">
-                            Advanced Settings
+                            {t('atc:config.advanced.title')}
                         </CardTitle>
                         <BookOpen className={`${iconClass} shrink-0`} />
                     </div>
@@ -165,12 +169,16 @@ export const ConfigTab: React.FC = ({
                                 <div className="flex items-center gap-2">
                                     <SlidersHorizontal className={iconClass} />
                                     <Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
-                                        Offset Management
+                                        {t(
+                                            'atc:config.advanced.offsetManagement',
+                                        )}
                                     </Label>
                                 </div>
                                 <div className="space-y-1">
                                     <Label className={subLabelClass}>
-                                        When loading from tool rack:
+                                        {t(
+                                            'atc:config.advanced.whenLoadingFromRack',
+                                        )}
                                     </Label>
                                     <OffsetManagementWidget
                                         value={
@@ -198,7 +206,9 @@ export const ConfigTab: React.FC = ({
                                 </div>
                                 <div className="space-y-1">
                                     <Label className={subLabelClass}>
-                                        When loading manually:
+                                        {t(
+                                            'atc:config.advanced.whenLoadingManually',
+                                        )}
                                     </Label>
                                     <OffsetManagementWidget
                                         value={
@@ -228,11 +238,15 @@ export const ConfigTab: React.FC = ({
                                 <div className="flex items-center gap-2">
                                     <Move className={iconClass} />
                                     <Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
-                                        Manual Change Position
+                                        {t(
+                                            'atc:config.advanced.manualChangePosition',
+                                        )}
                                     </Label>
                                 </div>
                                 <PositionInput
-                                    label="Manual Tool Change Position"
+                                    label={t(
+                                        'atc:config.advanced.manualChangePositionLabel',
+                                    )}
                                     position={config.manualLoadPosition}
                                     onPositionChange={(position) =>
                                         updatePosition(
@@ -244,7 +258,7 @@ export const ConfigTab: React.FC = ({
                                         setWorkspacePosition('P8')
                                     }
                                     disableZ
-                                    actionLabel="Set Manually"
+                                    actionLabel={t('atc:config.setManually')}
                                     hideLabel
                                 />
                             </div>
@@ -252,7 +266,7 @@ export const ConfigTab: React.FC = ({
                                 <div className="flex items-center gap-2">
                                     <SlidersHorizontal className={iconClass} />
                                     <Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
-                                        Advanced
+                                        {t('atc:config.advanced.advanced')}
                                     </Label>
                                 </div>
                                 <div
@@ -270,8 +284,9 @@ export const ConfigTab: React.FC = ({
                                     )}
                                 >
                                     <Label className="text-xs font-medium text-gray-700 dark:text-content-primary flex-1">
-                                        Retain tool table settings when rack
-                                        removed
+                                        {t(
+                                            'atc:config.advanced.retainToolTable',
+                                        )}
                                     </Label>
                                     <Switch
                                         checked={
@@ -303,7 +318,7 @@ export const ConfigTab: React.FC = ({
                                 <div className="flex items-center gap-2">
                                     <ShieldCheck className={iconClass} />
                                     <Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
-                                        Safety Checks
+                                        {t('atc:config.advanced.safetyChecks')}
                                     </Label>
                                 </div>
                                 <div className="space-y-3">
@@ -324,13 +339,16 @@ export const ConfigTab: React.FC = ({
                                                 <Label
                                                     className={rowLabelClass}
                                                 >
-                                                    Pressure Sensor
+                                                    {t(
+                                                        'atc:config.advanced.pressureSensor',
+                                                    )}
                                                 </Label>
                                                 <div
                                                     className={helperTextClass}
                                                 >
-                                                    Check pressure before tool
-                                                    change
+                                                    {t(
+                                                        'atc:config.advanced.pressureSensorDescription',
+                                                    )}
                                                 </div>
                                             </div>
                                             <Switch
@@ -373,13 +391,16 @@ export const ConfigTab: React.FC = ({
                                                 <Label
                                                     className={rowLabelClass}
                                                 >
-                                                    Tool-stud Sensor
+                                                    {t(
+                                                        'atc:config.advanced.toolStudSensor',
+                                                    )}
                                                 </Label>
                                                 <div
                                                     className={helperTextClass}
                                                 >
-                                                    Check tool collision before
-                                                    tool unload
+                                                    {t(
+                                                        'atc:config.advanced.toolStudSensorDescription',
+                                                    )}
                                                 </div>
                                             </div>
                                             <Switch
@@ -412,7 +433,7 @@ export const ConfigTab: React.FC = ({
                                 <div className="flex items-center gap-2">
                                     <SlidersHorizontal className={iconClass} />
                                     <Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
-                                        Other
+                                        {t('atc:config.advanced.other')}
                                     </Label>
                                 </div>
                                 <div
@@ -430,10 +451,14 @@ export const ConfigTab: React.FC = ({
                                     <div className="flex items-center justify-between gap-2">
                                         <div className="space-y-1">
                                             <Label className={rowLabelClass}>
-                                                Tool Fork Spacing (mm)
+                                                {t(
+                                                    'atc:config.advanced.forkSpacing',
+                                                )}
                                             </Label>
                                             <div className={helperTextClass}>
-                                                Distance between each fork.
+                                                {t(
+                                                    'atc:config.advanced.forkSpacingDescription',
+                                                )}
                                             </div>
                                         </div>
                                         <Input
@@ -497,7 +522,7 @@ export const ConfigTab: React.FC = ({
                         <div className="flex flex-row gap-2 items-center">
                             <Spinner className="h-4 w-4" />
                             <span className="text-gray-700 dark:text-content-secondary">
-                                {status.message}
+                                {translateKey(status.message)}
                             </span>
                         </div>
                     )}
@@ -506,7 +531,7 @@ export const ConfigTab: React.FC = ({
                         <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-green-50 border border-green-200 text-green-700 dark:bg-green-950/40 dark:border-green-800 dark:text-green-400 animate-in fade-in-0 duration-300">
                             <CheckCircle2 className="h-4 w-4 shrink-0" />
                             <span className="text-xs font-medium">
-                                {status.message}
+                                {translateKey(status.message)}
                             </span>
                         </div>
                     )}
@@ -515,7 +540,7 @@ export const ConfigTab: React.FC = ({
                         status.type !== 'success' &&
                         status.message && (
                             <div className={cn('text-xs', getStatusColor())}>
-                                {status.message}
+                                {translateKey(status.message)}
                             </div>
                         )}
 
@@ -529,9 +554,10 @@ export const ConfigTab: React.FC = ({
                         <div className="flex items-start gap-2 rounded-md border border-amber-400 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-700 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
                             <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                             <p>
-                                Unable to read board config (
-                                <code>ATCI.macro</code>). Ensure the file exists
-                                and SD card is installed — apply disabled.
+                                <TransKey
+                                    i18nKey="atc:config.macroReadFailed"
+                                    components={{ code: <code /> }}
+                                />
                             </p>
                         </div>
                     )}
@@ -543,7 +569,9 @@ export const ConfigTab: React.FC = ({
                         onClick={applyConfig}
                         disabled={uploading || !!macroReadFailed}
                     >
-                        {uploading ? 'Applying...' : 'Apply'}
+                        {uploading
+                            ? t('atc:config.applying')
+                            : t('common:actions.apply')}
                     </Button>
                 </div>
             </div>

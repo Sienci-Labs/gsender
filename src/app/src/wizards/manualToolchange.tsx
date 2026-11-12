@@ -20,14 +20,14 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { i18n } from 'app/i18n';
 import { getProbeSettings, getToolString } from 'app/lib/toolChangeUtils';
 import type { WizardInstructions } from './definitions';
 
-const wizard: WizardInstructions = {
+const createWizard = (): WizardInstructions => ({
     intro: {
         icon: 'fas fa-caution',
-        description:
-            'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!',
+        description: i18n.t('wizards:toolchange.intro'),
     },
     onStart: () => {
         const settings = getProbeSettings();
@@ -53,39 +53,47 @@ const wizard: WizardInstructions = {
     },
     steps: [
         {
-            title: 'Starting Off',
+            title: i18n.t('wizards:toolchange.startingOff'),
             substeps: [
                 {
-                    title: 'Safety First',
+                    title: i18n.t('wizards:toolchange.safetyFirst'),
                     description: () => (
                         <div>
-                            Jog your machine to a place you can reach using the
-                            jog controls and ensure that your router/spindle is
-                            turned off and has fully stopped spinning.
+                            {i18n.t(
+                                'wizards:manualToolchange.safetyFirst.description',
+                            )}
                         </div>
                     ),
                     overlay: false,
                 },
                 {
-                    title: 'Change Bit',
+                    title: i18n.t('wizards:manualToolchange.changeBit.title'),
                     description: () =>
-                        `Change over to the next tool (${getToolString()})`,
+                        i18n.t(
+                            'wizards:manualToolchange.changeBit.description',
+                            {
+                                tool: getToolString(),
+                            },
+                        ),
                     overlay: false,
                     toolBanner: true,
                 },
             ],
         },
         {
-            title: 'Probe New Tool',
+            title: i18n.t('wizards:toolchange.probeNewTool'),
             substeps: [
                 {
-                    title: 'Reset the Z',
-                    description:
-                        'Use jogging or X and Y gotos to bring your CNC back over to where you initially set the project zero. If you used a touch plate be sure to place the tool over the plate and attach the magnet.',
+                    title: i18n.t('wizards:manualToolchange.resetZ.title'),
+                    description: i18n.t(
+                        'wizards:manualToolchange.resetZ.description',
+                    ),
                     overlay: false,
                     actions: [
                         {
-                            label: 'Probe Z (touch plate)',
+                            label: i18n.t(
+                                'wizards:manualToolchange.resetZ.probeZ',
+                            ),
                             gcodeLines: [
                                 '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                 'G91',
@@ -98,7 +106,9 @@ const wizard: WizardInstructions = {
                             ],
                         },
                         {
-                            label: 'Set Z0 (paper method)',
+                            label: i18n.t(
+                                'wizards:manualToolchange.resetZ.setZ0',
+                            ),
                             gcodeLines: [
                                 '(Setting Z 0)',
                                 'G10 L20 P0 Z0',
@@ -110,16 +120,17 @@ const wizard: WizardInstructions = {
             ],
         },
         {
-            title: 'Resume Job',
+            title: i18n.t('wizards:toolchange.resumeJob'),
             substeps: [
                 {
-                    title: 'Resume Job',
-                    description:
-                        'If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Remove the touch plate magnet and turn on your router if you have them.',
+                    title: i18n.t('wizards:toolchange.resumeJob'),
+                    description: i18n.t(
+                        'wizards:toolchange.resumeJobDescription',
+                    ),
                     overlay: false,
                     actions: [
                         {
-                            label: 'Resume Job',
+                            label: i18n.t('wizards:toolchange.resumeJob'),
                             gcodeLines: [
                                 '(Returning to initial position)',
                                 'G21',
@@ -135,6 +146,6 @@ const wizard: WizardInstructions = {
             ],
         },
     ],
-};
+});
 
-export default wizard;
+export default createWizard;

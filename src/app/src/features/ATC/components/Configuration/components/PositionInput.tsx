@@ -3,6 +3,7 @@ import { Input } from 'app/components/shadcn/Input';
 import { Label } from 'app/components/shadcn/Label';
 import type { Position } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+import { useAppTranslation } from 'app/i18n';
 import { mapPositionToUnits } from 'app/lib/units.ts';
 import cn from 'classnames';
 import map from 'lodash/map';
@@ -34,12 +35,13 @@ export const PositionInput: React.FC<PositionInputProps> = ({
     disabled = false,
     disableZ = false,
     hideZ = false,
-    actionLabel = 'Set Position',
+    actionLabel,
     secondaryActionLabel,
     onSecondaryAction,
     secondaryActionDisabled = false,
     hideLabel = false,
 }) => {
+    const { t } = useAppTranslation();
     const { units } = useWorkspaceState();
     const hasSecondaryAction = Boolean(
         secondaryActionLabel && onSecondaryAction,
@@ -50,10 +52,9 @@ export const PositionInput: React.FC<PositionInputProps> = ({
         (position.x === 0 ||
             position.y === 0 ||
             (validateZ && position.z === 0));
-    const validationText = validateZ
-        ? 'X, Y, and Z should not be 0.'
-        : 'X and Y should not be 0.';
-    const validationMessage = `${validationText} Verify the offsets are correct.`;
+    const validationMessage = validateZ
+        ? t('atc:config.positionInput.zeroWarningXYZ')
+        : t('atc:config.positionInput.zeroWarningXY');
 
     const handleAxisChange = (axis: keyof Position, value: string) => {
         if (disabled) return;
@@ -96,7 +97,9 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                     <div className="flex items-center gap-2 flex-wrap">
                         <div className="flex items-center gap-1 flex-1 min-w-[6.5rem]">
                             <Label className="text-xs text-muted-foreground dark:text-content-secondary w-4">
-                                X:
+                                {t('atc:config.positionInput.axis', {
+                                    axis: 'X',
+                                })}
                             </Label>
                             <Input
                                 type="number"
@@ -115,7 +118,9 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                         </div>
                         <div className="flex items-center gap-1 flex-1 min-w-[6.5rem]">
                             <Label className="text-xs text-muted-foreground dark:text-content-secondary w-4">
-                                Y:
+                                {t('atc:config.positionInput.axis', {
+                                    axis: 'Y',
+                                })}
                             </Label>
                             <Input
                                 type="number"
@@ -140,7 +145,9 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                                 )}
                             >
                                 <Label className="text-xs text-muted-foreground dark:text-content-secondary w-4">
-                                    Z:
+                                    {t('atc:config.positionInput.axis', {
+                                        axis: 'Z',
+                                    })}
                                 </Label>
                                 <Input
                                     type="number"
@@ -172,7 +179,8 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                             disabled={disabled}
                         >
                             <FiTarget className="h-4 w-4" />
-                            {actionLabel}
+                            {actionLabel ??
+                                t('atc:config.positionInput.setPosition')}
                         </Button>
                         {hasSecondaryAction && (
                             <Button

@@ -19,6 +19,7 @@ import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadge
 import type { ToolProbeState } from 'app/features/ATC/types.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 import { RootState } from 'app/store/redux';
@@ -67,6 +68,7 @@ const ToolSection = ({
     disabled?: boolean;
     allowManualBadge?: boolean;
 }) => {
+    const { t } = useAppTranslation();
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     return (
@@ -92,11 +94,13 @@ const ToolSection = ({
                     <Table>
                         <TableHeader>
                             <TableRow className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[2fr_1fr_1fr]">
-                                <TableHead>Tool</TableHead>
+                                <TableHead>{t('atc:toolTable.tool')}</TableHead>
                                 <TableHead className={'portrait:hidden'}>
-                                    Z Offset
+                                    {t('atc:toolTable.zOffset')}
                                 </TableHead>
-                                <TableHead>Status</TableHead>
+                                <TableHead>
+                                    {t('atc:toolTable.status')}
+                                </TableHead>
                                 <TableHead>
                                     {defaultOpen ? (
                                         <Button
@@ -105,10 +109,10 @@ const ToolSection = ({
                                             onClick={probeEntireRack}
                                             disabled={disabled}
                                         >
-                                            Probe All
+                                            {t('atc:toolTable.probeAll')}
                                         </Button>
                                     ) : (
-                                        'Actions'
+                                        t('atc:toolTable.actions')
                                     )}
                                 </TableHead>
                             </TableRow>
@@ -183,6 +187,7 @@ export interface ToolTableProps {
 }
 
 export function ToolTable({ tools = [], disabled }: ToolTableProps) {
+    const { t } = useAppTranslation();
     const { rackSize, connected, atcAvailable } = useToolChange();
     const allowManualBadge = connected && atcAvailable;
     const reportedRackEnable = Number(
@@ -198,7 +203,7 @@ export function ToolTable({ tools = [], disabled }: ToolTableProps) {
     return (
         <div className="sm:rounded-lg w-full h-[500px] gap-1 flex flex-col">
             <ToolSection
-                title="Rack Loaded Tools"
+                title={t('atc:toolTable.rackLoadedTools')}
                 tools={onRackTools}
                 onProbe={() => {}}
                 defaultOpen={rackEnabled}
@@ -206,7 +211,7 @@ export function ToolTable({ tools = [], disabled }: ToolTableProps) {
                 allowManualBadge={allowManualBadge}
             />
             <ToolSection
-                title="Manually Loaded Tools"
+                title={t('atc:toolTable.manuallyLoadedTools')}
                 tools={offRackTools}
                 onProbe={() => {}}
                 defaultOpen={!rackEnabled}

@@ -1,4 +1,5 @@
 import { Button } from 'app/components/Button/';
+import { useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 import { Settings } from 'lucide-react';
 
@@ -9,6 +10,7 @@ export const ProbeButton = ({
     onProbe?: () => void;
     className?: string;
 }) => {
+    const { t } = useAppTranslation();
     return (
         <Button
             variant="primary"
@@ -17,7 +19,7 @@ export const ProbeButton = ({
             onClick={onProbe}
         >
             <Settings size={14} />
-            Probe Tool
+            {t('atc:toolTable.probeTool')}
         </Button>
     );
 };

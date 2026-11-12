@@ -31,6 +31,7 @@ import {
 import Tooltip from 'app/components/Tooltip';
 import type { UNITS_EN } from 'app/definitions/general';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useAppTranslation } from 'app/i18n';
 import {
     PROBE_TYPE_AUTO,
     PROBE_TYPE_DIAMETER,
@@ -95,6 +96,7 @@ const convertAvailableTools = (
 };
 
 const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
+    const { t } = useAppTranslation();
     const { touchplate, toolDiameter, probeType } = state;
     const { touchplateType } = touchplate;
     let { availableTools, units } = state;
@@ -335,12 +337,23 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         return units;
     }
 
+    // Auto and Tip are stored probe types; show them translated.
+    function getDisplayValue(option: string) {
+        if (option === PROBE_TYPE_AUTO) {
+            return t('probe:diameter.auto');
+        }
+        if (option === PROBE_TYPE_TIP) {
+            return t('probe:diameter.tip');
+        }
+        return option;
+    }
+
     const renderOptions = () => {
         if (options.length === 0) {
             return (
                 <div className="flex items-center justify-center h-full min-h-10">
                     <p className="text-gray-600">
-                        No tools available, add one below.
+                        {t('probe:diameter.noTools')}
                     </p>
                 </div>
             );
@@ -360,7 +373,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             >
                 <div className="flex items-center justify-between w-full">
                     <span>
-                        {option.label}{' '}
+                        {getDisplayValue(option.label)}{' '}
                         {getUnitString(option.value as PROBE_TYPES_T)}
                     </span>
 
@@ -373,7 +386,9 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                 handleDeleteOption(option.value);
                             }}
                             size="sm"
-                            aria-label={`Delete tool diameter ${option.label}`}
+                            aria-label={t('probe:diameter.deleteTool', {
+                                diameter: getDisplayValue(option.label),
+                            })}
                         >
                             {option.value !== PROBE_TYPE_AUTO &&
                                 option.value !== PROBE_TYPE_TIP && (
@@ -397,17 +412,17 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                             className="w-full justify-between bg-white dark:bg-surface-raised"
                             disabled={!probeCommand.tool}
                             tooltip={{
-                                content: 'Select tool diameter',
+                                content: t('probe:diameter.selectTooltip'),
                                 side: 'left',
                             }}
                         >
                             {value ? (
                                 <span>
-                                    {value}{' '}
+                                    {getDisplayValue(value)}{' '}
                                     {getUnitString(value as PROBE_TYPES_T)}
                                 </span>
                             ) : (
-                                'Select diameter'
+                                t('probe:diameter.selectPlaceholder')
                             )}
                             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -419,11 +434,14 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                         <div className="border-t">
                             <div className="flex items-center space-x-2 p-2">
                                 <Tooltip
-                                    content="Create and use a custom probe diameter"
+                                    content={t('probe:diameter.customTooltip')}
                                     side="bottom"
                                 >
                                     <Input
-                                        placeholder={`Custom diameter (${units})`}
+                                        placeholder={t(
+                                            'probe:diameter.customPlaceholder',
+                                            { units },
+                                        )}
                                         onKeyDown={(
                                             e: KeyboardEvent<HTMLInputElement>,
                                         ) => {
@@ -446,7 +464,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                         }
                                     }}
                                     size="sm"
-                                    text="Add"
+                                    text={t('probe:diameter.add')}
                                     icon={<Plus className="h-4 w-4" />}
                                 />
                             </div>

@@ -374,13 +374,13 @@ export function* initialize() {
             let title: string;
             let instructions: WizardInstructions;
             if (option === 'Standard Re-zero') {
-                title = 'Standard Re-zero Tool Change';
-                instructions = manualToolChange;
+                title = i18n.t('wizards:manualToolchange.title');
+                instructions = manualToolChange();
             } else if (option === 'Flexible Re-zero') {
-                title = 'Flexible Re-zero Tool Change';
+                title = i18n.t('wizards:semiautoToolchange.title');
                 instructions = semiautoToolChange(count as number);
             } else if (option === 'Fixed Tool Sensor') {
-                title = 'Fixed Tool Sensor Tool Change';
+                title = i18n.t('wizards:automaticToolchange.title');
                 instructions = await determineFixedSensorInstructions(
                     count as number,
                     comment,

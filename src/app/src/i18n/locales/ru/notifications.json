@@ -18,6 +18,20 @@
       "title": "ATC запросил диалог.",
       "content": "«Продолжить» — снять удержание, «Сброс» — остановить действие.",
       "resume": "Возобновить"
+    },
+    "toolchangeConfig": {
+      "title": "",
+      "intro": "",
+      "question": "",
+      "enablePassthrough": "",
+      "updateSettings": "",
+      "keepSettings": ""
+    },
+    "keepout": {
+      "title": "",
+      "description": "",
+      "toggleLabel": "",
+      "resource": ""
     }
   },
   "connection": {
@@ -69,7 +83,8 @@
     "fourAxisFileLoaded": {
       "title": "Загружен 4-осевой файл",
       "content": "G-код содержит команды одновременного движения по 4 осям, которые пока не поддерживаются и не могут быть выполнены."
-    }
+    },
+    "rejectedLine": ""
   },
   "diagnostics": {
     "downloaded": "Файл диагностики успешно загружен!",

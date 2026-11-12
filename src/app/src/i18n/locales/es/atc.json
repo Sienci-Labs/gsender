@@ -1,0 +1,167 @@
+{
+  "startValidation": {
+    "title": "",
+    "runJob": ""
+  },
+  "unavailable": {
+    "heading": "",
+    "notConnected": {
+      "title": "",
+      "message": ""
+    },
+    "noAtcFlag": {
+      "title": "",
+      "message": "",
+      "additionalInfo": ""
+    }
+  },
+  "advancedOptions": {
+    "load": "",
+    "unload": ""
+  },
+  "config": {
+    "tabs": {
+      "config": "",
+      "templates": ""
+    },
+    "toolRack": {
+      "title": "",
+      "goToSetup": "",
+      "description": ""
+    },
+    "toolLengthSensor": {
+      "title": "",
+      "sensorPosition": "",
+      "positionLabel": ""
+    },
+    "setManually": "",
+    "advanced": {
+      "title": "",
+      "offsetManagement": "",
+      "whenLoadingFromRack": "",
+      "whenLoadingManually": "",
+      "manualChangePosition": "",
+      "manualChangePositionLabel": "",
+      "advanced": "",
+      "retainToolTable": "",
+      "safetyChecks": "",
+      "pressureSensor": "",
+      "pressureSensorDescription": "",
+      "toolStudSensor": "",
+      "toolStudSensorDescription": "",
+      "other": "",
+      "forkSpacing": "",
+      "forkSpacingDescription": ""
+    },
+    "applying": "",
+    "offsetMode": {
+      "placeholder": "",
+      "probeNew": "",
+      "useTableWithoutVerify": "",
+      "useTableAndVerify": ""
+    },
+    "positionInput": {
+      "zeroWarningXYZ": "",
+      "zeroWarningXY": "",
+      "axis": "",
+      "setPosition": ""
+    },
+    "status": {
+      "applying": "",
+      "applied": ""
+    }
+  },
+  "templates": {
+    "invalidFileType": "",
+    "invalidStructure": "",
+    "sync": {
+      "controllerOutdated": "",
+      "localOutdated": "",
+      "inSync": "",
+      "unavailable": ""
+    },
+    "localTemplates": "",
+    "controllerTemplates": "",
+    "status": "",
+    "upload": "",
+    "content": "",
+    "selectMacro": "",
+    "macros": ""
+  },
+  "toolState": {
+    "empty": "",
+    "manualTitle": "",
+    "manualAriaLabel": "",
+    "probed": "",
+    "unprobed": "",
+    "current": "",
+    "error": "",
+    "needsRemap": "",
+    "manual": ""
+  },
+  "currentTool": {
+    "rack": "",
+    "manual": "",
+    "probe": ""
+  },
+  "loadTool": {
+    "status": {
+      "probed": {
+        "title": "",
+        "description": ""
+      },
+      "unprobed": {
+        "title": "",
+        "description": ""
+      }
+    },
+    "title": {
+      "load": "",
+      "manual": "",
+      "unload": "",
+      "loadAndSave": ""
+    },
+    "loading": "",
+    "load": ""
+  },
+  "tcStatus": {
+    "noOffset": {
+      "label": "",
+      "description": ""
+    },
+    "offRack": {
+      "label": "",
+      "description": ""
+    },
+    "ready": {
+      "label": "",
+      "description": ""
+    },
+    "empty": {
+      "description": ""
+    }
+  },
+  "toolTable": {
+    "openButton": "",
+    "tool": "",
+    "zOffset": "",
+    "status": "",
+    "probeAll": "",
+    "actions": "",
+    "rackLoadedTools": "",
+    "manuallyLoadedTools": "",
+    "probeTool": ""
+  },
+  "timeline": {
+    "remap": {
+      "title": "",
+      "description": "",
+      "newToolNumber": "",
+      "selectTool": "",
+      "confirm": ""
+    },
+    "item": {
+      "exceedsTableSize": ""
+    }
+  }
+}

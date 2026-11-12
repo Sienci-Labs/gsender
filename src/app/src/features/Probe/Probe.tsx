@@ -31,12 +31,18 @@ import {
 } from 'app/components/shadcn/Dropdown';
 import Tooltip from 'app/components/Tooltip';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { TOUCHPLATE_TYPES } from 'app/lib/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import cx from 'classnames';
 import { useCallback, useEffect, useRef } from 'react';
 import { PROBING_CATEGORY } from '../../constants';
-import { Actions, State } from './definitions';
+import {
+    Actions,
+    PROBE_ROUTINE_LABELS,
+    State,
+    TOUCHPLATE_TYPE_LABELS,
+} from './definitions';
 import ProbeDiameter from './ProbeDiameter';
 import ProbeImage from './ProbeImage';
 
@@ -46,6 +52,7 @@ type ProbeProps = {
 };
 
 const Probe = ({ state, actions }: ProbeProps) => {
+    const { t } = useAppTranslation();
     // Use a ref to always have access to the latest state
     const stateRef = useRef(state);
     const actionsRef = useRef(actions);
@@ -139,10 +146,16 @@ const Probe = ({ state, actions }: ProbeProps) => {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    aria-label="Change Probe Type"
+                                    aria-label={t(
+                                        'probe:widget.changeProbeType',
+                                    )}
                                     size="sm"
                                 >
-                                    {touchplateType}
+                                    {translateKey(
+                                        TOUCHPLATE_TYPE_LABELS[
+                                            touchplateType
+                                        ] ?? touchplateType,
+                                    )}
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 bg-white">
@@ -154,7 +167,9 @@ const Probe = ({ state, actions }: ProbeProps) => {
                                         }
                                         className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
                                     >
-                                        {tpt}
+                                        {translateKey(
+                                            TOUCHPLATE_TYPE_LABELS[tpt] ?? tpt,
+                                        )}
                                     </DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
@@ -163,7 +178,12 @@ const Probe = ({ state, actions }: ProbeProps) => {
                     <div className="flex w-full bg-white dark:bg-surface-raised rounded-md border-solid border border-gray-300 dark:border-outline text-gray-900 dark:text-content-secondary p-[2px]">
                         {availableProbeCommands.map((command, index) => (
                             <Tooltip
-                                content={`Probe using ${command.id}`}
+                                content={t('probe:widget.probeUsing', {
+                                    routine: translateKey(
+                                        PROBE_ROUTINE_LABELS[command.id] ??
+                                            command.id,
+                                    ),
+                                })}
                                 key={command.id}
                             >
                                 <ShadcnButton
@@ -173,7 +193,16 @@ const Probe = ({ state, actions }: ProbeProps) => {
                                         actions.handleProbeCommandChange(index)
                                     }
                                     size="icon"
-                                    aria-label={`Select probing routine ${command.id}`}
+                                    aria-label={t(
+                                        'probe:widget.selectRoutine',
+                                        {
+                                            routine: translateKey(
+                                                PROBE_ROUTINE_LABELS[
+                                                    command.id
+                                                ] ?? command.id,
+                                            ),
+                                        },
+                                    )}
                                     aria-pressed={
                                         index === selectedProbeCommand
                                     }
@@ -206,7 +235,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
                             onClick={() => actions.onOpenChange(true)}
                             disabled={!canClick}
                         >
-                            Probe
+                            {t('probe:widget.probe')}
                         </Button>
                     </div>
                 </div>

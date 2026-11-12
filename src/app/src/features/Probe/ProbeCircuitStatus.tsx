@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 
@@ -30,13 +31,17 @@ interface Props {
 }
 
 const ProbeCircuitStatus: React.FC<Props> = ({ probeActive, connected }) => {
+    const { t } = useAppTranslation();
+    const touchLabel = probeActive
+        ? t('probe:circuit.touchDetected')
+        : t('probe:circuit.noTouch');
     return (
         <div className="w-full flex flex-col justify-center items-center sm:mt-4">
             {connected && (
                 <div className="w-full flex flex-col justify-center items-center sm:mt-4">
                     <div
-                        aria-label={probeActive ? 'Touch detected' : 'No touch'}
-                        title={probeActive ? 'Touch detected' : 'No touch'}
+                        aria-label={touchLabel}
+                        title={touchLabel}
                         className={cx(
                             'w-8 h-8 rounded-full relative flex items-center justify-center',
                             {
@@ -55,12 +60,12 @@ const ProbeCircuitStatus: React.FC<Props> = ({ probeActive, connected }) => {
                     </div>
                     <span className="mt-3">
                         {connected && probeActive
-                            ? 'Touch detected'
-                            : 'No Touch'}
+                            ? t('probe:circuit.touchDetected')
+                            : t('probe:circuit.noTouch')}
                     </span>
                 </div>
             )}
-            {!connected && 'No device connected'}
+            {!connected && t('probe:circuit.noDevice')}
         </div>
     );
 };

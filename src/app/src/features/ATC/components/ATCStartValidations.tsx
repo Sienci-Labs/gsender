@@ -5,6 +5,7 @@ import {
     DialogDescription,
     DialogTitle,
 } from 'app/components/shadcn/Dialog.tsx';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { FaPlay } from 'react-icons/fa';
 
@@ -17,10 +18,15 @@ export function ATCStartValidations({
     setShow: (show: boolean) => void;
     payload: object;
 }) {
+    const { t } = useAppTranslation();
     return (
         <Dialog open={show} onOpenChange={setShow}>
             <DialogContent className="w-[500px] min-h-[200px] flex flex-col">
-                <DialogTitle>ATC - {payload.title}</DialogTitle>
+                <DialogTitle>
+                    {t('atc:startValidation.title', {
+                        title: payload.title,
+                    })}
+                </DialogTitle>
                 <DialogDescription className="flex flex-col gap-4 text-gray-400">
                     {payload.body}
                     {payload.type === 'alert' && (
@@ -31,7 +37,7 @@ export function ATCStartValidations({
                                 setShow(false);
                             }}
                         >
-                            <FaPlay /> Run job
+                            <FaPlay /> {t('atc:startValidation.runJob')}
                         </Button>
                     )}
                 </DialogDescription>

@@ -31,13 +31,18 @@ import {
 import { PROBING_CATEGORY } from 'app/constants';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { i18n } from 'app/i18n';
+import { i18n, translateKey, useAppTranslation } from 'app/i18n';
 import { TOUCHPLATE_TYPE_3D } from 'app/lib/constants';
 import { toast } from 'app/lib/toaster';
 import useKeybinding from 'app/lib/useKeybinding';
 import cx from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Actions, State } from './definitions';
+import {
+    Actions,
+    PROBE_DIRECTION_LABELS,
+    PROBE_ROUTINE_LABELS,
+    State,
+} from './definitions';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
 import { shallowEqual } from 'react-redux';
@@ -48,6 +53,7 @@ interface RunProbeProps {
 }
 
 const RunProbe = ({ actions, state }: RunProbeProps) => {
+    const { t } = useAppTranslation();
     const actionsRef = useRef(actions);
 
     useEffect(() => {
@@ -144,13 +150,9 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     //const probeCommands = actions.generateProbeCommands();
     //console.log(probeCommands.length);
     const probeCommand = availableProbeCommands[selectedProbeCommand];
-    const directionLabels = [
-        'Bottom Left',
-        'Top Left',
-        'Top Right',
-        'Bottom Right',
-    ];
-    const directionLabel = directionLabels[direction] || 'Unknown';
+    const directionLabel = PROBE_DIRECTION_LABELS[direction]
+        ? translateKey(PROBE_DIRECTION_LABELS[direction])
+        : t('probe:run.directions.unknown');
     const showDirectionWarning = direction !== 0;
     const is3DProbe = touchplateType === TOUCHPLATE_TYPE_3D;
 
@@ -167,7 +169,14 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                 )}
             >
                 <DialogHeader className="text-robin-700 flex items-start justify-center">
-                    <DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
+                    <DialogTitle>
+                        {t('probe:run.title', {
+                            routine: translateKey(
+                                PROBE_ROUTINE_LABELS[probeCommand.id] ??
+                                    probeCommand.id,
+                            ),
+                        })}
+                    </DialogTitle>
                 </DialogHeader>
 
                 <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
@@ -194,31 +203,29 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                 >
                                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                                 </svg>
-                                <span className="sr-only">Warning</span>
+                                <span className="sr-only">
+                                    {t('probe:run.warning')}
+                                </span>
                                 <div>
                                     <span className="font-medium">
-                                        Warning - Probing {directionLabel}{' '}
-                                        corner
+                                        {t('probe:run.directionWarning', {
+                                            corner: directionLabel,
+                                        })}
                                     </span>
-                                    <div>
-                                        Verify this is correct before starting.
-                                    </div>
+                                    <div>{t('probe:run.verify')}</div>
                                 </div>
                             </div>
                             <p className="mb-3">
-                                1. Check the tool is positioned correctly
-                                (pictured).
+                                {t('probe:run.checkPosition')}
                             </p>
                             <p className="mb-3">
                                 {is3DProbe
-                                    ? '2. Gently push the probe needle to check the circuit is triggered properly (indicated by a green light).'
-                                    : '2. Lift your touch plate to the tool to check the circuit is good (indicated by a green light), then put it back where it was.'}
+                                    ? t('probe:run.checkCircuit3D')
+                                    : t('probe:run.checkCircuitPlate')}
                             </p>
                             {!is3DProbe && (
                                 <p className="mb-3">
-                                    3. In some cases, holding the touch plate
-                                    still while probing will give a more
-                                    consistent measurement.
+                                    {t('probe:run.holdPlate')}
                                 </p>
                             )}
                         </div>
@@ -228,8 +235,8 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                             onClick={startProbe}
                         >
                             {connectionMade
-                                ? 'Start Probe'
-                                : 'Waiting for probe circuit check...'}
+                                ? t('probe:run.start')
+                                : t('probe:run.waitingForCircuit')}
                         </Button>
                     </div>
                     <div className="flex flex-col sm:m-auto sm:mb-4">

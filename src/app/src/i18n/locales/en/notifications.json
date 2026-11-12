@@ -16,6 +16,22 @@
       "title": "ATC requested a dialog.",
       "content": "Continue to unhold, Reset to stop action.",
       "resume": "Resume"
+    },
+    "toolchangeConfig": {
+      "title": "Controller is set up to handle tool changes",
+      "intro": "Your controller reported an ATC, but gSender's tool change settings will stop the ATC macros from running:",
+      "passthroughOff": "Passthrough is <bold>off</bold>, so M6 commands are being commented out and never reach the controller.",
+      "strategyWrong": "Tool change strategy is <bold>{{strategy}}</bold>, so gSender handles tool changes instead of the ATC macros.",
+      "question": "Update gSender's tool change settings?",
+      "enablePassthrough": "Enable passthrough",
+      "updateSettings": "Update settings",
+      "keepSettings": "Keep current settings"
+    },
+    "keepout": {
+      "title": "Jogging inside keepout area",
+      "description": "You are attempting to jog inside the keepout area. Disable keepout using the switch below, then re-enable it to continue.",
+      "toggleLabel": "Keepout",
+      "resource": "Keepout areas"
     }
   },
   "connection": {
@@ -65,7 +81,8 @@
     "fourAxisFileLoaded": {
       "title": "4 Axis File Loaded",
       "content": "G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run."
-    }
+    },
+    "rejectedLine": "The controller rejected this line:"
   },
   "diagnostics": {
     "downloaded": "Diagnostic file downloaded successfully!",

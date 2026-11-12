@@ -1,10 +1,12 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import type { RootState } from 'app/store/redux';
 import { Shield, ShieldOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function KeepoutToggle() {
+    const { t } = useAppTranslation();
     const [flags, setFlags] = useState<string[]>([]);
     const isEnabled = flags.includes('E');
 
@@ -30,7 +32,7 @@ export function KeepoutToggle() {
         }
     };
 
-    if (!flags) return <div>OK</div>;
+    if (!flags) return <div>{t('common:actions.ok')}</div>;
 
     return (
         <button

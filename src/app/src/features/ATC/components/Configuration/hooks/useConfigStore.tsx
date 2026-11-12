@@ -1,6 +1,7 @@
 import type { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { tk } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 import type { RootState } from 'app/store/redux';
@@ -215,7 +216,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     const applyConfig = async () => {
         setIsApplying(true);
         setProgress(0);
-        setStatus({ type: 'idle', message: 'Applying configuration...' });
+        setStatus({
+            type: 'idle',
+            message: tk('atc:config.status.applying'),
+        });
 
         const content = generateAllMacros(config, true);
 
@@ -224,7 +228,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
             controller.removeListener('ymodem:error', handleError);
             setStatus({
                 type: 'success',
-                message: 'Configuration applied successfully!',
+                message: tk('atc:config.status.applied'),
             });
             setTimeout(() => {
                 setStatus({ type: 'idle', message: '' });

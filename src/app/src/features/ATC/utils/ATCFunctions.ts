@@ -134,7 +134,7 @@ export function lookupSpecificTool(
 export function getToolAxisOffset(tool, axis, table: ToolInstance[]): string {
     const tableTool = table.find((tool) => tool.id === tool);
     if (!tableTool) {
-        return 'Empty';
+        return i18n.t('atc:toolState.empty');
     }
 
     return get(tableTool, `toolOffsets.${axis}`, '-') as string;

@@ -17,7 +17,21 @@
       "content": "Continuer pour lever le maintien, Réinitialiser pour arrêter l'action.",
       "resume": "Reprendre"
     },
-    "toolsOutOfRange_many": "Ce fichier utilise les outils {{list}}, qui dépassent votre table d'outils de {{size}} emplacements. Réaffectez-les dans la chronologie des outils avant de lancer le travail."
+    "toolsOutOfRange_many": "Ce fichier utilise les outils {{list}}, qui dépassent votre table d'outils de {{size}} emplacements. Réaffectez-les dans la chronologie des outils avant de lancer le travail.",
+    "toolchangeConfig": {
+      "title": "",
+      "intro": "",
+      "question": "",
+      "enablePassthrough": "",
+      "updateSettings": "",
+      "keepSettings": ""
+    },
+    "keepout": {
+      "title": "",
+      "description": "",
+      "toggleLabel": "",
+      "resource": ""
+    }
   },
   "connection": {
     "reconnectFailed": "Impossible de se reconnecter à {{port}} - {{reason}}"
@@ -67,7 +81,8 @@
     "fourAxisFileLoaded": {
       "title": "Fichier 4 axes chargé",
       "content": "Le G-code contient des commandes 4 axes simultanées, qui ne sont pas prises en charge pour le moment et ne peuvent pas être exécutées."
-    }
+    },
+    "rejectedLine": ""
   },
   "diagnostics": {
     "downloaded": "Fichier de diagnostic téléchargé avec succès !",

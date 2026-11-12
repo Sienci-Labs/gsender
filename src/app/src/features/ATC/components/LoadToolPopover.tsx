@@ -26,6 +26,7 @@ import {
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { useOpenInteractionGuard } from 'app/hooks/useOpenInteractionGuard.ts';
+import { useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 import { Loader2 } from 'lucide-react';
 import type React from 'react';
@@ -60,6 +61,7 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
     contentSide,
     contentSideOffset,
 }) => {
+    const { t } = useAppTranslation();
     const { mode, rackSize, connected, atcAvailable } = useToolChange();
     const [selectedToolId, setSelectedToolId] = useState<string>('1');
     const [isLoading, setIsLoading] = useState(false);
@@ -104,14 +106,14 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
             case 'probed':
                 return {
                     ...styling,
-                    title: 'Probed',
-                    description: 'Offset found for selected tool.',
+                    title: t('atc:loadTool.status.probed.title'),
+                    description: t('atc:loadTool.status.probed.description'),
                 };
             case 'unprobed':
                 return {
                     ...styling,
-                    title: 'Unprobed Tool',
-                    description: 'Offset not found for selected tool.',
+                    title: t('atc:loadTool.status.unprobed.title'),
+                    description: t('atc:loadTool.status.unprobed.description'),
                 };
         }
     };
@@ -119,13 +121,13 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
     const getModeTitle = (tcMode: LoadToolMode) => {
         switch (tcMode) {
             case 'load':
-                return 'Load Tool';
+                return t('atc:loadTool.title.load');
             case 'manual':
-                return 'Manual Load Tool';
+                return t('atc:loadTool.title.manual');
             case 'unload':
-                return 'Unload Tool Manually';
+                return t('atc:loadTool.title.unload');
             case 'loadAndSave':
-                return 'Load and Save Tool';
+                return t('atc:loadTool.title.loadAndSave');
         }
     };
 
@@ -229,10 +231,10 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
                             {isLoading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Loading...
+                                    {t('atc:loadTool.loading')}
                                 </>
                             ) : (
-                                'Load'
+                                t('atc:loadTool.load')
                             )}
                         </Button>
                     </div>

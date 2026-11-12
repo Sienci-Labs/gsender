@@ -4,11 +4,13 @@ import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
 import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
 import { Table2 } from 'lucide-react';
 
 export function ToolDisplayModal() {
+    const { t } = useAppTranslation();
     const { connected, setShowTable, showTable, tools, disabled } =
         useToolChange();
     function onOpenChange(isOpen) {
@@ -33,7 +35,7 @@ export function ToolDisplayModal() {
                     size="sm"
                 >
                     <Table2 className="h-4 w-4" />
-                    Tools
+                    {t('atc:toolTable.openButton')}
                 </Button>
             </DialogTitle>
             <DialogContent className="overflow-hidden p-0 shadow-lg w-3/5 portrait:w-4/5">

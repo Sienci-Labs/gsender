@@ -1,3 +1,4 @@
+import { tk } from 'app/i18n';
 import type { IconType } from 'react-icons';
 export const ATCI_SUPPORTED_VERSION = 20250627;
 
@@ -37,7 +38,7 @@ import { PiEmpty, PiHandTap } from 'react-icons/pi';
 export const toolStateThemes: ToolStateThemes = {
     // Primary States
     probed: {
-        label: 'Probed',
+        label: tk('atc:toolState.probed'),
         backgroundColor: 'bg-green-500/20 dark:bg-green-500/40',
         borderColor: 'border-green-700',
         textColor: 'text-green-700',
@@ -46,7 +47,7 @@ export const toolStateThemes: ToolStateThemes = {
     },
 
     unprobed: {
-        label: 'Unprobed',
+        label: tk('atc:toolState.unprobed'),
         backgroundColor: 'bg-yellow-500/20 dark:bg-yellow-500/40',
         borderColor: 'border-yellow-700',
         textColor: 'text-yellow-700 dark:text-yellow-400',
@@ -56,7 +57,7 @@ export const toolStateThemes: ToolStateThemes = {
 
     // Support Statuses
     empty: {
-        label: 'Empty',
+        label: tk('atc:toolState.empty'),
         backgroundColor: 'bg-gray-400/20 dark:bg-gray-400/40',
         borderColor: 'border-gray-600',
         textColor: 'text-gray-600 dark:text-content-secondary',
@@ -65,7 +66,7 @@ export const toolStateThemes: ToolStateThemes = {
     },
 
     current: {
-        label: 'Current',
+        label: tk('atc:toolState.current'),
         backgroundColor: 'bg-robin-500/20 dark:bg-robin-500/40',
         borderColor: 'border-robin-700',
         textColor: 'text-robin-700 dark:text-robin-400',
@@ -74,7 +75,7 @@ export const toolStateThemes: ToolStateThemes = {
     },
 
     error: {
-        label: 'Error',
+        label: tk('atc:toolState.error'),
         backgroundColor: 'bg-red-600/20 dark:bg-red-500/40',
         borderColor: 'border-red-800',
         textColor: 'text-red-800 dark:text-red-500',
@@ -83,7 +84,7 @@ export const toolStateThemes: ToolStateThemes = {
     },
 
     warn: {
-        label: 'Needs Remap',
+        label: tk('atc:toolState.needsRemap'),
         backgroundColor: 'bg-orange-500/20 dark:bg-orange-500/40',
         borderColor: 'border-orange-700',
         textColor: 'text-orange-700 dark:text-orange-400',
@@ -102,7 +103,7 @@ export interface ManualChipTheme {
 }
 
 export const manualChipTheme: ManualChipTheme = {
-    labelLong: 'Manual',
+    labelLong: tk('atc:toolState.manual'),
     labelShort: '',
     backgroundColor: 'bg-sky-100/70 dark:bg-sky-400/20',
     borderColor: 'border-sky-400',

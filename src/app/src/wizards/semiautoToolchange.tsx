@@ -20,6 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { i18n } from 'app/i18n';
 import { getProbeSettings, getToolString } from 'app/lib/toolChangeUtils';
 import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
@@ -56,18 +57,23 @@ const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
     return zProbeDistance.toFixed(3);
 };
 
-const probeInitialToolStep = [
+const getProbeInitialToolStep = () => [
     {
-        title: 'Setup Probe',
+        title: i18n.t('wizards:semiautoToolchange.setupProbe.title'),
         substeps: [
             {
-                title: 'Check Offset',
+                title: i18n.t('wizards:semiautoToolchange.checkOffset.title'),
                 description: () =>
-                    `Position the current cutting tool about ${getMoveAmount()} above the probe location, attach the magnet, and prepare to probe.`,
+                    i18n.t(
+                        'wizards:semiautoToolchange.checkOffset.description',
+                        {
+                            amount: getMoveAmount(),
+                        },
+                    ),
                 overlay: false,
                 actions: [
                     {
-                        label: 'Probe Initial Tool',
+                        label: i18n.t('wizards:toolchange.probeInitialTool'),
                         gcodeLines: [
                             'G91 G21',
                             'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
@@ -90,8 +96,7 @@ const createWizard = (count: number): WizardInstructions => {
     return {
         intro: {
             icon: 'fas fa-caution',
-            description:
-                'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!',
+            description: i18n.t('wizards:toolchange.intro'),
         },
         onStart: () => {
             const settings = getProbeSettings();
@@ -121,47 +126,48 @@ const createWizard = (count: number): WizardInstructions => {
         },
         steps: [
             {
-                title: 'Starting Off',
+                title: i18n.t('wizards:toolchange.startingOff'),
                 substeps: [
                     {
-                        title: 'Safety First',
-                        description: () => {
-                            const locationCopy =
-                                count === 1
-                                    ? 'probe location'
-                                    : 'tool change location';
-
-                            return (
-                                <div>
-                                    Ensure that your router/spindle is turned
-                                    off and has fully stopped spinning then jog
-                                    your machine to your {locationCopy} using
-                                    the jog controls.
-                                </div>
-                            );
-                        },
+                        title: i18n.t('wizards:toolchange.safetyFirst'),
+                        description: () => (
+                            <div>
+                                {count === 1
+                                    ? i18n.t(
+                                          'wizards:semiautoToolchange.safetyFirst.descriptionProbeLocation',
+                                      )
+                                    : i18n.t(
+                                          'wizards:semiautoToolchange.safetyFirst.descriptionToolChangeLocation',
+                                      )}
+                            </div>
+                        ),
                         overlay: false,
                     },
                 ],
             },
-            ...(count === 1 ? probeInitialToolStep : []),
+            ...(count === 1 ? getProbeInitialToolStep() : []),
             {
-                title: 'Probe New Tool',
+                title: i18n.t('wizards:toolchange.probeNewTool'),
                 substeps: [
                     {
-                        title: 'Change Tool',
+                        title: i18n.t('wizards:toolchange.changeTool'),
                         description: () => {
-                            const preamble =
-                                count === 1
-                                    ? 'Jog your machine to a place you can reach using the jog controls and change over to the next tool'
-                                    : 'Change over to the next tool';
+                            const values = {
+                                tool: getToolString(),
+                                amount: getMoveAmount(),
+                            };
 
                             return (
                                 <div>
-                                    {preamble} ({getToolString()}). Once ready,
-                                    jog to {getMoveAmount()} above the probe
-                                    location, attach the magnet, and prepare to
-                                    probe
+                                    {count === 1
+                                        ? i18n.t(
+                                              'wizards:semiautoToolchange.changeTool.descriptionFirst',
+                                              values,
+                                          )
+                                        : i18n.t(
+                                              'wizards:semiautoToolchange.changeTool.description',
+                                              values,
+                                          )}
                                 </div>
                             );
                         },
@@ -169,7 +175,9 @@ const createWizard = (count: number): WizardInstructions => {
                         toolBanner: true,
                         actions: [
                             {
-                                label: 'Probe Changed Tool',
+                                label: i18n.t(
+                                    'wizards:toolchange.probeChangedTool',
+                                ),
                                 gcodeLines: [
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
@@ -186,16 +194,19 @@ const createWizard = (count: number): WizardInstructions => {
                 ],
             },
             {
-                title: 'Resume Job',
+                title: i18n.t('wizards:toolchange.resumeJob'),
                 substeps: [
                     {
-                        title: 'Resume Job',
-                        description:
-                            'If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Remove the touch plate magnet and turn on your router if you have them.',
+                        title: i18n.t('wizards:toolchange.resumeJob'),
+                        description: i18n.t(
+                            'wizards:toolchange.resumeJobDescription',
+                        ),
                         overlay: false,
                         actions: [
                             {
-                                label: 'Resume Cutting',
+                                label: i18n.t(
+                                    'wizards:toolchange.resumeCutting',
+                                ),
                                 gcodeLines: [
                                     '(Returning to initial position)',
                                     'G21 G91 G0 Z10',

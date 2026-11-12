@@ -4,6 +4,7 @@ import { Badge } from 'app/features/ATC/components/ui/Badge';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
 import type { ToolProbeState } from 'app/features/ATC/types.ts';
 import { lookupToolName } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import {
     getToolStateClasses,
     toolStateThemes,
@@ -44,6 +45,7 @@ export function ToolTimelineItem({
     remapDisabled = false,
     showProbeStatus = true,
 }: ToolTimelineItemProps) {
+    const { t } = useAppTranslation();
     const [label, setLabel] = useState('');
 
     const hasNickname = label !== '-' && Boolean(label);
@@ -160,10 +162,12 @@ export function ToolTimelineItem({
                                     'justify-center gap-1 h-5 px-2 py-0 text-xs',
                                     getToolStateClasses('warn'),
                                 )}
-                                title={`T${tool.toolNumber} exceeds tool table size — remap required`}
+                                title={t('atc:timeline.item.exceedsTableSize', {
+                                    tool: tool.toolNumber,
+                                })}
                             >
                                 <toolStateThemes.warn.icon size={14} />
-                                {toolStateThemes.warn.label}
+                                {translateKey(toolStateThemes.warn.label)}
                             </Badge>
                         </div>
                     )}

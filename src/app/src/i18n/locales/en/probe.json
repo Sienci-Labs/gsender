@@ -1,0 +1,58 @@
+{
+  "touchplateTypes": {
+    "standardBlock": "Standard Block",
+    "zProbe": "Z Probe",
+    "probe3D": "3D Probe"
+  },
+  "routines": {
+    "xTouch": "X Touch",
+    "yTouch": "Y Touch",
+    "xyTouch": "XY Touch",
+    "zTouch": "Z Touch",
+    "xyzTouch": "XYZ Touch"
+  },
+  "widget": {
+    "changeProbeType": "Change Probe Type",
+    "probeUsing": "Probe using {{routine}}",
+    "selectRoutine": "Select probing routine {{routine}}",
+    "probe": "Probe"
+  },
+  "diameter": {
+    "auto": "Auto",
+    "tip": "Tip",
+    "noTools": "No tools available, add one below.",
+    "deleteTool": "Delete tool diameter {{diameter}}",
+    "selectTooltip": "Select tool diameter",
+    "selectPlaceholder": "Select diameter",
+    "customTooltip": "Create and use a custom probe diameter",
+    "customPlaceholder": "Custom diameter ({{units}})",
+    "add": "Add"
+  },
+  "image": {
+    "alt": "Probe Block orientation guide image"
+  },
+  "circuit": {
+    "touchDetected": "Touch detected",
+    "noTouch": "No touch",
+    "noDevice": "No device connected"
+  },
+  "run": {
+    "title": "Probe - {{routine}}",
+    "warning": "Warning",
+    "directionWarning": "Warning - Probing {{corner}} corner",
+    "verify": "Verify this is correct before starting.",
+    "directions": {
+      "bottomLeft": "Bottom Left",
+      "topLeft": "Top Left",
+      "topRight": "Top Right",
+      "bottomRight": "Bottom Right",
+      "unknown": "Unknown"
+    },
+    "checkPosition": "1. Check the tool is positioned correctly (pictured).",
+    "checkCircuit3D": "2. Gently push the probe needle to check the circuit is triggered properly (indicated by a green light).",
+    "checkCircuitPlate": "2. Lift your touch plate to the tool to check the circuit is good (indicated by a green light), then put it back where it was.",
+    "holdPlate": "3. In some cases, holding the touch plate still while probing will give a more consistent measurement.",
+    "start": "Start Probe",
+    "waitingForCircuit": "Waiting for probe circuit check..."
+  }
+}

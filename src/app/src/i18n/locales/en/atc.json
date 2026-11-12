@@ -1,0 +1,168 @@
+{
+  "toolState": {
+    "probed": "Probed",
+    "unprobed": "Unprobed",
+    "empty": "Empty",
+    "current": "Current",
+    "error": "Error",
+    "needsRemap": "Needs Remap",
+    "manual": "Manual",
+    "manualTitle": "Manual (off-rack)",
+    "manualAriaLabel": "Manual tool (off-rack)"
+  },
+  "unavailable": {
+    "heading": "ATC Unavailable",
+    "notConnected": {
+      "title": "Machine Not Connected",
+      "message": "You must be connected to a device with ATC support to use this feature."
+    },
+    "noAtcFlag": {
+      "title": "No ATC Flag",
+      "message": "Firmware did not report ATC=1 on startup.",
+      "additionalInfo": "Ensure the SD card is installed and mounted correctly, a TC.macro file exists, and the firmware has ATC support compiled in."
+    }
+  },
+  "startValidation": {
+    "title": "ATC - {{title}}",
+    "runJob": "Run job"
+  },
+  "advancedOptions": {
+    "load": "Load",
+    "unload": "Unload"
+  },
+  "currentTool": {
+    "rack": "Rack",
+    "manual": "Manual",
+    "probe": "Probe"
+  },
+  "loadTool": {
+    "title": {
+      "load": "Load Tool",
+      "manual": "Manual Load Tool",
+      "unload": "Unload Tool Manually",
+      "loadAndSave": "Load and Save Tool"
+    },
+    "status": {
+      "probed": {
+        "title": "Probed",
+        "description": "Offset found for selected tool."
+      },
+      "unprobed": {
+        "title": "Unprobed Tool",
+        "description": "Offset not found for selected tool."
+      }
+    },
+    "loading": "Loading...",
+    "load": "Load"
+  },
+  "tcStatus": {
+    "noOffset": {
+      "label": "Offset not found",
+      "description": "Make sure the tool is in the rack before proceeding."
+    },
+    "offRack": {
+      "label": "Off Rack",
+      "description": "Off Rack tool selected."
+    },
+    "ready": {
+      "label": "Ready",
+      "description": "Tool is ready to be loaded."
+    },
+    "empty": {
+      "description": "Tool is empty."
+    }
+  },
+  "toolTable": {
+    "openButton": "Tools",
+    "tool": "Tool",
+    "zOffset": "Z Offset",
+    "status": "Status",
+    "probeAll": "Probe All",
+    "actions": "Actions",
+    "probeTool": "Probe Tool",
+    "rackLoadedTools": "Rack Loaded Tools",
+    "manuallyLoadedTools": "Manually Loaded Tools"
+  },
+  "config": {
+    "tabs": {
+      "config": "ATC Config",
+      "templates": "Templates"
+    },
+    "setManually": "Set Manually",
+    "toolRack": {
+      "title": "Tool Rack",
+      "goToSetup": "Go to ATC Setup",
+      "description": "Tool rack configuration is managed through the ATC setup process. Re-run setup to reconfigure your rack."
+    },
+    "toolLengthSensor": {
+      "title": "Tool Length Sensor",
+      "sensorPosition": "Sensor Position",
+      "positionLabel": "Tool Length Sensor Position"
+    },
+    "advanced": {
+      "title": "Advanced Settings",
+      "offsetManagement": "Offset Management",
+      "whenLoadingFromRack": "When loading from tool rack:",
+      "whenLoadingManually": "When loading manually:",
+      "manualChangePosition": "Manual Change Position",
+      "manualChangePositionLabel": "Manual Tool Change Position",
+      "advanced": "Advanced",
+      "retainToolTable": "Retain tool table settings when rack removed",
+      "safetyChecks": "Safety Checks",
+      "pressureSensor": "Pressure Sensor",
+      "pressureSensorDescription": "Check pressure before tool change",
+      "toolStudSensor": "Tool-stud Sensor",
+      "toolStudSensorDescription": "Check tool collision before tool unload",
+      "other": "Other",
+      "forkSpacing": "Tool Fork Spacing (mm)",
+      "forkSpacingDescription": "Distance between each fork."
+    },
+    "offsetMode": {
+      "placeholder": "Select mode",
+      "probeNew": "Probe new offset after loading",
+      "useTableWithoutVerify": "Use Tool Table without verification",
+      "useTableAndVerify": "Use Tool Table and probe to verify"
+    },
+    "positionInput": {
+      "setPosition": "Set Position",
+      "axis": "{{axis}}:",
+      "zeroWarningXYZ": "X, Y, and Z should not be 0. Verify the offsets are correct.",
+      "zeroWarningXY": "X and Y should not be 0. Verify the offsets are correct."
+    },
+    "status": {
+      "applying": "Applying configuration...",
+      "applied": "Configuration applied successfully!"
+    },
+    "macroReadFailed": "Unable to read board config (<code>ATCI.macro</code>). Ensure the file exists and SD card is installed — apply disabled.",
+    "applying": "Applying..."
+  },
+  "templates": {
+    "invalidFileType": "Please select a valid JSON file",
+    "invalidStructure": "Invalid JSON file or incorrect structure",
+    "localTemplates": "Local Templates:",
+    "controllerTemplates": "Controller Templates:",
+    "status": "Status:",
+    "sync": {
+      "controllerOutdated": "Controller outdated",
+      "localOutdated": "Local outdated",
+      "inSync": "In sync",
+      "unavailable": "Controller version unavailable"
+    },
+    "upload": "Upload JSON Template File",
+    "content": "Content",
+    "selectMacro": "Select a macro to view its contents",
+    "macros": "Macros ({{total}})"
+  },
+  "timeline": {
+    "remap": {
+      "title": "Remap Tool T{{tool}}",
+      "description": "Select a new tool number to remap T{{tool}}. Unavailable tools are shown but disabled.",
+      "newToolNumber": "New Tool Number",
+      "selectTool": "Select a tool",
+      "confirm": "Confirm Remap"
+    },
+    "item": {
+      "exceedsTableSize": "T{{tool}} exceeds tool table size — remap required"
+    }
+  }
+}

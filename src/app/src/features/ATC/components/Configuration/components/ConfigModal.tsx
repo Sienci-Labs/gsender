@@ -7,6 +7,7 @@ import {
 } from 'app/components/shadcn/Tabs';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -26,6 +27,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
     uploading,
     uploadError,
 }) => {
+    const { t } = useAppTranslation();
     const [activeTab, setActiveTab] = useState('config');
     const { updateConfig, setTemplates } = useConfigContext();
     const updateConfigRef = useRef(updateConfig);
@@ -64,8 +66,12 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                     className="w-full flex flex-col flex-1 gap-2 min-h-0 h-full"
                 >
                     <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
-                        <TabsTrigger value="config">ATC Config</TabsTrigger>
-                        <TabsTrigger value="templates">Templates</TabsTrigger>
+                        <TabsTrigger value="config">
+                            {t('atc:config.tabs.config')}
+                        </TabsTrigger>
+                        <TabsTrigger value="templates">
+                            {t('atc:config.tabs.templates')}
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent

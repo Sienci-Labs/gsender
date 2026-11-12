@@ -4,9 +4,11 @@ import {
     getToolStateClasses,
     toolStateThemes,
 } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 
 export const StatusBadge = ({ status }: { status: ToolStatus }) => {
+    useAppTranslation();
     const config = toolStateThemes[status];
     const IconComponent = config.icon;
     return (
@@ -17,7 +19,7 @@ export const StatusBadge = ({ status }: { status: ToolStatus }) => {
             )}
         >
             <IconComponent size={16} />
-            {config.label}
+            {translateKey(config.label)}
         </Badge>
     );
 };

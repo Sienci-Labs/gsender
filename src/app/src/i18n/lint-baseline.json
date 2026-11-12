@@ -183,72 +183,6 @@
     "hardcoded: Jog to the front-left corner of your vacuum table.": 1,
     "hardcoded: Once you're in position, zero the X and Y axes so the mounting\n                and grid files line up with the table.": 1
   },
-  "src/app/src/features/ATC/components/ATCStartValidations.tsx": {
-    "hardcoded: Run job": 1
-  },
-  "src/app/src/features/ATC/components/ATCUnavailable.tsx": {
-    "hardcoded: ATC Unavailable": 1
-  },
-  "src/app/src/features/ATC/components/Configuration/components/ConfigTab.tsx": {
-    "hardcoded: ). Ensure the file exists\n                                and SD card is installed — apply disabled.": 1,
-    "hardcoded: Advanced": 1,
-    "hardcoded: Check pressure before tool\n                                                    change": 1,
-    "hardcoded: Check tool collision before\n                                                    tool unload": 1,
-    "hardcoded: Distance between each fork.": 1,
-    "hardcoded: Go to ATC Setup": 1,
-    "hardcoded: Manual Change Position": 1,
-    "hardcoded: Offset Management": 1,
-    "hardcoded: Other": 1,
-    "hardcoded: Pressure Sensor": 1,
-    "hardcoded: Retain tool table settings when rack\n                                        removed": 1,
-    "hardcoded: Safety Checks": 1,
-    "hardcoded: Sensor Position": 1,
-    "hardcoded: Tool Fork Spacing (mm)": 1,
-    "hardcoded: Tool rack configuration is managed through the ATC\n                            setup process. Re-run setup to reconfigure your\n                            rack.": 1,
-    "hardcoded: Tool-stud Sensor": 1,
-    "hardcoded: Unable to read board config (": 1,
-    "hardcoded: When loading from tool rack:": 1,
-    "hardcoded: When loading manually:": 1
-  },
-  "src/app/src/features/ATC/components/Configuration/components/PositionInput.tsx": {
-    "hardcoded: X:": 1,
-    "hardcoded: Y:": 1,
-    "hardcoded: Z:": 1
-  },
-  "src/app/src/features/ATC/components/Configuration/components/TemplatesTab.tsx": {
-    "hardcoded: Controller Templates:": 1,
-    "hardcoded: Local Templates:": 1,
-    "hardcoded: Macros (": 1,
-    "hardcoded: Select a macro to view its contents": 1,
-    "hardcoded: Status:": 1,
-    "hardcoded: Upload JSON Template File": 1
-  },
-  "src/app/src/features/ATC/components/CurrentToolInfo.tsx": {
-    "hardcoded: Manual": 1,
-    "hardcoded: Probe": 1,
-    "hardcoded: Rack": 1
-  },
-  "src/app/src/features/ATC/components/KeepOut/KeepOutToggle.tsx": {
-    "hardcoded: OK": 1
-  },
-  "src/app/src/features/ATC/components/LoadToolPopover.tsx": {
-    "hardcoded: Loading...": 1
-  },
-  "src/app/src/features/ATC/components/ToolDisplayModal.tsx": {
-    "hardcoded: Tools": 1
-  },
-  "src/app/src/features/ATC/components/ToolTable.tsx": {
-    "hardcoded: Probe All": 1
-  },
-  "src/app/src/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx": {
-    "hardcoded: Cancel": 1,
-    "hardcoded: Confirm Remap": 1,
-    "hardcoded: New Tool Number": 1,
-    "hardcoded: Select a tool": 1
-  },
-  "src/app/src/features/ATC/components/ui/ProbeButton.tsx": {
-    "hardcoded: Probe Tool": 1
-  },
   "src/app/src/features/Config/components/EEPROMInputs/BitValueIndicator.tsx": {
     "hardcoded: Value:": 2
   },
@@ -398,24 +332,6 @@
   },
   "src/app/src/features/Plugins/components/PluginVisualizerOverlayHost.tsx": {
     "hardcoded: Close plugin": 1
-  },
-  "src/app/src/features/Probe/Probe.tsx": {
-    "hardcoded: Change Probe Type": 1,
-    "hardcoded: Probe": 1
-  },
-  "src/app/src/features/Probe/ProbeDiameter.tsx": {
-    "hardcoded: No tools available, add one below.": 1
-  },
-  "src/app/src/features/Probe/ProbeImage.tsx": {
-    "hardcoded: Probe Block orientation guide image": 1
-  },
-  "src/app/src/features/Probe/RunProbe.tsx": {
-    "hardcoded: 1. Check the tool is positioned correctly\n                                (pictured).": 1,
-    "hardcoded: 3. In some cases, holding the touch plate\n                                    still while probing will give a more\n                                    consistent measurement.": 1,
-    "hardcoded: Verify this is correct before starting.": 1,
-    "hardcoded: Warning": 1,
-    "hardcoded: Warning - Probing": 1,
-    "hardcoded: corner": 1
   },
   "src/app/src/features/RemoteFileReceive/IncomingFileProgressBar.tsx": {
     "hardcoded: Received": 1
@@ -736,30 +652,6 @@
   "src/app/src/routes/tools.tsx": {
     "hardcoded: Tools": 1,
     "hardcoded: Tools are plugins that can be installed and used to extend the\n                functionality of gSender. Some are built in to gSender, some are\n                third party plugins. Star a tool to pin it to the top.": 1
-  },
-  "src/app/src/store/redux/sagas/controllerSagas.tsx": {
-    "hardcoded: , so\n                                gSender handles tool changes instead of the ATC\n                                macros.": 1,
-    "hardcoded: , so M6 commands are\n                                being commented out and never reach the\n                                controller.": 1,
-    "hardcoded: Keepout": 1,
-    "hardcoded: Passthrough is": 1,
-    "hardcoded: The controller rejected this line:": 1,
-    "hardcoded: Tool change strategy is": 1,
-    "hardcoded: Update gSender's tool change settings?": 1
-  },
-  "src/app/src/wizards/automaticToolchange.tsx": {
-    "hardcoded: ), click the button below to\n                                automatically probe and set the new tool's\n                                length offset.": 1,
-    "hardcoded: ).": 1,
-    "hardcoded: After you've switched to the new tool (": 1,
-    "hardcoded: Ensure that your router/spindle is turned off and has fully stopped\n            spinning, and prepare to change over to the next tool (": 1
-  },
-  "src/app/src/wizards/manualToolchange.tsx": {
-    "hardcoded: Jog your machine to a place you can reach using the\n                            jog controls and ensure that your router/spindle is\n                            turned off and has fully stopped spinning.": 1
-  },
-  "src/app/src/wizards/semiautoToolchange.tsx": {
-    "hardcoded: ). Once ready,\n                                    jog to": 1,
-    "hardcoded: Ensure that your router/spindle is turned\n                                    off and has fully stopped spinning then jog\n                                    your machine to your": 1,
-    "hardcoded: above the probe\n                                    location, attach the magnet, and prepare to\n                                    probe": 1,
-    "hardcoded: using\n                                    the jog controls.": 1
   },
   "src/pendant/src/components/ATCPanel.tsx": {
     "hardcoded: No tool changes in loaded file.": 1,

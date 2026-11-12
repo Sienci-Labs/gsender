@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import {
     TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
@@ -52,6 +53,7 @@ const ProbeImage: React.FC<Props> = ({
     probeCommand,
     touchplateType = TOUCHPLATE_TYPE_STANDARD,
 }) => {
+    const { t } = useAppTranslation();
     const getProbeImage = () => {
         const { id } = probeCommand;
         if (
@@ -93,7 +95,7 @@ const ProbeImage: React.FC<Props> = ({
     return (
         <div className="flex items-center justify-center">
             <img
-                alt="Probe Block orientation guide image"
+                alt={t('probe:image.alt')}
                 src={imgSrc}
                 className="w-[15vh] my-0 mx-auto dark:invert portrait:w-[10vh]"
             />

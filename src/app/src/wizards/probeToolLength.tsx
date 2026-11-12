@@ -20,6 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { getProbeSettings } from 'app/lib/toolChangeUtils';
 import store from 'app/store';
@@ -42,8 +43,7 @@ const createWizard = (): WizardInstructions => {
     return {
         intro: {
             icon: 'fas fa-ruler-vertical',
-            description:
-                'Prepare to probe the initial tool length. Ensure your router/spindle is turned off and has fully stopped spinning.',
+            description: i18n.t('wizards:probeToolLength.intro'),
         },
         onStart: () => {
             const settings = getProbeSettings();
@@ -86,16 +86,21 @@ const createWizard = (): WizardInstructions => {
         },
         steps: [
             {
-                title: 'Probe Initial Tool',
+                title: i18n.t('wizards:toolchange.probeInitialTool'),
                 substeps: [
                     {
-                        title: 'Measure Tool Length',
-                        description:
-                            'Ensure that your router/spindle is turned off and has fully stopped spinning. Click the button below to probe the length of the current tool.',
+                        title: i18n.t(
+                            'wizards:probeToolLength.measureToolLength.title',
+                        ),
+                        description: i18n.t(
+                            'wizards:probeToolLength.measureToolLength.description',
+                        ),
                         overlay: false,
                         actions: [
                             {
-                                label: 'Probe Tool Length',
+                                label: i18n.t(
+                                    'wizards:probeToolLength.measureToolLength.action',
+                                ),
                                 gcodeLines: [
                                     'G91 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
@@ -117,16 +122,21 @@ const createWizard = (): WizardInstructions => {
                 ],
             },
             {
-                title: 'Resume',
+                title: i18n.t('wizards:probeToolLength.resume.title'),
                 substeps: [
                     {
-                        title: 'Resume Operation',
-                        description:
-                            'Tool length has been probed and set. Click the button below to continue with your operation. Turn on your router if you have one.',
+                        title: i18n.t(
+                            'wizards:probeToolLength.resume.substepTitle',
+                        ),
+                        description: i18n.t(
+                            'wizards:probeToolLength.resume.description',
+                        ),
                         overlay: false,
                         actions: [
                             {
-                                label: 'Resume',
+                                label: i18n.t(
+                                    'wizards:probeToolLength.resume.action',
+                                ),
                                 gcodeLines: [
                                     '(Restart Spindle)',
                                     '([global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])',

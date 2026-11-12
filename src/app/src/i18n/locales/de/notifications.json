@@ -16,6 +16,20 @@
       "title": "Der ATC hat einen Dialog angefordert.",
       "content": "„Weiter“ hebt den Halt auf, „Zurücksetzen“ bricht die Aktion ab.",
       "resume": "Fortsetzen"
+    },
+    "toolchangeConfig": {
+      "title": "",
+      "intro": "",
+      "question": "",
+      "enablePassthrough": "",
+      "updateSettings": "",
+      "keepSettings": ""
+    },
+    "keepout": {
+      "title": "",
+      "description": "",
+      "toggleLabel": "",
+      "resource": ""
     }
   },
   "connection": {
@@ -65,7 +79,8 @@
     "fourAxisFileLoaded": {
       "title": "4-Achsen-Datei geladen",
       "content": "Der G-Code enthält simultane 4-Achsen-Befehle, die derzeit nicht unterstützt werden und nicht ausgeführt werden können."
-    }
+    },
+    "rejectedLine": ""
   },
   "diagnostics": {
     "downloaded": "Diagnosedatei erfolgreich heruntergeladen!",
