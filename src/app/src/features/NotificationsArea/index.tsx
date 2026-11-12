@@ -8,6 +8,7 @@ import { TOOLBAR_CATEGORY } from 'app/constants';
 import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import useKeybinding from 'app/lib/useKeybinding';
 import reduxStore from 'app/store/redux';
 import { readAllNotifications } from 'app/store/redux/slices/preferences.slice.ts';
@@ -15,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { LuBell } from 'react-icons/lu';
 
 const NotificationsArea = () => {
+    const { t } = useAppTranslation();
     const [open, setOpen] = useState(false);
     const notifications = useTypedSelector((state) =>
         state.preferences.notifications?.filter(
@@ -48,11 +50,17 @@ const NotificationsArea = () => {
 
     return (
         <Popover open={open} onOpenChange={markNotificationsRead}>
-            <Tooltip content="Notifications">
+            <Tooltip content={t('workspace:notifications.title')}>
                 <PopoverTrigger asChild>
                     <button
                         className="relative max-sm:hidden"
-                        aria-label={`Notifications${notifications && notifications.length > 0 ? `, ${notifications.length} unread` : ''}`}
+                        aria-label={
+                            notifications && notifications.length > 0
+                                ? t('workspace:notifications.unreadLabel', {
+                                      count: notifications.length,
+                                  })
+                                : t('workspace:notifications.title')
+                        }
                     >
                         <LuBell className="w-6 h-6 text-gray-400 cursor-pointer" />
                         {notifications && notifications.length > 0 && (

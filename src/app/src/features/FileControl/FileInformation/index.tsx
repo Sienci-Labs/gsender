@@ -11,6 +11,7 @@ import { JOB_STATUS } from 'app/constants';
 import GcodeStepper from 'app/features/GcodeStepper';
 import type { Job } from 'app/features/Stats/utils/StatContext';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import cx from 'classnames';
 import isElectron from 'is-electron';
@@ -44,6 +45,7 @@ interface Props {
 }
 
 const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
+    const { t } = useAppTranslation();
     const { name, size, total, path, fileLoaded, fileProcessing } =
         useTypedSelector((state) => state.file);
 
@@ -142,7 +144,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 {isElectron() && (
                     <div className="flex flex-col gap-2 max-xl:gap-1 portrait:w-3/4">
                         <span className="ml-6 dark:text-content-primary">
-                            Recent Files
+                            {t('workspace:fileControl.recentFiles')}
                         </span>
                         <ScrollArea className="ml-2 px-2 h-28 max-xl:h-[6.5rem] portrait:mb-5 bg-white dark:bg-surface-raised rounded-xl border-2 dark:border-outline">
                             <div className="grid divide-y items-center mr-2">
@@ -153,7 +155,10 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                                 className="grid grid-cols-[30px_3fr] items-center gap-1 cursor-pointer py-2"
                                                 role="button"
                                                 tabIndex={0}
-                                                aria-label={`Load recent file ${file.fileName}`}
+                                                aria-label={t(
+                                                    'workspace:fileControl.loadRecentFile',
+                                                    { name: file.fileName },
+                                                )}
                                                 onKeyDown={(e) => {
                                                     if (
                                                         e.key === 'Enter' ||
@@ -221,7 +226,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                     {lastJob && (
                         <>
                             <span className="text-base text-gray-900 dark:text-content-secondary">
-                                Last Job
+                                {t('workspace:fileControl.lastJob.title')}
                             </span>
                             <div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-600 font-bold">
                                 <TooltipProvider>
@@ -254,7 +259,17 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                                 JOB_STATUS.STOPPED,
                                         })}
                                     >
-                                        {lastJob.jobStatus}
+                                        {lastJob.jobStatus ===
+                                        JOB_STATUS.COMPLETE
+                                            ? t(
+                                                  'workspace:fileControl.lastJob.complete',
+                                              )
+                                            : lastJob.jobStatus ===
+                                                JOB_STATUS.STOPPED
+                                              ? t(
+                                                    'workspace:fileControl.lastJob.stopped',
+                                                )
+                                              : lastJob.jobStatus}
                                     </span>
                                 </div>
                                 <div className="flex flex-row gap-2">
@@ -276,14 +291,18 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 
     const formatFileSize = (size: number): string => {
         if (size < 1024) {
-            return `${size} Bytes`;
+            return t('workspace:fileControl.fileSize.bytes', { size });
         }
 
         if (size < 1024 * 1024) {
-            return `${(size / 1024).toFixed(0)} KB`;
+            return t('workspace:fileControl.fileSize.kilobytes', {
+                size: (size / 1024).toFixed(0),
+            });
         }
 
-        return `${(size / (1024 * 1024)).toFixed(0)} MB`;
+        return t('workspace:fileControl.fileSize.megabytes', {
+            size: (size / (1024 * 1024)).toFixed(0),
+        });
     };
 
     const splitFileNameAndExtension = (name: string = '') => {
@@ -322,7 +341,9 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
             <div className="text-gray-600 flex gap-1 text-xs">
                 <span>{fileSize}</span>
 
-                <span>({total} lines)</span>
+                <span>
+                    {t('workspace:fileControl.lineCount', { count: total })}
+                </span>
             </div>
 
             {path && (
@@ -335,15 +356,19 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 
             <div className="flex gap-4 justify-center items-center w-full">
                 <div className="flex flex-col items-center flex-shrink-0">
-                    <span className="text-gray-600">Info</span>
+                    <span className="text-gray-600">
+                        {t('workspace:fileControl.info')}
+                    </span>
                     <Switch
                         checked={toggleInfo}
                         onChange={() => setToggleInfo((prev) => !prev)}
                         position="vertical"
                         data-testid="toggle-info"
-                        aria-label="Toggle file info or size view"
+                        aria-label={t('workspace:fileControl.toggleInfoSize')}
                     />
-                    <span className="text-gray-600">Size</span>
+                    <span className="text-gray-600">
+                        {t('workspace:fileControl.size')}
+                    </span>
                 </div>
 
                 <ToggleOutput />
@@ -361,7 +386,9 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                             setShowEditor((prev) => !prev)
                                         }
                                         data-testid="show-gcode-editor"
-                                        aria-label="Toggle G-code editor"
+                                        aria-label={t(
+                                            'workspace:fileControl.toggleEditor',
+                                        )}
                                         aria-pressed={showEditor}
                                         className={cx(
                                             filePanelButtonClass,
@@ -373,7 +400,9 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                         <Pencil className="h-5 w-5" />
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent>G-code Editor</TooltipContent>
+                                <TooltipContent>
+                                    {t('workspace:fileControl.gcodeEditor')}
+                                </TooltipContent>
                             </Tooltip>
 
                             <Tooltip>
@@ -384,7 +413,9 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                             handleStepperOpenChange(true)
                                         }
                                         data-testid="open-gcode-stepper"
-                                        aria-label="Open G-code step through"
+                                        aria-label={t(
+                                            'workspace:fileControl.openStepThrough',
+                                        )}
                                         className={cx(
                                             filePanelButtonClass,
                                             filePanelButtonIdleClass,
@@ -394,7 +425,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    G-code Step Through
+                                    {t('workspace:fileControl.stepThrough')}
                                 </TooltipContent>
                             </Tooltip>
                         </div>

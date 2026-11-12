@@ -30,7 +30,7 @@ import {
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
@@ -61,6 +61,7 @@ export interface JogValueObject {
 }
 
 export function Jogging({ hideRotary = false }) {
+    const { t } = useAppTranslation();
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
@@ -1085,7 +1086,7 @@ export function Jogging({ hideRotary = false }) {
                     <img
                         className="absolute top-0 left-0 pointer-events-none w-[180px] portrait:w-[210px] h-[180px] portrait:h-[210px]"
                         src={jogWheeelLabels}
-                        alt="Jog wheel arrows"
+                        alt={t('workspace:jogging.wheelArrowsAlt')}
                     />
                     <StopButton
                         disabled={!isConnected}
@@ -1135,27 +1136,35 @@ export function Jogging({ hideRotary = false }) {
                     >
                         <JogInput
                             label="XY"
-                            screenReaderLabel="XY jog distance"
+                            screenReaderLabel={t(
+                                'workspace:jogging.input.xyDistance',
+                            )}
                             currentValue={jogSpeed.xyStep}
                             onChange={updateXYStep}
                         />
                         <JogInput
                             label="Z"
-                            screenReaderLabel="Z jog distance"
+                            screenReaderLabel={t(
+                                'workspace:jogging.input.zDistance',
+                            )}
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
                         {showA && (
                             <JogInput
                                 label="A°"
-                                screenReaderLabel="A jog distance"
+                                screenReaderLabel={t(
+                                    'workspace:jogging.input.aDistance',
+                                )}
                                 currentValue={jogSpeed.aStep}
                                 onChange={updateAStep}
                             />
                         )}
                         <JogInput
-                            label="at"
-                            screenReaderLabel="Jog feedrate"
+                            label={t('workspace:jogging.input.feedrateLabel')}
+                            screenReaderLabel={t(
+                                'workspace:jogging.input.feedrate',
+                            )}
                             currentValue={jogSpeed.feedrate}
                             onChange={updateFeedrate}
                         />

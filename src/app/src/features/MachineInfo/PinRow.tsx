@@ -1,4 +1,5 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import type React from 'react';
 import { FaCheck, FaTimes } from 'react-icons/fa';
@@ -13,10 +14,12 @@ interface PinIndicatorProps {
 }
 
 export function PinIndicator({ on = false }: PinIndicatorProps) {
+    const { t } = useAppTranslation();
+    const stateLabel = on ? t('common:status.on') : t('common:status.off');
     return (
         <div
-            aria-label={on ? 'On' : 'Off'}
-            title={on ? 'On' : 'Off'}
+            aria-label={stateLabel}
+            title={stateLabel}
             className={cx('relative rounded-md py-1 px-2 w-3 h-3', {
                 'bg-green-500': on,
                 'bg-red-500': !on,

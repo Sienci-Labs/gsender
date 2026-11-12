@@ -11,7 +11,9 @@
     "ok": "ОК",
     "reset": "Сбросить",
     "save": "Сохранить",
-    "yes": "Да"
+    "yes": "Да",
+    "copyToClipboard": "Копировать в буфер обмена",
+    "goBack": "Назад"
   },
   "language": {
     "label": "Язык",
@@ -37,5 +39,112 @@
     "disconnected": "Отключено",
     "toolChange": "Смена инструмента",
     "door": "Дверь"
+  },
+  "pluginToolCard": {
+    "plugin": "Плагин",
+    "official": "Официальный",
+    "community": "Сообщество"
+  },
+  "rangeSlider": {
+    "resetTooltip": "Сбросить коррекцию до 100%",
+    "resetLabel": "Сбросить коррекцию «{{title}}» до 100%",
+    "decreaseTooltip": "Уменьшить коррекцию «{{title}}» на {{step}}%",
+    "decreaseLabel": "Уменьшить коррекцию «{{title}}»",
+    "increaseTooltip": "Увеличить коррекцию «{{title}}» на {{step}}%",
+    "increaseLabel": "Увеличить коррекцию «{{title}}»"
+  },
+  "table": {
+    "searchPlaceholder": "Поиск по всем столбцам...",
+    "addNew": "Добавить",
+    "addNewTask": "Добавить задачу",
+    "resetAll": "Сбросить всё",
+    "jumpToPage": "Перейти к странице:",
+    "entriesPerPage": "Записей на странице:",
+    "showCount": "Показать {{size}}"
+  },
+  "status": {
+    "offUpper": "ВЫКЛ",
+    "onUpper": "ВКЛ",
+    "loading": "Загрузка",
+    "on": "Вкл",
+    "off": "Выкл"
+  },
+  "spindleLaser": {
+    "spindle": "Шпиндель",
+    "laser": "Лазер"
+  },
+  "toggle": {
+    "label": "Переключить"
+  },
+  "tabs": {
+    "scrollLeft": "Прокрутить вкладки влево",
+    "widgetTabs": "Вкладки виджетов",
+    "scrollRight": "Прокрутить вкладки вправо"
+  },
+  "toolCard": {
+    "unpinTool": "Открепить инструмент",
+    "pinToTop": "Закрепить сверху"
+  },
+  "updateAlert": {
+    "title": "Функция в разработке",
+    "description": "Внешний вид и функциональность этого раздела будут обновлены в следующей сборке."
+  },
+  "wizard": {
+    "allStepsComplete": "Все шаги выполнены",
+    "stepOf": "Шаг {{step}} из {{total}}",
+    "percentComplete": "Выполнено: {{percent}}%",
+    "exit": "Выход",
+    "restartHome": "Перезапустить поиск нуля",
+    "secondaryContentAlt": "Дополнительное содержимое",
+    "onlineResources": "онлайн-ресурсы",
+    "scanQrCode": "Отсканируйте QR-код",
+    "runningLabel": "{{label}}...",
+    "complete": "Готово",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "validation": {
+      "failed": "Проверка не пройдена",
+      "notConnected": "Контроллер не подключён. Подключитесь к станку, чтобы настроить этот аксессуар.",
+      "notHomed": "Поиск нуля не выполнен. Выполните поиск нуля станка перед настройкой аксессуара.",
+      "requiresGrblHal": "Для этого мастера необходимо подключение к устройству grblHAL.",
+      "requiresGrbl": "Для этого мастера необходимо подключение к устройству Grbl.",
+      "notIdle": "Для этого мастера станок должен находиться в режиме ожидания или ручного перемещения."
+    },
+    "configFileVersion": "Версия файла конфигурации: {{version}}",
+    "exitWizard": "Выйти из мастера",
+    "restartWizard": "Перезапустить мастер",
+    "previous": "Назад",
+    "next": "Далее",
+    "backToWizards": "К мастерам",
+    "backToTools": "К инструментам",
+    "estimatedTime": "Расчётное время:",
+    "imageAlt": "Изображение мастера",
+    "needHelp": "Нужна помощь?",
+    "hub": {
+      "defaultTitle": "Мастера настройки аксессуаров ЧПУ",
+      "configurationCount_few": "{{count}} конфигурации",
+      "configurationCount_many": "{{count}} конфигураций",
+      "configurationCount_one": "{{count}} конфигурация",
+      "configurationCount_other": "{{count}} конфигурации",
+      "totalSteps_few": "Всего {{count}} шага",
+      "totalSteps_many": "Всего {{count}} шагов",
+      "totalSteps_one": "Всего {{count}} шаг",
+      "totalSteps_other": "Всего {{count}} шага",
+      "startWizard": "Запустить мастер",
+      "noWizards": "Нет доступных мастеров"
+    }
+  },
+  "carousel": {
+    "roleDescription": "карусель",
+    "slideRoleDescription": "слайд",
+    "previousSlide": "Предыдущий слайд",
+    "nextSlide": "Следующий слайд"
+  },
+  "select": {
+    "scrollUp": "Прокрутить вверх",
+    "scrollDown": "Прокрутить вниз"
+  },
+  "toast": {
+    "dismiss": "Закрыть уведомление"
   }
 }

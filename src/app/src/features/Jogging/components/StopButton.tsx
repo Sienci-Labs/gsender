@@ -1,6 +1,8 @@
+import { useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 
 export function StopButton({ disabled = false, onClick }) {
+    const { t } = useAppTranslation();
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -8,7 +10,7 @@ export function StopButton({ disabled = false, onClick }) {
             viewBox="0 0 79 79"
             role="button"
             tabIndex={disabled ? -1 : 0}
-            aria-label="Stop Jogging"
+            aria-label={t('workspace:jogging.stopAriaLabel')}
             onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();

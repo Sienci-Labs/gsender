@@ -276,7 +276,14 @@
     "unsupportedGcode_one": "Trovata {{count}} riga di G-code non supportato da GRBL in questo file. Il lavoro potrebbe non essere eseguito correttamente.",
     "unsupportedGcode_other": "Trovate {{count}} righe di G-code non supportato da GRBL in questo file. Il lavoro potrebbe non essere eseguito correttamente.",
     "grblHalOnlyShortcut": "Impossibile attivare la scorciatoia riservata a grblHAL",
-    "unsupportedGcode_many": "Trovate {{count}} righe di G-code non supportato da GRBL in questo file. Il lavoro potrebbe non essere eseguito correttamente."
+    "unsupportedGcode_many": "Trovate {{count}} righe di G-code non supportato da GRBL in questo file. Il lavoro potrebbe non essere eseguito correttamente.",
+    "invalidLines": {
+      "description_many": "Rilevate {{count}} righe non valide al caricamento del file. Il lavoro potrebbe non essere eseguito correttamente.",
+      "description_one": "Rilevata {{count}} riga non valida al caricamento del file. Il lavoro potrebbe non essere eseguito correttamente.",
+      "description_other": "Rilevate {{count}} righe non valide al caricamento del file. Il lavoro potrebbe non essere eseguito correttamente.",
+      "sample": "Esempi di righe non valide trovate:",
+      "title": "Righe non valide rilevate"
+    }
   },
   "workspace": {
     "modeSetDefault": "Modalità area di lavoro impostata su Predefinita",

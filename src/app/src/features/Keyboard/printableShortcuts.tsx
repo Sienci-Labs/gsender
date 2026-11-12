@@ -21,15 +21,18 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import type { CommandKey, ShuttleEvent } from 'app/lib/definitions/shortcuts';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
 import store from 'app/store';
 import React, { useMemo } from 'react';
+import { getShortcutTitle } from './shortcutLabels';
 
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
 const PrintableShortcuts = React.forwardRef<HTMLDivElement>((_, ref) => {
+    const { t } = useAppTranslation();
     const shortcutsList: [string, CommandKey][] = Object.entries(
         store.get('commandKeys', {}),
     );
@@ -41,9 +44,13 @@ const PrintableShortcuts = React.forwardRef<HTMLDivElement>((_, ref) => {
                     ([, shortcut]) => shortcut.isActive && shortcut.keys !== '',
                 )
                 .map(([key, shortcut]) => {
-                    const title = allShuttleControlEvents[key]
-                        ? (allShuttleControlEvents[key] as ShuttleEvent).title
-                        : (shortcut as ShuttleEvent).title;
+                    const title = getShortcutTitle(
+                        key,
+                        allShuttleControlEvents[key]
+                            ? (allShuttleControlEvents[key] as ShuttleEvent)
+                                  .title
+                            : (shortcut as ShuttleEvent).title,
+                    );
 
                     return (
                         <tr key={shortcut.cmd}>
@@ -64,10 +71,10 @@ const PrintableShortcuts = React.forwardRef<HTMLDivElement>((_, ref) => {
                     <thead>
                         <tr>
                             <th className="border border-gray-300 p-2 text-left">
-                                <b>Action</b>
+                                <b>{t('workspace:keyboard.table.action')}</b>
                             </th>
                             <th className="border border-gray-300 p-2 text-left">
-                                <b>Shortcut</b>
+                                <b>{t('workspace:keyboard.table.shortcut')}</b>
                             </th>
                         </tr>
                     </thead>

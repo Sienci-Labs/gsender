@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import { FaExclamation } from 'react-icons/fa';
 
@@ -29,10 +30,13 @@ type Props = {
 };
 
 const ActiveIndicator = ({ active = true }: Props) => {
+    const { t } = useAppTranslation();
     return (
         <div className="flex items-center w-full justify-end">
             <small className="text-gray-400 text-sm mr-2">
-                {active ? 'Active' : 'Not Active'}
+                {active
+                    ? t('workspace:spindle.active')
+                    : t('workspace:spindle.notActive')}
             </small>
             <div
                 className={cx(

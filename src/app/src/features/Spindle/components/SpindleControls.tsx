@@ -26,6 +26,7 @@ import { Input } from 'app/components/shadcn/Input';
 import { Slider } from 'app/components/shadcn/Slider';
 import Tooltip from 'app/components/Tooltip';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import store from 'app/store';
 import { useEffect, useState } from 'react';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
@@ -48,6 +49,7 @@ type Props = {
 };
 
 const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
+    const { t } = useAppTranslation();
     const { spindle } = useTypedSelector((state) => state.controller.modal);
     const [inputType, setInputType] = useState(
         store.get('widgets.spindle.inputType', 'Slider'),
@@ -99,41 +101,54 @@ const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
                     onClick={actions.sendM3}
                     disabled={!canClick}
                     icon={<FaRedoAlt />}
-                    text="Forward"
+                    text={t('workspace:spindle.controls.forward')}
                     size="sm"
                     className="w-full"
                     active={isConnected && spindleForward}
-                    tooltip={{ content: 'Run spindle clockwise' }}
-                    aria-label="Start spindle clockwise (M3)"
+                    tooltip={{
+                        content: t('workspace:spindle.controls.forwardTooltip'),
+                    }}
+                    aria-label={t(
+                        'workspace:spindle.controls.forwardAriaLabel',
+                    )}
                 />
                 <ActiveStateButton
                     onClick={actions.sendM4}
                     disabled={!canClick}
                     icon={<FaUndoAlt />}
-                    text="Reverse"
+                    text={t('workspace:spindle.controls.reverse')}
                     size="sm"
                     className="w-full"
                     active={spindleReverse}
                     tooltip={{
-                        content: 'Run spindle counterclockwise',
+                        content: t('workspace:spindle.controls.reverseTooltip'),
                     }}
-                    aria-label="Start spindle counterclockwise (M4)"
+                    aria-label={t(
+                        'workspace:spindle.controls.reverseAriaLabel',
+                    )}
                 />
                 <ActiveStateButton
                     onClick={() => actions.sendM5({ type: 'spindle' })}
                     disabled={!canClick}
                     icon={<FaBan />}
-                    text="Stop"
+                    text={t('workspace:spindle.controls.stop')}
                     size="sm"
                     className="w-full"
-                    tooltip={{ content: 'Stop spindle' }}
-                    aria-label="Stop spindle (M5)"
+                    tooltip={{
+                        content: t('workspace:spindle.controls.stopTooltip'),
+                    }}
+                    aria-label={t('workspace:spindle.controls.stopAriaLabel')}
                 />
             </div>
             <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center items-center dark:text-content-primary">
-                <span className="text-right">Speed</span>
+                <span className="text-right">
+                    {t('workspace:spindle.controls.speed')}
+                </span>
                 {inputType === 'Slider' ? (
-                    <Tooltip content="Adjust spindle speed" side="bottom">
+                    <Tooltip
+                        content={t('workspace:spindle.controls.adjustSpeed')}
+                        side="bottom"
+                    >
                         <Slider
                             value={[state.spindleSpeed]}
                             min={state.spindleMin}
@@ -144,7 +159,9 @@ const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
                                 actions.handleSpindleSpeedChange(value[0])
                             }
                             disabled={!canClick}
-                            aria-label="Adjust spindle speed"
+                            aria-label={t(
+                                'workspace:spindle.controls.adjustSpeed',
+                            )}
                         />
                     </Tooltip>
                 ) : (
@@ -161,7 +178,9 @@ const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
                             max={state.spindleMax}
                             disabled={!canClick}
                             className="h-8 w-full"
-                            aria-label="Type spindle speed"
+                            aria-label={t(
+                                'workspace:spindle.controls.typeSpeed',
+                            )}
                         />
                     </div>
                 )}

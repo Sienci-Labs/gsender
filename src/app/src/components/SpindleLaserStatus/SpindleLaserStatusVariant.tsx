@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import classNames from 'classnames';
 import { tv, type VariantProps } from 'tailwind-variants';
 
@@ -24,6 +25,7 @@ export type SpindleLaserStatusProps = {
 } & SpindleLaserStatusVariants;
 
 export const SpindleLaserStatusVariant = (props: SpindleLaserStatusProps) => {
+    const { t } = useAppTranslation();
     return (
         <span className={spindleLaserStatusStyle(props)}>
             {props.label}
@@ -31,7 +33,9 @@ export const SpindleLaserStatusVariant = (props: SpindleLaserStatusProps) => {
                 className={classNames('ml-1 rounded-lg border-2 border-white')}
             >
                 <span className="p-1">
-                    {props.color === 'disabled' ? 'OFF' : 'ON'}
+                    {props.color === 'disabled'
+                        ? t('common:status.offUpper')
+                        : t('common:status.onUpper')}
                 </span>
             </span>
         </span>

@@ -1,4 +1,5 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import type { Notification } from 'app/workspace/definitions';
 
 import { NotificationItem } from './NotificationItem';
@@ -8,6 +9,7 @@ type Props = {
 };
 
 const NotificationList = ({ value }: Props) => {
+    const { t } = useAppTranslation();
     const notifications = useTypedSelector(
         (state) => state.preferences.notifications,
     );
@@ -22,7 +24,7 @@ const NotificationList = ({ value }: Props) => {
     if (filteredNotifications.length === 0) {
         return (
             <div className="min-h-[200px] flex items-center justify-center">
-                No notifications
+                {t('workspace:notifications.empty')}
             </div>
         );
     }

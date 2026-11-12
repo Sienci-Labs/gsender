@@ -1,7 +1,7 @@
 import { usePostHog } from '@posthog/react';
 import { Button } from 'app/components/shadcn/Button';
 import { LASER_MODE } from 'app/constants';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { getZUpTravel } from 'app/lib/SoftLimits.js';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -107,6 +107,7 @@ export const runOutline = (
 
 const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
     const posthog = usePostHog();
+    const { t } = useAppTranslation();
 
     return (
         <Button
@@ -121,7 +122,8 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
             )}
             onClick={() => runOutline(posthog)}
         >
-            <TbVector className="text-2xl mr-1" /> Outline
+            <TbVector className="text-2xl mr-1" />{' '}
+            {t('workspace:jobControl.outline')}
         </Button>
     );
 };

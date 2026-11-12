@@ -6,7 +6,7 @@ import {
     DropdownMenuTrigger,
 } from 'app/components/shadcn/Dropdown';
 import Tooltip from 'app/components/Tooltip';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import cn from 'classnames';
 import cx from 'classnames';
@@ -35,6 +35,7 @@ type MacroButtonProps = {
 
 const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
     ({ onMacroRun, disabled, macro }, ref) => {
+        const { t } = useAppTranslation();
         const [running, setRunning] = useState<boolean>(false);
 
         const run = () => {
@@ -58,7 +59,7 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
                 )}
             >
                 <span className="block w-full text-left whitespace-nowrap overflow-hidden text-ellipsis">
-                    {running ? 'Running...' : macro.name}
+                    {running ? t('workspace:macros.running') : macro.name}
                 </span>
             </button>
         );
@@ -72,6 +73,7 @@ const MacroItem = ({
     onDelete,
     disabled = false,
 }: MacroItemProps) => {
+    const { t } = useAppTranslation();
     const onMacroRun = () => {
         if (disabled) {
             return;
@@ -107,7 +109,9 @@ const MacroItem = ({
             <DropdownMenu>
                 <DropdownMenuTrigger
                     className="flex items-center justify-center w-10 h-8 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter"
-                    aria-label={`Options for macro ${macro.name}`}
+                    aria-label={t('workspace:macros.optionsFor', {
+                        name: macro.name,
+                    })}
                 >
                     <FaEllipsisH className="text-xl" />
                 </DropdownMenuTrigger>
@@ -117,14 +121,14 @@ const MacroItem = ({
                         className="cursor-pointer py-3 px-4 text-lg hover:bg-gray-100"
                     >
                         <FaEdit className="mr-3 text-xl" />
-                        <span>Edit</span>
+                        <span>{t('workspace:macros.edit')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onClick={() => onDelete(macro.id)}
                         className="cursor-pointer py-3 px-4 text-lg hover:bg-gray-100"
                     >
                         <FaTrashAlt className="mr-3 text-xl" />
-                        <span>Delete</span>
+                        <span>{t('common:actions.delete')}</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

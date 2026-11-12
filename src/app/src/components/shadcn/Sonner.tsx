@@ -1,10 +1,12 @@
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import { Toaster as Sonner } from 'sonner';
 import { toastIcons } from './ToastIcon';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
+    const { t } = useAppTranslation();
     const { enableDarkMode = false } = useWorkspaceState();
 
     return (
@@ -14,7 +16,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             icons={toastIcons}
             toastOptions={{
                 unstyled: true,
-                closeButtonAriaLabel: 'Dismiss notification',
+                closeButtonAriaLabel: t('common:toast.dismiss'),
                 classNames: {
                     toast: 'group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border border-border bg-background px-4 py-3.5 text-foreground shadow-[0_8px_20px_rgb(15_23_42_/_0.10),0_2px_6px_rgb(15_23_42_/_0.06)] dark:shadow-[0_10px_24px_rgb(0_0_0_/_0.28),0_2px_6px_rgb(0_0_0_/_0.20)]',
                     title: 'text-[14px] text-foreground leading-5',

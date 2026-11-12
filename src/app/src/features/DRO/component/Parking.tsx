@@ -9,6 +9,7 @@ import {
 } from 'app/constants';
 import { isBitSetInNumber } from 'app/features/DRO/utils/RapidPosition';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
@@ -46,6 +47,7 @@ export function Parking({
     isConnected = false,
     homingEnabled = false,
 }) {
+    const { t } = useAppTranslation();
     const hasHomed = useSelector(
         (state: RootState) => state.controller.hasHomed,
     );
@@ -106,7 +108,7 @@ export function Parking({
     }
 
     return (
-        <Tooltip content="Go to Park Location">
+        <Tooltip content={t('workspace:dro.parking.goToPark')}>
             <Button
                 disabled={isDisabled}
                 icon={<RiParkingFill className="w-4 h-4" />}
@@ -120,7 +122,7 @@ export function Parking({
                         is_disabled: isDisabled,
                     });
                 }}
-                aria-label="Go to Park Location"
+                aria-label={t('workspace:dro.parking.goToPark')}
             />
         </Tooltip>
     );

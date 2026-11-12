@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import reduxStore from 'app/store/redux';
 import { updateReleaseNotes } from 'app/store/redux/slices/gSenderInfo.slice.ts';
 import gSenderIcon from 'app/workspace/TopBar/assets/icon-round.png';
@@ -24,6 +25,7 @@ export function UpdateBadge({ hidden }) {
 }
 
 export function IconUpdater() {
+    const { t } = useAppTranslation();
     const [releaseNotes, setReleaseNotes] = useState({});
     const [showUpdater, setShowUpdater] = useState(false);
 
@@ -44,7 +46,7 @@ export function IconUpdater() {
 
     return (
         <div className="w-[40px] h-[40px] max-sm:hidden relative z-[10000]">
-            <img alt="gSender Logo" src={gSenderIcon} />
+            <img alt={t('workspace:layout.logoAlt')} src={gSenderIcon} />
             <UpdateBadge hidden={showUpdater} />
         </div>
     );

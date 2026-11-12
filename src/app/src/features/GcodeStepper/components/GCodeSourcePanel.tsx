@@ -22,6 +22,7 @@
  */
 
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 import { ChevronRight, Search, X } from 'lucide-react';
 import React, {
@@ -166,6 +167,7 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
     onSelectLine,
     deferScroll = false,
 }) => {
+    const { t } = useAppTranslation();
     const scrollRef = useRef<HTMLDivElement>(null);
     const [scrollTop, setScrollTop] = useState(0);
     const [viewportHeight, setViewportHeight] = useState(0);
@@ -305,11 +307,18 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
         <div className="flex h-full min-h-0 flex-col gap-2">
             <div className="flex items-center justify-between gap-2">
                 <span className="whitespace-nowrap text-xs uppercase tracking-wide text-gray-600 dark:text-content-muted">
-                    G-code ({lines.length.toLocaleString()} lines)
+                    {t('workspace:gcodeStepper.sourceHeading', {
+                        count: lines.length,
+                        lines: lines.length.toLocaleString(),
+                    })}
                 </span>
                 <button
                     type="button"
-                    aria-label={searchOpen ? 'Close search' : 'Search G-code'}
+                    aria-label={
+                        searchOpen
+                            ? t('workspace:gcodeStepper.closeSearch')
+                            : t('workspace:gcodeStepper.searchGcode')
+                    }
                     onClick={() => {
                         setSearchOpen((prev) => !prev);
                         setQuery('');
@@ -337,8 +346,10 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
                                 goToNextMatch();
                             }
                         }}
-                        placeholder="Search..."
-                        aria-label="Search G-code"
+                        placeholder={t(
+                            'workspace:gcodeStepper.searchPlaceholder',
+                        )}
+                        aria-label={t('workspace:gcodeStepper.searchGcode')}
                         className="h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-xs text-gray-900 dark:border-outline dark:bg-surface-sunken dark:text-content-primary"
                     />
                     <span className="whitespace-nowrap text-xs text-gray-600 dark:text-content-muted">
@@ -365,7 +376,7 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
                 onClick={() => onSelectLine(1)}
                 className="min-h-[2.75rem] rounded-lg border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-primary dark:hover:bg-surface-hover"
             >
-                Go to start
+                {t('workspace:gcodeStepper.goToStart')}
             </button>
         </div>
     );

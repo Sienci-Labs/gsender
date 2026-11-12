@@ -1,6 +1,7 @@
 // https://ui.shadcn.com/docs/components/select
 
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import * as React from 'react';
@@ -34,37 +35,43 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 const SelectScrollUpButton = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
     React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
->(({ className, ...props }, ref) => (
-    <SelectPrimitive.ScrollUpButton
-        ref={ref}
-        className={cx(
-            'flex cursor-default items-center justify-center py-1',
-            className,
-        )}
-        {...props}
-        aria-label="Scroll up"
-    >
-        <ChevronUp className="h-4 w-4" />
-    </SelectPrimitive.ScrollUpButton>
-));
+>(({ className, ...props }, ref) => {
+    const { t } = useAppTranslation();
+    return (
+        <SelectPrimitive.ScrollUpButton
+            ref={ref}
+            className={cx(
+                'flex cursor-default items-center justify-center py-1',
+                className,
+            )}
+            {...props}
+            aria-label={t('common:select.scrollUp')}
+        >
+            <ChevronUp className="h-4 w-4" />
+        </SelectPrimitive.ScrollUpButton>
+    );
+});
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
 
 const SelectScrollDownButton = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
     React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
->(({ className, ...props }, ref) => (
-    <SelectPrimitive.ScrollDownButton
-        ref={ref}
-        className={cx(
-            'flex cursor-default items-center justify-center py-1',
-            className,
-        )}
-        {...props}
-        aria-label="Scroll down"
-    >
-        <ChevronDown className="h-4 w-4" />
-    </SelectPrimitive.ScrollDownButton>
-));
+>(({ className, ...props }, ref) => {
+    const { t } = useAppTranslation();
+    return (
+        <SelectPrimitive.ScrollDownButton
+            ref={ref}
+            className={cx(
+                'flex cursor-default items-center justify-center py-1',
+                className,
+            )}
+            {...props}
+            aria-label={t('common:select.scrollDown')}
+        >
+            <ChevronDown className="h-4 w-4" />
+        </SelectPrimitive.ScrollDownButton>
+    );
+});
 SelectScrollDownButton.displayName =
     SelectPrimitive.ScrollDownButton.displayName;
 

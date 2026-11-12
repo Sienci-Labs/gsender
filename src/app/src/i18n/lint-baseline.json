@@ -1,86 +1,7 @@
 {
-  "src/app/src/components/GcodeViewer/index.tsx": {
-    "hardcoded: Copy to Clipboard": 1
-  },
-  "src/app/src/components/Page/index.tsx": {
-    "hardcoded: Go Back": 1
-  },
-  "src/app/src/components/PluginToolCard/index.tsx": {
-    "hardcoded: Plugin": 1
-  },
-  "src/app/src/components/shadcn/Carousel.tsx": {
-    "hardcoded: Next slide": 1,
-    "hardcoded: Previous slide": 1,
-    "hardcoded: carousel": 1,
-    "hardcoded: slide": 1
-  },
-  "src/app/src/components/shadcn/Dialog.tsx": {
-    "hardcoded: Close": 1
-  },
-  "src/app/src/components/shadcn/Sheet.tsx": {
-    "hardcoded: Close": 1
-  },
   "src/app/src/components/SortableTable/index.tsx": {
     "hardcoded: <<": 1,
-    "hardcoded: >>": 1,
-    "hardcoded: Add New": 2,
-    "hardcoded: Add New Task": 1,
-    "hardcoded: Entries/Page:": 1,
-    "hardcoded: Jump to page:": 1,
-    "hardcoded: Page": 1,
-    "hardcoded: Reset All": 1,
-    "hardcoded: Show": 1,
-    "hardcoded: of": 1
-  },
-  "src/app/src/components/Tabs/index.tsx": {
-    "hardcoded: Scroll tabs left": 1,
-    "hardcoded: Scroll tabs right": 1,
-    "hardcoded: Widget Tabs": 1
-  },
-  "src/app/src/components/UpdateAlert/index.tsx": {
-    "hardcoded: Feature In-progress": 1,
-    "hardcoded: Look, feel and functionality of this area will be\n                        updated in a later build.": 1
-  },
-  "src/app/src/components/Wizard/hooks/UseValidations.tsx": {
-    "hardcoded: Learn More": 1,
-    "hardcoded: This setup wizard requires a newer firmware version, please\n                    update your firmware before proceeding.": 1
-  },
-  "src/app/src/components/Wizard/ProgressBar.tsx": {
-    "hardcoded: % Complete": 1,
-    "hardcoded: Exit": 1
-  },
-  "src/app/src/components/Wizard/RestartHome.tsx": {
-    "hardcoded: Restart Home": 1
-  },
-  "src/app/src/components/Wizard/SecondaryContentPanel.tsx": {
-    "hardcoded: Scan QR Code": 1,
-    "hardcoded: online resources": 1
-  },
-  "src/app/src/components/Wizard/StepActionButton.tsx": {
-    "hardcoded: Error": 1,
-    "hardcoded: Success": 1
-  },
-  "src/app/src/components/Wizard/WizardContainer.tsx": {
-    "hardcoded: Configuration File Version:": 1,
-    "hardcoded: Exit": 1,
-    "hardcoded: Exit Wizard": 1,
-    "hardcoded: Next": 1,
-    "hardcoded: Previous": 1,
-    "hardcoded: Restart Wizard": 1
-  },
-  "src/app/src/components/Wizard/WizardLanding.tsx": {
-    "hardcoded: Configuration File Version:": 1,
-    "hardcoded: Estimated time:": 1,
-    "hardcoded: Follow along in our": 1,
-    "hardcoded: Need Help?": 1,
-    "hardcoded: Wizard image": 1,
-    "hardcoded: online resources": 1
-  },
-  "src/app/src/components/Wizard/WizardsHub.tsx": {
-    "hardcoded: No wizards available": 1,
-    "hardcoded: Start Wizard": 1,
-    "hardcoded: configuration": 1,
-    "hardcoded: total steps": 1
+    "hardcoded: >>": 1
   },
   "src/app/src/features/AccessoryConnectivity/AccessoryConnectivityToast.tsx": {
     "hardcoded: Device available": 1,
@@ -358,34 +279,6 @@
     "hardcoded: Y:": 1,
     "hardcoded: Z:": 1
   },
-  "src/app/src/features/Connection/components/DisconnectButton.tsx": {
-    "hardcoded: Disconnect": 1
-  },
-  "src/app/src/features/Connection/components/PortListings.tsx": {
-    "hardcoded: Ethernet (port": 1,
-    "hardcoded: No USB devices found": 1,
-    "hardcoded: USB (": 1,
-    "hardcoded: Unrecognized Ports": 1
-  },
-  "src/app/src/features/Connection/index.tsx": {
-    "hardcoded: Connect": 1,
-    "hardcoded: Connect to CNC": 1,
-    "hardcoded: Connecting...": 1,
-    "hardcoded: Connection menu": 1,
-    "hardcoded: Unable to connect.": 1
-  },
-  "src/app/src/features/Console/components/ConsoleInput.tsx": {
-    "hardcoded: Run": 1
-  },
-  "src/app/src/features/Console/components/ConsoleList.tsx": {
-    "hardcoded: Scroll to latest message": 1
-  },
-  "src/app/src/features/Console/components/ConsoleToolbar.tsx": {
-    "hardcoded: Filter console messages": 1
-  },
-  "src/app/src/features/Console/index.tsx": {
-    "hardcoded: Not connected to a device": 1
-  },
   "src/app/src/features/DataCollection/index.tsx": {
     "hardcoded: Accept": 1,
     "hardcoded: Anonymous": 1,
@@ -395,161 +288,8 @@
     "hardcoded: Help us make gSender better": 1,
     "hardcoded: Optional": 1
   },
-  "src/app/src/features/DRO/component/GoTo.tsx": {
-    "hardcoded: Execute move to location": 1,
-    "hardcoded: Go To Location": 1,
-    "hardcoded: Go!": 1,
-    "hardcoded: Open Go To Location dialog": 1
-  },
-  "src/app/src/features/DRO/component/HomingSwitch.tsx": {
-    "hardcoded: Home": 1
-  },
-  "src/app/src/features/DRO/component/Parking.tsx": {
-    "hardcoded: Go to Park Location": 1
-  },
-  "src/app/src/features/DRO/component/UnitBadge.tsx": {
-    "hardcoded: Units:": 1
-  },
-  "src/app/src/features/DRO/index.tsx": {
-    "hardcoded: Go to": 1,
-    "hardcoded: Zero all axes: Set current position as work zero for all axes": 2
-  },
-  "src/app/src/features/FileControl/ButtonControlGroup.tsx": {
-    "hardcoded: Close File": 1,
-    "hardcoded: View Recent Files": 1
-  },
-  "src/app/src/features/FileControl/components/ReloadFileAlert.tsx": {
-    "hardcoded: Reload File": 1
-  },
-  "src/app/src/features/FileControl/FileInformation/index.tsx": {
-    "hardcoded: Info": 1,
-    "hardcoded: Last Job": 1,
-    "hardcoded: Open G-code step through": 1,
-    "hardcoded: Recent Files": 1,
-    "hardcoded: Size": 1,
-    "hardcoded: Toggle G-code editor": 1,
-    "hardcoded: lines)": 1
-  },
-  "src/app/src/features/FileControl/FileInformation/Info.tsx": {
-    "hardcoded: Estimated Time": 1,
-    "hardcoded: Feed": 1,
-    "hardcoded: Speed": 1,
-    "hardcoded: Tools": 1
-  },
-  "src/app/src/features/FileControl/FileInformation/Size.tsx": {
-    "hardcoded: Max": 1,
-    "hardcoded: Min": 1,
-    "hardcoded: Size": 1
-  },
-  "src/app/src/features/GcodeStepper/components/GCodeSourcePanel.tsx": {
-    "hardcoded: G-code (": 1,
-    "hardcoded: Go to start": 1,
-    "hardcoded: lines)": 1
-  },
-  "src/app/src/features/GcodeStepper/components/StepControls.tsx": {
-    "hardcoded: Reset to start": 1,
-    "hardcoded: Step Controls": 1,
-    "hardcoded: lines": 1
-  },
-  "src/app/src/features/GcodeStepper/components/StepThroughScrubber.tsx": {
-    "hardcoded: G-code line": 1
-  },
   "src/app/src/features/GcodeStepper/components/ToolVisibilityPanel.tsx": {
-    "hardcoded: No tools found in this file.": 1,
-    "hardcoded: RPM": 1,
-    "hardcoded: Tools": 1
-  },
-  "src/app/src/features/GcodeStepper/index.tsx": {
-    "hardcoded: Close step through": 1,
-    "hardcoded: Reading positions…": 1
-  },
-  "src/app/src/features/IconUpdater/index.tsx": {
-    "hardcoded: gSender Logo": 1
-  },
-  "src/app/src/features/JobControl/index.tsx": {
-    "hardcoded: , which exceed": 1,
-    "hardcoded: Alternatively, you can update your\n                                post-processor to include a tool change command\n                                with your file.": 1,
-    "hardcoded: Load the tool you want to use into the spindle\n                                before trying again.": 1,
-    "hardcoded: Please confirm that you want to use this\n                                    tool": 1,
-    "hardcoded: Remap": 1,
-    "hardcoded: Select": 1,
-    "hardcoded: The file contains no tool change commands\n                                    (M6) and the tool in the spindle will be\n                                    used. However, the tool in the spindle does\n                                    not have an offset.": 1,
-    "hardcoded: This file contains no tool change commands\n                                    (M6) and the tool in the spindle will be\n                                    used.": 1,
-    "hardcoded: This file contains no tool change commands (M6)\n                                and there is no tool in the spindle.": 1,
-    "hardcoded: This file references tool": 1,
-    "hardcoded: in the ATC tab to\n                                    establish an offset and re-zero the\n                                    workpiece before trying again.": 1,
-    "hardcoded: in the Tool Timeline before starting, or confirm\n                                to run anyway.": 1,
-    "hardcoded: tools).": 1,
-    "hardcoded: your\n                                configured tool table size (": 1
-  },
-  "src/app/src/features/JobControl/OutlineButton.tsx": {
-    "hardcoded: Outline": 1
-  },
-  "src/app/src/features/JobControl/ProgressArea.tsx": {
-    "hardcoded: Finalizing": 1,
-    "hardcoded: Job Progress": 1,
-    "hardcoded: cutting": 1,
-    "hardcoded: remaining": 1
-  },
-  "src/app/src/features/JobControl/StartFromLine.tsx": {
-    "hardcoded: (amount above the max height of the file)": 1,
-    "hardcoded: 10 lines": 1,
-    "hardcoded: Calculates all your CNC movements, attributes,\n                                and gSender automations to pick up right where\n                                you left off.": 1,
-    "hardcoded: For best success, we usually recommend\n                                    resuming about": 1,
-    "hardcoded: Recover a job after power loss, mechanical\n                                malfunction, disconnection, or other failure.": 1,
-    "hardcoded: Resume job at line:": 1,
-    "hardcoded: Start from Line": 1,
-    "hardcoded: With Safe Height:": 1,
-    "hardcoded: Your job of": 1,
-    "hardcoded: earlier:": 1,
-    "hardcoded: line": 1,
-    "hardcoded: lines was last\n                                stopped around line:": 1
-  },
-  "src/app/src/features/JobControl/WoodcuttingProgress.tsx": {
-    "hardcoded: Spinning Drill": 1
-  },
-  "src/app/src/features/Jogging/components/AJog.tsx": {
-    "hardcoded: a Labels tab": 1
-  },
-  "src/app/src/features/Jogging/components/ZJog.tsx": {
-    "hardcoded: Z Labels tab": 1
-  },
-  "src/app/src/features/Jogging/index.tsx": {
-    "hardcoded: Jog wheel arrows": 1
-  },
-  "src/app/src/features/Keyboard/Keyboard/EditArea.tsx": {
-    "hardcoded: Action": 1,
-    "hardcoded: Cancel": 1,
-    "hardcoded: Current Shortcut": 1,
-    "hardcoded: New Shortcut:": 1,
-    "hardcoded: None": 1,
-    "hardcoded: Press Some Keys...": 1,
-    "hardcoded: Update Shortcut": 1
-  },
-  "src/app/src/features/MachineInfo/index.tsx": {
-    "hardcoded: Machine Information": 1
-  },
-  "src/app/src/features/MachineInfo/MachineInfoDisplay.tsx": {
-    "hardcoded: CNC Modals": 1,
-    "hardcoded: Close machine information": 1,
-    "hardcoded: Current tool:": 1,
-    "hardcoded: Keepout:": 1,
-    "hardcoded: Lock stepper motors": 1,
-    "hardcoded: Machine Information": 1,
-    "hardcoded: Pins": 1
-  },
-  "src/app/src/features/Macros/Macro.tsx": {
-    "hardcoded: No Macros...": 1
-  },
-  "src/app/src/features/Macros/MacroForm.tsx": {
-    "hardcoded: Cancel": 1,
-    "hardcoded: G-code": 1,
-    "hardcoded: Macro Description": 1,
-    "hardcoded: Name": 1
-  },
-  "src/app/src/features/Macros/MacroItem.tsx": {
-    "hardcoded: Delete": 1,
-    "hardcoded: Edit": 1
+    "hardcoded: RPM": 1
   },
   "src/app/src/features/MovementTuning/Steps/AxisSelection.tsx": {
     "hardcoded: Axis to Tune": 1,
@@ -613,13 +353,6 @@
     "hardcoded: By testing for this difference using a marker or\n                                tape and a measuring tape, this tool will better\n                                tune the firmware to your machine.": 1,
     "hardcoded: If you're looking to use your CNC for more\n                                accurate work and notice a specific axis is\n                                always off by a small amount - say 102mm instead\n                                of 100 - then use this tool.": 1,
     "hardcoded: Since CNC firmware needs to understand its\n                                hardware to make exact movements, small\n                                manufacturing variations in the motors, lead\n                                screws, pulleys, or incorrect firmware will\n                                create inaccuracies over longer distances.": 1
-  },
-  "src/app/src/features/NotificationsArea/Header.tsx": {
-    "hardcoded: Clear all notifications": 1,
-    "hardcoded: Notifications": 1
-  },
-  "src/app/src/features/NotificationsArea/NotificationList.tsx": {
-    "hardcoded: No notifications": 1
   },
   "src/app/src/features/Plugins/components/InstallPluginDialog.tsx": {
     "hardcoded: A gSender plugin is a folder holding a": 1,
@@ -827,17 +560,8 @@
     "hardcoded: Pair with QR code": 1,
     "hardcoded: Sending to": 1
   },
-  "src/app/src/features/Spindle/components/LaserControls.tsx": {
-    "hardcoded: Power": 1,
-    "hardcoded: Test Duration:": 1
-  },
-  "src/app/src/features/Spindle/components/ModalToggle.tsx": {
-    "hardcoded: Laser": 1,
-    "hardcoded: Spindle": 1
-  },
   "src/app/src/features/Spindle/components/SpindleControls.tsx": {
-    "hardcoded: RPM": 2,
-    "hardcoded: Speed": 1
+    "hardcoded: RPM": 2
   },
   "src/app/src/features/Squaring/components/ShowJogControls.tsx": {
     "hardcoded: Show Jog Controls": 1
@@ -1009,41 +733,6 @@
     "hardcoded: know your CNCs\n                        exact movement limits accounting for limit switches and\n                        other add-ons, get nicer and faster cuts using your\n                        widest diameter bit, and consider turning off hard and\n                        soft limits so you don't encounter alarms or\n                        errors.": 1,
     "hardcoded: lines)": 1
   },
-  "src/app/src/features/Visualizer/GcodeEditor.tsx": {
-    "hardcoded: G-code Editor": 1,
-    "hardcoded: Jump to line:": 1,
-    "hardcoded: No G-code file loaded": 1,
-    "hardcoded: lines": 1,
-    "hardcoded: selected": 1
-  },
-  "src/app/src/features/Visualizer/GcodeViewer.tsx": {
-    "hardcoded: Detected": 1,
-    "hardcoded: Sample invalid lines found include:": 1,
-    "hardcoded: invalid lines on file load. Your\n                    job may not run correctly.": 1
-  },
-  "src/app/src/features/Visualizer/index.tsx": {
-    "hardcoded: Go to iso view": 1,
-    "hardcoded: It looks like your device doesn't support WebGL": 1,
-    "hardcoded: Move To Here": 1
-  },
-  "src/app/src/features/Visualizer/Loading.tsx": {
-    "hardcoded: Loading...": 1
-  },
-  "src/app/src/features/Visualizer/Placeholder.tsx": {
-    "hardcoded: Detected": 1,
-    "hardcoded: Louis the dog placeholder": 1,
-    "hardcoded: Sample invalid lines found include:": 1,
-    "hardcoded: invalid lines on file load.\n                                Your job may not run correctly.": 1
-  },
-  "src/app/src/features/Visualizer/Rendering.tsx": {
-    "hardcoded: Rendering": 1
-  },
-  "src/app/src/features/Visualizer/SoftLimitsWarningArea.tsx": {
-    "hardcoded: Warning: Cut will leave soft limits!": 1
-  },
-  "src/app/src/features/WorkspaceSelector/index.tsx": {
-    "hardcoded: Workspace:": 1
-  },
   "src/app/src/routes/tools.tsx": {
     "hardcoded: Tools": 1,
     "hardcoded: Tools are plugins that can be installed and used to extend the\n                functionality of gSender. Some are built in to gSender, some are\n                third party plugins. Star a tool to pin it to the top.": 1
@@ -1071,27 +760,6 @@
     "hardcoded: Ensure that your router/spindle is turned\n                                    off and has fully stopped spinning then jog\n                                    your machine to your": 1,
     "hardcoded: above the probe\n                                    location, attach the magnet, and prepare to\n                                    probe": 1,
     "hardcoded: using\n                                    the jog controls.": 1
-  },
-  "src/app/src/workspace/Alerts/JobEndModal.tsx": {
-    "hardcoded: Errors:": 1,
-    "hardcoded: None": 1,
-    "hardcoded: Status:": 1,
-    "hardcoded: Time:": 1
-  },
-  "src/app/src/workspace/Alerts/MaintenanceAlert.tsx": {
-    "hardcoded: Click 'Reset Timers' to reset the timers on ALL\n                            listed tasks. Click 'Close' to close the popup and\n                            do nothing.": 1,
-    "hardcoded: Close": 1,
-    "hardcoded: Reset Timers": 1,
-    "hardcoded: The following maintenance tasks are due:": 1
-  },
-  "src/app/src/workspace/index.tsx": {
-    "hardcoded: Skip to main content": 1
-  },
-  "src/app/src/workspace/PortraitMacroBar/index.tsx": {
-    "hardcoded: Drag to reorder": 1
-  },
-  "src/app/src/workspace/PrimaryArea/index.tsx": {
-    "hardcoded: Vizualizer": 1
   },
   "src/pendant/src/components/ATCPanel.tsx": {
     "hardcoded: No tool changes in loaded file.": 1,

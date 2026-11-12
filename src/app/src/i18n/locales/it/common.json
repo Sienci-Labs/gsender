@@ -11,7 +11,9 @@
     "ok": "OK",
     "reset": "Ripristina",
     "save": "Salva",
-    "yes": "Sì"
+    "yes": "Sì",
+    "copyToClipboard": "Copia negli appunti",
+    "goBack": "Indietro"
   },
   "language": {
     "label": "Lingua",
@@ -37,5 +39,110 @@
     "disconnected": "Disconnesso",
     "toolChange": "Cambio utensile",
     "door": "Sportello"
+  },
+  "pluginToolCard": {
+    "plugin": "Plugin",
+    "official": "Ufficiale",
+    "community": "Community"
+  },
+  "rangeSlider": {
+    "resetTooltip": "Ripristina override al 100%",
+    "resetLabel": "Ripristina override {{title}} al 100%",
+    "decreaseTooltip": "Riduci override {{title}} del {{step}}%",
+    "decreaseLabel": "Riduci override {{title}}",
+    "increaseTooltip": "Aumenta override {{title}} del {{step}}%",
+    "increaseLabel": "Aumenta override {{title}}"
+  },
+  "table": {
+    "searchPlaceholder": "Cerca in tutte le colonne...",
+    "addNew": "Aggiungi",
+    "addNewTask": "Aggiungi attività",
+    "resetAll": "Ripristina tutto",
+    "jumpToPage": "Vai alla pagina:",
+    "entriesPerPage": "Voci/pagina:",
+    "showCount": "Mostra {{size}}"
+  },
+  "status": {
+    "offUpper": "OFF",
+    "onUpper": "ON",
+    "loading": "Caricamento",
+    "on": "On",
+    "off": "Off"
+  },
+  "spindleLaser": {
+    "spindle": "Mandrino",
+    "laser": "Laser"
+  },
+  "toggle": {
+    "label": "Attiva/disattiva"
+  },
+  "tabs": {
+    "scrollLeft": "Scorri schede a sinistra",
+    "widgetTabs": "Schede widget",
+    "scrollRight": "Scorri schede a destra"
+  },
+  "toolCard": {
+    "unpinTool": "Sgancia strumento",
+    "pinToTop": "Fissa in alto"
+  },
+  "updateAlert": {
+    "title": "Funzione in sviluppo",
+    "description": "Aspetto e funzionalità di quest'area verranno aggiornati in una versione successiva."
+  },
+  "wizard": {
+    "allStepsComplete": "Tutti i passaggi completati",
+    "stepOf": "Passaggio {{step}} di {{total}}",
+    "percentComplete": "{{percent}}% completato",
+    "exit": "Esci",
+    "restartHome": "Torna all'inizio",
+    "secondaryContentAlt": "Contenuto secondario",
+    "onlineResources": "risorse online",
+    "scanQrCode": "Scansiona il codice QR",
+    "runningLabel": "{{label}}...",
+    "complete": "Completato",
+    "error": "Errore",
+    "success": "Riuscito",
+    "validation": {
+      "failed": "Convalida non riuscita",
+      "notConnected": "Il controller non è connesso. Connettiti alla CNC per configurare questo accessorio.",
+      "notHomed": "Homing della macchina non eseguito. Esegui l'homing prima di procedere con la configurazione dell'accessorio.",
+      "requiresGrblHal": "Per usare questa procedura guidata devi essere connesso a un dispositivo grblHAL.",
+      "requiresGrbl": "Per usare questa procedura guidata devi essere connesso a un dispositivo grbl.",
+      "notIdle": "Per usare questa procedura guidata la macchina deve essere inattiva o in jog."
+    },
+    "configFileVersion": "Versione file di configurazione: {{version}}",
+    "exitWizard": "Esci dalla procedura",
+    "restartWizard": "Riavvia procedura",
+    "previous": "Indietro",
+    "next": "Avanti",
+    "backToWizards": "Torna alle procedure",
+    "backToTools": "Torna agli strumenti",
+    "estimatedTime": "Tempo stimato:",
+    "imageAlt": "Immagine della procedura",
+    "needHelp": "Serve aiuto?",
+    "hub": {
+      "defaultTitle": "Procedure guidate accessori CNC",
+      "configurationCount_many": "{{count}} configurazioni",
+      "configurationCount_one": "{{count}} configurazione",
+      "configurationCount_other": "{{count}} configurazioni",
+      "totalSteps_many": "{{count}} passaggi totali",
+      "totalSteps_one": "{{count}} passaggio totale",
+      "totalSteps_other": "{{count}} passaggi totali",
+      "startWizard": "Avvia procedura",
+      "noWizards": "Nessuna procedura disponibile"
+    }
+  },
+  "carousel": {
+    "roleDescription": "carosello",
+    "slideRoleDescription": "diapositiva",
+    "previousSlide": "Diapositiva precedente",
+    "nextSlide": "Diapositiva successiva"
+  },
+  "select": {
+    "scrollUp": "Scorri su",
+    "scrollDown": "Scorri giù"
+  },
+  "toast": {
+    "dismiss": "Chiudi notifica"
   }
 }

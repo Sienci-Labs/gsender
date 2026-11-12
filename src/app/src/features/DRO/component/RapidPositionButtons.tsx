@@ -7,6 +7,7 @@ import {
     FRONT_RIGHT,
     getMovementGCode,
 } from 'app/features/DRO/utils/RapidPosition';
+import { useAppTranslation } from 'app/i18n';
 
 import controller from 'app/lib/controller.ts';
 import type { RootState } from 'app/store/redux';
@@ -15,6 +16,7 @@ import cn from 'classnames';
 import get from 'lodash/get';
 import { useSelector } from 'react-redux';
 export function RapidPositionButtons({ disabled = false }) {
+    const { t } = useAppTranslation();
     const homingFlag = useSelector(
         (state: RootState) => state.controller.homingFlag,
     );
@@ -58,14 +60,17 @@ export function RapidPositionButtons({ disabled = false }) {
     return (
         <div className="justify-center items-center text-blue-600 dark:text-blue-400 rapidButtonTransform portrait:rapidButtonTransformPortrait portrait:ml-24 ml-16 max-xl:-mt-[8px] max-xl:-mb-[8px]">
             <div className="grid grid-cols-2 w-16 h-14 portrait:w-20 portrait:h-[68px] font-bold">
-                <Tooltip content="Go to Back Left Corner" side="top">
+                <Tooltip
+                    content={t('workspace:dro.rapidPosition.backLeft')}
+                    side="top"
+                >
                     <svg
                         viewBox="0 0 37 34"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         role="button"
                         tabIndex={disabled ? -1 : 0}
-                        aria-label="Go to Back Left Corner"
+                        aria-label={t('workspace:dro.rapidPosition.backLeft')}
                         className={cx('h-full w-full', {
                             'cursor-pointer': !isDisabled,
                             'cursor-not-allowed': isDisabled,
@@ -90,14 +95,17 @@ export function RapidPositionButtons({ disabled = false }) {
                     </svg>
                 </Tooltip>
 
-                <Tooltip content="Go to Back Right Corner" side="top">
+                <Tooltip
+                    content={t('workspace:dro.rapidPosition.backRight')}
+                    side="top"
+                >
                     <svg
                         viewBox="0 0 27 34"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         role="button"
                         tabIndex={disabled ? -1 : 0}
-                        aria-label="Go to Back Right Corner"
+                        aria-label={t('workspace:dro.rapidPosition.backRight')}
                         className={cx('h-full w-full', {
                             'cursor-pointer': !isDisabled,
                             'cursor-not-allowed': isDisabled,
@@ -123,14 +131,17 @@ export function RapidPositionButtons({ disabled = false }) {
                     </svg>
                 </Tooltip>
 
-                <Tooltip content="Go to Front Left Corner" side="bottom">
+                <Tooltip
+                    content={t('workspace:dro.rapidPosition.frontLeft')}
+                    side="bottom"
+                >
                     <svg
                         viewBox="0 0 37 33"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         role="button"
                         tabIndex={disabled ? -1 : 0}
-                        aria-label="Go to Front Left Corner"
+                        aria-label={t('workspace:dro.rapidPosition.frontLeft')}
                         className={cx('h-full w-full', {
                             'cursor-pointer': !isDisabled,
                             'cursor-not-allowed': isDisabled,
@@ -156,14 +167,17 @@ export function RapidPositionButtons({ disabled = false }) {
                     </svg>
                 </Tooltip>
 
-                <Tooltip content="Go to Front Right Corner" side="bottom">
+                <Tooltip
+                    content={t('workspace:dro.rapidPosition.frontRight')}
+                    side="bottom"
+                >
                     <svg
                         viewBox="0 0 27 33"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         role="button"
                         tabIndex={disabled ? -1 : 0}
-                        aria-label="Go to Front Right Corner"
+                        aria-label={t('workspace:dro.rapidPosition.frontRight')}
                         className={cx('h-full w-full', {
                             'cursor-pointer': !isDisabled,
                             'cursor-not-allowed': isDisabled,

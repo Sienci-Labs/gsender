@@ -18,6 +18,7 @@ import {
     homeAxis,
 } from 'app/features/DRO/utils/DRO.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+import { useAppTranslation } from 'app/i18n';
 import { gotoZero, zeroWCS } from '../utils/DRO.ts';
 
 interface AxisRowProps {
@@ -41,6 +42,7 @@ export function AxisRow({
     disablePositionUpdate,
     disableGotoZero,
 }: AxisRowProps) {
+    const { t } = useAppTranslation();
     const { shouldWarnZero } = useWorkspaceState();
     const posthog = usePostHog();
 
@@ -64,13 +66,23 @@ export function AxisRow({
                     disabled={disabled}
                     variant={homingMode ? 'alt' : 'secondary'}
                     tooltip={{
-                        content: `${homingMode ? 'Home' : 'Zero'} your ${label}-axis`,
+                        content: homingMode
+                            ? t('workspace:dro.axisRow.homeTooltip', {
+                                  axis: label,
+                              })
+                            : t('workspace:dro.axisRow.zeroTooltip', {
+                                  axis: label,
+                              }),
                         side: 'left',
                     }}
                     aria-label={
                         homingMode
-                            ? `Home ${label} axis: Move to physical machine limit`
-                            : `Zero ${label} axis: Set current position as work zero`
+                            ? t('workspace:dro.axisRow.homeAriaLabel', {
+                                  axis: label,
+                              })
+                            : t('workspace:dro.axisRow.zeroAriaLabel', {
+                                  axis: label,
+                              })
                     }
                 >
                     <span className="font-bold font-mono text-xl transition-all transition-duration-300">
@@ -84,7 +96,9 @@ export function AxisRow({
                             disabled={disabled}
                             variant="secondary"
                             size="sm"
-                            aria-label={`Zero ${label} axis`}
+                            aria-label={t('workspace:dro.axisRow.zeroAxis', {
+                                axis: label,
+                            })}
                         >
                             <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                                 {`${label}0`}
@@ -94,14 +108,20 @@ export function AxisRow({
                     <AlertDialogContent className="bg-white">
                         <AlertDialogHeader>
                             <AlertDialogTitle>
-                                Zero {label} Axis
+                                {t('workspace:dro.axisRow.confirmTitle', {
+                                    axis: label,
+                                })}
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                                Are you sure you want to zero the {label} axis?
+                                {t('workspace:dro.axisRow.confirmContent', {
+                                    axis: label,
+                                })}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>
+                                {t('common:actions.cancel')}
+                            </AlertDialogCancel>
                             <AlertDialogAction
                                 onClick={() => {
                                     zeroWCS(label, 0);
@@ -111,7 +131,7 @@ export function AxisRow({
                                     });
                                 }}
                             >
-                                Continue
+                                {t('common:actions.continue')}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
@@ -141,9 +161,13 @@ export function AxisRow({
                 variant="alt"
                 size="responsive"
                 tooltip={{
-                    content: `Go to ${label}-axis zero`,
+                    content: t('workspace:dro.axisRow.goToZeroTooltip', {
+                        axis: label,
+                    }),
                 }}
-                aria-label={`Go to ${label} axis zero: Move axis to its current work zero position`}
+                aria-label={t('workspace:dro.axisRow.goToZeroAriaLabel', {
+                    axis: label,
+                })}
             >
                 <span className="text-lg font-mono">{label}</span>
             </Button>

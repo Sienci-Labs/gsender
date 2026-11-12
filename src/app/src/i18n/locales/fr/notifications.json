@@ -276,7 +276,14 @@
     "unsupportedGcode_one": "{{count}} ligne de G-code non prise en charge par GRBL a été trouvée dans ce fichier. Votre travail risque de ne pas s'exécuter correctement.",
     "unsupportedGcode_other": "{{count}} lignes de G-code non prises en charge par GRBL ont été trouvées dans ce fichier. Votre travail risque de ne pas s'exécuter correctement.",
     "grblHalOnlyShortcut": "Impossible d'activer le raccourci réservé à grblHAL",
-    "unsupportedGcode_many": "{{count}} lignes de G-code non prises en charge par GRBL ont été trouvées dans ce fichier. Votre travail risque de ne pas s'exécuter correctement."
+    "unsupportedGcode_many": "{{count}} lignes de G-code non prises en charge par GRBL ont été trouvées dans ce fichier. Votre travail risque de ne pas s'exécuter correctement.",
+    "invalidLines": {
+      "description_many": "{{count}} lignes non valides détectées au chargement du fichier. Votre travail risque de ne pas s'exécuter correctement.",
+      "description_one": "{{count}} ligne non valide détectée au chargement du fichier. Votre travail risque de ne pas s'exécuter correctement.",
+      "description_other": "{{count}} lignes non valides détectées au chargement du fichier. Votre travail risque de ne pas s'exécuter correctement.",
+      "sample": "Exemples de lignes non valides trouvées :",
+      "title": "Lignes non valides détectées"
+    }
   },
   "workspace": {
     "modeSetDefault": "Mode d'espace de travail défini sur Par défaut",

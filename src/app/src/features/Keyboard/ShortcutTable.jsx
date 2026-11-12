@@ -1,8 +1,11 @@
+import { useAppTranslation } from 'app/i18n';
 import store from 'app/store';
 import uniqueId from 'lodash/uniqueId';
 import React, { useEffect, useState } from 'react';
+import { getCategoryLabel, getShortcutTitle } from './shortcutLabels';
 
 function ShortcutTable({ forwardRef }) {
+    const { t } = useAppTranslation();
     const [shortcuts, setShortcuts] = useState([{}]);
 
     useEffect(() => {
@@ -19,27 +22,33 @@ function ShortcutTable({ forwardRef }) {
                     <thead>
                         <tr>
                             <th className="bg-[#1f2937] font-extrabold text-white w-1/2 border border-solid">
-                                Action
+                                {t('workspace:keyboard.table.action')}
                             </th>
                             <th className="bg-[#1f2937] font-extrabold text-white w-1/2 border border-solid">
-                                Shortcut
+                                {t('workspace:keyboard.table.shortcut')}
                             </th>
                             <th className="bg-[#1f2937] font-extrabold text-white w-1/2 border border-solid">
-                                Category
+                                {t('workspace:keyboard.table.category')}
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         {shortcuts.map((shortcut, i) => {
-                            const { title, keys, category } = shortcut;
+                            const { cmd, title, keys, category } = shortcut;
                             return keys ? (
                                 <tr
                                     key={`${title}-${uniqueId()}`}
                                     className="border-b border-dotted border-[#BDB76B]"
                                 >
-                                    <td>{title || '-'}</td>
+                                    <td>
+                                        {getShortcutTitle(cmd, title) || '-'}
+                                    </td>
                                     <td>{keys || '-'}</td>
-                                    <td>{category || '-'}</td>
+                                    <td>
+                                        {category
+                                            ? getCategoryLabel(category)
+                                            : '-'}
+                                    </td>
                                 </tr>
                             ) : null;
                         })}

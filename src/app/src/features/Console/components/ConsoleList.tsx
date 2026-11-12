@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { ArrowDown } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
@@ -55,6 +56,7 @@ function followOutput(atBottom: boolean) {
 }
 
 function ConsoleLog({ messages }: { messages: ConsoleMessage[] }) {
+    const { t } = useAppTranslation();
     const virtuosoRef = useRef<VirtuosoHandle>(null);
     const [isAtBottom, setIsAtBottom] = useState(true);
     const hideFabTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -122,7 +124,7 @@ function ConsoleLog({ messages }: { messages: ConsoleMessage[] }) {
                 <button
                     type="button"
                     onClick={scrollToLatest}
-                    aria-label="Scroll to latest message"
+                    aria-label={t('workspace:console.scrollToLatest')}
                     className="absolute bottom-2 right-3 flex items-center justify-center w-11 h-11 rounded-full shadow-lg bg-robin-500 text-white hover:bg-robin-600 active:bg-robin-700"
                 >
                     <ArrowDown className="w-4 h-4" />
@@ -143,6 +145,7 @@ export function ConsoleList({
     isActive = true,
     isFiltered = false,
 }: Props) {
+    const { t } = useAppTranslation();
     // The tool tabs stay mounted and hide with display:none, where Virtuoso
     // measures a zero-height viewport. Keeping it unmounted while hidden means
     // it always mounts against a laid-out box, and re-enters on the newest
@@ -156,8 +159,8 @@ export function ConsoleList({
             <div className={`flex items-center justify-center ${SURFACE}`}>
                 <span className="console-text text-xs italic text-content-muted">
                     {isFiltered
-                        ? 'No messages match this filter'
-                        : 'No console output yet'}
+                        ? t('workspace:console.noMatchingMessages')
+                        : t('workspace:console.noOutput')}
                 </span>
             </div>
         );

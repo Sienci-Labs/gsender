@@ -9,6 +9,7 @@ import {
 } from 'app/components/shadcn/Dialog';
 import { Input } from 'app/components/shadcn/Input';
 import Tooltip from 'app/components/Tooltip';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { getThemeCssColor } from 'app/lib/getThemeCssColor';
 import { type ChangeEvent, type FormEvent, useRef, useState } from 'react';
 import Select from 'react-select';
@@ -62,6 +63,7 @@ const MacroForm = ({
     submitLabel,
     allowEmptyContent = false,
 }: MacroFormProps) => {
+    const { t } = useAppTranslation();
     const [macroState, setMacroState] = useState<MacroState>({
         name: macroName,
         content: macroContent,
@@ -89,7 +91,8 @@ const MacroForm = ({
 
     const options = MACRO_VARIABLES.reduce((acc: any[], v: any) => {
         if (typeof v === 'object') {
-            const { group, text } = v;
+            const { text } = v;
+            const group = translateKey(v.group);
             if (v.type === 'header') {
                 acc.push({ label: text, options: [] });
             } else {
@@ -125,11 +128,11 @@ const MacroForm = ({
                     </DialogHeader>
                     <DialogDescription className="mt-1 mb-4 text-sm text-gray-600">
                         {dialogDescription ??
-                            'Macros are a way to store and reuse commands. They can be used to speed up repetitive tasks and make your CNC more efficient.'}
+                            t('workspace:macros.form.defaultDescription')}
                     </DialogDescription>
                     {showNameField && (
                         <div className="flex flex-col gap-2 mb-4">
-                            <label>Name</label>
+                            <label>{t('workspace:macros.form.name')}</label>
                             <Input
                                 ref={nameRef}
                                 maxLength={MAX_CHARACTERS}
@@ -143,7 +146,7 @@ const MacroForm = ({
                     )}
                     <div className="flex flex-col gap-2 mb-4">
                         <div className="flex flex-row gap-2 items-center justify-between">
-                            <label>G-code</label>
+                            <label>{t('workspace:macros.form.gcode')}</label>
                             <Select<OptionType>
                                 options={options}
                                 onChange={(selectedOption: OptionType) => {
@@ -160,7 +163,9 @@ const MacroForm = ({
                                     }
                                 }}
                                 className="w-1/2"
-                                placeholder="Variables"
+                                placeholder={t(
+                                    'workspace:macros.form.variables',
+                                )}
                                 value={null}
                                 styles={{
                                     option: (
@@ -288,7 +293,9 @@ const MacroForm = ({
                             />
                         </div>
 
-                        <Tooltip content="Add your g-code here. Use the variables or JavaScript logic to create more complex commands.">
+                        <Tooltip
+                            content={t('workspace:macros.form.gcodeTooltip')}
+                        >
                             <textarea
                                 ref={contentRef}
                                 rows={10}
@@ -303,7 +310,9 @@ const MacroForm = ({
                     </div>
                     {showDescriptionField && (
                         <div className="flex flex-col gap-2 mb-4">
-                            <label>Macro Description</label>
+                            <label>
+                                {t('workspace:macros.form.description')}
+                            </label>
                             <textarea
                                 ref={descriptionRef}
                                 rows={4}
@@ -335,7 +344,9 @@ const MacroForm = ({
                         >
                             {submitLabel}
                         </Button>
-                        <Button onClick={onCancel}>Cancel</Button>
+                        <Button onClick={onCancel}>
+                            {t('common:actions.cancel')}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -34,7 +34,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { Button } from 'app/components/shadcn/Button';
 import type { MaintenanceTask } from 'app/features/Stats/utils/StatContext';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import chainedFunction from 'chained-function';
 import uniqueId from 'lodash/uniqueId';
@@ -53,6 +53,7 @@ const MaintenanceAlert: React.FC<Props> = ({
     setShowModal,
     onClose,
 }) => {
+    const { t } = useAppTranslation();
     const alertTasks: MaintenanceTask[] = [];
     tasks.forEach((task: MaintenanceTask) => {
         const { rangeStart, currentTime } = task;
@@ -65,9 +66,11 @@ const MaintenanceAlert: React.FC<Props> = ({
         <AlertDialog open={showModal} onOpenChange={setShowModal}>
             <AlertDialogContent className="bg-slate-200">
                 <AlertDialogHeader className="flex justify-between items-center">
-                    <AlertDialogTitle>Maintenance Alert</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        {t('workspace:alerts.maintenance.title')}
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                        <p>{'The following maintenance tasks are due:'}</p>
+                        <p>{t('workspace:alerts.maintenance.tasksDue')}</p>
                         <span className="flex flex-col overflow-y-auto border border-slate-400 m-3">
                             {alertTasks.map((task) => {
                                 return (
@@ -77,11 +80,7 @@ const MaintenanceAlert: React.FC<Props> = ({
                                 );
                             })}
                         </span>
-                        <p>
-                            Click 'Reset Timers' to reset the timers on ALL
-                            listed tasks. Click 'Close' to close the popup and
-                            do nothing.
-                        </p>
+                        <p>{t('workspace:alerts.maintenance.instructions')}</p>
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -126,11 +125,13 @@ const MaintenanceAlert: React.FC<Props> = ({
                                     });
                             }, onClose)}
                         >
-                            {'Reset Timers'}
+                            {t('workspace:alerts.maintenance.resetTimers')}
                         </Button>
                     </AlertDialogAction>
                     <AlertDialogCancel>
-                        <Button onClick={onClose}>{'Close'}</Button>
+                        <Button onClick={onClose}>
+                            {t('common:actions.close')}
+                        </Button>
                     </AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>

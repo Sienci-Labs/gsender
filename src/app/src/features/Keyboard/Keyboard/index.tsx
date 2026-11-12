@@ -44,7 +44,7 @@ import {
     TOOLBAR_CATEGORY,
     VISUALIZER_CATEGORY,
 } from 'app/constants';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import combokeys from 'app/lib/combokeys';
 import type {
     CommandKey,
@@ -74,6 +74,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import CategoryFilter from '../CategoryFilter';
 import ShortcutsTable from '../ShortcutsTable';
+import { getCategoryLabel, getShortcutTitle } from '../shortcutLabels';
 import { generateList } from '../utils';
 import EditArea from './EditArea';
 
@@ -84,6 +85,7 @@ type ShortcutByCategory = CommandKey & { title: string; category: string };
  * @prop {Boolean} active Check if this page is currently active or not
  */
 const Keyboard = () => {
+    const { t } = useAppTranslation();
     const [shortcutsList, setShortcutsList] = useState<CommandKeys>(
         store.get('commandKeys', {}),
     );
@@ -123,9 +125,10 @@ const Keyboard = () => {
             color:
                 categoryColors[category as keyof typeof categoryColors] ||
                 'bg-gray-100 text-gray-800',
-            label:
+            label: getCategoryLabel(
                 SHORTCUT_CATEGORY[category as keyof typeof SHORTCUT_CATEGORY] ||
-                category,
+                    category,
+            ),
         };
     };
 
@@ -445,7 +448,10 @@ const Keyboard = () => {
                 }
                 shortcutsByCategory[categoryName].push({
                     ...shortcut,
-                    title: (shortcutData as ShuttleEvent).title || shortcut.cmd, // title is a migration
+                    title: getShortcutTitle(
+                        shortcut.cmd,
+                        (shortcutData as ShuttleEvent).title || shortcut.cmd, // title is a migration
+                    ),
                     category: categoryKey,
                 });
             });
@@ -469,8 +475,8 @@ const Keyboard = () => {
 
             let printContent = `
                 <div class="header">
-                    <h1>gSender Keyboard Shortcuts</h1>
-                    <p class="subtitle">Generated on ${new Date().toLocaleDateString()}</p>
+                    <h1>${t('workspace:keyboard.print.heading')}</h1>
+                    <p class="subtitle">${t('workspace:keyboard.print.generatedOn', { date: new Date().toLocaleDateString() })}</p>
                 </div>
             `;
 
@@ -515,7 +521,7 @@ const Keyboard = () => {
                     <!DOCTYPE html>
                     <html>
                     <head>
-                        <title>Keyboard Shortcuts</title>
+                        <title>${t('workspace:keyboard.print.documentTitle')}</title>
                         <style>
                             body {
                                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -697,17 +703,21 @@ const Keyboard = () => {
                     <Button
                         onClick={handleImportShortcuts}
                         icon={<DownloadIcon size={16} />}
-                        text="Import"
+                        text={t('workspace:keyboard.actions.import')}
                         tooltip={{
-                            content: 'Import shortcuts from a file',
+                            content: t(
+                                'workspace:keyboard.actions.importTooltip',
+                            ),
                         }}
                     />
                     <Button
                         onClick={handleExportShortcuts}
                         icon={<UploadIcon size={16} />}
-                        text="Export"
+                        text={t('workspace:keyboard.actions.export')}
                         tooltip={{
-                            content: 'Export shortcuts to a file',
+                            content: t(
+                                'workspace:keyboard.actions.exportTooltip',
+                            ),
                         }}
                     />
                 </div>
@@ -716,26 +726,32 @@ const Keyboard = () => {
                         onClick={enableAllShortcuts}
                         disabled={allShortcutsEnabled}
                         icon={<ToggleRightIcon size={16} />}
-                        text="Enable All"
+                        text={t('workspace:keyboard.actions.enableAll')}
                         tooltip={{
-                            content: 'Enable all shortcuts',
+                            content: t(
+                                'workspace:keyboard.actions.enableAllTooltip',
+                            ),
                         }}
                     />
                     <Button
                         onClick={disableAllShortcuts}
                         disabled={allShortcutsDisabled}
                         icon={<ToggleLeftIcon size={16} />}
-                        text="Disable All"
+                        text={t('workspace:keyboard.actions.disableAll')}
                         tooltip={{
-                            content: 'Disable all shortcuts',
+                            content: t(
+                                'workspace:keyboard.actions.disableAllTooltip',
+                            ),
                         }}
                     />
                     <Button
                         onClick={handlePrintShortcuts}
                         icon={<PrinterIcon size={16} />}
-                        text="Print"
+                        text={t('workspace:keyboard.actions.print')}
                         tooltip={{
-                            content: 'Print shortcuts',
+                            content: t(
+                                'workspace:keyboard.actions.printTooltip',
+                            ),
                         }}
                     />
                 </div>
@@ -748,10 +764,12 @@ const Keyboard = () => {
                 >
                     <DialogContent className="p-6 w-3/4 max-w-[800px]">
                         <DialogHeader>
-                            <DialogTitle>Edit Shortcut</DialogTitle>
+                            <DialogTitle>
+                                {t('workspace:keyboard.editDialog.title')}
+                            </DialogTitle>
 
                             <DialogDescription>
-                                Update the keybinding for this shortcut
+                                {t('workspace:keyboard.editDialog.description')}
                             </DialogDescription>
                         </DialogHeader>
 

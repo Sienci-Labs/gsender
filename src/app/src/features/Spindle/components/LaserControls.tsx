@@ -26,6 +26,7 @@ import { ControlledInput } from 'app/components/ControlledInput';
 import { Slider } from 'app/components/shadcn/Slider';
 import Tooltip from 'app/components/Tooltip';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import type React from 'react';
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import type { SendM5Type } from '../definitions';
@@ -55,6 +56,7 @@ interface LaserActions {
 }
 
 const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
+    const { t } = useAppTranslation();
     const { laser } = state;
     const { spindle } = useTypedSelector((state) => state.controller.modal);
 
@@ -66,34 +68,40 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                 <ActiveStateButton
                     onClick={actions.sendLaserM3}
                     icon={<FaLightbulb />}
-                    text="Laser On"
+                    text={t('workspace:spindle.laser.on')}
                     active={isConnected && laserIsOn}
                     size={'sm'}
                     disabled={!canClick}
-                    tooltip={{ content: 'Turn on laser' }}
+                    tooltip={{
+                        content: t('workspace:spindle.laser.onTooltip'),
+                    }}
                 />
                 <ActiveStateButton
                     onClick={actions.runLaserTest}
                     icon={<FaSatelliteDish />}
-                    text="Laser Test"
+                    text={t('workspace:spindle.laser.test')}
                     size={'sm'}
                     disabled={!canClick}
                     tooltip={{
-                        content: 'Turn on laser for Test Duration',
+                        content: t('workspace:spindle.laser.testTooltip'),
                     }}
                 />
                 <ActiveStateButton
                     onClick={() => actions.sendM5({ type: 'laser' })}
                     icon={<FaRegLightbulb />}
-                    text="Off"
+                    text={t('workspace:spindle.laser.off')}
                     size={'sm'}
                     disabled={!canClick}
-                    tooltip={{ content: 'Turn off laser' }}
+                    tooltip={{
+                        content: t('workspace:spindle.laser.offTooltip'),
+                    }}
                 />
             </div>
             <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-content-primary">
-                <span className="text-right">Power</span>
-                <Tooltip content="Adjust laser power">
+                <span className="text-right">
+                    {t('workspace:spindle.laser.power')}
+                </span>
+                <Tooltip content={t('workspace:spindle.laser.adjustPower')}>
                     <Slider
                         value={[laser.power]}
                         max={100}
@@ -102,24 +110,30 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                             actions.handleLaserPowerChange(value[0])
                         }
                         disabled={!canClick}
-                        aria-label="Adjust laser power"
+                        aria-label={t('workspace:spindle.laser.adjustPower')}
                     />
                 </Tooltip>
                 <span>{laser.power}%</span>
             </div>
             <div className="flex gap-2 justify-center items-center mt-1 dark:text-content-primary">
-                <label htmlFor="laser-test-duration">Test Duration:</label>
+                <label htmlFor="laser-test-duration">
+                    {t('workspace:spindle.laser.testDurationLabel')}
+                </label>
                 <div className="flex gap-2">
-                    <Tooltip content="Laser test duration">
+                    <Tooltip
+                        content={t('workspace:spindle.laser.testDuration')}
+                    >
                         <ControlledInput
                             id="laser-test-duration"
                             value={laser.duration}
                             onChange={actions.handleLaserDurationChange}
                             className="z-0 text-center text-blue-600 dark:text-blue-400 text-xl"
-                            suffix="sec"
+                            suffix={t('workspace:spindle.laser.secondsSuffix')}
                             type="number"
                             sizing="xs"
-                            aria-label="Laser test duration"
+                            aria-label={t(
+                                'workspace:spindle.laser.testDuration',
+                            )}
                         />
                     </Tooltip>
                 </div>

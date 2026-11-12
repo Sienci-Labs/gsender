@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { useRef } from 'react';
 
 import SpinningDrill from './assets/loading-spinning-bit.gif';
@@ -14,6 +15,7 @@ const WoodcuttingProgress = ({
     percentage,
     isPaused = false,
 }: WoodcuttingProgressProps) => {
+    const { t } = useAppTranslation();
     const drillImageRef = useRef<HTMLImageElement>(null);
 
     // Use static SVG when paused, animated GIF when running
@@ -41,7 +43,7 @@ const WoodcuttingProgress = ({
 
             <img
                 src={currentDrillSrc}
-                alt="Spinning Drill"
+                alt={t('workspace:jobControl.progress.spinningDrill')}
                 className="absolute top-1/2 w-8 h-auto transition-all duration-100 -translate-y-1/2 z-10 brightness-[0.8]"
                 style={{
                     left: `calc(${percentage}% - ${drillImageRef.current?.offsetWidth}px + 6px)`,

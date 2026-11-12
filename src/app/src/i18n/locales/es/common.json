@@ -11,7 +11,9 @@
     "ok": "Aceptar",
     "reset": "Restablecer",
     "save": "Guardar",
-    "yes": "Sí"
+    "yes": "Sí",
+    "copyToClipboard": "Copiar al portapapeles",
+    "goBack": "Volver"
   },
   "language": {
     "label": "Idioma",
@@ -37,5 +39,110 @@
     "disconnected": "Desconectado",
     "toolChange": "Cambio de herramienta",
     "door": "Puerta"
+  },
+  "pluginToolCard": {
+    "plugin": "Plugin",
+    "official": "Oficial",
+    "community": "Comunidad"
+  },
+  "rangeSlider": {
+    "resetTooltip": "Restablecer ajuste al 100%",
+    "resetLabel": "Restablecer ajuste de {{title}} al 100%",
+    "decreaseTooltip": "Reducir ajuste de {{title}} en {{step}}%",
+    "decreaseLabel": "Reducir ajuste de {{title}}",
+    "increaseTooltip": "Aumentar ajuste de {{title}} en {{step}}%",
+    "increaseLabel": "Aumentar ajuste de {{title}}"
+  },
+  "table": {
+    "searchPlaceholder": "Buscar en todas las columnas...",
+    "addNew": "Añadir nuevo",
+    "addNewTask": "Añadir nueva tarea",
+    "resetAll": "Restablecer todo",
+    "jumpToPage": "Ir a la página:",
+    "entriesPerPage": "Entradas/página:",
+    "showCount": "Mostrar {{size}}"
+  },
+  "status": {
+    "offUpper": "APAGADO",
+    "onUpper": "ENCENDIDO",
+    "loading": "Cargando",
+    "on": "Encendido",
+    "off": "Apagado"
+  },
+  "spindleLaser": {
+    "spindle": "Husillo",
+    "laser": "Láser"
+  },
+  "toggle": {
+    "label": "Alternar"
+  },
+  "tabs": {
+    "scrollLeft": "Desplazar pestañas a la izquierda",
+    "widgetTabs": "Pestañas de widgets",
+    "scrollRight": "Desplazar pestañas a la derecha"
+  },
+  "toolCard": {
+    "unpinTool": "Desanclar herramienta",
+    "pinToTop": "Anclar arriba"
+  },
+  "updateAlert": {
+    "title": "Función en desarrollo",
+    "description": "El aspecto y la funcionalidad de esta área se actualizarán en una versión posterior."
+  },
+  "wizard": {
+    "allStepsComplete": "Todos los pasos completados",
+    "stepOf": "Paso {{step}} de {{total}}",
+    "percentComplete": "{{percent}}% completado",
+    "exit": "Salir",
+    "restartHome": "Volver al inicio",
+    "secondaryContentAlt": "Contenido secundario",
+    "onlineResources": "recursos en línea",
+    "scanQrCode": "Escanear código QR",
+    "runningLabel": "{{label}}...",
+    "complete": "Completado",
+    "error": "Error",
+    "success": "Éxito",
+    "validation": {
+      "failed": "La validación falló",
+      "notConnected": "Tu controlador no está conectado. Conéctate a tu CNC para configurar este accesorio.",
+      "notHomed": "La máquina no ha hecho homing. Haz el homing de la máquina antes de configurar el accesorio.",
+      "requiresGrblHal": "Debes estar conectado a un dispositivo grblHAL para usar este asistente.",
+      "requiresGrbl": "Debes estar conectado a un dispositivo Grbl para usar este asistente.",
+      "notIdle": "Tu máquina debe estar inactiva o desplazándose para usar este asistente."
+    },
+    "configFileVersion": "Versión del archivo de configuración: {{version}}",
+    "exitWizard": "Salir del asistente",
+    "restartWizard": "Reiniciar asistente",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "backToWizards": "Volver a asistentes",
+    "backToTools": "Volver a herramientas",
+    "estimatedTime": "Tiempo estimado:",
+    "imageAlt": "Imagen del asistente",
+    "needHelp": "¿Necesitas ayuda?",
+    "hub": {
+      "defaultTitle": "Asistentes de accesorios CNC",
+      "configurationCount_many": "{{count}} configuraciones",
+      "configurationCount_one": "{{count}} configuración",
+      "configurationCount_other": "{{count}} configuraciones",
+      "totalSteps_many": "{{count}} pasos en total",
+      "totalSteps_one": "{{count}} paso en total",
+      "totalSteps_other": "{{count}} pasos en total",
+      "startWizard": "Iniciar asistente",
+      "noWizards": "No hay asistentes disponibles"
+    }
+  },
+  "carousel": {
+    "roleDescription": "carrusel",
+    "slideRoleDescription": "diapositiva",
+    "previousSlide": "Diapositiva anterior",
+    "nextSlide": "Diapositiva siguiente"
+  },
+  "select": {
+    "scrollUp": "Desplazar hacia arriba",
+    "scrollDown": "Desplazar hacia abajo"
+  },
+  "toast": {
+    "dismiss": "Descartar notificación"
   }
 }

@@ -31,6 +31,7 @@ import {
     convertMillisecondsToTimeStamp,
     convertSecondsToDHMS,
 } from 'app/lib/datetime';
+import { useAppTranslation } from 'app/i18n';
 import type { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import moment from 'moment';
 import type { JSX } from 'react';
@@ -49,6 +50,7 @@ type Props = {
  *
  */
 const ProgressArea = ({ senderStatus, workflowState }: Props) => {
+    const { t } = useAppTranslation();
     const { total, currentLineRunning, elapsedTime, remainingTime, startTime } =
         senderStatus || {};
 
@@ -78,22 +80,22 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
         let text2 = '';
         if (timeSplit[0] !== 0) {
             time1 = `${String(timeSplit[0]).padStart(2, '0')}`;
-            text1 = 'd';
+            text1 = t('workspace:jobControl.progress.days');
             time2 = `${String(timeSplit[1]).padStart(2, '0')}`;
-            text2 = 'hr';
+            text2 = t('workspace:jobControl.progress.hours');
         } else if (timeSplit[1] !== 0) {
             time1 = `${String(timeSplit[1]).padStart(2, '0')}`;
-            text1 = 'hr';
+            text1 = t('workspace:jobControl.progress.hours');
             time2 = `${String(timeSplit[2]).padStart(2, '0')}`;
-            text2 = 'm';
+            text2 = t('workspace:jobControl.progress.minutes');
         } else if (timeSplit[2] !== 0) {
             time1 = `${String(timeSplit[2]).padStart(2, '0')}`;
-            text1 = 'm';
+            text1 = t('workspace:jobControl.progress.minutes');
             time2 = `${String(timeSplit[3]).padStart(2, '0')}`;
-            text2 = 's';
+            text2 = t('workspace:jobControl.progress.seconds');
         } else {
             time1 = `${String(timeSplit[3]).padStart(2, '0')}`;
-            text1 = 's';
+            text1 = t('workspace:jobControl.progress.seconds');
             time2 = null;
             text2 = null;
         }
@@ -135,7 +137,7 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
             aria-valuenow={Math.round(percentageValue)}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label="Job Progress"
+            aria-label={t('workspace:jobControl.progress.label')}
         >
             <div className="border-solid border border-gray-500 dark:border-outline rounded-sm bg-gray-100 dark:bg-surface-raised gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-content-secondary">
                 <div className="flex flex-col gap-0 w-full h-full -mt-6">
@@ -161,12 +163,18 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
                         <TooltipTrigger asChild>
                             <div className="flex flex-col  justify-center items-center w-32">
                                 {isFinalizing ? (
-                                    <span className="text-sm">Finalizing</span>
+                                    <span className="text-sm">
+                                        {t(
+                                            'workspace:jobControl.progress.finalizing',
+                                        )}
+                                    </span>
                                 ) : (
                                     <>
                                         {timeComponent}
                                         <span className="text-sm">
-                                            remaining
+                                            {t(
+                                                'workspace:jobControl.progress.remaining',
+                                            )}
                                         </span>
                                     </>
                                 )}
@@ -180,10 +188,15 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
             </div>
             <div className="w-full flex flex-row justify-between gap-2 text-sm whitespace-nowrap mt-1.5">
                 <span className="px-2 py-0.5 rounded-md bg-gray-900/60 dark:bg-gray-100/70 text-gray-100 dark:text-content-inverse">
-                    {`${currentLineRunning} / ${total} Lines`}
+                    {t('workspace:jobControl.progress.lines', {
+                        current: currentLineRunning,
+                        total,
+                    })}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-gray-900/60 dark:bg-gray-100/70 text-gray-100 dark:text-content-inverse">
-                    {convertMillisecondsToTimeStamp(elapsedTime, true)} cutting
+                    {t('workspace:jobControl.progress.cutting', {
+                        time: convertMillisecondsToTimeStamp(elapsedTime, true),
+                    })}
                 </span>
             </div>
         </div>

@@ -10,6 +10,7 @@ import { METRIC_UNITS } from 'app/constants';
 import type { DROPosition } from 'app/features/DRO/utils/DRO';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import store from 'app/store';
 import type { RootState } from 'app/store/redux';
@@ -26,6 +27,7 @@ interface GotoProps {
 }
 
 export function GoTo({ units, wpos, disabled }: GotoProps) {
+    const { t } = useAppTranslation();
     const { mode } = useWorkspaceState();
     const [hasAAxisReported, setHasAAxisReported] = useState<boolean>(false);
 
@@ -200,20 +202,20 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 
     return (
         <Popover onOpenChange={onPopoverOpen}>
-            <Tooltip content="Go To Location">
+            <Tooltip content={t('workspace:dro.goTo.title')}>
                 <PopoverTrigger asChild>
                     <Button
                         disabled={disabled}
                         icon={<FaPaperPlane />}
                         variant="secondary"
                         size="sm"
-                        aria-label="Open Go To Location dialog"
+                        aria-label={t('workspace:dro.goTo.openAriaLabel')}
                     />
                 </PopoverTrigger>
             </Tooltip>
             <PopoverContent className="bg-white">
                 <div className="w-full gap-2 flex flex-col">
-                    <h1>Go To Location</h1>
+                    <h1>{t('workspace:dro.goTo.title')}</h1>
                     <div className="flex flex-row text-sm border rounded overflow-hidden">
                         {modeLabels.map(({ key, label }) => {
                             const isActive = movementMode === key;
@@ -230,7 +232,9 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                                     disabled={isDisabled}
                                     title={
                                         isDisabled
-                                            ? 'Requires homing enabled ($22>0) and machine homed'
+                                            ? t(
+                                                  'workspace:dro.goTo.mcsUnavailable',
+                                              )
                                             : label
                                     }
                                     aria-pressed={isActive}
@@ -270,9 +274,9 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                     <Button
                         variant="alt"
                         onClick={goToLocation}
-                        aria-label="Execute move to location"
+                        aria-label={t('workspace:dro.goTo.executeAriaLabel')}
                     >
-                        Go!
+                        {t('workspace:dro.goTo.go')}
                     </Button>
                 </div>
             </PopoverContent>

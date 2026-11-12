@@ -1,6 +1,6 @@
 import api from 'app/api';
 import Button from 'app/components/Button';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import log from 'app/lib/log';
@@ -58,6 +58,7 @@ const MacroWidget = ({
     isConnected,
     isRemote,
 }: MacroWidgetProps) => {
+    const { t } = useAppTranslation();
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [macros, setMacros] = useState<any[]>([]);
@@ -466,13 +467,13 @@ const MacroWidget = ({
                     macroDescription={editMacro?.description}
                     title={
                         modal.name === MODAL_EDIT_MACRO
-                            ? 'Edit Macro'
-                            : 'Add Macro'
+                            ? t('workspace:macros.editTitle')
+                            : t('workspace:macros.addTitle')
                     }
                     submitLabel={
                         modal.name === MODAL_EDIT_MACRO
-                            ? 'Update Macro'
-                            : 'Add New Macro'
+                            ? t('workspace:macros.update')
+                            : t('workspace:macros.addNew')
                     }
                 />
             )}
@@ -504,8 +505,8 @@ const MacroWidget = ({
                         onClick={actions.openAddMacroModal}
                         className="flex flex-1 justify-center items-center h-8 text-sm"
                         icon={<FaPlus />}
-                        text="Add"
-                        tooltip={{ content: 'Add a new macro' }}
+                        text={t('workspace:macros.add')}
+                        tooltip={{ content: t('workspace:macros.addTooltip') }}
                     />
 
                     <Button
@@ -514,16 +515,20 @@ const MacroWidget = ({
                         }}
                         className="flex flex-1 justify-center items-center h-8 text-sm"
                         icon={<FaFileImport />}
-                        text="Import"
-                        tooltip={{ content: 'Import macros from a file' }}
+                        text={t('workspace:macros.import')}
+                        tooltip={{
+                            content: t('workspace:macros.importTooltip'),
+                        }}
                     />
 
                     <Button
                         onClick={exportMacros}
                         className="flex flex-1 justify-center items-center h-8 text-sm"
                         icon={<FaFileExport />}
-                        text="Export"
-                        tooltip={{ content: 'Export macros to a file' }}
+                        text={t('workspace:macros.export')}
+                        tooltip={{
+                            content: t('workspace:macros.exportTooltip'),
+                        }}
                     />
                 </div>
             </div>

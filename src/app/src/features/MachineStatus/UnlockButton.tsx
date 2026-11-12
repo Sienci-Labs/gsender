@@ -23,6 +23,7 @@
 
 import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import type { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import type React from 'react';
 import type { MouseEventHandler } from 'react';
@@ -40,14 +41,15 @@ const UnlockButton: React.FC<UnlockProps> = ({
     alarmCode,
     onClick,
 }) => {
+    const { t } = useAppTranslation();
     const getButtonText = (): string => {
         if (
             activeState === GRBL_ACTIVE_STATE_ALARM &&
             (alarmCode === 11 || alarmCode === 'Homing')
         ) {
-            return 'Click to Run Homing';
+            return t('workspace:machineStatus.clickToRunHoming');
         }
-        return 'Click to Unlock Machine';
+        return t('workspace:machineStatus.clickToUnlock');
     };
 
     const SymbolComponent =

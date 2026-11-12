@@ -1,3 +1,10 @@
+import { useAppTranslation } from 'app/i18n';
+
 export const PrimaryArea = () => {
-    return <div className="border p-3 flex-1">Vizualizer</div>;
+    const { t } = useAppTranslation();
+    return (
+        <div className="border p-3 flex-1">
+            {t('workspace:layout.visualizerPlaceholder')}
+        </div>
+    );
 };

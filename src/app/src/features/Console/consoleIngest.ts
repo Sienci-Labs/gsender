@@ -1,4 +1,5 @@
 import { WORKSPACE_MODE, WRITE_SOURCE_SERVER } from 'app/constants';
+import { i18n } from 'app/i18n';
 import controller, {
     addControllerEvents,
     removeControllerEvents,
@@ -56,7 +57,7 @@ const controllerEvents = {
 
         consoleWrite(`gSender - [${controller.type}]`, 'system');
         consoleWrite(
-            `Connected to ${port} with a baud rate of ${baudrate}`,
+            i18n.t('workspace:console.connected', { port, baudrate }),
             'system',
         );
 

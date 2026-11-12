@@ -46,6 +46,7 @@ import {
     TOOLBAR_CATEGORY,
     VISUALIZER_CATEGORY,
 } from 'app/constants';
+import { useAppTranslation } from 'app/i18n';
 import type {
     CommandKey,
     Macro,
@@ -56,6 +57,7 @@ import { cn } from 'app/lib/utils';
 import PropTypes from 'prop-types';
 import { LuPencil, LuPlus, LuTrash } from 'react-icons/lu';
 import { formatShortcut } from './helpers';
+import { getCategoryLabel, getShortcutTitle } from './shortcutLabels';
 
 interface Props {
     onEdit: (currentShortcut: CommandKey | Macro) => void;
@@ -77,6 +79,15 @@ const ShortcutsTable = ({
     onShortcutToggle,
     dataSet,
 }: Props) => {
+    const { t } = useAppTranslation();
+
+    const getRowTitle = (row: CommandKey) =>
+        getShortcutTitle(
+            row.cmd,
+            (allShuttleControlEvents[row.cmd] as ShuttleEvent)?.title ??
+                (row as ShuttleEvent).title,
+        );
+
     const renderShortcutCell = (row: CommandKey) => {
         const { keys, isActive } = row;
         const shortcut = [...keys][0] === '+' ? ['+'] : keys.split('+');
@@ -98,7 +109,7 @@ const ShortcutsTable = ({
 
         const shortcutButton = {
             edit: (
-                <Tooltip content="Edit this shortcut">
+                <Tooltip content={t('workspace:keyboard.table.editTooltip')}>
                     <Button
                         variant="ghost"
                         size="sm"
@@ -107,12 +118,14 @@ const ShortcutsTable = ({
                         }
                         onClick={() => onEdit(row)}
                         onKeyDown={null}
-                        aria-label={`Edit shortcut for ${(allShuttleControlEvents[row.cmd] as ShuttleEvent)?.title ?? (row as ShuttleEvent).title}`}
+                        aria-label={t('workspace:keyboard.table.editAria', {
+                            action: getRowTitle(row),
+                        })}
                     />
                 </Tooltip>
             ),
             delete: (
-                <Tooltip content="Delete this shortcut">
+                <Tooltip content={t('workspace:keyboard.table.deleteTooltip')}>
                     <Button
                         variant="ghost"
                         size="sm"
@@ -121,12 +134,14 @@ const ShortcutsTable = ({
                         }
                         onClick={() => onDelete(row)}
                         onKeyDown={null}
-                        aria-label={`Delete shortcut for ${(allShuttleControlEvents[row.cmd] as ShuttleEvent)?.title ?? (row as ShuttleEvent).title}`}
+                        aria-label={t('workspace:keyboard.table.deleteAria', {
+                            action: getRowTitle(row),
+                        })}
                     />
                 </Tooltip>
             ),
             add: (
-                <Tooltip content="Assign a shortcut to this action">
+                <Tooltip content={t('workspace:keyboard.table.addTooltip')}>
                     <Button
                         variant="ghost"
                         size="sm"
@@ -135,7 +150,9 @@ const ShortcutsTable = ({
                         }
                         onClick={() => onEdit(row)}
                         onKeyDown={null}
-                        aria-label={`Add shortcut for ${(allShuttleControlEvents[row.cmd] as ShuttleEvent)?.title ?? (row as ShuttleEvent).title}`}
+                        aria-label={t('workspace:keyboard.table.addAria', {
+                            action: getRowTitle(row),
+                        })}
                     />
                 </Tooltip>
             ),
@@ -169,7 +186,9 @@ const ShortcutsTable = ({
                 onChange={(isActive) => {
                     onShortcutToggle({ ...row, isActive }, false);
                 }}
-                aria-label={`Toggle active status for ${(allShuttleControlEvents[row.cmd] as ShuttleEvent)?.title ?? (row as ShuttleEvent).title}`}
+                aria-label={t('workspace:keyboard.table.toggleAria', {
+                    action: getRowTitle(row),
+                })}
             />
         );
     };
@@ -199,14 +218,14 @@ const ShortcutsTable = ({
             'bg-gray-100 text-gray-800';
 
         return (
-            <div className={cn(baseClass, categoryClass)}>{rowCategory}</div>
+            <div className={cn(baseClass, categoryClass)}>
+                {getCategoryLabel(rowCategory)}
+            </div>
         );
     };
 
     const renderTitleCell = (row: CommandKey) => {
-        const rowTitle = allShuttleControlEvents[row.cmd]
-            ? (allShuttleControlEvents[row.cmd] as ShuttleEvent).title
-            : (row as ShuttleEvent).title;
+        const rowTitle = getRowTitle(row);
         const isSpecial =
             (allShuttleControlEvents[row.cmd] as ShuttleEvent)?.payload
                 ?.type === GRBLHAL;
@@ -264,10 +283,18 @@ const ShortcutsTable = ({
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[25%]">Action</TableHead>
-                        <TableHead className="w-[45%]">Shortcut</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Active</TableHead>
+                        <TableHead className="w-[25%]">
+                            {t('workspace:keyboard.table.action')}
+                        </TableHead>
+                        <TableHead className="w-[45%]">
+                            {t('workspace:keyboard.table.shortcut')}
+                        </TableHead>
+                        <TableHead>
+                            {t('workspace:keyboard.table.category')}
+                        </TableHead>
+                        <TableHead>
+                            {t('workspace:keyboard.table.active')}
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

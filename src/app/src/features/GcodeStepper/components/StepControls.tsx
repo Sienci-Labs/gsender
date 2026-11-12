@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 import {
     ChevronsLeft,
@@ -60,105 +61,122 @@ export const StepControls: React.FC<StepControlsProps> = ({
     onSpeedChange,
     onTogglePlay,
     onReset,
-}) => (
-    <div className="flex flex-col gap-2">
-        <span className="text-xs uppercase tracking-wide text-gray-600 dark:text-content-muted">
-            Step Controls
-        </span>
+}) => {
+    const { t } = useAppTranslation();
+    return (
+        <div className="flex flex-col gap-2">
+            <span className="text-xs uppercase tracking-wide text-gray-600 dark:text-content-muted">
+                {t('workspace:gcodeStepper.stepControls')}
+            </span>
 
-        <div className="flex flex-wrap items-center gap-2">
-            <button
-                type="button"
-                disabled={totalLines === 0}
-                onClick={onTogglePlay}
-                aria-label={isPlaying ? 'Pause playback' : 'Play'}
-                className={cn(
-                    'flex min-h-[3.25rem] w-16 flex-shrink-0 items-center justify-center rounded-lg border transition-colors',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                    'disabled:cursor-not-allowed disabled:opacity-40',
-                    isPlaying
-                        ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
-                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-primary dark:hover:bg-surface-hover',
-                )}
-            >
-                {isPlaying ? (
-                    <Pause className="h-5 w-5" />
-                ) : (
-                    <Play className="h-5 w-5" />
-                )}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+                <button
+                    type="button"
+                    disabled={totalLines === 0}
+                    onClick={onTogglePlay}
+                    aria-label={
+                        isPlaying
+                            ? t('workspace:gcodeStepper.pausePlayback')
+                            : t('workspace:gcodeStepper.play')
+                    }
+                    className={cn(
+                        'flex min-h-[3.25rem] w-16 flex-shrink-0 items-center justify-center rounded-lg border transition-colors',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        'disabled:cursor-not-allowed disabled:opacity-40',
+                        isPlaying
+                            ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
+                            : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-primary dark:hover:bg-surface-hover',
+                    )}
+                >
+                    {isPlaying ? (
+                        <Pause className="h-5 w-5" />
+                    ) : (
+                        <Play className="h-5 w-5" />
+                    )}
+                </button>
 
-            <button
-                type="button"
-                disabled={totalLines === 0 || currentLine === 1}
-                onClick={onReset}
-                aria-label="Reset to start"
-                className={cn(
-                    'flex min-h-[3.25rem] w-16 flex-shrink-0 items-center justify-center rounded-lg border transition-colors',
-                    'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-primary dark:hover:bg-surface-hover',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                    'disabled:cursor-not-allowed disabled:opacity-40',
-                )}
-            >
-                <RotateCcw className="h-5 w-5" />
-            </button>
+                <button
+                    type="button"
+                    disabled={totalLines === 0 || currentLine === 1}
+                    onClick={onReset}
+                    aria-label={t('workspace:gcodeStepper.resetToStart')}
+                    className={cn(
+                        'flex min-h-[3.25rem] w-16 flex-shrink-0 items-center justify-center rounded-lg border transition-colors',
+                        'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-primary dark:hover:bg-surface-hover',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        'disabled:cursor-not-allowed disabled:opacity-40',
+                    )}
+                >
+                    <RotateCcw className="h-5 w-5" />
+                </button>
 
-            <div className="flex min-h-[3.25rem] flex-1 items-center gap-1 rounded-lg border border-gray-200 p-1 dark:border-outline">
-                {SPEEDS.map((preset) => (
-                    <button
-                        key={preset}
-                        type="button"
-                        onClick={() => onSpeedChange(preset)}
-                        aria-pressed={speed === preset}
-                        className={cn(
-                            'flex-1 rounded-md py-2 text-xs font-medium transition-colors',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                            speed === preset
-                                ? 'bg-blue-600 text-white'
-                                : 'text-gray-600 hover:bg-gray-100 dark:text-content-secondary dark:hover:bg-surface-hover',
-                        )}
-                    >
-                        {preset}x
-                    </button>
-                ))}
+                <div className="flex min-h-[3.25rem] flex-1 items-center gap-1 rounded-lg border border-gray-200 p-1 dark:border-outline">
+                    {SPEEDS.map((preset) => (
+                        <button
+                            key={preset}
+                            type="button"
+                            onClick={() => onSpeedChange(preset)}
+                            aria-pressed={speed === preset}
+                            className={cn(
+                                'flex-1 rounded-md py-2 text-xs font-medium transition-colors',
+                                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                speed === preset
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-600 hover:bg-gray-100 dark:text-content-secondary dark:hover:bg-surface-hover',
+                            )}
+                        >
+                            {preset}x
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
+                {STEPS.map((delta) => {
+                    const back = delta < 0;
+                    const disabled = back
+                        ? currentLine <= 1
+                        : currentLine >= totalLines;
+                    const Icon = back ? ChevronsLeft : ChevronsRight;
+
+                    return (
+                        <button
+                            key={delta}
+                            type="button"
+                            disabled={disabled}
+                            onClick={() => onStep(delta)}
+                            aria-label={
+                                back
+                                    ? t('workspace:gcodeStepper.backLines', {
+                                          count: Math.abs(delta),
+                                      })
+                                    : t('workspace:gcodeStepper.forwardLines', {
+                                          count: Math.abs(delta),
+                                      })
+                            }
+                            className={cn(
+                                'flex min-h-[3.25rem] items-center justify-center gap-2 rounded-lg border px-3 text-base font-medium',
+                                'border-gray-300 bg-white text-gray-700',
+                                'dark:border-outline dark:bg-surface-elevated dark:text-content-primary',
+                                'hover:bg-gray-100 dark:hover:bg-surface-hover active:scale-[0.99]',
+                                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white dark:disabled:hover:bg-surface-elevated',
+                            )}
+                        >
+                            {back && <Icon className="h-5 w-5 shrink-0" />}
+                            <span className="whitespace-nowrap">
+                                {t('workspace:gcodeStepper.stepLines', {
+                                    count: Math.abs(delta),
+                                    sign: back ? '-' : '+',
+                                })}
+                            </span>
+                            {!back && <Icon className="h-5 w-5 shrink-0" />}
+                        </button>
+                    );
+                })}
             </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
-            {STEPS.map((delta) => {
-                const back = delta < 0;
-                const disabled = back
-                    ? currentLine <= 1
-                    : currentLine >= totalLines;
-                const Icon = back ? ChevronsLeft : ChevronsRight;
-
-                return (
-                    <button
-                        key={delta}
-                        type="button"
-                        disabled={disabled}
-                        onClick={() => onStep(delta)}
-                        aria-label={`${back ? 'Back' : 'Forward'} ${Math.abs(delta)} lines`}
-                        className={cn(
-                            'flex min-h-[3.25rem] items-center justify-center gap-2 rounded-lg border px-3 text-base font-medium',
-                            'border-gray-300 bg-white text-gray-700',
-                            'dark:border-outline dark:bg-surface-elevated dark:text-content-primary',
-                            'hover:bg-gray-100 dark:hover:bg-surface-hover active:scale-[0.99]',
-                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                            'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white dark:disabled:hover:bg-surface-elevated',
-                        )}
-                    >
-                        {back && <Icon className="h-5 w-5 shrink-0" />}
-                        <span className="whitespace-nowrap">
-                            {back ? '-' : '+'}
-                            {Math.abs(delta)} lines
-                        </span>
-                        {!back && <Icon className="h-5 w-5 shrink-0" />}
-                    </button>
-                );
-            })}
-        </div>
-    </div>
-);
+    );
+};
 
 export default StepControls;

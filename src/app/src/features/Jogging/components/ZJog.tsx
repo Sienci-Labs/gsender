@@ -9,6 +9,7 @@ import {
     zMinusJog,
     zPlusJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
+import { useAppTranslation } from 'app/i18n';
 import { useLongPress } from 'use-long-press';
 
 export function ZJog({
@@ -17,6 +18,7 @@ export function ZJog({
     canClick,
     threshold = 200,
 }: JoggerProps) {
+    const { t } = useAppTranslation();
     const posthog = usePostHog();
 
     const zPlusJogHandlers = useLongPress(
@@ -90,15 +92,15 @@ export function ZJog({
                 bottomHandlers={zMinusJogHandlers}
                 canClick={canClick}
                 idForTest="Z"
-                topLabel="Jog Z plus"
-                bottomLabel="Jog Z minus"
+                topLabel={t('workspace:jogging.tab.plus', { axis: 'Z' })}
+                bottomLabel={t('workspace:jogging.tab.minus', { axis: 'Z' })}
                 onTopKeyDown={(e) => handleKeyDown(e, zPlusJog)}
                 onBottomKeyDown={(e) => handleKeyDown(e, zMinusJog)}
                 onPressCancel={stopContinuousJog}
             />
             <img
                 src={zLabels}
-                alt="Z Labels tab"
+                alt={t('workspace:jogging.tab.labelsAlt', { axis: 'Z' })}
                 className="absolute top-0 left-0 pointer-events-none w-full h-full"
             />
         </div>

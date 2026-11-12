@@ -276,7 +276,14 @@
     "unsupportedGcode_one": "Se encontró {{count}} línea de G-code no compatible con GRBL en este archivo. Es posible que tu trabajo no se ejecute correctamente.",
     "unsupportedGcode_other": "Se encontraron {{count}} líneas de G-code no compatible con GRBL en este archivo. Es posible que tu trabajo no se ejecute correctamente.",
     "grblHalOnlyShortcut": "No se puede activar el atajo exclusivo de grblHAL",
-    "unsupportedGcode_many": "Se encontraron {{count}} líneas de G-code no compatible con GRBL en este archivo. Es posible que tu trabajo no se ejecute correctamente."
+    "unsupportedGcode_many": "Se encontraron {{count}} líneas de G-code no compatible con GRBL en este archivo. Es posible que tu trabajo no se ejecute correctamente.",
+    "invalidLines": {
+      "description_many": "Se detectaron {{count}} líneas no válidas al cargar el archivo. Es posible que el trabajo no se ejecute correctamente.",
+      "description_one": "Se detectó {{count}} línea no válida al cargar el archivo. Es posible que el trabajo no se ejecute correctamente.",
+      "description_other": "Se detectaron {{count}} líneas no válidas al cargar el archivo. Es posible que el trabajo no se ejecute correctamente.",
+      "sample": "Algunas de las líneas no válidas encontradas:",
+      "title": "Líneas no válidas detectadas"
+    }
   },
   "workspace": {
     "modeSetDefault": "Modo de espacio de trabajo establecido en Predeterminado",

@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { AlertCircle } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ interface ValidationBannerProps {
 }
 
 export function ValidationBanner({ validations }: ValidationBannerProps) {
+    const { t } = useAppTranslation();
     const [validationError, setValidationError] = useState<ReactNode | null>(
         null,
     );
@@ -17,13 +19,15 @@ export function ValidationBanner({ validations }: ValidationBannerProps) {
             for (const validation of validations) {
                 const result = validation();
                 if (!result.success) {
-                    setValidationError(result.reason || 'Validation failed');
+                    setValidationError(
+                        result.reason || t('common:wizard.validation.failed'),
+                    );
                     return;
                 }
             }
             setValidationError(null);
         }
-    }, [validations]);
+    }, [validations, t]);
 
     if (!validationError) {
         return <div className="mt-4 max-w-3/5 h-14"></div>;

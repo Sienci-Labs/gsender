@@ -4,7 +4,7 @@ import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import type { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { homeMachine } from 'app/features/DRO/utils/DRO';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
 import cx from 'classnames';
@@ -101,6 +101,7 @@ export function unlockFirmware(
 }
 
 export function UnlockButton() {
+    const { t } = useAppTranslation();
     const status = useTypedSelector(
         (state: RootState) => state.controller.state.status,
     );
@@ -112,12 +113,14 @@ export function UnlockButton() {
     const activateUnlockButton = isHold || isAlarm;
 
     const ariaLabel = activateUnlockButton
-        ? `Machine is ${isAlarm ? 'locked in alarm' : 'held'}. Click to unlock machine.`
-        : 'Machine is unlocked.';
+        ? isAlarm
+            ? t('workspace:unlockButton.lockedInAlarmLabel')
+            : t('workspace:unlockButton.heldLabel')
+        : t('workspace:unlockButton.unlockedLabel');
 
     return (
         <div className="text-4xl absolute top-3 max-xl:top-2 left-72 max-sm:left-56">
-            <Tooltip content="Unlock Machine">
+            <Tooltip content={t('workspace:unlockButton.tooltip')}>
                 <button
                     className={cx('group text-gray-400', {
                         'text-yellow-600 bg-orange-200 bg-opacity-10 rounded':

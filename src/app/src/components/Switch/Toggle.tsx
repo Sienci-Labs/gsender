@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 
 type Props = {
@@ -24,6 +25,7 @@ const Toggle = ({
     id,
     value,
 }: Props) => {
+    const { t } = useAppTranslation();
     const isVertical = position === 'vertical';
 
     return (
@@ -45,7 +47,7 @@ const Toggle = ({
                     className="sr-only peer"
                     disabled={disabled}
                     value={value}
-                    aria-label={label || 'Toggle'}
+                    aria-label={label || t('common:toggle.label')}
                 />
                 <div
                     className={cn(

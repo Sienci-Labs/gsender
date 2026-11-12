@@ -1,0 +1,671 @@
+{
+  "alerts": {
+    "jobEnd": {
+      "title": "Job End",
+      "status": "Status:",
+      "statusComplete": "COMPLETE",
+      "statusStopped": "STOPPED",
+      "time": "Time:",
+      "errors": "Errors:",
+      "noErrors": "None"
+    },
+    "maintenance": {
+      "title": "Maintenance Alert",
+      "tasksDue": "The following maintenance tasks are due:",
+      "instructions": "Click 'Reset Timers' to reset the timers on ALL listed tasks. Click 'Close' to close the popup and do nothing.",
+      "resetTimers": "Reset Timers"
+    }
+  },
+  "layout": {
+    "visualizerPlaceholder": "Visualizer",
+    "skipToMain": "Skip to main content",
+    "logoAlt": "gSender Logo"
+  },
+  "macroBar": {
+    "dragToReorder": "Drag to reorder"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unreadLabel_one": "Notifications, {{count}} unread",
+    "unreadLabel_other": "Notifications, {{count}} unread",
+    "clearAll": "Clear all notifications",
+    "empty": "No notifications",
+    "tabs": {
+      "all": "All",
+      "errors": "Errors",
+      "info": "Info",
+      "success": "Success"
+    }
+  },
+  "workspaceSelector": {
+    "label": "Workspace:",
+    "tooltip": "Select a workspace",
+    "ariaLabel": "Select workspace"
+  },
+  "machineInfo": {
+    "title": "Machine Information",
+    "firmwareDisconnected": "disconnected",
+    "firmwareVersion": "Firmware version:",
+    "unpin": "Unpin machine information",
+    "pin": "Pin machine information",
+    "close": "Close machine information",
+    "cncModals": "CNC Modals",
+    "pins": "Pins",
+    "currentTool": "Current tool:",
+    "lockStepperMotors": "Lock stepper motors",
+    "keepout": "Keepout:",
+    "modals": {
+      "probeStyle": "Probe style",
+      "coordinateSystem": "Coordinate system",
+      "planeSelection": "Plane selection",
+      "units": "Units",
+      "distanceMode": "Distance mode",
+      "feed": "Feed",
+      "spindle": "Spindle",
+      "coolant": "Coolant"
+    },
+    "pinLabels": {
+      "xLimit": "X limit",
+      "yLimit": "Y limit",
+      "zLimit": "Z limit",
+      "aLimit": "A limit",
+      "probe": "Probe/TLS",
+      "door": "Door",
+      "cycleStart": "Cycle start",
+      "hold": "Hold",
+      "softReset": "Soft reset"
+    }
+  },
+  "machineStatus": {
+    "clickToRunHoming": "Click to Run Homing",
+    "clickToUnlock": "Click to Unlock Machine"
+  },
+  "unlockButton": {
+    "lockedInAlarmLabel": "Machine is locked in alarm. Click to unlock machine.",
+    "heldLabel": "Machine is held. Click to unlock machine.",
+    "unlockedLabel": "Machine is unlocked.",
+    "tooltip": "Unlock Machine"
+  },
+  "statusIcons": {
+    "wirelessControl": "Wireless Control",
+    "keyboardShortcuts": "Keyboard Shortcuts",
+    "gamepadShortcuts": "Gamepad Shortcuts"
+  },
+  "connection": {
+    "menuLabel": "Connection menu",
+    "connectToCnc": "Connect to CNC",
+    "connect": "Connect",
+    "connecting": "Connecting...",
+    "unableToConnect": "Unable to connect.",
+    "disconnect": "Disconnect",
+    "usbBaud": "USB ({{baud}})",
+    "noUsbDevices": "No USB devices found",
+    "ethernetPort": "Ethernet (port {{port}})",
+    "unrecognizedPorts": "Unrecognized Ports"
+  },
+  "console": {
+    "notConnected": "Not connected to a device",
+    "inputPlaceholder": "Enter G-code here...",
+    "inputLabel": "Console command",
+    "run": "Run",
+    "filterLabel": "Filter console messages",
+    "copyLast": "Copy last {{limit}} messages",
+    "clear": "Clear console",
+    "popOut": "Pop out console",
+    "filters": {
+      "all": "All",
+      "gcode": "G-code",
+      "responses": "Responses",
+      "system": "System",
+      "faults": "Faults"
+    },
+    "messageType": {
+      "sent": "Sent",
+      "response": "Response",
+      "system": "System",
+      "warning": "Warning",
+      "error": "Error",
+      "alarm": "Alarm"
+    },
+    "scrollToLatest": "Scroll to latest message",
+    "noMatchingMessages": "No messages match this filter",
+    "noOutput": "No console output yet",
+    "connected": "Connected to {{port}} with a baud rate of {{baudrate}}"
+  },
+  "macros": {
+    "variableGroups": {
+      "waitForPlanner": "Wait until the planner queue is empty",
+      "globalVariables": "User-defined global variables",
+      "displayGlobalVariable": "Display a global variable using an inline comment",
+      "backupWorkPosition": "Keep a backup of current work position",
+      "previousWorkPosition": "Go to previous work position",
+      "toolChange": "Tool change",
+      "saveModalState": "Save modal state",
+      "restoreModalState": "Restore modal state",
+      "currentWorkPosition": "Current work position",
+      "boundingBox": "Set bounding box",
+      "requestParameters": "Request current Parameters - must do before using parameters",
+      "getParameters": "Get current Parameters"
+    },
+    "form": {
+      "defaultDescription": "Macros are a way to store and reuse commands. They can be used to speed up repetitive tasks and make your CNC more efficient.",
+      "name": "Name",
+      "gcode": "G-code",
+      "variables": "Variables",
+      "gcodeTooltip": "Add your g-code here. Use the variables or JavaScript logic to create more complex commands.",
+      "description": "Macro Description"
+    },
+    "running": "Running...",
+    "optionsFor": "Options for macro {{name}}",
+    "edit": "Edit",
+    "empty": "No Macros...",
+    "editTitle": "Edit Macro",
+    "addTitle": "Add Macro",
+    "update": "Update Macro",
+    "addNew": "Add New Macro",
+    "add": "Add",
+    "addTooltip": "Add a new macro",
+    "import": "Import",
+    "importTooltip": "Import macros from a file",
+    "export": "Export",
+    "exportTooltip": "Export macros to a file"
+  },
+  "fileControl": {
+    "loadFile": "Load File",
+    "viewRecentFiles": "View Recent Files",
+    "recentFiles": "Recent Files",
+    "closeFile": "Close File",
+    "confirmTitle": "Are you sure?",
+    "closeFileConfirm": "This will close the current file. Any unsaved changes will be lost.",
+    "reloadFile": "Reload File",
+    "reloadFileConfirm": "This will reload the current file from disk.",
+    "loadRecentFile": "Load recent file {{name}}",
+    "lastJob": {
+      "title": "Last Job",
+      "complete": "COMPLETE",
+      "stopped": "STOPPED"
+    },
+    "fileSize": {
+      "bytes": "{{size}} Bytes",
+      "kilobytes": "{{size}} KB",
+      "megabytes": "{{size}} MB"
+    },
+    "lineCount_one": "({{count}} line)",
+    "lineCount_other": "({{count}} lines)",
+    "info": "Info",
+    "size": "Size",
+    "toggleInfoSize": "Toggle file info or size view",
+    "toggleEditor": "Toggle G-code editor",
+    "gcodeEditor": "G-code Editor",
+    "openStepThrough": "Open G-code step through",
+    "stepThrough": "G-code Step Through",
+    "estimatedTime": "Estimated Time",
+    "feed": "Feed",
+    "speed": "Speed",
+    "tools": "Tools",
+    "none": "None",
+    "min": "Min",
+    "max": "Max"
+  },
+  "gcodeStepper": {
+    "title": "G-code Step Through",
+    "close": "Close step through",
+    "readingPositions": "Reading positions… {{percent}}%",
+    "stepControls": "Step Controls",
+    "pausePlayback": "Pause playback",
+    "play": "Play",
+    "resetToStart": "Reset to start",
+    "backLines_one": "Back {{count}} line",
+    "backLines_other": "Back {{count}} lines",
+    "forwardLines_one": "Forward {{count}} line",
+    "forwardLines_other": "Forward {{count}} lines",
+    "stepLines_one": "{{sign}}{{count}} line",
+    "stepLines_other": "{{sign}}{{count}} lines",
+    "gcodeLine": "G-code line",
+    "sourceHeading_one": "G-code ({{lines}} line)",
+    "sourceHeading_other": "G-code ({{lines}} lines)",
+    "closeSearch": "Close search",
+    "searchGcode": "Search G-code",
+    "searchPlaceholder": "Search...",
+    "goToStart": "Go to start",
+    "hideToolpath": "Hide tool {{tool}} toolpath",
+    "showToolpath": "Show tool {{tool}} toolpath",
+    "goToTool": "Go to tool {{tool}}, line {{line}}",
+    "tools": "Tools",
+    "noTools": "No tools found in this file.",
+    "modals": {
+      "motion": "Motion",
+      "wcs": "WCS",
+      "plane": "Plane",
+      "units": "Units",
+      "distance": "Distance",
+      "feedMode": "Feed mode",
+      "spindle": "Spindle",
+      "coolant": "Coolant",
+      "tool": "Tool",
+      "feed": "Feed",
+      "speed": "Speed"
+    },
+    "workPosition": "Position (Work, {{units}})",
+    "modalsLabel": "Modals",
+    "showPriorLines": "Show prior lines",
+    "hidePriorLines": "Hide prior lines"
+  },
+  "jobControl": {
+    "atcValidation": {
+      "outOfRange": {
+        "title": "Tool Number Exceeds Tool Table Size",
+        "description_one": "This file references tool {{list}}, which exceeds your configured tool table size ({{size}} tools).",
+        "description_other": "This file references tools {{list}}, which exceed your configured tool table size ({{size}} tools).",
+        "remap_one": "Remap this tool in the Tool Timeline before starting, or confirm to run anyway.",
+        "remap_other": "Remap these tools in the Tool Timeline before starting, or confirm to run anyway."
+      },
+      "usingCurrentTool": {
+        "title": "Using Current Tool (T{{tool}})",
+        "description": "This file contains no tool change commands (M6) and the tool in the spindle will be used.",
+        "confirm": "Please confirm that you want to use this tool"
+      },
+      "notProbed": {
+        "title": "Current Tool Not Probed",
+        "description": "The file contains no tool change commands (M6) and the tool in the spindle will be used. However, the tool in the spindle does not have an offset.",
+        "hint": "Select <bold>\"Probe\"</bold> in the ATC tab to establish an offset and re-zero the workpiece before trying again."
+      },
+      "noTool": {
+        "title": "No Current Tool",
+        "description": "This file contains no tool change commands (M6) and there is no tool in the spindle.",
+        "loadTool": "Load the tool you want to use into the spindle before trying again.",
+        "alternative": "Alternatively, you can update your post-processor to include a tool change command with your file."
+      }
+    },
+    "startFromLine": {
+      "button": "Start From",
+      "recoveryTitle": "Recovery: Start From Line",
+      "title": "Start From Line",
+      "description": "Recover a job after power loss, mechanical malfunction, disconnection, or other failure.",
+      "lastStopped": "Your job of <bold>{{total}}</bold> lines was last stopped around line: <bold>{{line}}</bold>.",
+      "recommendation": "For best success, we usually recommend resuming about <bold>10 lines</bold> earlier: <bold>line {{line}}</bold>",
+      "resumeAtLine": "Resume job at line:",
+      "defaultValue": "Default Value: {{value}}",
+      "safeHeight": "With Safe Height:",
+      "safeHeightHint": "(amount above the max height of the file)",
+      "calculates": "Calculates all your CNC movements, attributes, and gSender automations to pick up right where you left off.",
+      "start": "Start from Line"
+    },
+    "outline": "Outline",
+    "progress": {
+      "days": "d",
+      "hours": "hr",
+      "minutes": "m",
+      "seconds": "s",
+      "label": "Job Progress",
+      "finalizing": "Finalizing",
+      "remaining": "remaining",
+      "lines": "{{current}} / {{total}} Lines",
+      "cutting": "{{time}} cutting",
+      "spinningDrill": "Spinning Drill"
+    },
+    "start": "Start",
+    "pause": "Pause",
+    "stop": "Stop",
+    "overrides": {
+      "feed": "Feed",
+      "laser": "Laser",
+      "spindle": "Spindle",
+      "power": "Power"
+    }
+  },
+  "visualizer": {
+    "loading": "Loading...",
+    "rendering": "Rendering",
+    "placeholderAlt": "Louis the dog placeholder",
+    "softLimitsWarning": "Warning: Cut will leave soft limits!",
+    "cycleStart": "Cycle Start",
+    "unlockMachine": "Unlock Machine",
+    "disableLiteMode": "Disable lightweight mode",
+    "enableLiteMode": "Enable lightweight mode",
+    "noWebGL": "It looks like your device doesn't support WebGL",
+    "moveToHereTooltip": "Move To Here: press and hold a spot to move the spindle there",
+    "moveToHere": "Move To Here",
+    "isoView": "Go to iso view",
+    "perspectiveView": "Switch to perspective view",
+    "orthographicView": "Switch to orthographic view",
+    "editor": {
+      "editingDisabled": "Editing disabled while job is running",
+      "toggleSelection": "Click to toggle selection",
+      "noFile": "No G-code file loaded",
+      "title": "G-code Editor",
+      "paused": "Paused",
+      "selectedCount_one": "{{count}} selected",
+      "selectedCount_other": "{{count}} selected",
+      "lineCount_one": "{{lines}} line",
+      "lineCount_other": "{{lines}} lines",
+      "close": "Close editor",
+      "scrollToTop": "Scroll to top",
+      "searchPlaceholder": "Search...",
+      "previousMatch": "Previous match (Shift+Enter)",
+      "nextMatch": "Next match (Enter)",
+      "closeSearch": "Close search",
+      "jumpToLineLabel": "Jump to line:",
+      "jumpToLine": "Jump to Line",
+      "closeJumpToLine": "Close jump to line",
+      "search": "Search (Ctrl+F / Cmd+F)",
+      "deselectAll": "Deselect all lines",
+      "selectAll": "Select all lines",
+      "copyDisabled": "Copy disabled while job is running",
+      "copySelected_one": "Copy {{count}} selected line(s)",
+      "copySelected_other": "Copy {{count}} selected line(s)",
+      "copyAll": "Copy all lines",
+      "deleteDisabled": "Delete disabled while job is running",
+      "deleteSelected_one": "Delete {{count}} selected line(s)",
+      "deleteSelected_other": "Delete {{count}} selected line(s)",
+      "revertDisabled": "Revert disabled while job is running",
+      "revert": "Revert to original content",
+      "saveDisabled": "Save disabled while job is running",
+      "save": "Save changes"
+    }
+  },
+  "keyboard": {
+    "commands": {
+      "ccwLaserTest": "CCW / Laser Test",
+      "confirmProbe": "Confirm probe popup",
+      "controllerCommandErrorClear": "Clear error",
+      "controllerCommandHoming": "Home machine",
+      "controllerCommandRealtimeReport": "Realtime report",
+      "controllerCommandReset": "Soft reset",
+      "controllerCommandToolchangeAcknowledgement": "Acknowledge tool change",
+      "controllerCommandUnlock": "Unlock",
+      "controllerCommandVirtualStopToggle": "Feed hold",
+      "copy": "Copy",
+      "cut": "Cut",
+      "cwLaserOn": "CW / Laser On",
+      "cycleJogPresets": "Switch between Presets",
+      "displayMachineInfo": "Display Machine Info",
+      "displayNotifications": "Display Notifications",
+      "feedrateOverrideM": "Feed -",
+      "feedrateOverrideMm": "Feed --",
+      "feedrateOverrideP": "Feed +",
+      "feedrateOverridePp": "Feed ++",
+      "feedrateOverrideReset": "Feed reset",
+      "floodCoolant": "Flood coolant (M8)",
+      "goToAAxisZero": "Go to A zero",
+      "goToXyAxisZero": "Go to XY zero",
+      "goToXAxisZero": "Go to X zero",
+      "goToYAxisZero": "Go to Y zero",
+      "goToZAxisZero": "Go to Z zero",
+      "homingGoToBackLeftCorner": "Go to Back Left corner",
+      "homingGoToBackRightCorner": "Go to Back Right corner",
+      "homingGoToFrontLeftCorner": "Go to Front Left corner",
+      "homingGoToFrontRightCorner": "Go to Front Right corner",
+      "homingPark": "Park",
+      "jogAMinus": "Jog A- (CW)",
+      "jogAPlus": "Jog A+ (CCW)",
+      "jogSpeedD": "Decrease Jog Speed",
+      "jogSpeedI": "Increase Jog Speed",
+      "jogXM": "Jog X- (left)",
+      "jogXMYP": "Jog X- Y+",
+      "jogXP": "Jog X+ (right)",
+      "jogXPYM": "Jog X+ Y-",
+      "jogXYM": "Jog X- Y-",
+      "jogXYP": "Jog X+ Y+",
+      "jogYM": "Jog Y- (fwd)",
+      "jogYP": "Jog Y+ (back)",
+      "jogZM": "Jog Z- (down)",
+      "jogZP": "Jog Z+ (up)",
+      "lightweightMode": "Lightweight mode",
+      "loadFile": "Load file",
+      "mistCoolant": "Mist coolant (M7)",
+      "openProbe": "Display probe popup",
+      "paste": "Paste",
+      "pauseJob": "Pause job",
+      "probeDiameterScrollDown": "Tool Diameter scroll down",
+      "probeDiameterScrollUp": "Tool Diameter scroll up",
+      "probeRotaryYAxis": "Rotary Y-axis Alignment",
+      "probeRotaryZAxis": "Rotary Probe Z-axis",
+      "probeRoutineScrollLeft": "Probe Routine scroll left",
+      "probeRoutineScrollRight": "Probe Routine scroll right",
+      "runOutline": "Run outline",
+      "setNJogPreset": "Set to Normal Preset",
+      "setPJogPreset": "Set to Precise Preset",
+      "setRJogPreset": "Set to Rapid Preset",
+      "spindleOverrideM": "Spindle/Laser -",
+      "spindleOverrideMm": "Spindle/Laser --",
+      "spindleOverrideP": "Spindle/Laser +",
+      "spindleOverridePp": "Spindle/Laser ++",
+      "spindleOverrideReset": "Spindle/Laser reset",
+      "startJob": "Start job",
+      "startProbe": "Begin probing",
+      "stopCoolant": "Stop coolant (M9)",
+      "stopJob": "Global Stop",
+      "stopLaserOff": "Stop / Laser Off",
+      "switchWorkspaceMode": "Toggle Rotary Mode",
+      "toggleInfoHelper": "Display Helper",
+      "toggleMountingSetup": "Rotary Mounting Setup",
+      "toggleRotarySurfacing": "Toggle Rotary Surfacing Display",
+      "toggleShortcuts": "Toggle on/off shortcuts",
+      "toggleSpindleLaserMode": "Toggle Between Spindle and Laser Mode",
+      "undo": "Undo",
+      "unloadFile": "Unload file",
+      "visualizerView3d": "See 3D view",
+      "visualizerViewCycle": "Switch between views",
+      "visualizerViewFront": "See Front view",
+      "visualizerViewLeft": "See Left view",
+      "visualizerViewReset": "Reset view",
+      "visualizerViewRight": "See Right view",
+      "visualizerViewTop": "See Top view",
+      "visualizerZoomFit": "Zoom fit",
+      "visualizerZoomIn": "Zoom in",
+      "visualizerZoomOut": "Zoom out",
+      "zeroAllAxis": "Zero all axes",
+      "zeroAAxis": "Zero A-axis",
+      "zeroXAxis": "Zero X-axis",
+      "zeroYAxis": "Zero Y-axis",
+      "zeroZAxis": "Zero Z-axis"
+    },
+    "categories": {
+      "all": "All",
+      "carving": "Carving",
+      "coolant": "Coolant",
+      "general": "General",
+      "jogging": "Jogging",
+      "location": "Location",
+      "macros": "Macros",
+      "overrides": "Overrides",
+      "probing": "Probing",
+      "spindleLaser": "Spindle/Laser",
+      "toolbar": "Toolbar",
+      "visualizer": "Visualizer"
+    },
+    "table": {
+      "editTooltip": "Edit this shortcut",
+      "deleteTooltip": "Delete this shortcut",
+      "addTooltip": "Assign a shortcut to this action",
+      "editAria": "Edit shortcut for {{action}}",
+      "deleteAria": "Delete shortcut for {{action}}",
+      "addAria": "Add shortcut for {{action}}",
+      "toggleAria": "Toggle active status for {{action}}",
+      "action": "Action",
+      "shortcut": "Shortcut",
+      "category": "Category",
+      "active": "Active"
+    },
+    "editArea": {
+      "inUse": "This shortcut is already in use by action \"{{action}}\"",
+      "available": "Shortcut is Available",
+      "none": "None",
+      "pressKeys": "Press Some Keys...",
+      "action": "Action",
+      "currentShortcut": "Current Shortcut",
+      "newShortcut": "New Shortcut:",
+      "update": "Update Shortcut"
+    },
+    "print": {
+      "heading": "gSender Keyboard Shortcuts",
+      "generatedOn": "Generated on {{date}}",
+      "documentTitle": "Keyboard Shortcuts"
+    },
+    "actions": {
+      "import": "Import",
+      "importTooltip": "Import shortcuts from a file",
+      "export": "Export",
+      "exportTooltip": "Export shortcuts to a file",
+      "enableAll": "Enable All",
+      "enableAllTooltip": "Enable all shortcuts",
+      "disableAll": "Disable All",
+      "disableAllTooltip": "Disable all shortcuts",
+      "print": "Print",
+      "printTooltip": "Print shortcuts"
+    },
+    "editDialog": {
+      "title": "Edit Shortcut",
+      "description": "Update the keybinding for this shortcut"
+    }
+  },
+  "dro": {
+    "labels": {
+      "home": "Home",
+      "zero": "Zero",
+      "goTo": "Go to"
+    },
+    "zeroAll": {
+      "tooltip": "Zero all axes",
+      "button": "Zero",
+      "ariaLabel": "Zero all axes: Set current position as work zero for all axes",
+      "confirmTitle": "Zero All Axes",
+      "confirmContent": "Are you sure you want to zero all axes?"
+    },
+    "goToXY": {
+      "tooltip": "Go to XY zero",
+      "ariaLabelXA": "Go to XA zero: Move X and A axes to their current work zero position",
+      "ariaLabelXY": "Go to XY zero: Move X and Y axes to their current work zero position"
+    },
+    "axisRow": {
+      "homeTooltip": "Home your {{axis}}-axis",
+      "zeroTooltip": "Zero your {{axis}}-axis",
+      "homeAriaLabel": "Home {{axis}} axis: Move to physical machine limit",
+      "zeroAriaLabel": "Zero {{axis}} axis: Set current position as work zero",
+      "zeroAxis": "Zero {{axis}} axis",
+      "confirmTitle": "Zero {{axis}} Axis",
+      "confirmContent": "Are you sure you want to zero the {{axis}} axis?",
+      "goToZeroTooltip": "Go to {{axis}}-axis zero",
+      "goToZeroAriaLabel": "Go to {{axis}} axis zero: Move axis to its current work zero position"
+    },
+    "goTo": {
+      "title": "Go To Location",
+      "openAriaLabel": "Open Go To Location dialog",
+      "mcsUnavailable": "Requires homing enabled ($22>0) and machine homed",
+      "executeAriaLabel": "Execute move to location",
+      "go": "Go!"
+    },
+    "homing": {
+      "toggleSingleAxis": "Toggle single axis homing",
+      "runTooltip": "Run homing",
+      "home": "Home"
+    },
+    "parking": {
+      "goToPark": "Go to Park Location"
+    },
+    "units": {
+      "inch": "Inch",
+      "currentAriaLabel": "Current units are {{units}}. Click to change.",
+      "label": "Units:",
+      "title": "Units",
+      "selectAriaLabel": "Select units",
+      "inches": "Inches",
+      "millimeters": "Millimeters"
+    },
+    "rapidPosition": {
+      "backLeft": "Go to Back Left Corner",
+      "backRight": "Go to Back Right Corner",
+      "frontLeft": "Go to Front Left Corner",
+      "frontRight": "Go to Front Right Corner"
+    }
+  },
+  "coolant": {
+    "mist": "Mist",
+    "mistTooltip": "Turn on mist coolant",
+    "flood": "Flood",
+    "floodTooltip": "Turn on flood coolant",
+    "off": "Off",
+    "offTooltip": "Turn off coolant"
+  },
+  "spindle": {
+    "active": "Active",
+    "notActive": "Not Active",
+    "laser": {
+      "on": "Laser On",
+      "onTooltip": "Turn on laser",
+      "test": "Laser Test",
+      "testTooltip": "Turn on laser for Test Duration",
+      "off": "Off",
+      "offTooltip": "Turn off laser",
+      "power": "Power",
+      "adjustPower": "Adjust laser power",
+      "testDurationLabel": "Test Duration:",
+      "testDuration": "Laser test duration",
+      "secondsSuffix": "sec"
+    },
+    "modeToggle": {
+      "tooltip": "Enable Spindle or Laser mode",
+      "spindle": "Spindle",
+      "laser": "Laser",
+      "ariaLabel": "Toggle spindle or laser mode"
+    },
+    "controls": {
+      "forward": "Forward",
+      "forwardTooltip": "Run spindle clockwise",
+      "forwardAriaLabel": "Start spindle clockwise (M3)",
+      "reverse": "Reverse",
+      "reverseTooltip": "Run spindle counterclockwise",
+      "reverseAriaLabel": "Start spindle counterclockwise (M4)",
+      "stop": "Stop",
+      "stopTooltip": "Stop spindle",
+      "stopAriaLabel": "Stop spindle (M5)",
+      "speed": "Speed",
+      "adjustSpeed": "Adjust spindle speed",
+      "typeSpeed": "Type spindle speed"
+    },
+    "selector": {
+      "tooltip": "Select a spindle",
+      "defaultSpindle": "Default Spindle",
+      "ariaLabel": "Select spindle"
+    }
+  },
+  "jogging": {
+    "wheelArrowsAlt": "Jog wheel arrows",
+    "input": {
+      "xyDistance": "XY jog distance",
+      "zDistance": "Z jog distance",
+      "aDistance": "A jog distance",
+      "feedrateLabel": "at",
+      "feedrate": "Jog feedrate",
+      "decrease": "Decrease {{label}}",
+      "increase": "Increase {{label}}"
+    },
+    "wheel": {
+      "xPlusYMinus": "Jog X plus Y minus",
+      "xMinusYMinus": "Jog X minus Y minus",
+      "xMinusYPlus": "Jog X minus Y plus",
+      "xPlusYPlus": "Jog X plus Y plus",
+      "yMinus": "Jog Y minus",
+      "xMinus": "Jog X minus",
+      "yPlus": "Jog Y plus",
+      "xPlus": "Jog X plus"
+    },
+    "stopAriaLabel": "Stop Jogging",
+    "tab": {
+      "plus": "Jog {{axis}} plus",
+      "minus": "Jog {{axis}} minus",
+      "labelsAlt": "{{axis}} Labels tab"
+    },
+    "speed": {
+      "precise": "Precise",
+      "preciseAriaLabel": "Set to Precise jog preset",
+      "normal": "Normal",
+      "normalAriaLabel": "Set to Normal jog preset",
+      "rapid": "Rapid",
+      "rapidAriaLabel": "Set to Rapid jog preset",
+      "custom": "Custom",
+      "customAriaLabel": "Set to Custom jog preset"
+    }
+  }
+}

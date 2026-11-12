@@ -1,5 +1,6 @@
 import RangeSlider from 'app/components/RangeSlider';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { mapPositionToUnits } from 'app/lib/units';
 import store from 'app/store';
@@ -55,6 +56,7 @@ const Overrides: React.FC<OverridesProps> = ({
     isConnected,
 }) => {
     globalOvTimestamp = ovTimestamp;
+    const { t } = useAppTranslation();
     const { units } = useWorkspaceState();
 
     const [showSpindleOverride, setShowSpindleOverride] = useState(
@@ -115,7 +117,7 @@ const Overrides: React.FC<OverridesProps> = ({
                 percentage={[localOvF]}
                 defaultPercentage={[100]}
                 showText={true}
-                title="Feed"
+                title={t('workspace:jobControl.overrides.feed')}
                 unitString={unitString}
                 colour={isConnected ? 'bg-blue-400' : 'bg-gray-500'}
                 disabled={!isConnected}
@@ -143,9 +145,15 @@ const Overrides: React.FC<OverridesProps> = ({
                     percentage={[localOvS]}
                     defaultPercentage={[100]}
                     showText={true}
-                    title={spindleOverrideLabel}
+                    title={
+                        spindleOverrideLabel === 'Laser'
+                            ? t('workspace:jobControl.overrides.laser')
+                            : t('workspace:jobControl.overrides.spindle')
+                    }
                     unitString={
-                        spindleOverrideLabel === 'Laser' ? 'Power' : 'RPM'
+                        spindleOverrideLabel === 'Laser'
+                            ? t('workspace:jobControl.overrides.power')
+                            : 'RPM'
                     }
                     colour={
                         isConnected

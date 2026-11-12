@@ -28,6 +28,7 @@ import {
 } from 'app/features/Rotary/utils/probeCommands';
 import { useDarkMode } from 'app/hooks/useDarkMode';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
@@ -46,6 +47,7 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 
 const Workspace = () => {
+    const { t } = useAppTranslation();
     const location = useLocation();
 
     useEffect(() => {
@@ -402,7 +404,7 @@ const Workspace = () => {
                 href="#main-content"
                 className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[10000] focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-md"
             >
-                Skip to main content
+                {t('workspace:layout.skipToMain')}
             </a>
             <div className="flex flex-col h-full dark:bg-surface-base">
                 <header role="banner">

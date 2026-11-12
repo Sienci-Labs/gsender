@@ -11,7 +11,9 @@
     "ok": "OK",
     "reset": "Zurücksetzen",
     "save": "Speichern",
-    "yes": "Ja"
+    "yes": "Ja",
+    "copyToClipboard": "In Zwischenablage kopieren",
+    "goBack": "Zurück"
   },
   "language": {
     "label": "Sprache",
@@ -37,5 +39,108 @@
     "disconnected": "Getrennt",
     "toolChange": "Werkzeugwechsel",
     "door": "Tür"
+  },
+  "pluginToolCard": {
+    "plugin": "Plugin",
+    "official": "Offiziell",
+    "community": "Community"
+  },
+  "rangeSlider": {
+    "resetTooltip": "Override auf 100 % zurücksetzen",
+    "resetLabel": "{{title}}-Override auf 100 % zurücksetzen",
+    "decreaseTooltip": "{{title}}-Override um {{step}} % verringern",
+    "decreaseLabel": "{{title}}-Override verringern",
+    "increaseTooltip": "{{title}}-Override um {{step}} % erhöhen",
+    "increaseLabel": "{{title}}-Override erhöhen"
+  },
+  "table": {
+    "searchPlaceholder": "Alle Spalten durchsuchen...",
+    "addNew": "Neu hinzufügen",
+    "addNewTask": "Neue Aufgabe hinzufügen",
+    "resetAll": "Alle zurücksetzen",
+    "jumpToPage": "Gehe zu Seite:",
+    "entriesPerPage": "Einträge/Seite:",
+    "showCount": "{{size}} anzeigen"
+  },
+  "status": {
+    "offUpper": "AUS",
+    "onUpper": "EIN",
+    "loading": "Wird geladen",
+    "on": "Ein",
+    "off": "Aus"
+  },
+  "spindleLaser": {
+    "spindle": "Spindel",
+    "laser": "Laser"
+  },
+  "toggle": {
+    "label": "Umschalten"
+  },
+  "tabs": {
+    "scrollLeft": "Registerkarten nach links scrollen",
+    "widgetTabs": "Widget-Registerkarten",
+    "scrollRight": "Registerkarten nach rechts scrollen"
+  },
+  "toolCard": {
+    "unpinTool": "Werkzeug lösen",
+    "pinToTop": "Oben anheften"
+  },
+  "updateAlert": {
+    "title": "Funktion in Arbeit",
+    "description": "Aussehen, Bedienung und Funktionsumfang dieses Bereichs werden in einer späteren Version aktualisiert."
+  },
+  "wizard": {
+    "allStepsComplete": "Alle Schritte abgeschlossen",
+    "stepOf": "Schritt {{step}} von {{total}}",
+    "percentComplete": "{{percent}} % abgeschlossen",
+    "exit": "Beenden",
+    "restartHome": "Zurück zum Anfang",
+    "secondaryContentAlt": "Zusätzlicher Inhalt",
+    "onlineResources": "Online-Ressourcen",
+    "scanQrCode": "QR-Code scannen",
+    "runningLabel": "{{label}}...",
+    "complete": "Abgeschlossen",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "validation": {
+      "failed": "Validierung fehlgeschlagen",
+      "notConnected": "Ihre Steuerung ist nicht verbunden. Verbinden Sie sich mit Ihrer CNC, um dieses Zubehör zu konfigurieren.",
+      "notHomed": "Maschine nicht referenziert. Bitte führen Sie eine Referenzfahrt durch, bevor Sie mit der Zubehörkonfiguration fortfahren.",
+      "requiresGrblHal": "Sie müssen mit einem grblHAL-Gerät verbunden sein, um diesen Assistenten zu verwenden.",
+      "requiresGrbl": "Sie müssen mit einem Grbl-Gerät verbunden sein, um diesen Assistenten zu verwenden.",
+      "notIdle": "Ihre Maschine muss bereit sein oder verfahren, um diesen Assistenten zu verwenden."
+    },
+    "configFileVersion": "Version der Konfigurationsdatei: {{version}}",
+    "exitWizard": "Assistenten beenden",
+    "restartWizard": "Assistenten neu starten",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "backToWizards": "Zurück zu den Assistenten",
+    "backToTools": "Zurück zu den Werkzeugen",
+    "estimatedTime": "Geschätzte Dauer:",
+    "imageAlt": "Bild des Assistenten",
+    "needHelp": "Hilfe benötigt?",
+    "hub": {
+      "defaultTitle": "Assistenten für CNC-Zubehör",
+      "configurationCount_one": "{{count}} Konfiguration",
+      "configurationCount_other": "{{count}} Konfigurationen",
+      "totalSteps_one": "{{count}} Schritt insgesamt",
+      "totalSteps_other": "{{count}} Schritte insgesamt",
+      "startWizard": "Assistenten starten",
+      "noWizards": "Keine Assistenten verfügbar"
+    }
+  },
+  "carousel": {
+    "roleDescription": "Karussell",
+    "slideRoleDescription": "Folie",
+    "previousSlide": "Vorherige Folie",
+    "nextSlide": "Nächste Folie"
+  },
+  "select": {
+    "scrollUp": "Nach oben scrollen",
+    "scrollDown": "Nach unten scrollen"
+  },
+  "toast": {
+    "dismiss": "Benachrichtigung schließen"
   }
 }

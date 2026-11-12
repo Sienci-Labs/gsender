@@ -4,12 +4,14 @@ import common from './common.json';
 import config from './config.json';
 import helper from './helper.json';
 import notifications from './notifications.json';
+import workspace from './workspace.json';
 
 export const resources = {
     common,
     config,
     helper,
     notifications,
+    workspace,
 } as const;
 
 export type Namespace = keyof typeof resources;

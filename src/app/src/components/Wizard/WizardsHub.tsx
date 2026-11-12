@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/a11y/useButtonType: <> */
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { ArrowRight, Settings } from 'lucide-react';
 import Button from '../Button';
 import type { Wizard } from './types/wizard';
@@ -17,6 +18,7 @@ export function WizardsHub({
     title,
     description,
 }: WizardsHubProps) {
+    const { t } = useAppTranslation();
     return (
         <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
             <div className="max-w-6xl mx-auto px-8 py-16">
@@ -27,12 +29,13 @@ export function WizardsHub({
                             className="text-gray-700 dark:text-content-primary"
                         />
                         <h1 className="text-5xl font-bold text-gray-900 dark:text-content-primary">
-                            {title || 'CNC Accessory Wizards'}
+                            {translateKey(title) ||
+                                t('common:wizard.hub.defaultTitle')}
                         </h1>
                     </div>
                     {description && (
                         <p className="text-xl text-gray-600 dark:text-content-secondary max-w-3xl">
-                            {description}
+                            {translateKey(description)}
                         </p>
                     )}
                 </div>
@@ -58,7 +61,7 @@ export function WizardsHub({
 
                                 <div className="relative w-full">
                                     <h2 className="text-2xl font-bold text-gray-900 dark:text-content-primary mb-3 group-hover:text-blue-600 transition-colors">
-                                        {wizard.title}
+                                        {translateKey(wizard.title)}
                                     </h2>
 
                                     <div className="space-y-2 mb-6">
@@ -77,11 +80,13 @@ export function WizardsHub({
                                                 />
                                             </svg>
                                             <span>
-                                                {wizard.subWizards.length}{' '}
-                                                configuration
-                                                {wizard.subWizards.length !== 1
-                                                    ? 's'
-                                                    : ''}
+                                                {t(
+                                                    'common:wizard.hub.configurationCount',
+                                                    {
+                                                        count: wizard.subWizards
+                                                            .length,
+                                                    },
+                                                )}
                                             </span>
                                         </div>
 
@@ -100,7 +105,10 @@ export function WizardsHub({
                                                 />
                                             </svg>
                                             <span>
-                                                {totalSteps} total steps
+                                                {t(
+                                                    'common:wizard.hub.totalSteps',
+                                                    { count: totalSteps },
+                                                )}
                                             </span>
                                         </div>
 
@@ -119,13 +127,19 @@ export function WizardsHub({
                                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                                     />
                                                 </svg>
-                                                <span>{estimatedTime}</span>
+                                                <span>
+                                                    {translateKey(
+                                                        estimatedTime,
+                                                    )}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all">
-                                        <span>Start Wizard</span>
+                                        <span>
+                                            {t('common:wizard.hub.startWizard')}
+                                        </span>
                                         <ArrowRight
                                             size={20}
                                             className="group-hover:translate-x-1 transition-transform"
@@ -143,7 +157,7 @@ export function WizardsHub({
                             <Settings size={32} className="text-gray-400" />
                         </div>
                         <p className="text-xl text-gray-600">
-                            No wizards available
+                            {t('common:wizard.hub.noWizards')}
                         </p>
                     </div>
                 )}

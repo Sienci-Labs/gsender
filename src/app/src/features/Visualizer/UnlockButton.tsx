@@ -22,6 +22,7 @@
  */
 
 import { GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import get from 'lodash/get';
 import noop from 'lodash/noop';
@@ -35,15 +36,16 @@ interface Props {
 }
 
 const UnlockButton = ({ activeState }: Props) => {
+    const { t } = useAppTranslation();
     const [isHovering, setIsHovering] = useState(false);
     const onMouseOver = () => setIsHovering(true);
     const onMouseOut = () => setIsHovering(false);
 
     const getButtonText = () => {
         if (activeState === GRBL_ACTIVE_STATE_HOLD) {
-            return 'Cycle Start';
+            return t('workspace:visualizer.cycleStart');
         }
-        return 'Unlock Machine';
+        return t('workspace:visualizer.unlockMachine');
     };
 
     const handleUnlock = () => {

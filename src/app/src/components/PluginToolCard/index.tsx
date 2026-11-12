@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 import cx from 'classnames';
 import type { IconType } from 'react-icons';
@@ -30,6 +31,7 @@ const PluginToolCard = ({
     onTogglePin,
     className,
 }: PluginToolCardProps) => {
+    const { t } = useAppTranslation();
     const CardContent = (
         <div
             onClick={onClick}
@@ -68,7 +70,7 @@ const PluginToolCard = ({
                         official ? 'text-teal-200' : 'text-purple-200',
                     )}
                 >
-                    Plugin
+                    {t('common:pluginToolCard.plugin')}
                 </span>
             </div>
 
@@ -91,7 +93,9 @@ const PluginToolCard = ({
                         official ? 'text-teal-50' : 'text-purple-100',
                     )}
                 >
-                    {official ? 'Official' : 'Community'}
+                    {official
+                        ? t('common:pluginToolCard.official')
+                        : t('common:pluginToolCard.community')}
                 </span>
             </div>
 

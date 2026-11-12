@@ -5,6 +5,7 @@ import {
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
 import { GRBL } from 'app/constants';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { isIPv4 } from 'app/lib/utils';
 import store from 'app/store';
@@ -44,6 +45,7 @@ export interface ConnectionProps {
 export type FirmwareFlavour = 'Grbl' | 'grblHAL' | '';
 
 function Connection(props: ConnectionProps) {
+    const { t } = useAppTranslation();
     const connectionConfig = new WidgetConfig('connection');
     const posthog = usePostHog();
 
@@ -304,7 +306,7 @@ function Connection(props: ConnectionProps) {
                 role="button"
                 aria-haspopup="true"
                 aria-expanded={isDropdownOpen}
-                aria-label="Connection menu"
+                aria-label={t('workspace:connection.menuLabel')}
                 tabIndex={0}
             >
                 {connectionState !== ConnectionState.CONNECTED && (
@@ -325,20 +327,22 @@ function Connection(props: ConnectionProps) {
                         />
                         {connectionState === ConnectionState.DISCONNECTED && (
                             <span className="max-sm:hidden portrait:hidden animate-pulse">
-                                Connect to CNC
+                                {t('workspace:connection.connectToCnc')}
                             </span>
                         )}
                         {connectionState === ConnectionState.DISCONNECTED && (
                             <span className="max-sm:hidden landscape:hidden animate-pulse">
-                                Connect
+                                {t('workspace:connection.connect')}
                             </span>
                         )}
                         {connectionState === ConnectionState.CONNECTING && (
-                            <span className="max-sm:hidden">Connecting...</span>
+                            <span className="max-sm:hidden">
+                                {t('workspace:connection.connecting')}
+                            </span>
                         )}
                         {connectionState === ConnectionState.ERROR && (
                             <span className="max-sm:hidden">
-                                Unable to connect.
+                                {t('workspace:connection.unableToConnect')}
                             </span>
                         )}
                         {connectionState == ConnectionState.CONNECTED && (

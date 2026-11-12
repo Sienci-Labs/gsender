@@ -1337,10 +1337,14 @@ class GcodeViewer extends Component<Props> {
         const description = (
             <div className={'flex flex-col gap-2'}>
                 <p>
-                    Detected {invalidLineCount} invalid lines on file load. Your
-                    job may not run correctly.
+                    {i18n.t(
+                        'notifications:visualizer.invalidLines.description',
+                        {
+                            count: invalidLineCount,
+                        },
+                    )}
                 </p>
-                <p>Sample invalid lines found include:</p>
+                <p>{i18n.t('notifications:visualizer.invalidLines.sample')}</p>
                 <ol>
                     {lineSample.map((line, i) => (
                         <li className="text-xs" key={i}>
@@ -1352,7 +1356,7 @@ class GcodeViewer extends Component<Props> {
         );
         pubsub.publish('helper:info', {
             kind: 'error',
-            title: 'Invalid lines detected',
+            title: i18n.t('notifications:visualizer.invalidLines.title'),
             description,
         });
     }

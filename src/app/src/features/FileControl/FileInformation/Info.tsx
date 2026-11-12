@@ -1,7 +1,9 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 
 const Info = () => {
+    const { t } = useAppTranslation();
     const { toolSet, movementSet, spindleSet, estimatedTime, fileModal } =
         useTypedSelector((state) => state.file);
     const { units } = useWorkspaceState();
@@ -71,29 +73,37 @@ const Info = () => {
     return (
         <div className="text-gray-900 dark:text-content-secondary">
             <div className="flex gap-1">
-                <span className="font-bold">Estimated Time</span>
+                <span className="font-bold">
+                    {t('workspace:fileControl.estimatedTime')}
+                </span>
                 <span>{formattedEstimatedTime}</span>
             </div>
 
             <div className="flex gap-1">
-                <span className="font-bold">Feed</span>
+                <span className="font-bold">
+                    {t('workspace:fileControl.feed')}
+                </span>
                 <span>{formattedFeedrate}</span>
             </div>
 
             <div className="flex gap-1">
-                <span className="font-bold">Speed</span>
+                <span className="font-bold">
+                    {t('workspace:fileControl.speed')}
+                </span>
                 <span>
                     {spindleSetFormatted.length === 0
-                        ? 'None'
+                        ? t('workspace:fileControl.none')
                         : `${spindleMin}-${spindleMax} RPM`}
                 </span>
             </div>
 
             <div className="flex gap-1">
-                <span className="font-bold">Tools</span>
+                <span className="font-bold">
+                    {t('workspace:fileControl.tools')}
+                </span>
                 <span>
                     {toolSetFormatted.length === 0
-                        ? 'None'
+                        ? t('workspace:fileControl.none')
                         : `${toolSetFormatted.length} (${toolSetFormatted.toString()})`}
                 </span>
             </div>

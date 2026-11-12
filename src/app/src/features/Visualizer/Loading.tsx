@@ -21,10 +21,12 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import pubsub from 'pubsub-js';
 import { useEffect, useState } from 'react';
 
 const Loading = () => {
+    const { t } = useAppTranslation();
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
@@ -44,7 +46,7 @@ const Loading = () => {
             <div className="flex mb-2 items-center justify-between">
                 <div>
                     <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-white bg-robin-500 invisible">
-                        Loading...
+                        {t('workspace:visualizer.loading')}
                     </span>
                 </div>
                 <div className="text-right bg-gray-500 bg-opacity-30 border border-gray-500 rounded-xl px-2 w-20 flex items-center justify-center">

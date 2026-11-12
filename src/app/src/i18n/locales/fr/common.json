@@ -11,7 +11,9 @@
     "ok": "OK",
     "reset": "Réinitialiser",
     "save": "Enregistrer",
-    "yes": "Oui"
+    "yes": "Oui",
+    "copyToClipboard": "Copier dans le presse-papiers",
+    "goBack": "Retour"
   },
   "language": {
     "label": "Langue",
@@ -37,5 +39,110 @@
     "disconnected": "Déconnecté",
     "toolChange": "Changement d'outil",
     "door": "Porte"
+  },
+  "pluginToolCard": {
+    "plugin": "Plugin",
+    "official": "Officiel",
+    "community": "Communauté"
+  },
+  "rangeSlider": {
+    "resetTooltip": "Rétablir la surcharge à 100%",
+    "resetLabel": "Rétablir la surcharge {{title}} à 100%",
+    "decreaseTooltip": "Réduire la surcharge {{title}} de {{step}}%",
+    "decreaseLabel": "Réduire la surcharge {{title}}",
+    "increaseTooltip": "Augmenter la surcharge {{title}} de {{step}}%",
+    "increaseLabel": "Augmenter la surcharge {{title}}"
+  },
+  "table": {
+    "searchPlaceholder": "Rechercher dans toutes les colonnes...",
+    "addNew": "Ajouter",
+    "addNewTask": "Ajouter une tâche",
+    "resetAll": "Tout réinitialiser",
+    "jumpToPage": "Aller à la page :",
+    "entriesPerPage": "Entrées/page :",
+    "showCount": "Afficher {{size}}"
+  },
+  "status": {
+    "offUpper": "ARRÊT",
+    "onUpper": "MARCHE",
+    "loading": "Chargement",
+    "on": "Marche",
+    "off": "Arrêt"
+  },
+  "spindleLaser": {
+    "spindle": "Broche",
+    "laser": "Laser"
+  },
+  "toggle": {
+    "label": "Basculer"
+  },
+  "tabs": {
+    "scrollLeft": "Faire défiler les onglets vers la gauche",
+    "widgetTabs": "Onglets des widgets",
+    "scrollRight": "Faire défiler les onglets vers la droite"
+  },
+  "toolCard": {
+    "unpinTool": "Désépingler l'outil",
+    "pinToTop": "Épingler en haut"
+  },
+  "updateAlert": {
+    "title": "Fonctionnalité en cours de développement",
+    "description": "L'apparence et les fonctionnalités de cette zone seront mises à jour dans une version ultérieure."
+  },
+  "wizard": {
+    "allStepsComplete": "Toutes les étapes sont terminées",
+    "stepOf": "Étape {{step}} sur {{total}}",
+    "percentComplete": "{{percent}}% terminé",
+    "exit": "Quitter",
+    "restartHome": "Retour à l'accueil",
+    "secondaryContentAlt": "Contenu secondaire",
+    "onlineResources": "ressources en ligne",
+    "scanQrCode": "Scanner le code QR",
+    "runningLabel": "{{label}}...",
+    "complete": "Terminé",
+    "error": "Erreur",
+    "success": "Succès",
+    "validation": {
+      "failed": "Échec de la validation",
+      "notConnected": "Votre contrôleur n'est pas connecté. Connectez-vous à votre CNC pour configurer cet accessoire.",
+      "notHomed": "Prise d'origine non effectuée. Veuillez effectuer la prise d'origine de votre machine avant de configurer l'accessoire.",
+      "requiresGrblHal": "Vous devez être connecté à un appareil grblHAL pour utiliser cet assistant.",
+      "requiresGrbl": "Vous devez être connecté à un appareil Grbl pour utiliser cet assistant.",
+      "notIdle": "Votre machine doit être inactive ou en déplacement manuel pour utiliser cet assistant."
+    },
+    "configFileVersion": "Version du fichier de configuration : {{version}}",
+    "exitWizard": "Quitter l'assistant",
+    "restartWizard": "Redémarrer l'assistant",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "backToWizards": "Retour aux assistants",
+    "backToTools": "Retour aux outils",
+    "estimatedTime": "Durée estimée :",
+    "imageAlt": "Image de l'assistant",
+    "needHelp": "Besoin d'aide ?",
+    "hub": {
+      "defaultTitle": "Assistants d'accessoires CNC",
+      "configurationCount_many": "{{count}} configurations",
+      "configurationCount_one": "{{count}} configuration",
+      "configurationCount_other": "{{count}} configurations",
+      "totalSteps_many": "{{count}} étapes au total",
+      "totalSteps_one": "{{count}} étape au total",
+      "totalSteps_other": "{{count}} étapes au total",
+      "startWizard": "Lancer l'assistant",
+      "noWizards": "Aucun assistant disponible"
+    }
+  },
+  "carousel": {
+    "roleDescription": "carrousel",
+    "slideRoleDescription": "diapositive",
+    "previousSlide": "Diapositive précédente",
+    "nextSlide": "Diapositive suivante"
+  },
+  "select": {
+    "scrollUp": "Défiler vers le haut",
+    "scrollDown": "Défiler vers le bas"
+  },
+  "toast": {
+    "dismiss": "Fermer la notification"
   }
 }

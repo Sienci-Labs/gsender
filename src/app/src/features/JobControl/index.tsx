@@ -9,6 +9,7 @@ import {
     isToolProbed,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
+import { TransKey, useAppTranslation } from 'app/i18n';
 import type { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import type { WORKFLOW_STATES_T } from 'app/store/definitions';
 import cx from 'classnames';
@@ -76,6 +77,7 @@ const JobControl: React.FC<JobControlProps> = ({
     toolTableSize,
     hasToolTable,
 }) => {
+    const { t } = useAppTranslation();
     const [lastLine, setLastLine] = useState(1);
     const [pubsubTokens, setPubsubTokens] = useState([]);
     //const disabled = !isConnected || !fileLoaded;
@@ -150,25 +152,30 @@ const JobControl: React.FC<JobControlProps> = ({
                 true,
                 {
                     type: 'alert',
-                    title: 'Tool Number Exceeds Tool Table Size',
+                    title: t(
+                        'workspace:jobControl.atcValidation.outOfRange.title',
+                    ),
                     body: (
                         <>
                             <p>
-                                This file references tool
-                                {outOfRangeTools.length > 1 ? 's' : ''}{' '}
-                                {outOfRangeTools.map((n) => `T${n}`).join(', ')}
-                                , which exceed
-                                {outOfRangeTools.length === 1 ? 's' : ''} your
-                                configured tool table size ({toolTableSize}{' '}
-                                tools).
+                                {t(
+                                    'workspace:jobControl.atcValidation.outOfRange.description',
+                                    {
+                                        count: outOfRangeTools.length,
+                                        list: outOfRangeTools
+                                            .map((n) => `T${n}`)
+                                            .join(', '),
+                                        size: toolTableSize,
+                                    },
+                                )}
                             </p>
                             <p>
-                                Remap{' '}
-                                {outOfRangeTools.length > 1
-                                    ? 'these tools'
-                                    : 'this tool'}{' '}
-                                in the Tool Timeline before starting, or confirm
-                                to run anyway.
+                                {t(
+                                    'workspace:jobControl.atcValidation.outOfRange.remap',
+                                    {
+                                        count: outOfRangeTools.length,
+                                    },
+                                )}
                             </p>
                         </>
                     ),
@@ -204,17 +211,23 @@ const JobControl: React.FC<JobControlProps> = ({
                     true,
                     {
                         type: 'alert',
-                        title: `Using Current Tool (T${currentTool})`,
+                        title: t(
+                            'workspace:jobControl.atcValidation.usingCurrentTool.title',
+                            {
+                                tool: currentTool,
+                            },
+                        ),
                         body: (
                             <>
                                 <p>
-                                    This file contains no tool change commands
-                                    (M6) and the tool in the spindle will be
-                                    used.
+                                    {t(
+                                        'workspace:jobControl.atcValidation.usingCurrentTool.description',
+                                    )}
                                 </p>
                                 <p>
-                                    Please confirm that you want to use this
-                                    tool
+                                    {t(
+                                        'workspace:jobControl.atcValidation.usingCurrentTool.confirm',
+                                    )}
                                 </p>
                             </>
                         ),
@@ -225,19 +238,21 @@ const JobControl: React.FC<JobControlProps> = ({
                     true,
                     {
                         type: 'error',
-                        title: 'Current Tool Not Probed',
+                        title: t(
+                            'workspace:jobControl.atcValidation.notProbed.title',
+                        ),
                         body: (
                             <>
                                 <p>
-                                    The file contains no tool change commands
-                                    (M6) and the tool in the spindle will be
-                                    used. However, the tool in the spindle does
-                                    not have an offset.
+                                    {t(
+                                        'workspace:jobControl.atcValidation.notProbed.description',
+                                    )}
                                 </p>
                                 <p>
-                                    Select <b>"Probe"</b> in the ATC tab to
-                                    establish an offset and re-zero the
-                                    workpiece before trying again.
+                                    <TransKey
+                                        i18nKey="workspace:jobControl.atcValidation.notProbed.hint"
+                                        components={{ bold: <b /> }}
+                                    />
                                 </p>
                             </>
                         ),
@@ -251,21 +266,23 @@ const JobControl: React.FC<JobControlProps> = ({
                 true,
                 {
                     type: 'error',
-                    title: 'No Current Tool',
+                    title: t('workspace:jobControl.atcValidation.noTool.title'),
                     body: (
                         <>
                             <p>
-                                This file contains no tool change commands (M6)
-                                and there is no tool in the spindle.
+                                {t(
+                                    'workspace:jobControl.atcValidation.noTool.description',
+                                )}
                             </p>
                             <p>
-                                Load the tool you want to use into the spindle
-                                before trying again.
+                                {t(
+                                    'workspace:jobControl.atcValidation.noTool.loadTool',
+                                )}
                             </p>
                             <p>
-                                Alternatively, you can update your
-                                post-processor to include a tool change command
-                                with your file.
+                                {t(
+                                    'workspace:jobControl.atcValidation.noTool.alternative',
+                                )}
                             </p>
                         </>
                     ),

@@ -21,6 +21,8 @@
  *
  */
 
+import { tk } from 'app/i18n';
+
 export const MODAL_NONE = 'widgets/macro/MODAL_NONE' as const;
 export const MODAL_ADD_MACRO = 'widgets/macro/MODAL_ADD_MACRO' as const;
 export const MODAL_EDIT_MACRO = 'widgets/macro/MODAL_EDIT_MACRO' as const;
@@ -28,54 +30,114 @@ export const MODAL_RUN_MACRO = 'widgets/macro/MODAL_RUN_MACRO' as const;
 export const MODAL_MACRO_FORM = 'widgets/macro/MODAL_MACRO_FORM' as const;
 
 export const MACRO_VARIABLES = [
-    { text: '%wait', group: 'Wait until the planner queue is empty' },
+    {
+        text: '%wait',
+        group: tk('workspace:macros.variableGroups.waitForPlanner'),
+    },
     {
         text: '%global.tool = Number(tool) || 0\n',
-        group: 'User-defined global variables',
+        group: tk('workspace:macros.variableGroups.globalVariables'),
     },
     {
         text: '(tool=[global.tool])\n',
-        group: 'Display a global variable using an inline comment',
+        group: tk('workspace:macros.variableGroups.displayGlobalVariable'),
     },
     {
         text: '%X0=posx,Y0=posy,Z0=posz\n',
-        group: 'Keep a backup of current work position',
+        group: tk('workspace:macros.variableGroups.backupWorkPosition'),
     },
-    { text: 'G0 X[X0] Y[Y0]\n', group: 'Go to previous work position' },
-    { text: 'G0 Z[Z0]\n', group: 'Go to previous work position' },
+    {
+        text: 'G0 X[X0] Y[Y0]\n',
+        group: tk('workspace:macros.variableGroups.previousWorkPosition'),
+    },
+    {
+        text: 'G0 Z[Z0]\n',
+        group: tk('workspace:macros.variableGroups.previousWorkPosition'),
+    },
     {
         text: '%prevTool = Number(global.tool) || 0, global.tool = tool\n',
-        group: 'Tool change',
+        group: tk('workspace:macros.variableGroups.toolChange'),
     },
-    { text: '%WCS=modal.wcs\n', group: 'Save modal state' },
-    { text: '%PLANE=modal.plane\n', group: 'Save modal state' },
-    { text: '%UNITS=modal.units\n', group: 'Save modal state' },
-    { text: '%DISTANCE=modal.distance\n', group: 'Save modal state' },
-    { text: '%FEEDRATE=modal.feedrate\n', group: 'Save modal state' },
-    { text: '%SPINDLE=modal.spindle\n', group: 'Save modal state' },
-    { text: '%COOLANT=modal.coolant\n', group: 'Save modal state' },
+    {
+        text: '%WCS=modal.wcs\n',
+        group: tk('workspace:macros.variableGroups.saveModalState'),
+    },
+    {
+        text: '%PLANE=modal.plane\n',
+        group: tk('workspace:macros.variableGroups.saveModalState'),
+    },
+    {
+        text: '%UNITS=modal.units\n',
+        group: tk('workspace:macros.variableGroups.saveModalState'),
+    },
+    {
+        text: '%DISTANCE=modal.distance\n',
+        group: tk('workspace:macros.variableGroups.saveModalState'),
+    },
+    {
+        text: '%FEEDRATE=modal.feedrate\n',
+        group: tk('workspace:macros.variableGroups.saveModalState'),
+    },
+    {
+        text: '%SPINDLE=modal.spindle\n',
+        group: tk('workspace:macros.variableGroups.saveModalState'),
+    },
+    {
+        text: '%COOLANT=modal.coolant\n',
+        group: tk('workspace:macros.variableGroups.saveModalState'),
+    },
     {
         text: '[WCS] [PLANE] [UNITS] [DISTANCE] [FEEDRATE] [SPINDLE] [COOLANT]\n',
-        group: 'Restore modal state',
+        group: tk('workspace:macros.variableGroups.restoreModalState'),
     },
-    { text: '[posx]', group: 'Current work position' },
-    { text: '[posy]', group: 'Current work position' },
-    { text: '[posz]', group: 'Current work position' },
-    { text: '[posa]', group: 'Current work position' },
+    {
+        text: '[posx]',
+        group: tk('workspace:macros.variableGroups.currentWorkPosition'),
+    },
+    {
+        text: '[posy]',
+        group: tk('workspace:macros.variableGroups.currentWorkPosition'),
+    },
+    {
+        text: '[posz]',
+        group: tk('workspace:macros.variableGroups.currentWorkPosition'),
+    },
+    {
+        text: '[posa]',
+        group: tk('workspace:macros.variableGroups.currentWorkPosition'),
+    },
     {
         text: '%xmin=0,xmax=100,ymin=0,ymax=100,zmin=0,zmax=50\n',
-        group: 'Set bounding box',
+        group: tk('workspace:macros.variableGroups.boundingBox'),
     },
     {
         text: '$#\n%wait',
-        group: 'Request current Parameters - must do before using parameters',
+        group: tk('workspace:macros.variableGroups.requestParameters'),
     },
-    { text: '%PROBE_X=params.PRB.x\n', group: 'Get current Parameters' },
-    { text: '%PROBE_Y=params.PRB.y\n', group: 'Get current Parameters' },
-    { text: '%PROBE_Z=params.PRB.z\n', group: 'Get current Parameters' },
-    { text: '%G54_Z=params.G54.z\n', group: 'Get current Parameters' },
-    { text: '%G57_Z=params.G57.z\n', group: 'Get current Parameters' },
-    { text: '%TOOL_OFFSET=params.TLO\n', group: 'Get current Parameters' },
+    {
+        text: '%PROBE_X=params.PRB.x\n',
+        group: tk('workspace:macros.variableGroups.getParameters'),
+    },
+    {
+        text: '%PROBE_Y=params.PRB.y\n',
+        group: tk('workspace:macros.variableGroups.getParameters'),
+    },
+    {
+        text: '%PROBE_Z=params.PRB.z\n',
+        group: tk('workspace:macros.variableGroups.getParameters'),
+    },
+    {
+        text: '%G54_Z=params.G54.z\n',
+        group: tk('workspace:macros.variableGroups.getParameters'),
+    },
+    {
+        text: '%G57_Z=params.G57.z\n',
+        group: tk('workspace:macros.variableGroups.getParameters'),
+    },
+    {
+        text: '%TOOL_OFFSET=params.TLO\n',
+        group: tk('workspace:macros.variableGroups.getParameters'),
+    },
 ];
 
 export type ModalType =

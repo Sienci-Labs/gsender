@@ -31,7 +31,7 @@ import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileA
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -54,6 +54,7 @@ import { getRecentFiles } from './utils/recentfiles';
 
 const ButtonControlGroup = () => {
     const posthog = usePostHog();
+    const { t } = useAppTranslation();
     const isIOSDevice =
         /iPad|iPhone|iPod/.test(navigator.platform) ||
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -225,7 +226,7 @@ const ButtonControlGroup = () => {
             <Button
                 onClick={handleClickLoadFile}
                 icon={<FaFolderOpen className="w-5 h-5" />}
-                text="Load File"
+                text={t('workspace:fileControl.loadFile')}
                 variant="ghost"
                 disabled={!canClick}
                 className="h-full px-4 rounded-none portrait:text-xl portrait:px-6"
@@ -233,7 +234,9 @@ const ButtonControlGroup = () => {
             <Divider />
             <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px]">
                 <DropdownMenu>
-                    <Tooltip content="View Recent Files">
+                    <Tooltip
+                        content={t('workspace:fileControl.viewRecentFiles')}
+                    >
                         <DropdownMenuTrigger asChild>
                             <Button
                                 icon={
@@ -242,12 +245,16 @@ const ButtonControlGroup = () => {
                                 variant="ghost"
                                 disabled={!canClick || isCheck}
                                 className="h-full rounded-none"
-                                aria-label="View Recent Files"
+                                aria-label={t(
+                                    'workspace:fileControl.viewRecentFiles',
+                                )}
                             />
                         </DropdownMenuTrigger>
                     </Tooltip>
                     <DropdownMenuContent className="w-56 bg-white">
-                        <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
+                        <DropdownMenuLabel>
+                            {t('workspace:fileControl.recentFiles')}
+                        </DropdownMenuLabel>
                         {recentFiles.map((file) => (
                             <DropdownMenuItem
                                 key={file.filePath}
@@ -279,29 +286,34 @@ const ButtonControlGroup = () => {
                 <Divider />
 
                 <AlertDialog>
-                    <Tooltip content="Close File">
+                    <Tooltip content={t('workspace:fileControl.closeFile')}>
                         <AlertDialogTrigger asChild>
                             <Button
                                 icon={<MdClose className="w-6 h-6" />}
                                 variant="ghost"
                                 className="h-full rounded-none"
                                 disabled={isRunning || !fileLoaded}
-                                aria-label="Close File"
+                                aria-label={t(
+                                    'workspace:fileControl.closeFile',
+                                )}
                             />
                         </AlertDialogTrigger>
                     </Tooltip>
                     <AlertDialogContent className="bg-white">
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogTitle>
+                                {t('workspace:fileControl.confirmTitle')}
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                                This will close the current file. Any unsaved
-                                changes will be lost.
+                                {t('workspace:fileControl.closeFileConfirm')}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>
+                                {t('common:actions.cancel')}
+                            </AlertDialogCancel>
                             <AlertDialogAction onClick={handleCloseFile}>
-                                Close File
+                                {t('workspace:fileControl.closeFile')}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

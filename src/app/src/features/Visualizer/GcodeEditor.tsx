@@ -10,7 +10,7 @@ import {
 } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -83,6 +83,7 @@ const GcodeEditorLine = React.memo(
         handleLineChange,
         setEditingLineIndex,
     }: GcodeEditorLineProps) => {
+        const { t } = useAppTranslation();
         const getLineStatusClass = () => {
             if (!isJobRunning) return '';
             switch (lineStatus) {
@@ -152,8 +153,8 @@ const GcodeEditorLine = React.memo(
                     onClick={(e) => handleCheckboxClick(index, e)}
                     title={
                         isJobRunning
-                            ? 'Editing disabled while job is running'
-                            : 'Click to toggle selection'
+                            ? t('workspace:visualizer.editor.editingDisabled')
+                            : t('workspace:visualizer.editor.toggleSelection')
                     }
                     onMouseEnter={(e) => {
                         if (!isSelected)
@@ -284,6 +285,7 @@ const SYNTAX_CUSTOM_STYLE = {
 } as const;
 
 const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
+    const { t } = useAppTranslation();
     const { content, name } = useTypedSelector((state) => state.file);
     const workflowState = useTypedSelector(
         (state: RootState) => state.controller.workflow.state,
@@ -750,7 +752,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     if (!content) {
         return (
             <div className="w-full h-full flex items-center justify-center">
-                <p className="text-gray-600">No G-code file loaded</p>
+                <p className="text-gray-600">
+                    {t('workspace:visualizer.editor.noFile')}
+                </p>
             </div>
         );
     }
@@ -760,7 +764,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
             <div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-outline gap-3">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                     <h3 className="text-lg font-semibold dark:text-content-primary whitespace-nowrap">
-                        G-code Editor
+                        {t('workspace:visualizer.editor.title')}
                     </h3>
                     {isJobRunning && (
                         <span
@@ -776,18 +780,23 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             )}
                         >
                             {workflowState === WORKFLOW_STATE_PAUSED
-                                ? 'Paused'
-                                : 'Running'}
+                                ? t('workspace:visualizer.editor.paused')
+                                : t('common:machineState.running')}
                         </span>
                     )}
                     {selectedLines.size > 0 && (
                         <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium whitespace-nowrap">
-                            {selectedLines.size} selected
+                            {t('workspace:visualizer.editor.selectedCount', {
+                                count: selectedLines.size,
+                            })}
                         </span>
                     )}
                     {gcodeLines.length > 0 && (
                         <span className="text-xs text-gray-600 dark:text-content-muted whitespace-nowrap">
-                            {gcodeLines.length.toLocaleString()} lines
+                            {t('workspace:visualizer.editor.lineCount', {
+                                count: gcodeLines.length,
+                                lines: gcodeLines.length.toLocaleString(),
+                            })}
                         </span>
                     )}
                 </div>
@@ -798,7 +807,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                         onClick={onClose}
                         icon={<X className="h-4 w-4" />}
                         tooltip={{
-                            content: 'Close editor',
+                            content: t('workspace:visualizer.editor.close'),
                         }}
                     />
                 </div>
@@ -846,7 +855,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                         disabled={isJobRunning}
                         icon={<ArrowUp className="h-4 w-4" />}
                         tooltip={{
-                            content: 'Scroll to top',
+                            content: t(
+                                'workspace:visualizer.editor.scrollToTop',
+                            ),
                         }}
                     />
                 </div>
@@ -857,7 +868,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             name="search-gcode-lines"
                             sizing="sm"
                             value={searchQuery}
-                            placeholder="Search..."
+                            placeholder={t(
+                                'workspace:visualizer.editor.searchPlaceholder',
+                            )}
                             ref={searchInputRef}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => {
@@ -882,7 +895,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             className="h-6 w-6"
                             icon={<ChevronUp className="h-3 w-3" />}
                             tooltip={{
-                                content: 'Previous match (Shift+Enter)',
+                                content: t(
+                                    'workspace:visualizer.editor.previousMatch',
+                                ),
                             }}
                         />
                         <Button
@@ -892,7 +907,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             className="h-6 w-6"
                             icon={<ChevronDown className="h-3 w-3" />}
                             tooltip={{
-                                content: 'Next match (Enter)',
+                                content: t(
+                                    'workspace:visualizer.editor.nextMatch',
+                                ),
                             }}
                         />
                         <Button
@@ -904,7 +921,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             className="h-6 w-6"
                             icon={<X className="h-3 w-3" />}
                             tooltip={{
-                                content: 'Close search',
+                                content: t(
+                                    'workspace:visualizer.editor.closeSearch',
+                                ),
                             }}
                         />
                     </div>
@@ -912,7 +931,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                 {isJumpOpen && (
                     <div className="fixed top-20 right-6 z-[8999] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
                         <span className="text-xs text-gray-600 dark:text-content-muted whitespace-nowrap">
-                            Jump to line:
+                            {t('workspace:visualizer.editor.jumpToLineLabel')}
                         </span>
                         <Input
                             name="jump-gcode-lines"
@@ -944,7 +963,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             className="h-6 w-6"
                             icon={<VscDebugStart className="h-3 w-3" />}
                             tooltip={{
-                                content: 'Jump To Line',
+                                content: t(
+                                    'workspace:visualizer.editor.jumpToLine',
+                                ),
                             }}
                         />
                         <Button
@@ -956,7 +977,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                             className="h-6 w-6"
                             icon={<X className="h-3 w-3" />}
                             tooltip={{
-                                content: 'Close jump to line',
+                                content: t(
+                                    'workspace:visualizer.editor.closeJumpToLine',
+                                ),
                             }}
                         />
                     </div>
@@ -1025,7 +1048,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     className="border border-gray-500"
                     icon={<PiMouseScroll className="h-5 w-5" />}
                     tooltip={{
-                        content: 'Jump to Line',
+                        content: t('workspace:visualizer.editor.jumpToLine'),
                     }}
                 />
                 <Button
@@ -1040,7 +1063,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     className="border border-gray-500"
                     icon={<Search className="h-4 w-4" />}
                     tooltip={{
-                        content: 'Search (Ctrl+F / Cmd+F)',
+                        content: t('workspace:visualizer.editor.search'),
                     }}
                 />
                 <Button
@@ -1056,8 +1079,8 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     tooltip={{
                         content:
                             selectedLines.size === gcodeLines.length
-                                ? 'Deselect all lines'
-                                : 'Select all lines',
+                                ? t('workspace:visualizer.editor.deselectAll')
+                                : t('workspace:visualizer.editor.selectAll'),
                     }}
                 />
                 <Button
@@ -1069,10 +1092,12 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     icon={<Copy className="h-4 w-4" />}
                     tooltip={{
                         content: isJobRunning
-                            ? 'Copy disabled while job is running'
+                            ? t('workspace:visualizer.editor.copyDisabled')
                             : selectedLines.size > 0
-                              ? `Copy ${selectedLines.size} selected line(s)`
-                              : 'Copy all lines',
+                              ? t('workspace:visualizer.editor.copySelected', {
+                                    count: selectedLines.size,
+                                })
+                              : t('workspace:visualizer.editor.copyAll'),
                     }}
                 />
                 <Button
@@ -1084,8 +1109,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     icon={<Trash2 className="h-4 w-4" />}
                     tooltip={{
                         content: isJobRunning
-                            ? 'Delete disabled while job is running'
-                            : `Delete ${selectedLines.size} selected line(s)`,
+                            ? t('workspace:visualizer.editor.deleteDisabled')
+                            : t('workspace:visualizer.editor.deleteSelected', {
+                                  count: selectedLines.size,
+                              }),
                     }}
                 />
                 <Button
@@ -1097,8 +1124,8 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     icon={<RotateCcw className="h-4 w-4" />}
                     tooltip={{
                         content: isJobRunning
-                            ? 'Revert disabled while job is running'
-                            : 'Revert to original content',
+                            ? t('workspace:visualizer.editor.revertDisabled')
+                            : t('workspace:visualizer.editor.revert'),
                     }}
                 />
                 <Button
@@ -1109,8 +1136,8 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                     icon={<Save className="h-4 w-4" />}
                     tooltip={{
                         content: isJobRunning
-                            ? 'Save disabled while job is running'
-                            : 'Save changes',
+                            ? t('workspace:visualizer.editor.saveDisabled')
+                            : t('workspace:visualizer.editor.save'),
                     }}
                 />
             </div>

@@ -21,6 +21,7 @@
  *
  */
 
+import { i18n } from 'app/i18n';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { Component } from 'react';
@@ -78,7 +79,9 @@ class ControlArea extends Component<Props, ControlAreaState> {
         return (
             <div>
                 {this.state.showWarning && softLimitsEnabled ? (
-                    <div>Warning: Cut will leave soft limits!</div>
+                    <div>
+                        {i18n.t('workspace:visualizer.softLimitsWarning')}
+                    </div>
                 ) : (
                     <div />
                 )}

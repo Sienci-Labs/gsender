@@ -3,6 +3,7 @@ import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle
 import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
 import get from 'lodash/get';
@@ -21,6 +22,7 @@ export function MachineInfoDisplay({
     setPinned,
     onClose,
 }: MachineInfoDisplayProps) {
+    const { t } = useAppTranslation();
     const { pins, keepoutFlags, modals, isConnected, settings, currentTool } =
         useTypedSelector(
             (state) => ({
@@ -38,7 +40,9 @@ export function MachineInfoDisplay({
     // We do some firmware version finagling
     const reportedFirmwareVersion = settings?.version;
     const firmwareVersion = (() => {
-        const disconnectedValue = 'disconnected';
+        const disconnectedValue = t(
+            'workspace:machineInfo.firmwareDisconnected',
+        );
 
         if (!isConnected) return disconnectedValue;
 
@@ -96,10 +100,11 @@ export function MachineInfoDisplay({
             <div className="flex flex-row w-full justify-between items-center mb-2">
                 <div>
                     <span className="font-bold text-2xl">
-                        Machine Information
+                        {t('workspace:machineInfo.title')}
                     </span>
                     <div className="my-3">
-                        <b>Firmware version:</b> {firmwareVersion}
+                        <b>{t('workspace:machineInfo.firmwareVersion')}</b>{' '}
+                        {firmwareVersion}
                     </div>
                 </div>
 
@@ -108,7 +113,7 @@ export function MachineInfoDisplay({
                         {pinned ? (
                             <TiPin
                                 onClick={() => setPinned(!pinned)}
-                                aria-label="Unpin machine information"
+                                aria-label={t('workspace:machineInfo.unpin')}
                                 role="button"
                                 tabIndex={0}
                                 onKeyDown={(e) => {
@@ -120,7 +125,7 @@ export function MachineInfoDisplay({
                         ) : (
                             <TiPinOutline
                                 onClick={() => setPinned(!pinned)}
-                                aria-label="Pin machine information"
+                                aria-label={t('workspace:machineInfo.pin')}
                                 role="button"
                                 tabIndex={0}
                                 onKeyDown={(e) => {
@@ -135,7 +140,7 @@ export function MachineInfoDisplay({
                         <button
                             onClick={onClose}
                             className="text-2xl text-gray-600 dark:text-content-primary hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                            aria-label="Close machine information"
+                            aria-label={t('workspace:machineInfo.close')}
                         >
                             <IoClose />
                         </button>
@@ -144,61 +149,102 @@ export function MachineInfoDisplay({
             </div>
             <div className="grid grid-cols-[3fr_2fr]">
                 <div className="flex flex-col pr-4">
-                    <span className="underline float-left">CNC Modals</span>
+                    <span className="underline float-left">
+                        {t('workspace:machineInfo.cncModals')}
+                    </span>
                     <div className="flex flex-col justify-between items-center">
                         <ModalRow
-                            label="Probe style"
+                            label={t('workspace:machineInfo.modals.probeStyle')}
                             value={isConnected ? probeSelection : '-'}
                         />
                         <ModalRow
-                            label="Coordinate system"
+                            label={t(
+                                'workspace:machineInfo.modals.coordinateSystem',
+                            )}
                             value={isConnected ? modals.wcs : '-'}
                         />
                         <ModalRow
-                            label="Plane selection"
+                            label={t(
+                                'workspace:machineInfo.modals.planeSelection',
+                            )}
                             value={isConnected ? modals.plane : '-'}
                         />
                         <ModalRow
-                            label="Units"
+                            label={t('workspace:machineInfo.modals.units')}
                             value={isConnected ? modals.units : '-'}
                         />
                         <ModalRow
-                            label="Distance mode"
+                            label={t(
+                                'workspace:machineInfo.modals.distanceMode',
+                            )}
                             value={isConnected ? modals.distance : '-'}
                         />
                         <ModalRow
-                            label="Feed"
+                            label={t('workspace:machineInfo.modals.feed')}
                             value={isConnected ? modals.feedrate : '-'}
                         />
                         <ModalRow
-                            label="Spindle"
+                            label={t('workspace:machineInfo.modals.spindle')}
                             value={isConnected ? modals.spindle : '-'}
                         />
                         <ModalRow
-                            label="Coolant"
+                            label={t('workspace:machineInfo.modals.coolant')}
                             value={isConnected ? modals.coolant : '-'}
                         />
                     </div>
                 </div>
                 <div className="flex flex-col border-l-2 border-l-gray-200 pl-4">
-                    <span className="underline float-left">Pins</span>
+                    <span className="underline float-left">
+                        {t('workspace:machineInfo.pins')}
+                    </span>
                     <div className="flex flex-col justify-between items-center">
-                        <PinRow label="X limit" on={pins?.X} />
-                        <PinRow label="Y limit" on={pins?.Y} />
-                        <PinRow label="Z limit" on={pins?.Z} />
-                        <PinRow label="A limit" on={pins?.A} />
-                        <PinRow label="Probe/TLS" on={pins?.P} />
-                        <PinRow label="Door" on={pins?.D} />
-                        <PinRow label="Cycle start" on={pins?.S} />
-                        <PinRow label="Hold" on={pins?.H} />
-                        <PinRow label="Soft reset" on={pins?.R} />
+                        <PinRow
+                            label={t('workspace:machineInfo.pinLabels.xLimit')}
+                            on={pins?.X}
+                        />
+                        <PinRow
+                            label={t('workspace:machineInfo.pinLabels.yLimit')}
+                            on={pins?.Y}
+                        />
+                        <PinRow
+                            label={t('workspace:machineInfo.pinLabels.zLimit')}
+                            on={pins?.Z}
+                        />
+                        <PinRow
+                            label={t('workspace:machineInfo.pinLabels.aLimit')}
+                            on={pins?.A}
+                        />
+                        <PinRow
+                            label={t('workspace:machineInfo.pinLabels.probe')}
+                            on={pins?.P}
+                        />
+                        <PinRow
+                            label={t('workspace:machineInfo.pinLabels.door')}
+                            on={pins?.D}
+                        />
+                        <PinRow
+                            label={t(
+                                'workspace:machineInfo.pinLabels.cycleStart',
+                            )}
+                            on={pins?.S}
+                        />
+                        <PinRow
+                            label={t('workspace:machineInfo.pinLabels.hold')}
+                            on={pins?.H}
+                        />
+                        <PinRow
+                            label={t(
+                                'workspace:machineInfo.pinLabels.softReset',
+                            )}
+                            on={pins?.R}
+                        />
                     </div>
                 </div>
             </div>
             {currentTool >= 0 && (
                 <div className="text-gray-600 flex w-full gap-4">
                     <span className="text-gray-600 dark:text-content-primary">
-                        Current tool:{' '}
+                        {t('workspace:machineInfo.currentTool')}{' '}
                     </span>
                     <span className="text-black dark:text-content-primary">
                         T{currentTool}
@@ -210,7 +256,7 @@ export function MachineInfoDisplay({
                     className="text-gray-600 dark:text-content-primary"
                     id="lock-stepper-label"
                 >
-                    Lock stepper motors
+                    {t('workspace:machineInfo.lockStepperMotors')}
                 </span>
                 <Switch
                     aria-labelledby="lock-stepper-label"
@@ -223,7 +269,7 @@ export function MachineInfoDisplay({
             {keepoutFlags && (
                 <div className="flex flex-row gap-2 items-center mt-2">
                     <span className="text-gray-600 dark:text-content-primary">
-                        Keepout:
+                        {t('workspace:machineInfo.keepout')}
                     </span>
                     <KeepoutToggle />
                 </div>

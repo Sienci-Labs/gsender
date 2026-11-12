@@ -6,12 +6,14 @@ import {
 import Tooltip from 'app/components/Tooltip';
 import { TOOLBAR_CATEGORY } from 'app/constants';
 import useShuttleEvents from 'app/hooks/useShuttleEvents.ts';
+import { useAppTranslation } from 'app/i18n';
 import useKeybinding from 'app/lib/useKeybinding.ts';
 import { useEffect, useState } from 'react';
 import minfo from './assets/minfo.svg';
 import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
 
 const MachineInfo = () => {
+    const { t } = useAppTranslation();
     const [open, setOpen] = useState(false);
     const [pinned, setPinned] = useState(false);
 
@@ -40,11 +42,11 @@ const MachineInfo = () => {
 
     return (
         <Popover open={open || pinned} onOpenChange={handleOpenChange}>
-            <Tooltip content="Machine Information">
+            <Tooltip content={t('workspace:machineInfo.title')}>
                 <PopoverTrigger asChild>
                     <button
                         className="z-50 w-[24px] max-sm:hidden"
-                        aria-label="Machine Information"
+                        aria-label={t('workspace:machineInfo.title')}
                     >
                         <img src={minfo} className="w-[24px]" />
                     </button>

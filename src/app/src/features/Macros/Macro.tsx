@@ -42,6 +42,7 @@ import includes from 'lodash/includes';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { useAppTranslation } from 'app/i18n';
 
 import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from '../../constants';
 import DroppableColumn, { type Actions } from './DroppableColumn';
@@ -96,6 +97,7 @@ type ColumnsState = {
 };
 
 const Macro = ({ state, actions, workflow }: MacroProps) => {
+    const { t } = useAppTranslation();
     const { macros = [] } = state;
     const [activeId, setActiveId] = useState<string | null>(null);
     const [columns, setColumns] = useState<ColumnsState>({
@@ -240,7 +242,7 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
         return (
             <div className="flex flex-col gap-1 p-1 h-full justify-center items-center">
                 <p className="text-center dark:text-content-primary">
-                    No Macros...
+                    {t('workspace:macros.empty')}
                 </p>
             </div>
         );

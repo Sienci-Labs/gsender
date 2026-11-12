@@ -1,0 +1,668 @@
+{
+  "connection": {
+    "disconnect": "Trennen",
+    "usbBaud": "USB ({{baud}})",
+    "noUsbDevices": "Keine USB-Geräte gefunden",
+    "ethernetPort": "Ethernet (Port {{port}})",
+    "unrecognizedPorts": "Unbekannte Ports",
+    "menuLabel": "Verbindungsmenü",
+    "connectToCnc": "Mit CNC verbinden",
+    "connect": "Verbinden",
+    "connecting": "Verbinde...",
+    "unableToConnect": "Verbindung nicht möglich."
+  },
+  "console": {
+    "inputPlaceholder": "G-code hier eingeben...",
+    "inputLabel": "Konsolenbefehl",
+    "run": "Ausführen",
+    "scrollToLatest": "Zur neuesten Meldung scrollen",
+    "noMatchingMessages": "Keine Meldungen entsprechen diesem Filter",
+    "noOutput": "Noch keine Konsolenausgabe",
+    "filterLabel": "Konsolenmeldungen filtern",
+    "copyLast": "Letzte {{limit}} Meldungen kopieren",
+    "clear": "Konsole leeren",
+    "popOut": "Konsole abdocken",
+    "messageType": {
+      "sent": "Gesendet",
+      "response": "Antwort",
+      "system": "System",
+      "warning": "Warnung",
+      "error": "Fehler",
+      "alarm": "Alarm"
+    },
+    "connected": "Verbunden mit {{port}} mit einer Baudrate von {{baudrate}}",
+    "filters": {
+      "all": "Alle",
+      "gcode": "G-code",
+      "responses": "Antworten",
+      "system": "System",
+      "faults": "Störungen"
+    },
+    "notConnected": "Nicht mit einem Gerät verbunden"
+  },
+  "coolant": {
+    "mist": "Nebel",
+    "mistTooltip": "Sprühnebelkühlung einschalten",
+    "flood": "Flut",
+    "floodTooltip": "Flutkühlung einschalten",
+    "off": "Aus",
+    "offTooltip": "Kühlmittel ausschalten"
+  },
+  "dro": {
+    "axisRow": {
+      "homeTooltip": "Referenzfahrt der {{axis}}-Achse",
+      "zeroTooltip": "{{axis}}-Achse nullen",
+      "homeAriaLabel": "Referenzfahrt {{axis}}-Achse: Zum physischen Maschinenendpunkt fahren",
+      "zeroAriaLabel": "{{axis}}-Achse nullen: Aktuelle Position als Werkstück-Nullpunkt setzen",
+      "zeroAxis": "{{axis}}-Achse nullen",
+      "confirmTitle": "{{axis}}-Achse nullen",
+      "confirmContent": "Möchten Sie die {{axis}}-Achse wirklich nullen?",
+      "goToZeroTooltip": "Zum Nullpunkt der {{axis}}-Achse fahren",
+      "goToZeroAriaLabel": "Zum Nullpunkt der {{axis}}-Achse fahren: Achse auf ihren aktuellen Werkstück-Nullpunkt fahren"
+    },
+    "goTo": {
+      "title": "Position anfahren",
+      "openAriaLabel": "Dialog „Position anfahren“ öffnen",
+      "mcsUnavailable": "Erfordert aktivierte Referenzfahrt ($22>0) und referenzierte Maschine",
+      "executeAriaLabel": "Fahrt zur Position ausführen",
+      "go": "Los!"
+    },
+    "homing": {
+      "toggleSingleAxis": "Einzelachsen-Referenzfahrt umschalten",
+      "runTooltip": "Referenzfahrt ausführen",
+      "home": "Referenzfahrt"
+    },
+    "parking": {
+      "goToPark": "Parkposition anfahren"
+    },
+    "rapidPosition": {
+      "backLeft": "Hintere linke Ecke anfahren",
+      "backRight": "Hintere rechte Ecke anfahren",
+      "frontLeft": "Vordere linke Ecke anfahren",
+      "frontRight": "Vordere rechte Ecke anfahren"
+    },
+    "units": {
+      "inch": "Zoll",
+      "currentAriaLabel": "Aktuelle Einheit ist {{units}}. Zum Ändern klicken.",
+      "label": "Einheiten:",
+      "title": "Einheiten",
+      "selectAriaLabel": "Einheiten auswählen",
+      "inches": "Zoll",
+      "millimeters": "Millimeter"
+    },
+    "labels": {
+      "home": "Referenz",
+      "zero": "Nullen",
+      "goTo": "Anfahren"
+    },
+    "zeroAll": {
+      "tooltip": "Alle Achsen nullen",
+      "button": "Nullen",
+      "ariaLabel": "Alle Achsen nullen: Aktuelle Position als Werkstück-Nullpunkt für alle Achsen setzen",
+      "confirmTitle": "Alle Achsen nullen",
+      "confirmContent": "Möchten Sie wirklich alle Achsen nullen?"
+    },
+    "goToXY": {
+      "tooltip": "XY-Nullpunkt anfahren",
+      "ariaLabelXA": "XA-Nullpunkt anfahren: X- und A-Achse auf ihren aktuellen Werkstück-Nullpunkt fahren",
+      "ariaLabelXY": "XY-Nullpunkt anfahren: X- und Y-Achse auf ihren aktuellen Werkstück-Nullpunkt fahren"
+    }
+  },
+  "fileControl": {
+    "loadFile": "Datei laden",
+    "viewRecentFiles": "Zuletzt verwendete Dateien anzeigen",
+    "recentFiles": "Zuletzt verwendet",
+    "closeFile": "Datei schließen",
+    "confirmTitle": "Sind Sie sicher?",
+    "closeFileConfirm": "Dadurch wird die aktuelle Datei geschlossen. Nicht gespeicherte Änderungen gehen verloren.",
+    "estimatedTime": "Geschätzte Dauer",
+    "feed": "Vorschub",
+    "speed": "Drehzahl",
+    "none": "Keine",
+    "tools": "Werkzeuge",
+    "size": "Größe",
+    "min": "Min",
+    "max": "Max",
+    "loadRecentFile": "Zuletzt verwendete Datei {{name}} laden",
+    "lastJob": {
+      "title": "Letzter Job",
+      "complete": "ABGESCHLOSSEN",
+      "stopped": "GESTOPPT"
+    },
+    "fileSize": {
+      "bytes": "{{size}} Bytes",
+      "kilobytes": "{{size}} KB",
+      "megabytes": "{{size}} MB"
+    },
+    "lineCount_one": "({{count}} Zeile)",
+    "lineCount_other": "({{count}} Zeilen)",
+    "info": "Info",
+    "toggleInfoSize": "Zwischen Dateiinfo und Größenansicht umschalten",
+    "toggleEditor": "G-code-Editor umschalten",
+    "gcodeEditor": "G-code-Editor",
+    "openStepThrough": "G-code-Einzelschritt öffnen",
+    "stepThrough": "G-code-Einzelschritt",
+    "reloadFile": "Datei neu laden",
+    "reloadFileConfirm": "Dadurch wird die aktuelle Datei neu vom Datenträger geladen."
+  },
+  "gcodeStepper": {
+    "sourceHeading_one": "G-code ({{lines}} Zeile)",
+    "sourceHeading_other": "G-code ({{lines}} Zeilen)",
+    "closeSearch": "Suche schließen",
+    "searchGcode": "G-code durchsuchen",
+    "searchPlaceholder": "Suchen...",
+    "goToStart": "Zum Anfang",
+    "stepControls": "Schrittsteuerung",
+    "pausePlayback": "Wiedergabe pausieren",
+    "play": "Abspielen",
+    "resetToStart": "Auf Anfang zurücksetzen",
+    "backLines_one": "{{count}} Zeile zurück",
+    "backLines_other": "{{count}} Zeilen zurück",
+    "forwardLines_one": "{{count}} Zeile vor",
+    "forwardLines_other": "{{count}} Zeilen vor",
+    "stepLines_one": "{{sign}}{{count}} Zeile",
+    "stepLines_other": "{{sign}}{{count}} Zeilen",
+    "gcodeLine": "G-code-Zeile",
+    "modals": {
+      "motion": "Bewegung",
+      "wcs": "WKS",
+      "plane": "Ebene",
+      "units": "Einheiten",
+      "distance": "Abstand",
+      "feedMode": "Vorschubmodus",
+      "spindle": "Spindel",
+      "coolant": "Kühlmittel",
+      "tool": "Werkzeug",
+      "feed": "Vorschub",
+      "speed": "Drehzahl"
+    },
+    "workPosition": "Position (Werkstück, {{units}})",
+    "modalsLabel": "Modalzustände",
+    "showPriorLines": "Vorherige Zeilen anzeigen",
+    "hidePriorLines": "Vorherige Zeilen ausblenden",
+    "hideToolpath": "Werkzeugweg von Werkzeug {{tool}} ausblenden",
+    "showToolpath": "Werkzeugweg von Werkzeug {{tool}} anzeigen",
+    "goToTool": "Zu Werkzeug {{tool}}, Zeile {{line}}",
+    "tools": "Werkzeuge",
+    "noTools": "Keine Werkzeuge in dieser Datei gefunden.",
+    "title": "G-code-Einzelschritt",
+    "close": "Einzelschritt schließen",
+    "readingPositions": "Positionen werden gelesen… {{percent}} %"
+  },
+  "layout": {
+    "logoAlt": "gSender-Logo",
+    "visualizerPlaceholder": "Visualisierung",
+    "skipToMain": "Zum Hauptinhalt springen"
+  },
+  "jobControl": {
+    "start": "Start",
+    "pause": "Pause",
+    "stop": "Stopp",
+    "overrides": {
+      "feed": "Vorschub",
+      "laser": "Laser",
+      "spindle": "Spindel",
+      "power": "Leistung"
+    },
+    "outline": "Umriss",
+    "progress": {
+      "days": "T",
+      "hours": "h",
+      "minutes": "m",
+      "seconds": "s",
+      "label": "Jobfortschritt",
+      "finalizing": "Wird abgeschlossen",
+      "remaining": "verbleibend",
+      "lines": "{{current}} / {{total}} Zeilen",
+      "cutting": "{{time}} Fräsen",
+      "spinningDrill": "Bohrer dreht sich"
+    },
+    "startFromLine": {
+      "button": "Starten ab",
+      "recoveryTitle": "Wiederherstellung: Ab Zeile starten",
+      "title": "Ab Zeile starten",
+      "description": "Einen Job nach Stromausfall, mechanischer Störung, Verbindungsabbruch oder einem anderen Fehler fortsetzen.",
+      "resumeAtLine": "Job fortsetzen ab Zeile:",
+      "defaultValue": "Standardwert: {{value}}",
+      "safeHeight": "Mit Sicherheitshöhe:",
+      "safeHeightHint": "(Abstand über der maximalen Höhe der Datei)",
+      "calculates": "Berechnet alle CNC-Bewegungen, Attribute und gSender-Automatisierungen, um genau dort weiterzumachen, wo Sie aufgehört haben.",
+      "start": "Ab Zeile starten"
+    },
+    "atcValidation": {
+      "outOfRange": {
+        "title": "Werkzeugnummer überschreitet Größe der Werkzeugtabelle",
+        "description_one": "Diese Datei verwendet das Werkzeug {{list}}, das die konfigurierte Größe Ihrer Werkzeugtabelle ({{size}} Werkzeuge) überschreitet.",
+        "description_other": "Diese Datei verwendet die Werkzeuge {{list}}, die die konfigurierte Größe Ihrer Werkzeugtabelle ({{size}} Werkzeuge) überschreiten.",
+        "remap_one": "Ordnen Sie dieses Werkzeug vor dem Start in der Werkzeug-Zeitleiste neu zu oder bestätigen Sie, um trotzdem zu starten.",
+        "remap_other": "Ordnen Sie diese Werkzeuge vor dem Start in der Werkzeug-Zeitleiste neu zu oder bestätigen Sie, um trotzdem zu starten."
+      },
+      "usingCurrentTool": {
+        "title": "Aktuelles Werkzeug wird verwendet (T{{tool}})",
+        "description": "Diese Datei enthält keine Werkzeugwechselbefehle (M6), daher wird das Werkzeug in der Spindel verwendet.",
+        "confirm": "Bitte bestätigen Sie, dass Sie dieses Werkzeug verwenden möchten"
+      },
+      "notProbed": {
+        "title": "Aktuelles Werkzeug nicht vermessen",
+        "description": "Die Datei enthält keine Werkzeugwechselbefehle (M6), daher wird das Werkzeug in der Spindel verwendet. Für das Werkzeug in der Spindel ist jedoch kein Versatz hinterlegt."
+      },
+      "noTool": {
+        "title": "Kein aktuelles Werkzeug",
+        "description": "Diese Datei enthält keine Werkzeugwechselbefehle (M6) und es befindet sich kein Werkzeug in der Spindel.",
+        "loadTool": "Setzen Sie das gewünschte Werkzeug in die Spindel ein, bevor Sie es erneut versuchen.",
+        "alternative": "Alternativ können Sie Ihren Postprozessor so anpassen, dass Ihre Datei einen Werkzeugwechselbefehl enthält."
+      }
+    }
+  },
+  "jogging": {
+    "tab": {
+      "plus": "{{axis}}+ verfahren",
+      "minus": "{{axis}}- verfahren",
+      "labelsAlt": "{{axis}}-Beschriftungen"
+    },
+    "input": {
+      "decrease": "{{label}} verringern",
+      "increase": "{{label}} erhöhen",
+      "xyDistance": "XY-Verfahrweg",
+      "zDistance": "Z-Verfahrweg",
+      "aDistance": "A-Verfahrweg",
+      "feedrateLabel": "mit",
+      "feedrate": "Verfahrgeschwindigkeit"
+    },
+    "wheel": {
+      "xPlusYMinus": "X+ Y- verfahren",
+      "xMinusYMinus": "X- Y- verfahren",
+      "xMinusYPlus": "X- Y+ verfahren",
+      "xPlusYPlus": "X+ Y+ verfahren",
+      "yMinus": "Y- verfahren",
+      "xMinus": "X- verfahren",
+      "yPlus": "Y+ verfahren",
+      "xPlus": "X+ verfahren"
+    },
+    "speed": {
+      "precise": "Präzise",
+      "preciseAriaLabel": "Voreinstellung „Präzise“ wählen",
+      "normal": "Normal",
+      "normalAriaLabel": "Voreinstellung „Normal“ wählen",
+      "rapid": "Eilgang",
+      "rapidAriaLabel": "Voreinstellung „Eilgang“ wählen",
+      "custom": "Benutzerdef.",
+      "customAriaLabel": "Voreinstellung „Benutzerdefiniert“ wählen"
+    },
+    "stopAriaLabel": "Verfahren stoppen",
+    "wheelArrowsAlt": "Pfeile des Verfahrrads"
+  },
+  "keyboard": {
+    "editArea": {
+      "inUse": "Dieses Tastenkürzel wird bereits von der Aktion „{{action}}“ verwendet",
+      "available": "Tastenkürzel ist verfügbar",
+      "none": "Keins",
+      "pressKeys": "Tasten drücken...",
+      "action": "Aktion",
+      "currentShortcut": "Aktuelles Tastenkürzel",
+      "newShortcut": "Neues Tastenkürzel:",
+      "update": "Tastenkürzel aktualisieren"
+    },
+    "print": {
+      "heading": "gSender-Tastenkürzel",
+      "generatedOn": "Erstellt am {{date}}",
+      "documentTitle": "Tastenkürzel"
+    },
+    "actions": {
+      "import": "Importieren",
+      "importTooltip": "Tastenkürzel aus einer Datei importieren",
+      "export": "Exportieren",
+      "exportTooltip": "Tastenkürzel in eine Datei exportieren",
+      "enableAll": "Alle aktivieren",
+      "enableAllTooltip": "Alle Tastenkürzel aktivieren",
+      "disableAll": "Alle deaktivieren",
+      "disableAllTooltip": "Alle Tastenkürzel deaktivieren",
+      "print": "Drucken",
+      "printTooltip": "Tastenkürzel drucken"
+    },
+    "editDialog": {
+      "title": "Tastenkürzel bearbeiten",
+      "description": "Tastenbelegung für dieses Tastenkürzel ändern"
+    },
+    "table": {
+      "editTooltip": "Dieses Tastenkürzel bearbeiten",
+      "editAria": "Tastenkürzel für {{action}} bearbeiten",
+      "deleteTooltip": "Dieses Tastenkürzel löschen",
+      "deleteAria": "Tastenkürzel für {{action}} löschen",
+      "addTooltip": "Dieser Aktion ein Tastenkürzel zuweisen",
+      "addAria": "Tastenkürzel für {{action}} hinzufügen",
+      "toggleAria": "Aktivstatus für {{action}} umschalten",
+      "action": "Aktion",
+      "shortcut": "Tastenkürzel",
+      "category": "Kategorie",
+      "active": "Aktiv"
+    },
+    "commands": {
+      "ccwLaserTest": "Linkslauf / Lasertest",
+      "confirmProbe": "Antast-Popup bestätigen",
+      "controllerCommandErrorClear": "Fehler löschen",
+      "controllerCommandHoming": "Referenzfahrt",
+      "controllerCommandRealtimeReport": "Echtzeitbericht",
+      "controllerCommandReset": "Soft-Reset",
+      "controllerCommandToolchangeAcknowledgement": "Werkzeugwechsel bestätigen",
+      "controllerCommandUnlock": "Entsperren",
+      "controllerCommandVirtualStopToggle": "Vorschub-Halt",
+      "copy": "Kopieren",
+      "cut": "Ausschneiden",
+      "cwLaserOn": "Rechtslauf / Laser ein",
+      "cycleJogPresets": "Voreinstellungen durchschalten",
+      "displayMachineInfo": "Maschineninfo anzeigen",
+      "displayNotifications": "Benachrichtigungen anzeigen",
+      "feedrateOverrideM": "Vorschub -",
+      "feedrateOverrideMm": "Vorschub --",
+      "feedrateOverrideP": "Vorschub +",
+      "feedrateOverridePp": "Vorschub ++",
+      "feedrateOverrideReset": "Vorschub zurücksetzen",
+      "floodCoolant": "Flutkühlung (M8)",
+      "goToAAxisZero": "A-Nullpunkt anfahren",
+      "goToXyAxisZero": "XY-Nullpunkt anfahren",
+      "goToXAxisZero": "X-Nullpunkt anfahren",
+      "goToYAxisZero": "Y-Nullpunkt anfahren",
+      "goToZAxisZero": "Z-Nullpunkt anfahren",
+      "homingGoToBackLeftCorner": "Hintere linke Ecke anfahren",
+      "homingGoToBackRightCorner": "Hintere rechte Ecke anfahren",
+      "homingGoToFrontLeftCorner": "Vordere linke Ecke anfahren",
+      "homingGoToFrontRightCorner": "Vordere rechte Ecke anfahren",
+      "homingPark": "Parken",
+      "jogAMinus": "A- verfahren (CW)",
+      "jogAPlus": "A+ verfahren (CCW)",
+      "jogSpeedD": "Verfahrgeschwindigkeit verringern",
+      "jogSpeedI": "Verfahrgeschwindigkeit erhöhen",
+      "jogXM": "X- verfahren (links)",
+      "jogXMYP": "X- Y+ verfahren",
+      "jogXP": "X+ verfahren (rechts)",
+      "jogXPYM": "X+ Y- verfahren",
+      "jogXYM": "X- Y- verfahren",
+      "jogXYP": "X+ Y+ verfahren",
+      "jogYM": "Y- verfahren (vorne)",
+      "jogYP": "Y+ verfahren (hinten)",
+      "jogZM": "Z- verfahren (runter)",
+      "jogZP": "Z+ verfahren (hoch)",
+      "lightweightMode": "Leichtmodus",
+      "loadFile": "Datei laden",
+      "mistCoolant": "Sprühnebelkühlung (M7)",
+      "openProbe": "Antast-Popup anzeigen",
+      "paste": "Einfügen",
+      "pauseJob": "Job pausieren",
+      "probeDiameterScrollDown": "Werkzeugdurchmesser nach unten scrollen",
+      "probeDiameterScrollUp": "Werkzeugdurchmesser nach oben scrollen",
+      "probeRotaryYAxis": "Drehachse an Y-Achse ausrichten",
+      "probeRotaryZAxis": "Drehachse Z-Achse antasten",
+      "probeRoutineScrollLeft": "Antastroutine nach links scrollen",
+      "probeRoutineScrollRight": "Antastroutine nach rechts scrollen",
+      "runOutline": "Umriss abfahren",
+      "setNJogPreset": "Voreinstellung „Normal“ wählen",
+      "setPJogPreset": "Voreinstellung „Präzise“ wählen",
+      "setRJogPreset": "Voreinstellung „Eilgang“ wählen",
+      "spindleOverrideM": "Spindel/Laser -",
+      "spindleOverrideMm": "Spindel/Laser --",
+      "spindleOverrideP": "Spindel/Laser +",
+      "spindleOverridePp": "Spindel/Laser ++",
+      "spindleOverrideReset": "Spindel/Laser zurücksetzen",
+      "startJob": "Job starten",
+      "startProbe": "Antasten starten",
+      "stopCoolant": "Kühlmittel aus (M9)",
+      "stopJob": "Globaler Stopp",
+      "stopLaserOff": "Stopp / Laser aus",
+      "switchWorkspaceMode": "Drehachsenmodus umschalten",
+      "toggleInfoHelper": "Hilfe anzeigen",
+      "toggleMountingSetup": "Drehachsen-Montage einrichten",
+      "toggleRotarySurfacing": "Drehachsen-Planfräsen anzeigen/ausblenden",
+      "toggleShortcuts": "Tastenkürzel ein-/ausschalten",
+      "toggleSpindleLaserMode": "Zwischen Spindel- und Lasermodus umschalten",
+      "undo": "Rückgängig",
+      "unloadFile": "Datei entladen",
+      "visualizerView3d": "3D-Ansicht",
+      "visualizerViewCycle": "Ansichten durchschalten",
+      "visualizerViewFront": "Vorderansicht",
+      "visualizerViewLeft": "Linke Ansicht",
+      "visualizerViewReset": "Ansicht zurücksetzen",
+      "visualizerViewRight": "Rechte Ansicht",
+      "visualizerViewTop": "Draufsicht",
+      "visualizerZoomFit": "Einpassen",
+      "visualizerZoomIn": "Vergrößern",
+      "visualizerZoomOut": "Verkleinern",
+      "zeroAllAxis": "Alle Achsen nullen",
+      "zeroAAxis": "A-Achse nullen",
+      "zeroXAxis": "X-Achse nullen",
+      "zeroYAxis": "Y-Achse nullen",
+      "zeroZAxis": "Z-Achse nullen"
+    },
+    "categories": {
+      "all": "Alle",
+      "carving": "Fräsen",
+      "coolant": "Kühlmittel",
+      "general": "Allgemein",
+      "jogging": "Verfahren",
+      "location": "Position",
+      "macros": "Makros",
+      "overrides": "Overrides",
+      "probing": "Antasten",
+      "spindleLaser": "Spindel/Laser",
+      "toolbar": "Werkzeugleiste",
+      "visualizer": "Visualisierung"
+    }
+  },
+  "machineInfo": {
+    "firmwareDisconnected": "getrennt",
+    "title": "Maschineninformationen",
+    "firmwareVersion": "Firmware-Version:",
+    "unpin": "Maschineninformationen lösen",
+    "pin": "Maschineninformationen anheften",
+    "close": "Maschineninformationen schließen",
+    "cncModals": "CNC-Modalzustände",
+    "modals": {
+      "probeStyle": "Antastart",
+      "coordinateSystem": "Koordinatensystem",
+      "planeSelection": "Ebenenauswahl",
+      "units": "Einheiten",
+      "distanceMode": "Abstandsmodus",
+      "feed": "Vorschub",
+      "spindle": "Spindel",
+      "coolant": "Kühlmittel"
+    },
+    "pins": "Pins",
+    "pinLabels": {
+      "xLimit": "X-Endschalter",
+      "yLimit": "Y-Endschalter",
+      "zLimit": "Z-Endschalter",
+      "aLimit": "A-Endschalter",
+      "probe": "Taster/TLS",
+      "door": "Tür",
+      "cycleStart": "Zyklusstart",
+      "hold": "Halt",
+      "softReset": "Soft-Reset"
+    },
+    "currentTool": "Aktuelles Werkzeug:",
+    "lockStepperMotors": "Schrittmotoren sperren",
+    "keepout": "Sperrzone:"
+  },
+  "machineStatus": {
+    "clickToRunHoming": "Klicken für Referenzfahrt",
+    "clickToUnlock": "Klicken zum Entsperren der Maschine"
+  },
+  "macros": {
+    "empty": "Keine Makros...",
+    "form": {
+      "defaultDescription": "Makros sind eine Möglichkeit, Befehle zu speichern und wiederzuverwenden. Sie beschleunigen wiederkehrende Aufgaben und machen Ihre CNC effizienter.",
+      "name": "Name",
+      "gcode": "G-code",
+      "variables": "Variablen",
+      "gcodeTooltip": "Fügen Sie hier Ihren G-code ein. Verwenden Sie Variablen oder JavaScript-Logik, um komplexere Befehle zu erstellen.",
+      "description": "Makrobeschreibung"
+    },
+    "running": "Läuft...",
+    "optionsFor": "Optionen für Makro {{name}}",
+    "edit": "Bearbeiten",
+    "variableGroups": {
+      "waitForPlanner": "Warten, bis die Planer-Warteschlange leer ist",
+      "globalVariables": "Benutzerdefinierte globale Variablen",
+      "displayGlobalVariable": "Globale Variable über einen Inline-Kommentar anzeigen",
+      "backupWorkPosition": "Aktuelle Werkstückposition sichern",
+      "previousWorkPosition": "Vorherige Werkstückposition anfahren",
+      "toolChange": "Werkzeugwechsel",
+      "saveModalState": "Modalzustand speichern",
+      "restoreModalState": "Modalzustand wiederherstellen",
+      "currentWorkPosition": "Aktuelle Werkstückposition",
+      "boundingBox": "Begrenzungsrahmen festlegen",
+      "requestParameters": "Aktuelle Parameter anfordern – vor Verwendung der Parameter erforderlich",
+      "getParameters": "Aktuelle Parameter abrufen"
+    },
+    "editTitle": "Makro bearbeiten",
+    "addTitle": "Makro hinzufügen",
+    "update": "Makro aktualisieren",
+    "addNew": "Neues Makro hinzufügen",
+    "add": "Hinzufügen",
+    "addTooltip": "Neues Makro hinzufügen",
+    "import": "Importieren",
+    "importTooltip": "Makros aus einer Datei importieren",
+    "export": "Exportieren",
+    "exportTooltip": "Makros in eine Datei exportieren"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "clearAll": "Alle Benachrichtigungen löschen",
+    "empty": "Keine Benachrichtigungen",
+    "tabs": {
+      "all": "Alle",
+      "errors": "Fehler",
+      "info": "Info",
+      "success": "Erfolg"
+    },
+    "unreadLabel_one": "Benachrichtigungen, {{count}} ungelesen",
+    "unreadLabel_other": "Benachrichtigungen, {{count}} ungelesen"
+  },
+  "spindle": {
+    "active": "Aktiv",
+    "notActive": "Nicht aktiv",
+    "laser": {
+      "on": "Laser ein",
+      "onTooltip": "Laser einschalten",
+      "test": "Lasertest",
+      "testTooltip": "Laser für die Testdauer einschalten",
+      "off": "Aus",
+      "offTooltip": "Laser ausschalten",
+      "power": "Leistung",
+      "adjustPower": "Laserleistung einstellen",
+      "testDurationLabel": "Testdauer:",
+      "testDuration": "Dauer des Lasertests",
+      "secondsSuffix": "s"
+    },
+    "modeToggle": {
+      "tooltip": "Spindel- oder Lasermodus aktivieren",
+      "spindle": "Spindel",
+      "ariaLabel": "Zwischen Spindel- und Lasermodus umschalten",
+      "laser": "Laser"
+    },
+    "controls": {
+      "forward": "Rechtslauf",
+      "forwardTooltip": "Spindel im Uhrzeigersinn drehen",
+      "forwardAriaLabel": "Spindel im Uhrzeigersinn starten (M3)",
+      "reverse": "Linkslauf",
+      "reverseTooltip": "Spindel gegen den Uhrzeigersinn drehen",
+      "reverseAriaLabel": "Spindel gegen den Uhrzeigersinn starten (M4)",
+      "stop": "Stopp",
+      "stopTooltip": "Spindel stoppen",
+      "stopAriaLabel": "Spindel stoppen (M5)",
+      "speed": "Drehzahl",
+      "adjustSpeed": "Spindeldrehzahl einstellen",
+      "typeSpeed": "Spindeldrehzahl eingeben"
+    },
+    "selector": {
+      "tooltip": "Spindel auswählen",
+      "defaultSpindle": "Standardspindel",
+      "ariaLabel": "Spindel auswählen"
+    }
+  },
+  "statusIcons": {
+    "wirelessControl": "Drahtlose Steuerung",
+    "keyboardShortcuts": "Tastenkürzel",
+    "gamepadShortcuts": "Gamepad-Kürzel"
+  },
+  "unlockButton": {
+    "lockedInAlarmLabel": "Maschine ist im Alarmzustand gesperrt. Zum Entsperren klicken.",
+    "heldLabel": "Maschine ist angehalten. Zum Entsperren klicken.",
+    "unlockedLabel": "Maschine ist entsperrt.",
+    "tooltip": "Maschine entsperren"
+  },
+  "visualizer": {
+    "editor": {
+      "editingDisabled": "Bearbeiten während eines laufenden Jobs deaktiviert",
+      "toggleSelection": "Klicken, um Auswahl umzuschalten",
+      "noFile": "Keine G-code-Datei geladen",
+      "title": "G-code-Editor",
+      "paused": "Pausiert",
+      "selectedCount_one": "{{count}} ausgewählt",
+      "selectedCount_other": "{{count}} ausgewählt",
+      "lineCount_one": "{{lines}} Zeile",
+      "lineCount_other": "{{lines}} Zeilen",
+      "close": "Editor schließen",
+      "scrollToTop": "Nach oben scrollen",
+      "searchPlaceholder": "Suchen...",
+      "previousMatch": "Vorheriger Treffer (Umschalt+Enter)",
+      "nextMatch": "Nächster Treffer (Enter)",
+      "closeSearch": "Suche schließen",
+      "jumpToLineLabel": "Gehe zu Zeile:",
+      "jumpToLine": "Gehe zu Zeile",
+      "closeJumpToLine": "„Gehe zu Zeile“ schließen",
+      "search": "Suchen (Strg+F / Cmd+F)",
+      "deselectAll": "Auswahl aller Zeilen aufheben",
+      "selectAll": "Alle Zeilen auswählen",
+      "copyDisabled": "Kopieren während eines laufenden Jobs deaktiviert",
+      "copySelected_one": "{{count}} ausgewählte Zeile kopieren",
+      "copySelected_other": "{{count}} ausgewählte Zeilen kopieren",
+      "copyAll": "Alle Zeilen kopieren",
+      "deleteDisabled": "Löschen während eines laufenden Jobs deaktiviert",
+      "deleteSelected_one": "{{count}} ausgewählte Zeile löschen",
+      "deleteSelected_other": "{{count}} ausgewählte Zeilen löschen",
+      "revertDisabled": "Zurücksetzen während eines laufenden Jobs deaktiviert",
+      "revert": "Auf ursprünglichen Inhalt zurücksetzen",
+      "saveDisabled": "Speichern während eines laufenden Jobs deaktiviert",
+      "save": "Änderungen speichern"
+    },
+    "loading": "Wird geladen...",
+    "placeholderAlt": "Platzhalterbild: Hund Louis",
+    "rendering": "Wird gerendert",
+    "softLimitsWarning": "Warnung: Fräsbahn verlässt die Software-Endlagen!",
+    "cycleStart": "Zyklusstart",
+    "unlockMachine": "Maschine entsperren",
+    "disableLiteMode": "Leichtmodus deaktivieren",
+    "enableLiteMode": "Leichtmodus aktivieren",
+    "noWebGL": "Ihr Gerät scheint WebGL nicht zu unterstützen",
+    "moveToHereTooltip": "Hierhin fahren: Eine Stelle gedrückt halten, um die Spindel dorthin zu fahren",
+    "moveToHere": "Hierhin fahren",
+    "isoView": "Isometrische Ansicht",
+    "perspectiveView": "Zur perspektivischen Ansicht wechseln",
+    "orthographicView": "Zur orthografischen Ansicht wechseln"
+  },
+  "workspaceSelector": {
+    "label": "Arbeitsbereich:",
+    "tooltip": "Arbeitsbereich auswählen",
+    "ariaLabel": "Arbeitsbereich auswählen"
+  },
+  "alerts": {
+    "jobEnd": {
+      "statusComplete": "ABGESCHLOSSEN",
+      "statusStopped": "GESTOPPT",
+      "title": "Jobende",
+      "status": "Status:",
+      "time": "Zeit:",
+      "errors": "Fehler:",
+      "noErrors": "Keine"
+    },
+    "maintenance": {
+      "title": "Wartungshinweis",
+      "tasksDue": "Folgende Wartungsaufgaben sind fällig:",
+      "instructions": "Klicken Sie auf „Timer zurücksetzen“, um die Timer ALLER aufgeführten Aufgaben zurückzusetzen. Klicken Sie auf „Schließen“, um das Fenster ohne Änderung zu schließen.",
+      "resetTimers": "Timer zurücksetzen"
+    }
+  },
+  "macroBar": {
+    "dragToReorder": "Zum Neuanordnen ziehen"
+  }
+}

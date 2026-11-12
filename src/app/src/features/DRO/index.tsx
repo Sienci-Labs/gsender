@@ -41,6 +41,7 @@ import {
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { mapPositionToMetricUnits, mapPositionToUnits } from 'app/lib/units.ts';
 import useKeybinding from 'app/lib/useKeybinding';
@@ -85,6 +86,7 @@ function DRO({
     singleAxisHoming,
     isRemote,
 }: DROProps) {
+    const { t } = useAppTranslation();
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const { units: preferredUnits } = useWorkspaceState();
     const [rotaryFunctionsEnabled, setRotaryFunctionsEnabled] = useState(false);
@@ -438,8 +440,12 @@ function DRO({
                 />
             </div>
             <div className="w-full flex flex-row justify-between px-3 max-xl:px-5 max-xl:-mt-[4px] max-xl:-mb-[4px]">
-                <Label>{homingMode ? 'Home' : 'Zero'}</Label>
-                <Label>Go to</Label>
+                <Label>
+                    {homingMode
+                        ? t('workspace:dro.labels.home')
+                        : t('workspace:dro.labels.zero')}
+                </Label>
+                <Label>{t('workspace:dro.labels.goTo')}</Label>
             </div>
             <div className="flex flex-col w-full gap-1 portrait:gap-2 space-between">
                 <AxisRow
@@ -484,39 +490,46 @@ function DRO({
             <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1 items-center">
                 {!shouldWarnZero ? (
                     <Button
-                        tooltip={{ content: 'Zero all axes', side: 'left' }}
-                        text="Zero"
+                        tooltip={{
+                            content: t('workspace:dro.zeroAll.tooltip'),
+                            side: 'left',
+                        }}
+                        text={t('workspace:dro.zeroAll.button')}
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={() => {
                             zeroAllAxes();
                             posthog?.capture('zero_all_axes');
                         }}
                         disabled={!canClick}
-                        aria-label="Zero all axes: Set current position as work zero for all axes"
+                        aria-label={t('workspace:dro.zeroAll.ariaLabel')}
                         size="responsive"
                     />
                 ) : (
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button
-                                text="Zero"
+                                text={t('workspace:dro.zeroAll.button')}
                                 icon={<VscTarget className="w-5 h-5" />}
                                 disabled={!canClick}
-                                aria-label="Zero all axes: Set current position as work zero for all axes"
+                                aria-label={t(
+                                    'workspace:dro.zeroAll.ariaLabel',
+                                )}
                                 size="responsive"
                             />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-white">
                             <AlertDialogHeader>
                                 <AlertDialogTitle>
-                                    Zero All Axes
+                                    {t('workspace:dro.zeroAll.confirmTitle')}
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Are you sure you want to zero all axes?
+                                    {t('workspace:dro.zeroAll.confirmContent')}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>
+                                    {t('common:actions.cancel')}
+                                </AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={() => {
                                         zeroAllAxes();
@@ -525,7 +538,7 @@ function DRO({
                                         });
                                     }}
                                 >
-                                    Continue
+                                    {t('common:actions.continue')}
                                 </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
@@ -549,8 +562,15 @@ function DRO({
                         );
                     }}
                     disabled={!canClick}
-                    tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
-                    aria-label={`Go to ${isRotaryMode ? 'XA' : 'XY'} zero: Move ${isRotaryMode ? 'X and A' : 'X and Y'} axes to their current work zero position`}
+                    tooltip={{
+                        content: t('workspace:dro.goToXY.tooltip'),
+                        side: 'bottom',
+                    }}
+                    aria-label={
+                        isRotaryMode
+                            ? t('workspace:dro.goToXY.ariaLabelXA')
+                            : t('workspace:dro.goToXY.ariaLabelXY')
+                    }
                     size="responsive"
                 >
                     <span className="font-mono text-lg">

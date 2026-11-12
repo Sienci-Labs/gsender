@@ -11,7 +11,9 @@
     "ok": "OK",
     "reset": "Reset",
     "save": "Save",
-    "yes": "Yes"
+    "yes": "Yes",
+    "goBack": "Go Back",
+    "copyToClipboard": "Copy to Clipboard"
   },
   "language": {
     "label": "Language",
@@ -37,5 +39,111 @@
     "disconnected": "Disconnected",
     "toolChange": "Tool Change",
     "door": "Door"
+  },
+  "carousel": {
+    "roleDescription": "carousel",
+    "slideRoleDescription": "slide",
+    "previousSlide": "Previous slide",
+    "nextSlide": "Next slide"
+  },
+  "select": {
+    "scrollUp": "Scroll up",
+    "scrollDown": "Scroll down"
+  },
+  "status": {
+    "loading": "Loading",
+    "onUpper": "ON",
+    "offUpper": "OFF",
+    "on": "On",
+    "off": "Off"
+  },
+  "updateAlert": {
+    "title": "Feature In-progress",
+    "description": "Look, feel and functionality of this area will be updated in a later build."
+  },
+  "wizard": {
+    "restartHome": "Restart Home",
+    "allStepsComplete": "All Steps Complete",
+    "stepOf": "Step {{step}} of {{total}}",
+    "percentComplete": "{{percent}}% Complete",
+    "exit": "Exit",
+    "runningLabel": "{{label}}...",
+    "complete": "Complete",
+    "error": "Error",
+    "success": "Success",
+    "validation": {
+      "notConnected": "Your controller is not connected.  Connect to your CNC to configure this accessory.",
+      "notHomed": "Machine not homed. Please home your machine before proceeding with accessory configuration.",
+      "firmwareTooOld": "This setup wizard requires a newer firmware version, please update your firmware before proceeding. <link>Learn More</link>",
+      "requiresGrblHal": "You must be connected to a grblHAL device to use this wizard.",
+      "requiresGrbl": "You must be connected to a grbl device to use this wizard.",
+      "notIdle": "Your machine must be idle or jogging to use this wizard.",
+      "failed": "Validation failed"
+    },
+    "secondaryContentAlt": "Secondary content",
+    "onlineResources": "online resources",
+    "scanQrCode": "Scan QR Code",
+    "backToWizards": "Back to Wizards",
+    "backToTools": "Back to Tools",
+    "estimatedTime": "Estimated time:",
+    "configFileVersion": "Configuration File Version: {{version}}",
+    "imageAlt": "Wizard image",
+    "needHelp": "Need Help?",
+    "followAlong": "Follow along in our <link>online resources</link>",
+    "exitWizard": "Exit Wizard",
+    "restartWizard": "Restart Wizard",
+    "previous": "Previous",
+    "next": "Next",
+    "hub": {
+      "defaultTitle": "CNC Accessory Wizards",
+      "configurationCount_one": "{{count}} configuration",
+      "configurationCount_other": "{{count}} configurations",
+      "totalSteps_one": "{{count}} total step",
+      "totalSteps_other": "{{count}} total steps",
+      "startWizard": "Start Wizard",
+      "noWizards": "No wizards available"
+    }
+  },
+  "toolCard": {
+    "unpinTool": "Unpin tool",
+    "pinToTop": "Pin to top"
+  },
+  "pluginToolCard": {
+    "plugin": "Plugin",
+    "official": "Official",
+    "community": "Community"
+  },
+  "tabs": {
+    "scrollLeft": "Scroll tabs left",
+    "widgetTabs": "Widget Tabs",
+    "scrollRight": "Scroll tabs right"
+  },
+  "rangeSlider": {
+    "resetTooltip": "Reset override to 100%",
+    "resetLabel": "Reset {{title}} override to 100%",
+    "decreaseTooltip": "Decrease {{title}} override by {{step}}%",
+    "decreaseLabel": "Decrease {{title}} override",
+    "increaseTooltip": "Increase {{title}} override by {{step}}%",
+    "increaseLabel": "Increase {{title}} override"
+  },
+  "table": {
+    "searchPlaceholder": "Search all columns...",
+    "addNew": "Add New",
+    "addNewTask": "Add New Task",
+    "resetAll": "Reset All",
+    "pageOf": "Page <bold>{{current}} of {{total}}</bold>",
+    "jumpToPage": "Jump to page:",
+    "entriesPerPage": "Entries/Page:",
+    "showCount": "Show {{size}}"
+  },
+  "spindleLaser": {
+    "spindle": "Spindle",
+    "laser": "Laser"
+  },
+  "toast": {
+    "dismiss": "Dismiss notification"
+  },
+  "toggle": {
+    "label": "Toggle"
   }
 }

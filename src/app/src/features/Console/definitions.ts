@@ -1,3 +1,5 @@
+import { tk } from 'app/i18n';
+
 export interface Console {
     minimized: boolean;
 }
@@ -26,11 +28,11 @@ export const CONSOLE_FILTERS: {
     id: ConsoleFilter;
     label: string;
 }[] = [
-    { id: 'all', label: 'All' },
-    { id: 'gcode', label: 'G-code' },
-    { id: 'response', label: 'Responses' },
-    { id: 'system', label: 'System' },
-    { id: 'faults', label: 'Faults' },
+    { id: 'all', label: tk('workspace:console.filters.all') },
+    { id: 'gcode', label: tk('workspace:console.filters.gcode') },
+    { id: 'response', label: tk('workspace:console.filters.responses') },
+    { id: 'system', label: tk('workspace:console.filters.system') },
+    { id: 'faults', label: tk('workspace:console.filters.faults') },
 ];
 
 export function matchesFilter(

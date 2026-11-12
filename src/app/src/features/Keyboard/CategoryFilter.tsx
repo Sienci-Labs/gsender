@@ -1,8 +1,10 @@
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 
 import { ALL_CATEGORIES } from 'app/constants';
+import { useAppTranslation } from 'app/i18n';
 import type { CommandKeys } from 'app/lib/definitions/shortcuts';
 import { cn } from 'app/lib/utils';
+import { getCategoryLabel } from './shortcutLabels';
 
 interface Props {
     onChange: (category: string, shortcuts?: CommandKeys) => void;
@@ -10,6 +12,8 @@ interface Props {
 }
 
 const CategoryFilter = ({ onChange, filterCategory }: Props) => {
+    // Re-render on language change so the category labels update
+    useAppTranslation();
     return (
         <div className="flex items-center space-x-2 self-center">
             <Tabs
@@ -24,7 +28,7 @@ const CategoryFilter = ({ onChange, filterCategory }: Props) => {
                             value={category}
                             className={cn('px-3 py-1 rounded-md capitalize')}
                         >
-                            {category}
+                            {getCategoryLabel(category)}
                         </TabsTrigger>
                     ))}
                 </TabsList>

@@ -1,7 +1,9 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 
 const Size = () => {
+    const { t } = useAppTranslation();
     const bbox = useTypedSelector((state) => state.file.bbox);
     const usedAxes = useTypedSelector((state) => state.file.usedAxes);
     const { units } = useWorkspaceState();
@@ -38,9 +40,15 @@ const Size = () => {
             <thead>
                 <tr>
                     <th className="border border-gray-300 px-1"></th>
-                    <th className="border border-gray-300 px-1">Size</th>
-                    <th className="border border-gray-300 px-1">Min</th>
-                    <th className="border border-gray-300 px-1">Max</th>
+                    <th className="border border-gray-300 px-1">
+                        {t('workspace:fileControl.size')}
+                    </th>
+                    <th className="border border-gray-300 px-1">
+                        {t('workspace:fileControl.min')}
+                    </th>
+                    <th className="border border-gray-300 px-1">
+                        {t('workspace:fileControl.max')}
+                    </th>
                 </tr>
             </thead>
             <tbody>

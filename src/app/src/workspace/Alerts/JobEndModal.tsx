@@ -10,6 +10,7 @@ import {
 import { Button } from 'app/components/shadcn/Button';
 import { JOB_STATUS } from 'app/constants';
 import type { Job } from 'app/features/Stats/utils/StatContext';
+import { useAppTranslation } from 'app/i18n';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import cx from 'classnames';
 import uniqueId from 'lodash/uniqueId';
@@ -29,16 +30,27 @@ const JobEndModal: React.FC<Props> = ({
     setShowModal,
     onClose,
 }) => {
+    const { t } = useAppTranslation();
+    const jobStatusLabel =
+        job.jobStatus === JOB_STATUS.COMPLETE
+            ? t('workspace:alerts.jobEnd.statusComplete')
+            : job.jobStatus === JOB_STATUS.STOPPED
+              ? t('workspace:alerts.jobEnd.statusStopped')
+              : job.jobStatus;
     return (
         <AlertDialog open={showModal} onOpenChange={setShowModal}>
             <AlertDialogContent className="bg-slate-200">
                 <AlertDialogHeader className="flex items-center">
-                    <AlertDialogTitle>Job End</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        {t('workspace:alerts.jobEnd.title')}
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
                         <div className="min-h-[100px] max-h-[500px] flex flex-col">
                             <div className="flex flex-col m-2 mt-0 overflow-y-auto float-left">
                                 <div>
-                                    <strong>Status:</strong>
+                                    <strong>
+                                        {t('workspace:alerts.jobEnd.status')}
+                                    </strong>
                                     <span
                                         className={cx({
                                             'text-green-500':
@@ -48,17 +60,19 @@ const JobEndModal: React.FC<Props> = ({
                                                 job.jobStatus ===
                                                 JOB_STATUS.STOPPED,
                                         })}
-                                    >{` ${job.jobStatus}\n`}</span>
+                                    >{` ${jobStatusLabel}\n`}</span>
                                 </div>
                                 <div>
-                                    <strong>Time:</strong>
+                                    <strong>
+                                        {t('workspace:alerts.jobEnd.time')}
+                                    </strong>
                                     <span>{` ${convertMillisecondsToTimeStamp(job.duration)}\n`}</span>
                                 </div>
-                                <strong>{'Errors:\n'}</strong>
+                                <strong>{`${t('workspace:alerts.jobEnd.errors')}\n`}</strong>
 
                                 {errors.length === 0 ? (
                                     <span className="flex flex-col m-2 mt-0">
-                                        None
+                                        {t('workspace:alerts.jobEnd.noErrors')}
                                     </span>
                                 ) : (
                                     <span className="flex flex-col m-2 mt-0 text-red-500">
@@ -77,7 +91,7 @@ const JobEndModal: React.FC<Props> = ({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onClose}>
-                        Close
+                        {t('common:actions.close')}
                     </AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>

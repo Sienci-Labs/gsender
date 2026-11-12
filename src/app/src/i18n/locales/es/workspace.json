@@ -1,0 +1,680 @@
+{
+  "connection": {
+    "disconnect": "Desconectar",
+    "usbBaud": "USB ({{baud}})",
+    "noUsbDevices": "No se encontraron dispositivos USB",
+    "ethernetPort": "Ethernet (puerto {{port}})",
+    "unrecognizedPorts": "Puertos no reconocidos",
+    "menuLabel": "Menú de conexión",
+    "connectToCnc": "Conectar a CNC",
+    "connect": "Conectar",
+    "connecting": "Conectando...",
+    "unableToConnect": "No se pudo conectar."
+  },
+  "console": {
+    "inputPlaceholder": "Escribe G-code aquí...",
+    "inputLabel": "Comando de consola",
+    "run": "Ejecutar",
+    "scrollToLatest": "Ir al último mensaje",
+    "noMatchingMessages": "Ningún mensaje coincide con este filtro",
+    "noOutput": "Aún no hay salida en la consola",
+    "filterLabel": "Filtrar mensajes de la consola",
+    "copyLast": "Copiar los últimos {{limit}} mensajes",
+    "clear": "Limpiar consola",
+    "popOut": "Abrir consola en ventana",
+    "messageType": {
+      "sent": "Enviado",
+      "response": "Respuesta",
+      "system": "Sistema",
+      "warning": "Advertencia",
+      "error": "Error",
+      "alarm": "Alarma"
+    },
+    "connected": "Conectado a {{port}} con una velocidad de {{baudrate}} baudios",
+    "filters": {
+      "all": "Todos",
+      "gcode": "G-code",
+      "responses": "Respuestas",
+      "system": "Sistema",
+      "faults": "Fallos"
+    },
+    "notConnected": "No conectado a ningún dispositivo"
+  },
+  "coolant": {
+    "mist": "Niebla",
+    "mistTooltip": "Activar refrigerante por niebla",
+    "flood": "Inundación",
+    "floodTooltip": "Activar refrigerante por inundación",
+    "off": "Apagado",
+    "offTooltip": "Desactivar refrigerante"
+  },
+  "dro": {
+    "axisRow": {
+      "homeTooltip": "Hacer homing del eje {{axis}}",
+      "zeroTooltip": "Poner a cero el eje {{axis}}",
+      "homeAriaLabel": "Homing del eje {{axis}}: mover hasta el límite físico de la máquina",
+      "zeroAriaLabel": "Cero del eje {{axis}}: establecer la posición actual como cero de trabajo",
+      "zeroAxis": "Poner a cero el eje {{axis}}",
+      "confirmTitle": "Poner a cero el eje {{axis}}",
+      "confirmContent": "¿Seguro que quieres poner a cero el eje {{axis}}?",
+      "goToZeroTooltip": "Ir al cero del eje {{axis}}",
+      "goToZeroAriaLabel": "Ir al cero del eje {{axis}}: mover el eje a su posición actual de cero de trabajo"
+    },
+    "goTo": {
+      "title": "Ir a ubicación",
+      "openAriaLabel": "Abrir el diálogo Ir a ubicación",
+      "mcsUnavailable": "Requiere homing activado ($22>0) y la máquina con homing realizado",
+      "executeAriaLabel": "Ejecutar movimiento a la ubicación",
+      "go": "¡Ir!"
+    },
+    "homing": {
+      "toggleSingleAxis": "Alternar homing de un solo eje",
+      "runTooltip": "Ejecutar homing",
+      "home": "Homing"
+    },
+    "parking": {
+      "goToPark": "Ir a la posición de estacionamiento"
+    },
+    "rapidPosition": {
+      "backLeft": "Ir a la esquina trasera izquierda",
+      "backRight": "Ir a la esquina trasera derecha",
+      "frontLeft": "Ir a la esquina delantera izquierda",
+      "frontRight": "Ir a la esquina delantera derecha"
+    },
+    "units": {
+      "inch": "Pulgada",
+      "currentAriaLabel": "Las unidades actuales son {{units}}. Haz clic para cambiarlas.",
+      "label": "Unidades:",
+      "title": "Unidades",
+      "selectAriaLabel": "Seleccionar unidades",
+      "inches": "Pulgadas",
+      "millimeters": "Milímetros"
+    },
+    "labels": {
+      "home": "Homing",
+      "zero": "Cero",
+      "goTo": "Ir a"
+    },
+    "zeroAll": {
+      "tooltip": "Poner a cero todos los ejes",
+      "button": "Cero",
+      "ariaLabel": "Poner a cero todos los ejes: establecer la posición actual como cero de trabajo en todos los ejes",
+      "confirmTitle": "Poner a cero todos los ejes",
+      "confirmContent": "¿Seguro que quieres poner a cero todos los ejes?"
+    },
+    "goToXY": {
+      "tooltip": "Ir al cero XY",
+      "ariaLabelXA": "Ir al cero XA: mover los ejes X y A a su posición actual de cero de trabajo",
+      "ariaLabelXY": "Ir al cero XY: mover los ejes X e Y a su posición actual de cero de trabajo"
+    }
+  },
+  "fileControl": {
+    "loadFile": "Cargar archivo",
+    "viewRecentFiles": "Ver archivos recientes",
+    "recentFiles": "Archivos recientes",
+    "closeFile": "Cerrar archivo",
+    "confirmTitle": "¿Estás seguro?",
+    "closeFileConfirm": "Se cerrará el archivo actual. Se perderán los cambios no guardados.",
+    "estimatedTime": "Tiempo estimado",
+    "feed": "Avance",
+    "speed": "Velocidad",
+    "none": "Ninguna",
+    "tools": "Herramientas",
+    "size": "Tamaño",
+    "min": "Mín",
+    "max": "Máx",
+    "loadRecentFile": "Cargar archivo reciente {{name}}",
+    "lastJob": {
+      "title": "Último trabajo",
+      "complete": "COMPLETADO",
+      "stopped": "DETENIDO"
+    },
+    "fileSize": {
+      "bytes": "{{size}} bytes",
+      "kilobytes": "{{size}} KB",
+      "megabytes": "{{size}} MB"
+    },
+    "lineCount_many": "({{count}} líneas)",
+    "lineCount_one": "({{count}} línea)",
+    "lineCount_other": "({{count}} líneas)",
+    "info": "Info",
+    "toggleInfoSize": "Alternar vista de información o tamaño del archivo",
+    "toggleEditor": "Alternar editor de G-code",
+    "gcodeEditor": "Editor de G-code",
+    "openStepThrough": "Abrir ejecución paso a paso de G-code",
+    "stepThrough": "G-code paso a paso",
+    "reloadFile": "Recargar archivo",
+    "reloadFileConfirm": "Se volverá a cargar el archivo actual desde el disco."
+  },
+  "gcodeStepper": {
+    "sourceHeading_many": "G-code ({{lines}} líneas)",
+    "sourceHeading_one": "G-code ({{lines}} línea)",
+    "sourceHeading_other": "G-code ({{lines}} líneas)",
+    "closeSearch": "Cerrar búsqueda",
+    "searchGcode": "Buscar en G-code",
+    "searchPlaceholder": "Buscar...",
+    "goToStart": "Ir al inicio",
+    "stepControls": "Controles de paso",
+    "pausePlayback": "Pausar reproducción",
+    "play": "Reproducir",
+    "resetToStart": "Volver al inicio",
+    "backLines_many": "Retroceder {{count}} líneas",
+    "backLines_one": "Retroceder {{count}} línea",
+    "backLines_other": "Retroceder {{count}} líneas",
+    "forwardLines_many": "Avanzar {{count}} líneas",
+    "forwardLines_one": "Avanzar {{count}} línea",
+    "forwardLines_other": "Avanzar {{count}} líneas",
+    "stepLines_many": "{{sign}}{{count}} líneas",
+    "stepLines_one": "{{sign}}{{count}} línea",
+    "stepLines_other": "{{sign}}{{count}} líneas",
+    "gcodeLine": "Línea de G-code",
+    "modals": {
+      "motion": "Movimiento",
+      "wcs": "WCS",
+      "plane": "Plano",
+      "units": "Unidades",
+      "distance": "Distancia",
+      "feedMode": "Modo de avance",
+      "spindle": "Husillo",
+      "coolant": "Refrigerante",
+      "tool": "Herramienta",
+      "feed": "Avance",
+      "speed": "Velocidad"
+    },
+    "workPosition": "Posición (trabajo, {{units}})",
+    "modalsLabel": "Modales",
+    "showPriorLines": "Mostrar líneas anteriores",
+    "hidePriorLines": "Ocultar líneas anteriores",
+    "hideToolpath": "Ocultar trayectoria de la herramienta {{tool}}",
+    "showToolpath": "Mostrar trayectoria de la herramienta {{tool}}",
+    "goToTool": "Ir a la herramienta {{tool}}, línea {{line}}",
+    "tools": "Herramientas",
+    "noTools": "No se encontraron herramientas en este archivo.",
+    "title": "G-code paso a paso",
+    "close": "Cerrar paso a paso",
+    "readingPositions": "Leyendo posiciones… {{percent}}%"
+  },
+  "layout": {
+    "logoAlt": "Logotipo de gSender",
+    "visualizerPlaceholder": "Visualizador",
+    "skipToMain": "Saltar al contenido principal"
+  },
+  "jobControl": {
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "stop": "Detener",
+    "overrides": {
+      "feed": "Avance",
+      "laser": "Láser",
+      "spindle": "Husillo",
+      "power": "Potencia"
+    },
+    "outline": "Contorno",
+    "progress": {
+      "days": "d",
+      "hours": "h",
+      "minutes": "m",
+      "seconds": "s",
+      "label": "Progreso del trabajo",
+      "finalizing": "Finalizando",
+      "remaining": "restante",
+      "lines": "{{current}} / {{total}} líneas",
+      "cutting": "{{time}} cortando",
+      "spinningDrill": "Taladro girando"
+    },
+    "startFromLine": {
+      "button": "Iniciar desde",
+      "recoveryTitle": "Recuperación: iniciar desde línea",
+      "title": "Iniciar desde línea",
+      "description": "Recupera un trabajo tras un corte de energía, una avería mecánica, una desconexión u otro fallo.",
+      "resumeAtLine": "Reanudar el trabajo en la línea:",
+      "defaultValue": "Valor predeterminado: {{value}}",
+      "safeHeight": "Con altura segura:",
+      "safeHeightHint": "(cantidad por encima de la altura máxima del archivo)",
+      "calculates": "Calcula todos los movimientos, atributos y automatizaciones de gSender de tu CNC para continuar justo donde lo dejaste.",
+      "start": "Iniciar desde línea"
+    },
+    "atcValidation": {
+      "outOfRange": {
+        "title": "El número de herramienta excede el tamaño de la tabla de herramientas",
+        "description_many": "Este archivo hace referencia a las herramientas {{list}}, que exceden el tamaño configurado de tu tabla de herramientas ({{size}} herramientas).",
+        "description_one": "Este archivo hace referencia a la herramienta {{list}}, que excede el tamaño configurado de tu tabla de herramientas ({{size}} herramientas).",
+        "description_other": "Este archivo hace referencia a las herramientas {{list}}, que exceden el tamaño configurado de tu tabla de herramientas ({{size}} herramientas).",
+        "remap_many": "Reasigna estas herramientas en la línea de tiempo de herramientas antes de iniciar, o confirma para ejecutar de todos modos.",
+        "remap_one": "Reasigna esta herramienta en la línea de tiempo de herramientas antes de iniciar, o confirma para ejecutar de todos modos.",
+        "remap_other": "Reasigna estas herramientas en la línea de tiempo de herramientas antes de iniciar, o confirma para ejecutar de todos modos."
+      },
+      "usingCurrentTool": {
+        "title": "Usando la herramienta actual (T{{tool}})",
+        "description": "Este archivo no contiene comandos de cambio de herramienta (M6) y se usará la herramienta que está en el husillo.",
+        "confirm": "Confirma que quieres usar esta herramienta"
+      },
+      "notProbed": {
+        "title": "Herramienta actual sin sondear",
+        "description": "El archivo no contiene comandos de cambio de herramienta (M6) y se usará la herramienta que está en el husillo. Sin embargo, la herramienta del husillo no tiene un offset."
+      },
+      "noTool": {
+        "title": "No hay herramienta actual",
+        "description": "Este archivo no contiene comandos de cambio de herramienta (M6) y no hay ninguna herramienta en el husillo.",
+        "loadTool": "Carga en el husillo la herramienta que quieres usar antes de volver a intentarlo.",
+        "alternative": "También puedes actualizar tu postprocesador para que incluya un comando de cambio de herramienta en el archivo."
+      }
+    }
+  },
+  "jogging": {
+    "tab": {
+      "plus": "Desplazar {{axis}} positivo",
+      "minus": "Desplazar {{axis}} negativo",
+      "labelsAlt": "Pestaña de etiquetas {{axis}}"
+    },
+    "input": {
+      "decrease": "Reducir {{label}}",
+      "increase": "Aumentar {{label}}",
+      "xyDistance": "Distancia de jog XY",
+      "zDistance": "Distancia de jog Z",
+      "aDistance": "Distancia de jog A",
+      "feedrateLabel": "a",
+      "feedrate": "Velocidad de jog"
+    },
+    "wheel": {
+      "xPlusYMinus": "Desplazar X positivo Y negativo",
+      "xMinusYMinus": "Desplazar X negativo Y negativo",
+      "xMinusYPlus": "Desplazar X negativo Y positivo",
+      "xPlusYPlus": "Desplazar X positivo Y positivo",
+      "yMinus": "Desplazar Y negativo",
+      "xMinus": "Desplazar X negativo",
+      "yPlus": "Desplazar Y positivo",
+      "xPlus": "Desplazar X positivo"
+    },
+    "speed": {
+      "precise": "Preciso",
+      "preciseAriaLabel": "Usar el preajuste de jog Preciso",
+      "normal": "Normal",
+      "normalAriaLabel": "Usar el preajuste de jog Normal",
+      "rapid": "Rápido",
+      "rapidAriaLabel": "Usar el preajuste de jog Rápido",
+      "custom": "Personalizado",
+      "customAriaLabel": "Usar el preajuste de jog Personalizado"
+    },
+    "stopAriaLabel": "Detener desplazamiento",
+    "wheelArrowsAlt": "Flechas de la rueda de jog"
+  },
+  "keyboard": {
+    "editArea": {
+      "inUse": "Este atajo ya lo usa la acción \"{{action}}\"",
+      "available": "El atajo está disponible",
+      "none": "Ninguno",
+      "pressKeys": "Pulsa algunas teclas...",
+      "action": "Acción",
+      "currentShortcut": "Atajo actual",
+      "newShortcut": "Nuevo atajo:",
+      "update": "Actualizar atajo"
+    },
+    "print": {
+      "heading": "Atajos de teclado de gSender",
+      "generatedOn": "Generado el {{date}}",
+      "documentTitle": "Atajos de teclado"
+    },
+    "actions": {
+      "import": "Importar",
+      "importTooltip": "Importar atajos desde un archivo",
+      "export": "Exportar",
+      "exportTooltip": "Exportar atajos a un archivo",
+      "enableAll": "Activar todos",
+      "enableAllTooltip": "Activar todos los atajos",
+      "disableAll": "Desactivar todos",
+      "disableAllTooltip": "Desactivar todos los atajos",
+      "print": "Imprimir",
+      "printTooltip": "Imprimir atajos"
+    },
+    "editDialog": {
+      "title": "Editar atajo",
+      "description": "Actualiza la combinación de teclas de este atajo"
+    },
+    "table": {
+      "editTooltip": "Editar este atajo",
+      "editAria": "Editar atajo de {{action}}",
+      "deleteTooltip": "Eliminar este atajo",
+      "deleteAria": "Eliminar atajo de {{action}}",
+      "addTooltip": "Asignar un atajo a esta acción",
+      "addAria": "Añadir atajo para {{action}}",
+      "toggleAria": "Alternar estado activo de {{action}}",
+      "action": "Acción",
+      "shortcut": "Atajo",
+      "category": "Categoría",
+      "active": "Activo"
+    },
+    "commands": {
+      "ccwLaserTest": "CCW / Prueba de láser",
+      "confirmProbe": "Confirmar ventana de sondeo",
+      "controllerCommandErrorClear": "Borrar error",
+      "controllerCommandHoming": "Hacer homing",
+      "controllerCommandRealtimeReport": "Informe en tiempo real",
+      "controllerCommandReset": "Reinicio suave",
+      "controllerCommandToolchangeAcknowledgement": "Confirmar cambio de herramienta",
+      "controllerCommandUnlock": "Desbloquear",
+      "controllerCommandVirtualStopToggle": "Retención de avance",
+      "copy": "Copiar",
+      "cut": "Cortar",
+      "cwLaserOn": "CW / Encender láser",
+      "cycleJogPresets": "Alternar entre preajustes",
+      "displayMachineInfo": "Mostrar info de la máquina",
+      "displayNotifications": "Mostrar notificaciones",
+      "feedrateOverrideM": "Avance -",
+      "feedrateOverrideMm": "Avance --",
+      "feedrateOverrideP": "Avance +",
+      "feedrateOverridePp": "Avance ++",
+      "feedrateOverrideReset": "Restablecer avance",
+      "floodCoolant": "Refrigerante por inundación (M8)",
+      "goToAAxisZero": "Ir al cero de A",
+      "goToXyAxisZero": "Ir al cero XY",
+      "goToXAxisZero": "Ir al cero de X",
+      "goToYAxisZero": "Ir al cero de Y",
+      "goToZAxisZero": "Ir al cero de Z",
+      "homingGoToBackLeftCorner": "Ir a esquina trasera izquierda",
+      "homingGoToBackRightCorner": "Ir a esquina trasera derecha",
+      "homingGoToFrontLeftCorner": "Ir a esquina delantera izquierda",
+      "homingGoToFrontRightCorner": "Ir a esquina delantera derecha",
+      "homingPark": "Estacionar",
+      "jogAMinus": "Desplazar A- (CW)",
+      "jogAPlus": "Desplazar A+ (CCW)",
+      "jogSpeedD": "Reducir velocidad de jog",
+      "jogSpeedI": "Aumentar velocidad de jog",
+      "jogXM": "Desplazar X- (izquierda)",
+      "jogXMYP": "Desplazar X- Y+",
+      "jogXP": "Desplazar X+ (derecha)",
+      "jogXPYM": "Desplazar X+ Y-",
+      "jogXYM": "Desplazar X- Y-",
+      "jogXYP": "Desplazar X+ Y+",
+      "jogYM": "Desplazar Y- (delante)",
+      "jogYP": "Desplazar Y+ (atrás)",
+      "jogZM": "Desplazar Z- (abajo)",
+      "jogZP": "Desplazar Z+ (arriba)",
+      "lightweightMode": "Modo ligero",
+      "loadFile": "Cargar archivo",
+      "mistCoolant": "Refrigerante por niebla (M7)",
+      "openProbe": "Mostrar ventana de sondeo",
+      "paste": "Pegar",
+      "pauseJob": "Pausar trabajo",
+      "probeDiameterScrollDown": "Diámetro de herramienta: desplazar abajo",
+      "probeDiameterScrollUp": "Diámetro de herramienta: desplazar arriba",
+      "probeRotaryYAxis": "Alineación del eje Y rotativo",
+      "probeRotaryZAxis": "Sondear eje Z rotativo",
+      "probeRoutineScrollLeft": "Rutina de sondeo: desplazar a la izquierda",
+      "probeRoutineScrollRight": "Rutina de sondeo: desplazar a la derecha",
+      "runOutline": "Ejecutar contorno",
+      "setNJogPreset": "Usar preajuste Normal",
+      "setPJogPreset": "Usar preajuste Preciso",
+      "setRJogPreset": "Usar preajuste Rápido",
+      "spindleOverrideM": "Husillo/Láser -",
+      "spindleOverrideMm": "Husillo/Láser --",
+      "spindleOverrideP": "Husillo/Láser +",
+      "spindleOverridePp": "Husillo/Láser ++",
+      "spindleOverrideReset": "Restablecer husillo/láser",
+      "startJob": "Iniciar trabajo",
+      "startProbe": "Iniciar sondeo",
+      "stopCoolant": "Detener refrigerante (M9)",
+      "stopJob": "Parada global",
+      "stopLaserOff": "Detener / Apagar láser",
+      "switchWorkspaceMode": "Alternar modo rotativo",
+      "toggleInfoHelper": "Mostrar ayuda",
+      "toggleMountingSetup": "Configuración de montaje rotativo",
+      "toggleRotarySurfacing": "Alternar vista de planeado rotativo",
+      "toggleShortcuts": "Activar/desactivar atajos",
+      "toggleSpindleLaserMode": "Alternar entre modo husillo y láser",
+      "undo": "Deshacer",
+      "unloadFile": "Descargar archivo",
+      "visualizerView3d": "Ver vista 3D",
+      "visualizerViewCycle": "Alternar entre vistas",
+      "visualizerViewFront": "Ver vista frontal",
+      "visualizerViewLeft": "Ver vista izquierda",
+      "visualizerViewReset": "Restablecer vista",
+      "visualizerViewRight": "Ver vista derecha",
+      "visualizerViewTop": "Ver vista superior",
+      "visualizerZoomFit": "Ajustar zoom",
+      "visualizerZoomIn": "Acercar",
+      "visualizerZoomOut": "Alejar",
+      "zeroAllAxis": "Poner a cero todos los ejes",
+      "zeroAAxis": "Poner a cero eje A",
+      "zeroXAxis": "Poner a cero eje X",
+      "zeroYAxis": "Poner a cero eje Y",
+      "zeroZAxis": "Poner a cero eje Z"
+    },
+    "categories": {
+      "all": "Todos",
+      "carving": "Tallado",
+      "coolant": "Refrigerante",
+      "general": "General",
+      "jogging": "Desplazamiento",
+      "location": "Ubicación",
+      "macros": "Macros",
+      "overrides": "Ajustes en vivo",
+      "probing": "Sondeo",
+      "spindleLaser": "Husillo/Láser",
+      "toolbar": "Barra de herramientas",
+      "visualizer": "Visualizador"
+    }
+  },
+  "machineInfo": {
+    "firmwareDisconnected": "desconectado",
+    "title": "Información de la máquina",
+    "firmwareVersion": "Versión de firmware:",
+    "unpin": "Desanclar información de la máquina",
+    "pin": "Anclar información de la máquina",
+    "close": "Cerrar información de la máquina",
+    "cncModals": "Modales CNC",
+    "modals": {
+      "probeStyle": "Tipo de sondeo",
+      "coordinateSystem": "Sistema de coordenadas",
+      "planeSelection": "Selección de plano",
+      "units": "Unidades",
+      "distanceMode": "Modo de distancia",
+      "feed": "Avance",
+      "spindle": "Husillo",
+      "coolant": "Refrigerante"
+    },
+    "pins": "Pines",
+    "pinLabels": {
+      "xLimit": "Límite X",
+      "yLimit": "Límite Y",
+      "zLimit": "Límite Z",
+      "aLimit": "Límite A",
+      "probe": "Sonda/TLS",
+      "door": "Puerta",
+      "cycleStart": "Inicio de ciclo",
+      "hold": "Pausa",
+      "softReset": "Reinicio suave"
+    },
+    "currentTool": "Herramienta actual:",
+    "lockStepperMotors": "Bloquear motores paso a paso",
+    "keepout": "Zona de exclusión:"
+  },
+  "machineStatus": {
+    "clickToRunHoming": "Clic para hacer homing",
+    "clickToUnlock": "Clic para desbloquear la máquina"
+  },
+  "macros": {
+    "empty": "No hay macros...",
+    "form": {
+      "defaultDescription": "Las macros permiten guardar y reutilizar comandos. Sirven para agilizar tareas repetitivas y hacer tu CNC más eficiente.",
+      "name": "Nombre",
+      "gcode": "G-code",
+      "variables": "Variables",
+      "gcodeTooltip": "Añade aquí tu G-code. Usa las variables o lógica JavaScript para crear comandos más complejos.",
+      "description": "Descripción de la macro"
+    },
+    "running": "Ejecutando...",
+    "optionsFor": "Opciones de la macro {{name}}",
+    "edit": "Editar",
+    "variableGroups": {
+      "waitForPlanner": "Esperar hasta que la cola del planificador esté vacía",
+      "globalVariables": "Variables globales definidas por el usuario",
+      "displayGlobalVariable": "Mostrar una variable global con un comentario en línea",
+      "backupWorkPosition": "Guardar una copia de la posición de trabajo actual",
+      "previousWorkPosition": "Ir a la posición de trabajo anterior",
+      "toolChange": "Cambio de herramienta",
+      "saveModalState": "Guardar estado modal",
+      "restoreModalState": "Restaurar estado modal",
+      "currentWorkPosition": "Posición de trabajo actual",
+      "boundingBox": "Establecer cuadro delimitador",
+      "requestParameters": "Solicitar parámetros actuales: obligatorio antes de usar parámetros",
+      "getParameters": "Obtener parámetros actuales"
+    },
+    "editTitle": "Editar macro",
+    "addTitle": "Añadir macro",
+    "update": "Actualizar macro",
+    "addNew": "Añadir nueva macro",
+    "add": "Añadir",
+    "addTooltip": "Añadir una nueva macro",
+    "import": "Importar",
+    "importTooltip": "Importar macros desde un archivo",
+    "export": "Exportar",
+    "exportTooltip": "Exportar macros a un archivo"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "clearAll": "Borrar todas las notificaciones",
+    "empty": "No hay notificaciones",
+    "tabs": {
+      "all": "Todas",
+      "errors": "Errores",
+      "info": "Info",
+      "success": "Éxito"
+    },
+    "unreadLabel_many": "Notificaciones, {{count}} sin leer",
+    "unreadLabel_one": "Notificaciones, {{count}} sin leer",
+    "unreadLabel_other": "Notificaciones, {{count}} sin leer"
+  },
+  "spindle": {
+    "active": "Activo",
+    "notActive": "Inactivo",
+    "laser": {
+      "on": "Láser encendido",
+      "onTooltip": "Encender láser",
+      "test": "Prueba de láser",
+      "testTooltip": "Encender el láser durante la duración de prueba",
+      "off": "Apagado",
+      "offTooltip": "Apagar láser",
+      "power": "Potencia",
+      "adjustPower": "Ajustar potencia del láser",
+      "testDurationLabel": "Duración de prueba:",
+      "testDuration": "Duración de la prueba de láser",
+      "secondsSuffix": "s"
+    },
+    "modeToggle": {
+      "tooltip": "Activar modo husillo o láser",
+      "spindle": "Husillo",
+      "ariaLabel": "Alternar modo husillo o láser",
+      "laser": "Láser"
+    },
+    "controls": {
+      "forward": "Directo",
+      "forwardTooltip": "Girar el husillo en sentido horario",
+      "forwardAriaLabel": "Arrancar husillo en sentido horario (M3)",
+      "reverse": "Inverso",
+      "reverseTooltip": "Girar el husillo en sentido antihorario",
+      "reverseAriaLabel": "Arrancar husillo en sentido antihorario (M4)",
+      "stop": "Detener",
+      "stopTooltip": "Detener husillo",
+      "stopAriaLabel": "Detener husillo (M5)",
+      "speed": "Velocidad",
+      "adjustSpeed": "Ajustar velocidad del husillo",
+      "typeSpeed": "Escribir velocidad del husillo"
+    },
+    "selector": {
+      "tooltip": "Seleccionar un husillo",
+      "defaultSpindle": "Husillo predeterminado",
+      "ariaLabel": "Seleccionar husillo"
+    }
+  },
+  "statusIcons": {
+    "wirelessControl": "Control inalámbrico",
+    "keyboardShortcuts": "Atajos de teclado",
+    "gamepadShortcuts": "Atajos de gamepad"
+  },
+  "unlockButton": {
+    "lockedInAlarmLabel": "La máquina está bloqueada en alarma. Haz clic para desbloquearla.",
+    "heldLabel": "La máquina está en pausa. Haz clic para desbloquearla.",
+    "unlockedLabel": "La máquina está desbloqueada.",
+    "tooltip": "Desbloquear máquina"
+  },
+  "visualizer": {
+    "editor": {
+      "editingDisabled": "Edición desactivada mientras se ejecuta el trabajo",
+      "toggleSelection": "Haz clic para alternar la selección",
+      "noFile": "No hay ningún archivo G-code cargado",
+      "title": "Editor de G-code",
+      "paused": "En pausa",
+      "selectedCount_many": "{{count}} seleccionadas",
+      "selectedCount_one": "{{count}} seleccionada",
+      "selectedCount_other": "{{count}} seleccionadas",
+      "lineCount_many": "{{lines}} líneas",
+      "lineCount_one": "{{lines}} línea",
+      "lineCount_other": "{{lines}} líneas",
+      "close": "Cerrar editor",
+      "scrollToTop": "Ir arriba",
+      "searchPlaceholder": "Buscar...",
+      "previousMatch": "Coincidencia anterior (Shift+Enter)",
+      "nextMatch": "Coincidencia siguiente (Enter)",
+      "closeSearch": "Cerrar búsqueda",
+      "jumpToLineLabel": "Ir a la línea:",
+      "jumpToLine": "Ir a la línea",
+      "closeJumpToLine": "Cerrar ir a la línea",
+      "search": "Buscar (Ctrl+F / Cmd+F)",
+      "deselectAll": "Deseleccionar todas las líneas",
+      "selectAll": "Seleccionar todas las líneas",
+      "copyDisabled": "Copia desactivada mientras se ejecuta el trabajo",
+      "copySelected_many": "Copiar {{count}} líneas seleccionadas",
+      "copySelected_one": "Copiar {{count}} línea seleccionada",
+      "copySelected_other": "Copiar {{count}} líneas seleccionadas",
+      "copyAll": "Copiar todas las líneas",
+      "deleteDisabled": "Eliminación desactivada mientras se ejecuta el trabajo",
+      "deleteSelected_many": "Eliminar {{count}} líneas seleccionadas",
+      "deleteSelected_one": "Eliminar {{count}} línea seleccionada",
+      "deleteSelected_other": "Eliminar {{count}} líneas seleccionadas",
+      "revertDisabled": "Revertir desactivado mientras se ejecuta el trabajo",
+      "revert": "Revertir al contenido original",
+      "saveDisabled": "Guardado desactivado mientras se ejecuta el trabajo",
+      "save": "Guardar cambios"
+    },
+    "loading": "Cargando...",
+    "placeholderAlt": "Imagen de Louis, el perro",
+    "rendering": "Renderizando",
+    "softLimitsWarning": "Advertencia: ¡el corte sobrepasará los límites por software!",
+    "cycleStart": "Inicio de ciclo",
+    "unlockMachine": "Desbloquear máquina",
+    "disableLiteMode": "Desactivar modo ligero",
+    "enableLiteMode": "Activar modo ligero",
+    "noWebGL": "Parece que tu dispositivo no es compatible con WebGL",
+    "moveToHereTooltip": "Mover aquí: mantén pulsado un punto para mover el husillo hasta allí",
+    "moveToHere": "Mover aquí",
+    "isoView": "Ir a vista isométrica",
+    "perspectiveView": "Cambiar a vista en perspectiva",
+    "orthographicView": "Cambiar a vista ortográfica"
+  },
+  "workspaceSelector": {
+    "label": "Espacio de trabajo:",
+    "tooltip": "Seleccionar un espacio de trabajo",
+    "ariaLabel": "Seleccionar espacio de trabajo"
+  },
+  "alerts": {
+    "jobEnd": {
+      "statusComplete": "COMPLETADO",
+      "statusStopped": "DETENIDO",
+      "title": "Fin del trabajo",
+      "status": "Estado:",
+      "time": "Tiempo:",
+      "errors": "Errores:",
+      "noErrors": "Ninguno"
+    },
+    "maintenance": {
+      "title": "Alerta de mantenimiento",
+      "tasksDue": "Las siguientes tareas de mantenimiento están pendientes:",
+      "instructions": "Haz clic en 'Reiniciar temporizadores' para reiniciar los temporizadores de TODAS las tareas de la lista. Haz clic en 'Cerrar' para cerrar la ventana sin hacer nada.",
+      "resetTimers": "Reiniciar temporizadores"
+    }
+  },
+  "macroBar": {
+    "dragToReorder": "Arrastrar para reordenar"
+  }
+}

@@ -269,7 +269,13 @@
     "movingTo": "Fahre zu X{{x}} Y{{y}}",
     "unsupportedGcode_one": "{{count}} Zeile mit nicht von GRBL unterstütztem G-Code in dieser Datei gefunden. Ihr Auftrag läuft möglicherweise nicht korrekt.",
     "unsupportedGcode_other": "{{count}} Zeilen mit nicht von GRBL unterstütztem G-Code in dieser Datei gefunden. Ihr Auftrag läuft möglicherweise nicht korrekt.",
-    "grblHalOnlyShortcut": "Nur-grblHAL-Tastenkürzel kann nicht aktiviert werden"
+    "grblHalOnlyShortcut": "Nur-grblHAL-Tastenkürzel kann nicht aktiviert werden",
+    "invalidLines": {
+      "description_one": "Beim Laden der Datei wurde {{count}} ungültige Zeile gefunden. Ihr Job wird möglicherweise nicht korrekt ausgeführt.",
+      "description_other": "Beim Laden der Datei wurden {{count}} ungültige Zeilen gefunden. Ihr Job wird möglicherweise nicht korrekt ausgeführt.",
+      "sample": "Beispiele gefundener ungültiger Zeilen:",
+      "title": "Ungültige Zeilen erkannt"
+    }
   },
   "workspace": {
     "modeSetDefault": "Arbeitsbereichsmodus auf Standard gesetzt",

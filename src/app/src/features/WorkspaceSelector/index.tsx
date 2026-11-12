@@ -9,6 +9,7 @@ import {
 } from 'app/components/shadcn/Select';
 import Tooltip from 'app/components/Tooltip';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import type { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
@@ -38,6 +39,7 @@ const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
 };
 
 export function WorkspaceSelector() {
+    const { t } = useAppTranslation();
     const posthog = usePostHog();
     const activeWorkspace = useSelector(
         (state: RootState) => state.controller.modal.wcs,
@@ -75,9 +77,12 @@ export function WorkspaceSelector() {
     return (
         <div className="absolute top-4 right-4 w-56 flex flex-row items-center justify-end gap-2">
             <span className="text-gray-400 dark:text-content-muted text-normal">
-                Workspace:
+                {t('workspace:workspaceSelector.label')}
             </span>
-            <Tooltip content="Select a workspace" side="left">
+            <Tooltip
+                content={t('workspace:workspaceSelector.tooltip')}
+                side="left"
+            >
                 <div>
                     <Select
                         onValueChange={onWorkspaceSelect}
@@ -86,7 +91,9 @@ export function WorkspaceSelector() {
                     >
                         <SelectTrigger
                             className="workspace-select-trigger max-w-24 h-7 bg-white dark:bg-surface-elevated dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline focus:ring-0 focus:ring-offset-0"
-                            aria-label="Select workspace"
+                            aria-label={t(
+                                'workspace:workspaceSelector.ariaLabel',
+                            )}
                         >
                             <SelectValue placeholder="G54" />
                         </SelectTrigger>

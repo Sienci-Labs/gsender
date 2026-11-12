@@ -1,5 +1,7 @@
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
 /** biome-ignore-all lint/a11y/useButtonType: <> */
+import { useAppTranslation } from 'app/i18n';
+
 interface ProgressBarProps {
     currentStep: number;
     totalSteps: number;
@@ -13,6 +15,7 @@ export function ProgressBar({
     onExit,
     isCompleted = false,
 }: ProgressBarProps) {
+    const { t } = useAppTranslation();
     const progressPercentage = isCompleted
         ? 100
         : Math.round(((currentStep - 1) / totalSteps) * 100);
@@ -24,11 +27,16 @@ export function ProgressBar({
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-600 dark:text-content-secondary">
                         {isCompleted
-                            ? 'All Steps Complete'
-                            : `Step ${displayStep} of ${totalSteps}`}
+                            ? t('common:wizard.allStepsComplete')
+                            : t('common:wizard.stepOf', {
+                                  step: displayStep,
+                                  total: totalSteps,
+                              })}
                     </span>
                     <span className="text-sm text-gray-600 dark:text-content-secondary">
-                        {progressPercentage}% Complete
+                        {t('common:wizard.percentComplete', {
+                            percent: progressPercentage,
+                        })}
                     </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
@@ -54,7 +62,7 @@ export function ProgressBar({
                 >
                     <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Exit
+                {t('common:wizard.exit')}
             </button>
         </div>
     );

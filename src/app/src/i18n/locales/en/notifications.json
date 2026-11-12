@@ -269,7 +269,13 @@
     "movingTo": "Moving to X{{x}} Y{{y}}",
     "unsupportedGcode_one": "Found {{count}} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.",
     "unsupportedGcode_other": "Found {{count}} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.",
-    "grblHalOnlyShortcut": "Unable to activate GrblHAL ONLY shortcut"
+    "grblHalOnlyShortcut": "Unable to activate GrblHAL ONLY shortcut",
+    "invalidLines": {
+      "title": "Invalid lines detected",
+      "description_one": "Detected {{count}} invalid line on file load. Your job may not run correctly.",
+      "description_other": "Detected {{count}} invalid lines on file load. Your job may not run correctly.",
+      "sample": "Sample invalid lines found include:"
+    }
   },
   "workspace": {
     "modeSetDefault": "Workspace Mode set to Default",

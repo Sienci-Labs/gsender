@@ -21,6 +21,7 @@
  *
  */
 
+import { useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
@@ -55,6 +56,7 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
     onScrub,
     onScrubEnd,
 }) => {
+    const { t } = useAppTranslation();
     const trackRef = useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = useState(false);
 
@@ -138,7 +140,7 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
             <div
                 role="slider"
                 tabIndex={0}
-                aria-label="G-code line"
+                aria-label={t('workspace:gcodeStepper.gcodeLine')}
                 aria-valuemin={1}
                 aria-valuemax={totalLines}
                 aria-valuenow={currentLine}

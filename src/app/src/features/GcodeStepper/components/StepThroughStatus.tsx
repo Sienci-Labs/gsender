@@ -22,6 +22,7 @@
  */
 
 import { IMPERIAL_UNITS } from 'app/constants';
+import { tk, translateKey, useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 import { Eye, EyeOff } from 'lucide-react';
 import type React from 'react';
@@ -163,17 +164,17 @@ function grblModals(state: LineModalState | null) {
 type GrblModals = NonNullable<ReturnType<typeof grblModals>>;
 
 const MODAL_LABELS: [keyof GrblModals, string][] = [
-    ['motion', 'Motion'],
-    ['coordinateSystem', 'WCS'],
-    ['plane', 'Plane'],
-    ['units', 'Units'],
-    ['distance', 'Distance'],
-    ['feedMode', 'Feed mode'],
-    ['spindle', 'Spindle'],
-    ['coolant', 'Coolant'],
-    ['tool', 'Tool'],
-    ['feedRate', 'Feed'],
-    ['spindleSpeed', 'Speed'],
+    ['motion', tk('workspace:gcodeStepper.modals.motion')],
+    ['coordinateSystem', tk('workspace:gcodeStepper.modals.wcs')],
+    ['plane', tk('workspace:gcodeStepper.modals.plane')],
+    ['units', tk('workspace:gcodeStepper.modals.units')],
+    ['distance', tk('workspace:gcodeStepper.modals.distance')],
+    ['feedMode', tk('workspace:gcodeStepper.modals.feedMode')],
+    ['spindle', tk('workspace:gcodeStepper.modals.spindle')],
+    ['coolant', tk('workspace:gcodeStepper.modals.coolant')],
+    ['tool', tk('workspace:gcodeStepper.modals.tool')],
+    ['feedRate', tk('workspace:gcodeStepper.modals.feed')],
+    ['spindleSpeed', tk('workspace:gcodeStepper.modals.speed')],
 ];
 
 /**
@@ -192,6 +193,7 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
     hideProcessed,
     onToggleHideProcessed,
 }) => {
+    const { t } = useAppTranslation();
     // Index positions are always mm; convert only for display. Both unit systems
     // use 2 decimals so the column width is constant across a units change.
     const imperial = units === IMPERIAL_UNITS;
@@ -204,7 +206,9 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
     return (
         <div className="flex flex-wrap items-stretch gap-2">
             <Block
-                label={`Position (Work, ${imperial ? 'in' : 'mm'})`}
+                label={t('workspace:gcodeStepper.workPosition', {
+                    units: imperial ? 'in' : 'mm',
+                })}
                 className="flex-shrink-0"
             >
                 {/* flex-1: grows to fill the card when a taller sibling (Modals)
@@ -223,7 +227,10 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
                 </div>
             </Block>
 
-            <Block label="Modals" className="min-w-[15rem] flex-1">
+            <Block
+                label={t('workspace:gcodeStepper.modalsLabel')}
+                className="min-w-[15rem] flex-1"
+            >
                 {current === null ? (
                     <span className="text-xs text-gray-600 dark:text-content-muted">
                         —
@@ -233,7 +240,7 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
                         {MODAL_LABELS.map(([key, label]) => (
                             <ModalCell
                                 key={key}
-                                label={label}
+                                label={translateKey(label)}
                                 value={current[key]}
                                 changed={
                                     previous !== null &&
@@ -267,7 +274,9 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
                     <EyeOff className="h-4 w-4 flex-shrink-0" />
                 )}
                 <span className="whitespace-nowrap">
-                    {hideProcessed ? 'Show prior lines' : 'Hide prior lines'}
+                    {hideProcessed
+                        ? t('workspace:gcodeStepper.showPriorLines')
+                        : t('workspace:gcodeStepper.hidePriorLines')}
                 </span>
             </button>
         </div>

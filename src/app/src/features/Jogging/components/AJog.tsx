@@ -9,6 +9,7 @@ import {
     type JoggerProps,
     stopContinuousJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
+import { useAppTranslation } from 'app/i18n';
 import { useLongPress } from 'use-long-press';
 
 export function AJog({
@@ -18,6 +19,7 @@ export function AJog({
     isRotaryMode,
     threshold = 200,
 }: JoggerProps) {
+    const { t } = useAppTranslation();
     const posthog = usePostHog();
 
     const axis = isRotaryMode ? 'Y' : 'A';
@@ -97,15 +99,15 @@ export function AJog({
                 bottomHandlers={aMinusJogHandlers}
                 canClick={canClick}
                 idForTest="A"
-                topLabel={`Jog ${axis} plus`}
-                bottomLabel={`Jog ${axis} minus`}
+                topLabel={t('workspace:jogging.tab.plus', { axis })}
+                bottomLabel={t('workspace:jogging.tab.minus', { axis })}
                 onTopKeyDown={(e) => handleKeyDown(e, aPlusJog)}
                 onBottomKeyDown={(e) => handleKeyDown(e, aMinusJog)}
                 onPressCancel={stopContinuousJog}
             />
             <img
                 src={aLabels}
-                alt="a Labels tab"
+                alt={t('workspace:jogging.tab.labelsAlt', { axis: 'A' })}
                 className="absolute top-0 right-0 pointer-events-none w-full h-full object-contain"
             />
         </div>

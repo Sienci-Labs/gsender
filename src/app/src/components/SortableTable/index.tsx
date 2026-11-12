@@ -13,6 +13,7 @@ import {
     useReactTable,
     type VisibilityState,
 } from '@tanstack/react-table';
+import { TransKey, useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import React, { useState } from 'react';
 import { BiReset } from 'react-icons/bi';
@@ -102,6 +103,7 @@ interface SortableTableProps<TData extends { subRow?: string }, TValue> {
 const SortableTable = <TData extends { subRow?: string }, TValue>(
     props: SortableTableProps<TData, TValue>,
 ) => {
+    const { t } = useAppTranslation();
     // set defaults
     const data = props.data || []; // array of data objects
     const columns = props.columns; // format above
@@ -112,7 +114,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
             ? props.enableSortingRemoval
             : true;
     const searchPlaceholder =
-        props.searchPlaceholder || 'Search all columns...';
+        props.searchPlaceholder || t('common:table.searchPlaceholder');
     const columnVisibility = props.columnVisibility || {};
     /*
         const sortBy = [
@@ -236,12 +238,12 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                         }}
                     >
                         <button
-                            title="Add New"
+                            title={t('common:table.addNew')}
                             onClick={onAdd}
                             className="gap-2 text-green-500 border border-green-500 hover:bg-green-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2"
                         >
                             <FaPlus />
-                            Add New Task
+                            {t('common:table.addNewTask')}
                         </button>
                     </div>
                 )}
@@ -255,12 +257,12 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                         }}
                     >
                         <button
-                            title="Add New"
+                            title={t('common:table.addNew')}
                             onClick={onResetAll}
                             className="gap-2 text-yellow-600 border border-yellow-600 hover:bg-yellow-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2"
                         >
                             <BiReset />
-                            Reset All
+                            {t('common:table.resetAll')}
                         </button>
                     </div>
                 )}
@@ -449,10 +451,14 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                             className="flex items-center gap-1 dark:text-content-primary"
                             style={{ marginLeft: '10px' }}
                         >
-                            {'Page '}
-                            <strong>
-                                {currentPage} of {maxPages}
-                            </strong>
+                            <TransKey
+                                i18nKey="common:table.pageOf"
+                                values={{
+                                    current: currentPage,
+                                    total: maxPages,
+                                }}
+                                components={{ bold: <strong /> }}
+                            />
                         </span>
                         {/* jump to page */}
                         <div
@@ -467,7 +473,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                                 style={{ marginRight: '5px' }}
                                 className="dark:text-content-primary"
                             >
-                                {'Jump to page: '}
+                                {t('common:table.jumpToPage')}{' '}
                                 <input
                                     type="number"
                                     defaultValue={currentPage}
@@ -501,7 +507,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                             {/*** PAGE SIZE ***/}
                             <div>
                                 <span className="dark:text-content-primary mr-1">
-                                    Entries/Page:
+                                    {t('common:table.entriesPerPage')}
                                 </span>
                                 <select
                                     value={table.getState().pagination.pageSize}
@@ -513,7 +519,9 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                                 >
                                     {[15, 30, 50, 75, 100].map((pageSize) => (
                                         <option key={pageSize} value={pageSize}>
-                                            Show {pageSize}
+                                            {t('common:table.showCount', {
+                                                size: pageSize,
+                                            })}
                                         </option>
                                     ))}
                                 </select>

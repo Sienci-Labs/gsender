@@ -1,7 +1,10 @@
+import { useAppTranslation } from 'app/i18n';
+
 export function RestartHome() {
+    const { t } = useAppTranslation();
     return (
         <div>
-            <p>Restart Home</p>
+            <p>{t('common:wizard.restartHome')}</p>
         </div>
     );
 }

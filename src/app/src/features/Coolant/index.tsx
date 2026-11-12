@@ -12,6 +12,7 @@ import {
     stopCoolant,
 } from 'app/features/Coolant/utils/actions';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
@@ -26,6 +27,7 @@ export interface CoolantProps {
 }
 
 export function Coolant({ mistActive, floodActive }: CoolantProps) {
+    const { t } = useAppTranslation();
     const { workflow, isConnected, controllerState, controllerType } =
         useTypedSelector(
             (state) => ({
@@ -57,7 +59,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
         <div className="flex flex-col justify-around items-center h-full">
             <div className="flex flex-row justify-center w-full gap-2">
                 <ActiveStateButton
-                    text="Mist"
+                    text={t('workspace:coolant.mist')}
                     icon={<FaShower />}
                     onClick={() => {
                         startMist();
@@ -67,10 +69,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     size="md"
                     active={isConnected && mistActive}
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn on mist coolant' }}
+                    tooltip={{ content: t('workspace:coolant.mistTooltip') }}
                 />
                 <ActiveStateButton
-                    text="Flood"
+                    text={t('workspace:coolant.flood')}
                     icon={<FaWater />}
                     onClick={() => {
                         startFlood();
@@ -80,10 +82,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     size="md"
                     active={isConnected && floodActive}
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn on flood coolant' }}
+                    tooltip={{ content: t('workspace:coolant.floodTooltip') }}
                 />
                 <ActiveStateButton
-                    text="Off"
+                    text={t('workspace:coolant.off')}
                     icon={<FaBan />}
                     onClick={() => {
                         stopCoolant();
@@ -92,7 +94,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="h-16"
                     size="md"
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn off coolant' }}
+                    tooltip={{ content: t('workspace:coolant.offTooltip') }}
                 />
             </div>
         </div>

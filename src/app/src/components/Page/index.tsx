@@ -1,4 +1,5 @@
 import Button from 'app/components/Button';
+import { useAppTranslation } from 'app/i18n';
 import { cx } from 'class-variance-authority';
 import cn from 'classnames';
 import { LuArrowLeft } from 'react-icons/lu';
@@ -30,6 +31,7 @@ const Page = ({
     withFlexContent,
     withGoBackButton,
 }: PageProps) => {
+    const { t } = useAppTranslation();
     const navigate = useNavigate();
     const canGoBack = window.history.length > 1;
 
@@ -66,7 +68,7 @@ const Page = ({
                         className="flex items-center justify-center"
                     >
                         <LuArrowLeft className="w-6 h-6 mr-1" />
-                        Go Back
+                        {t('common:actions.goBack')}
                     </Button>
                 )}
             </div>

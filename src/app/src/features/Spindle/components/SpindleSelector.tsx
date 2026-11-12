@@ -1,4 +1,5 @@
 import Tooltip from 'app/components/Tooltip';
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import Select from 'react-select';
 
@@ -31,11 +32,12 @@ const SpindleSelector = ({
     spindle,
     disabled,
 }: Props) => {
+    const { t } = useAppTranslation();
     const spindleFormatted = { label: spindle.label, value: spindle.id };
     const formattedSpindles = formatSpindles(spindles);
 
     return (
-        <Tooltip content="Select a spindle">
+        <Tooltip content={t('workspace:spindle.selector.tooltip')}>
             <div
                 className={cx('flex gap-1 justify-center w-full items-center', {
                     'cursor-not-allowed': disabled,
@@ -43,14 +45,14 @@ const SpindleSelector = ({
             >
                 <Select<FormattedSpindle>
                     options={formattedSpindles}
-                    placeholder="Default Spindle"
+                    placeholder={t('workspace:spindle.selector.defaultSpindle')}
                     value={spindleFormatted}
                     onChange={onChange}
                     onMenuOpen={onMenuOpen}
                     className="w-full z-10"
                     menuPlacement="top"
                     isDisabled={disabled}
-                    aria-label="Select spindle"
+                    aria-label={t('workspace:spindle.selector.ariaLabel')}
                 />
             </div>
         </Tooltip>

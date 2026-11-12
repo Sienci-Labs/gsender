@@ -1,5 +1,5 @@
 import Button from 'app/components/Button';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import throttle from 'lodash/throttle';
 import uniqueId from 'lodash/uniqueId';
@@ -12,6 +12,7 @@ interface GcodeViewerProps {
 }
 
 const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode, className = '' }) => {
+    const { t } = useAppTranslation();
     const handleCopy = throttle(
         async () => {
             await navigator.clipboard?.writeText(gcode);
@@ -40,7 +41,8 @@ const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode, className = '' }) => {
                 ))}
             </div>
             <Button className="mt-4" onClick={handleCopy}>
-                <i className="fas fa-copy mr-2" /> Copy to Clipboard
+                <i className="fas fa-copy mr-2" />{' '}
+                {t('common:actions.copyToClipboard')}
             </Button>
         </div>
     );

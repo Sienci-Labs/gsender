@@ -7,6 +7,7 @@ import type { JogValueObject } from 'app/features/Jogging';
 import type { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
 import cn from 'classnames';
@@ -52,6 +53,7 @@ interface SpeedSelectorProps {
 }
 
 export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
+    const { t } = useAppTranslation();
     const posthog = usePostHog();
     const [selectedSpeed, setSelectedSpeed] =
         useState<JoggingSpeedOptions>('Normal');
@@ -231,26 +233,28 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
             <SpeedSelectButton
                 active={preciseActive}
                 onClick={() => handleSpeedChange('Precise')}
-                label="Precise"
-                screenReaderLabel="Set to Precise jog preset"
+                label={t('workspace:jogging.speed.precise')}
+                screenReaderLabel={t(
+                    'workspace:jogging.speed.preciseAriaLabel',
+                )}
             />
             <SpeedSelectButton
                 active={normalActive}
                 onClick={() => handleSpeedChange('Normal')}
-                label="Normal"
-                screenReaderLabel="Set to Normal jog preset"
+                label={t('workspace:jogging.speed.normal')}
+                screenReaderLabel={t('workspace:jogging.speed.normalAriaLabel')}
             />
             <SpeedSelectButton
                 active={rapidActive}
                 onClick={() => handleSpeedChange('Rapid')}
-                label="Rapid"
-                screenReaderLabel="Set to Rapid jog preset"
+                label={t('workspace:jogging.speed.rapid')}
+                screenReaderLabel={t('workspace:jogging.speed.rapidAriaLabel')}
             />
             <SpeedSelectButton
                 active={customActive}
                 onClick={() => handleSpeedChange('Custom')}
-                label="Custom"
-                screenReaderLabel="Set to Custom jog preset"
+                label={t('workspace:jogging.speed.custom')}
+                screenReaderLabel={t('workspace:jogging.speed.customAriaLabel')}
             />
         </div>
     );

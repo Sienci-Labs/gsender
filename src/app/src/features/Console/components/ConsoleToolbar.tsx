@@ -1,4 +1,5 @@
 import Tooltip from 'app/components/Tooltip';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { Copy, Eraser, ExternalLink } from 'lucide-react';
 import { CONSOLE_FILTERS, type ConsoleFilter } from '../definitions';
 
@@ -58,11 +59,12 @@ export function ConsoleToolbar({
     showPopout = true,
     showActions = true,
 }: Props) {
+    const { t } = useAppTranslation();
     return (
         <div className="flex items-center justify-between gap-2">
             <div
                 role="group"
-                aria-label="Filter console messages"
+                aria-label={t('workspace:console.filterLabel')}
                 className="flex items-center gap-0.5 overflow-x-auto"
                 style={{ scrollbarWidth: 'none' }}
             >
@@ -90,7 +92,7 @@ export function ConsoleToolbar({
                                     }`}
                                 />
                             )}
-                            {label}
+                            {translateKey(label)}
                         </button>
                     );
                 })}
@@ -99,17 +101,22 @@ export function ConsoleToolbar({
             {showActions && (
                 <div className="flex items-center gap-0.5 shrink-0">
                     <ToolbarAction
-                        label="Copy last 50 messages"
+                        label={t('workspace:console.copyLast', {
+                            limit: 50,
+                        })}
                         onClick={onCopy}
                     >
                         <Copy className="w-4 h-4" />
                     </ToolbarAction>
-                    <ToolbarAction label="Clear console" onClick={onClear}>
+                    <ToolbarAction
+                        label={t('workspace:console.clear')}
+                        onClick={onClear}
+                    >
                         <Eraser className="w-4 h-4" />
                     </ToolbarAction>
                     {showPopout && onPopout && (
                         <ToolbarAction
-                            label="Pop out console"
+                            label={t('workspace:console.popOut')}
                             onClick={onPopout}
                         >
                             <ExternalLink className="w-4 h-4" />

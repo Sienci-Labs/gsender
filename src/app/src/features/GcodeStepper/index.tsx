@@ -30,6 +30,7 @@ import {
 import { FILE_TYPE, METRIC_UNITS } from 'app/constants';
 import { getLastWorkerGeometry } from 'app/features/Visualizer/lastWorkerGeometry';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { cn } from 'app/lib/utils';
 import store from 'app/store';
@@ -74,6 +75,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
     open,
     onOpenChange,
 }) => {
+    const { t } = useAppTranslation();
     const {
         content,
         total,
@@ -314,13 +316,13 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
                 <div className="flex h-full min-h-0 flex-col gap-3 overflow-hidden">
                     <div className="flex flex-shrink-0 items-center justify-between">
                         <DialogTitle className="mb-0">
-                            G-code Step Through
+                            {t('workspace:gcodeStepper.title')}
                         </DialogTitle>
                         {/* The dialog's built-in 16px close affordance is too small to hit
 						    on a touchscreen; it's hidden in favour of this one. */}
                         <button
                             type="button"
-                            aria-label="Close step through"
+                            aria-label={t('workspace:gcodeStepper.close')}
                             onClick={() => onOpenChange(false)}
                             className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 dark:text-content-muted dark:hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
@@ -362,8 +364,14 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
                                 />
                                 {indexing && (
                                     <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-                                        Reading positions…{' '}
-                                        {Math.round(indexProgress * 100)}%
+                                        {t(
+                                            'workspace:gcodeStepper.readingPositions',
+                                            {
+                                                percent: Math.round(
+                                                    indexProgress * 100,
+                                                ),
+                                            },
+                                        )}
                                     </div>
                                 )}
                             </div>

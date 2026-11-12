@@ -22,6 +22,7 @@
  */
 
 import { Button } from 'app/components/Button';
+import { useAppTranslation } from 'app/i18n';
 import type {
     CommandKey,
     CommandKeys,
@@ -36,6 +37,7 @@ import {
     FaInfoCircle,
 } from 'react-icons/fa';
 import { formatShortcut, shouldHideShiftForKey } from '../helpers';
+import { getShortcutTitle } from '../shortcutLabels';
 
 const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
@@ -48,6 +50,7 @@ interface EditProps {
 }
 
 const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
+    const { t } = useAppTranslation();
     const [state, setState] = useState({
         pressed: false,
         singleKey: '',
@@ -135,20 +138,25 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
         if (foundShortcut) {
             if (foundShortcut[1].keys !== shortcut.keys) {
                 console.log(foundShortcut[1]);
-                const title = allShuttleControlEvents[foundShortcut[1].cmd]
-                    ? (
-                          allShuttleControlEvents[
-                              foundShortcut[1].cmd
-                          ] as ShuttleEvent
-                      ).title
-                    : (foundShortcut[1] as ShuttleEvent).title; // in this case, it is a macro shuttle event
+                const title = getShortcutTitle(
+                    foundShortcut[1].cmd,
+                    allShuttleControlEvents[foundShortcut[1].cmd]
+                        ? (
+                              allShuttleControlEvents[
+                                  foundShortcut[1].cmd
+                              ] as ShuttleEvent
+                          ).title
+                        : (foundShortcut[1] as ShuttleEvent).title, // in this case, it is a macro shuttle event
+                );
                 setState((prev) => ({
                     ...prev,
                     ...keyState,
                     status: {
                         available: false,
                         error: true,
-                        message: `This shortcut is already in use by action "${title}"`,
+                        message: t('workspace:keyboard.editArea.inUse', {
+                            action: title,
+                        }),
                     },
                 }));
             } else {
@@ -167,7 +175,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
             status: {
                 available: true,
                 error: false,
-                message: 'Shortcut is Available',
+                message: t('workspace:keyboard.editArea.available'),
             },
         }));
     };
@@ -187,7 +195,9 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
 
         if (shortcut.keys === '') {
             return (
-                <span className="text-gray-600 dark:text-gray-300">None</span>
+                <span className="text-gray-600 dark:text-gray-300">
+                    {t('workspace:keyboard.editArea.none')}
+                </span>
             );
         }
 
@@ -203,16 +213,19 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
             : formatShortcut(shortcutArray);
     };
 
-    const title = allShuttleControlEvents[shortcut.cmd]
-        ? (allShuttleControlEvents[shortcut.cmd] as ShuttleEvent).title
-        : (shortcut as ShuttleEvent).title;
+    const title = getShortcutTitle(
+        shortcut.cmd,
+        allShuttleControlEvents[shortcut.cmd]
+            ? (allShuttleControlEvents[shortcut.cmd] as ShuttleEvent).title
+            : (shortcut as ShuttleEvent).title,
+    );
 
     const renderNewShortcut = () => {
         if (!state.pressed) {
             return (
                 <div className="h-12 flex items-center justify-center">
                     <span className="text-blue-600 dark:text-blue-400 animate-pulse">
-                        Press Some Keys...
+                        {t('workspace:keyboard.editArea.pressKeys')}
                     </span>
                 </div>
             );
@@ -255,7 +268,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-surface-elevated rounded-lg">
                     <div>
                         <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            Action
+                            {t('workspace:keyboard.editArea.action')}
                         </h4>
                         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                             {title}
@@ -263,7 +276,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                     </div>
                     <div>
                         <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            Current Shortcut
+                            {t('workspace:keyboard.editArea.currentShortcut')}
                         </h4>
                         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                             {displayShortcut()}
@@ -274,7 +287,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                 {/* New Shortcut Section */}
                 <div className="text-center p-6 bg-blue-50 rounded-lg">
                     <h4 className="text-sm font-medium text-gray-700 mb-4">
-                        New Shortcut:
+                        {t('workspace:keyboard.editArea.newShortcut')}
                     </h4>
                     <div className="min-h-[4rem] flex items-center justify-center">
                         {renderNewShortcut()}
@@ -318,13 +331,13 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                                 : 'bg-gray-300 text-gray-600 cursor-not-allowed',
                         )}
                     >
-                        Update Shortcut
+                        {t('workspace:keyboard.editArea.update')}
                     </Button>
                     <Button
                         onClick={onClose}
                         className="px-6 py-2 rounded-md font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
                     >
-                        Cancel
+                        {t('common:actions.cancel')}
                     </Button>
                 </div>
             </div>

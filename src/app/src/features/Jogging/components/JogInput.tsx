@@ -1,6 +1,7 @@
 import Button from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { Label } from 'app/components/Label';
+import { useAppTranslation } from 'app/i18n';
 import { toFixedIfNecessary } from 'app/lib/rounding';
 import { FaMinus, FaPlus } from 'react-icons/fa';
 
@@ -17,6 +18,7 @@ export const JogInput = ({
     currentValue,
     onChange,
 }: JogInputProps) => {
+    const { t } = useAppTranslation();
     const getStep = (increment = false) => {
         let step;
         const digitCount = Math.floor(currentValue).toString().length; // number of whole digits
@@ -100,7 +102,9 @@ export const JogInput = ({
                     }}
                     size="mini"
                     icon={<FaMinus />}
-                    aria-label={`Decrease ${effectiveLabel}`}
+                    aria-label={t('workspace:jogging.input.decrease', {
+                        label: effectiveLabel,
+                    })}
                 />
                 <ControlledInput
                     sizing="xs"
@@ -121,7 +125,9 @@ export const JogInput = ({
                     }}
                     size="mini"
                     icon={<FaPlus />}
-                    aria-label={`Increase ${effectiveLabel}`}
+                    aria-label={t('workspace:jogging.input.increase', {
+                        label: effectiveLabel,
+                    })}
                 />
             </div>
         </div>

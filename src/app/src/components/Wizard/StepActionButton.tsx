@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/a11y/useButtonType: <> */
+import { useAppTranslation } from 'app/i18n';
 import { AlertCircle, Check, CheckCircle, Loader2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
@@ -23,8 +24,8 @@ interface StepActionButtonProps {
 export function StepActionButton({
     label,
     runningLabel,
-    finishedLabel = 'Complete',
-    errorLabel = 'Error',
+    finishedLabel,
+    errorLabel,
     onApply,
     isComplete = false,
     error = null,
@@ -34,6 +35,7 @@ export function StepActionButton({
     icon,
     disabled = false,
 }: StepActionButtonProps) {
+    const { t } = useAppTranslation();
     const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
@@ -97,21 +99,22 @@ export function StepActionButton({
                 return (
                     <>
                         <Loader2 className="animate-spin" size={20} />
-                        {runningLabel || `${label}...`}
+                        {runningLabel ||
+                            t('common:wizard.runningLabel', { label })}
                     </>
                 );
             case 'finished':
                 return (
                     <>
                         <Check size={20} />
-                        {finishedLabel}
+                        {finishedLabel ?? t('common:wizard.complete')}
                     </>
                 );
             case 'error':
                 return (
                     <>
                         <AlertCircle size={20} />
-                        {errorLabel}
+                        {errorLabel ?? t('common:wizard.error')}
                     </>
                 );
         }
@@ -142,7 +145,7 @@ export function StepActionButton({
                         </div>
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-red-800/80 dark:text-red-100/80">
-                                Error
+                                {t('common:wizard.error')}
                             </p>
                             <p className="text-base font-semibold text-red-900 dark:text-red-100">
                                 {error}
@@ -167,7 +170,7 @@ export function StepActionButton({
                         </div>
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-800/80 dark:text-green-100/80">
-                                Success
+                                {t('common:wizard.success')}
                             </p>
                             <p className="text-base font-semibold text-green-900 dark:text-green-100">
                                 {success}

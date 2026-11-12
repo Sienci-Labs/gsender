@@ -1,6 +1,6 @@
 import { usePostHog } from '@posthog/react';
 import type { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { useCarveVisible } from 'app/hooks/useCarveVisible';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
@@ -35,6 +35,7 @@ const Console = ({
     const [port, setPort] = useState(controller.port);
     const [filter, setFilter] = useState<ConsoleFilter>('all');
     const posthog = usePostHog();
+    const { t } = useAppTranslation();
     const carveVisible = useCarveVisible();
 
     // Joining a port makes the server send this window another
@@ -221,7 +222,9 @@ const Console = ({
             >
                 <div className="flex flex-col justify-center items-center gap-2 h-full text-gray-600 dark:text-content-muted">
                     <Unplug className="h-12 w-12" />
-                    <span className="text-sm">Not connected to a device</span>
+                    <span className="text-sm">
+                        {t('workspace:console.notConnected')}
+                    </span>
                 </div>
             </div>
             <div className="grid grid-rows-[auto_1fr_auto] absolute gap-1 top-0 left-0 w-full h-full p-1">

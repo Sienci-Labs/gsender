@@ -22,6 +22,7 @@
  */
 
 import Button from 'app/components/Button';
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import type React from 'react';
 import type { PointerEventHandler } from 'react';
@@ -62,6 +63,7 @@ const RangeSlider = ({
     disabled,
     ...props
 }: RangeSliderProps): React.JSX.Element => {
+    const { t } = useAppTranslation();
     const textComponent = showText ? (
         <div className="flex flex-row items-center justify-between w-full px-4">
             <span className="w-16 text-left">{title}</span>
@@ -77,14 +79,16 @@ const RangeSlider = ({
         <div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-content-secondary">
             {textComponent}
             <div className="flex flex-row items-center gap-2 justify-center w-full rounded-md bg-gray-200 dark:bg-surface-raised shadow-inner">
-                <Tooltip content={`Reset override to 100%`}>
+                <Tooltip content={t('common:rangeSlider.resetTooltip')}>
                     <Button
                         type="button"
                         onClick={() => onButtonPress(defaultPercentage)}
                         disabled={disabled}
                         size="sm"
                         icon={<FaUndo />}
-                        aria-label={`Reset ${title} override to 100%`}
+                        aria-label={t('common:rangeSlider.resetLabel', {
+                            title,
+                        })}
                     />
                 </Tooltip>
                 <Slider
@@ -108,7 +112,12 @@ const RangeSlider = ({
                     disabled={disabled}
                     {...props}
                 ></Slider>
-                <Tooltip content={`Decrease ${title} override by ${step}%`}>
+                <Tooltip
+                    content={t('common:rangeSlider.decreaseTooltip', {
+                        title,
+                        step,
+                    })}
+                >
                     <Button
                         type="button"
                         onClick={() => {
@@ -121,10 +130,17 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaMinus />}
-                        aria-label={`Decrease ${title} override`}
+                        aria-label={t('common:rangeSlider.decreaseLabel', {
+                            title,
+                        })}
                     />
                 </Tooltip>
-                <Tooltip content={`Increase ${title} override by ${step}%`}>
+                <Tooltip
+                    content={t('common:rangeSlider.increaseTooltip', {
+                        title,
+                        step,
+                    })}
+                >
                     <Button
                         type="button"
                         onClick={() => {
@@ -137,7 +153,9 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaPlus />}
-                        aria-label={`Increase ${title} override`}
+                        aria-label={t('common:rangeSlider.increaseLabel', {
+                            title,
+                        })}
                     />
                 </Tooltip>
             </div>

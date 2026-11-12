@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/a11y/noRedundantAlt: <> */
 /** biome-ignore-all lint/a11y/useButtonType: <> */
+import { TransKey, translateKey, useAppTranslation } from 'app/i18n';
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 import Button from '../Button';
 import DefaultImage from './assets/placeholder.png';
@@ -29,6 +30,7 @@ export function WizardLanding({
     helpUrl,
     isHub = false,
 }: WizardLandingProps) {
+    const { t } = useAppTranslation();
     const activeSubWizard = subWizards.find(
         (sw) => sw.id === subWizards[0]?.id,
     );
@@ -71,7 +73,7 @@ export function WizardLanding({
                 }
 			`}
         >
-            <span>{subWizard.title}</span>
+            <span>{translateKey(subWizard.title)}</span>
             <ArrowRight size={20} />
         </Button>
     );
@@ -88,31 +90,36 @@ export function WizardLanding({
                         className="flex items-center gap-2 text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
                     >
                         <ArrowLeft size={20} />
-                        {isHub ? 'Back to Wizards' : 'Back to Tools'}
+                        {isHub
+                            ? t('common:wizard.backToWizards')
+                            : t('common:wizard.backToTools')}
                     </Button>
                 )}
 
                 <div className="flex-1">
                     <h1 className="text-5xl font-bold text-gray-900 dark:text-content-primary mb-4">
-                        {title}
+                        {translateKey(title)}
                     </h1>
                     {activeSubWizard?.estimatedTime && (
                         <p className="text-gray-700 dark:text-content-muted mb-1">
                             <span className="font-semibold">
-                                Estimated time:
+                                {t('common:wizard.estimatedTime')}
                             </span>{' '}
-                            {activeSubWizard.estimatedTime}
+                            {translateKey(activeSubWizard.estimatedTime)}
                         </p>
                     )}
                     {activeSubWizard?.configVersion && (
                         <p className="text-gray-700 dark:text-content-muted mb-8">
-                            Configuration File Version:{' '}
-                            {activeSubWizard.configVersion}
+                            {t('common:wizard.configFileVersion', {
+                                version: activeSubWizard.configVersion,
+                            })}
                         </p>
                     )}
                     {activeSubWizard?.description && (
                         <p className="mb-8 dark:text-content-primary">
-                            {activeSubWizard.description}
+                            {typeof activeSubWizard.description === 'string'
+                                ? translateKey(activeSubWizard.description)
+                                : activeSubWizard.description}
                         </p>
                     )}
                     <ValidationBanner validations={validations} />
@@ -147,7 +154,7 @@ export function WizardLanding({
             <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-surface-raised p-12 flex flex-col justify-between overflow-y-auto">
                 <div className="flex items-center justify-center flex-1 min-h-0">
                     <img
-                        alt="Wizard image"
+                        alt={t('common:wizard.imageAlt')}
                         src={image ?? DefaultImage}
                         className={`max-h-full w-auto object-contain rounded-2xl${invertImageInDarkMode ? ' dark:invert' : ''}`}
                     />
@@ -161,21 +168,25 @@ export function WizardLanding({
                         />
                         <div>
                             <h3 className="font-semibold text-lg text-gray-900 dark:text-content-primary mb-1">
-                                Need Help?
+                                {t('common:wizard.needHelp')}
                             </h3>
                             <p className="text-gray-600 dark:text-content-muted">
-                                Follow along in our{' '}
-                                <a
-                                    href={
-                                        helpUrl ??
-                                        'https://resources.sienci.com/'
-                                    }
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 dark:text-blue-400 font-bold"
-                                >
-                                    online resources
-                                </a>
+                                <TransKey
+                                    i18nKey="common:wizard.followAlong"
+                                    components={{
+                                        link: (
+                                            <a
+                                                href={
+                                                    helpUrl ??
+                                                    'https://resources.sienci.com/'
+                                                }
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 dark:text-blue-400 font-bold"
+                                            />
+                                        ),
+                                    }}
+                                />
                             </p>
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/a11y/useButtonType: <> */
+import { translateKey, useAppTranslation } from 'app/i18n';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -15,6 +16,7 @@ interface TabbedProps {
 }
 
 export const Tabs = ({ items = [] }: TabbedProps) => {
+    const { t } = useAppTranslation();
     const [activeTab, setActiveTab] = useState(items[0]?.label);
     const tabsRef = useRef<HTMLDivElement>(null);
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -108,7 +110,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         }`}
                         onClick={() => canScrollLeft && scrollTabs('left')}
                         disabled={!canScrollLeft}
-                        aria-label="Scroll tabs left"
+                        aria-label={t('common:tabs.scrollLeft')}
                     >
                         <MdKeyboardArrowLeft className="w-6 h-6 portrait:w-8 portrait:h-8" />
                     </button>
@@ -121,7 +123,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         }}
                         onScroll={checkScrollability}
                         role="tablist"
-                        aria-label="Widget Tabs"
+                        aria-label={t('common:tabs.widgetTabs')}
                     >
                         {items?.map((item, index) => (
                             <button
@@ -140,7 +142,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                     handleTabClick(item.label, index)
                                 }
                             >
-                                {item.label}
+                                {translateKey(item.label)}
                             </button>
                         ))}
                     </div>
@@ -152,7 +154,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         }`}
                         onClick={() => canScrollRight && scrollTabs('right')}
                         disabled={!canScrollRight}
-                        aria-label="Scroll tabs right"
+                        aria-label={t('common:tabs.scrollRight')}
                     >
                         <MdKeyboardArrowRight className="w-6 h-6 portrait:w-8 portrait:h-8" />
                     </button>

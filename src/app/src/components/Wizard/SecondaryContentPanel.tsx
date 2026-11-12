@@ -6,6 +6,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { ExternalLink, QrCode } from 'lucide-react';
 import type { ComponentType } from 'react';
 import QRCodeComponent from 'react-qr-code';
@@ -20,6 +21,7 @@ export function SecondaryContentPanel({
     content,
     getItemParams,
 }: SecondaryContentPanelProps) {
+    const { t } = useAppTranslation();
     if (!content || content.length === 0) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -59,13 +61,16 @@ export function SecondaryContentPanel({
                 <div key={index} className={imageContainerClass}>
                     {item.title && (
                         <h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
-                            {item.title}
+                            {translateKey(item.title)}
                         </h3>
                     )}
                     <div className="flex-1 min-h-0 overflow-hidden flex items-center justify-center">
                         <img
                             src={itemContent as string}
-                            alt={item.title || 'Secondary content'}
+                            alt={
+                                translateKey(item.title) ||
+                                t('common:wizard.secondaryContentAlt')
+                            }
                             className="max-h-full max-w-full rounded-xl"
                         />
                     </div>
@@ -78,7 +83,7 @@ export function SecondaryContentPanel({
                 <div key={index} className={containerClassName}>
                     {item.title && (
                         <h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
-                            {item.title}
+                            {translateKey(item.title)}
                         </h3>
                     )}
                     <div className="rounded-lg bg-gray-300 dark:bg-surface-elevated p-1.5">
@@ -106,7 +111,7 @@ export function SecondaryContentPanel({
                     >
                         {item.title && (
                             <h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
-                                {item.title}
+                                {translateKey(item.title)}
                             </h3>
                         )}
                         <div className="flex-1 min-h-0 flex items-center justify-center">
@@ -120,7 +125,7 @@ export function SecondaryContentPanel({
                 <div key={index} className={containerClassName}>
                     {item.title && (
                         <h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
-                            {item.title}
+                            {translateKey(item.title)}
                         </h3>
                     )}
                     <Component {...item.props} />
@@ -150,23 +155,25 @@ export function SecondaryContentPanel({
                             <span className="flex-1 text-sm text-gray-700 dark:text-content-primary">
                                 {linkItem.title && (
                                     <span className="font-semibold text-gray-900 dark:text-content-primary">
-                                        {linkItem.title}{' '}
+                                        {translateKey(linkItem.title)}{' '}
                                     </span>
                                 )}
                                 {linkItem.url ? (
                                     <>
-                                        {linkItem.content as string}{' '}
+                                        {translateKey(
+                                            linkItem.content as string,
+                                        )}{' '}
                                         <a
                                             href={linkItem.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-blue-600 hover:text-blue-700 hover:underline"
                                         >
-                                            online resources
+                                            {t('common:wizard.onlineResources')}
                                         </a>
                                     </>
                                 ) : (
-                                    (linkItem.content as string)
+                                    translateKey(linkItem.content as string)
                                 )}
                             </span>
                             {linkItem.url && (
@@ -187,7 +194,7 @@ export function SecondaryContentPanel({
                                     >
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="text-sm font-semibold text-gray-900 dark:text-content-primary">
-                                                Scan QR Code
+                                                {t('common:wizard.scanQrCode')}
                                             </div>
                                             <div className="bg-white dark:bg-surface-raised p-2 rounded border border-gray-100 dark:border-gray-600">
                                                 <QRCodeComponent

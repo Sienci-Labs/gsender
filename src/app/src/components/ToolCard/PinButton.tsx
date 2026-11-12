@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import type { MouseEvent } from 'react';
 import { TbStar, TbStarFilled } from 'react-icons/tb';
@@ -9,7 +10,10 @@ type PinButtonProps = {
 };
 
 const PinButton = ({ pinned, onToggle, className }: PinButtonProps) => {
-    const label = pinned ? 'Unpin tool' : 'Pin to top';
+    const { t } = useAppTranslation();
+    const label = pinned
+        ? t('common:toolCard.unpinTool')
+        : t('common:toolCard.pinToTop');
 
     // Cards are wrapped in a Link, so stop the click from navigating
     const handleClick = (e: MouseEvent<HTMLButtonElement>) => {

@@ -2,6 +2,7 @@ import { usePostHog } from '@posthog/react';
 import { Button } from 'app/components/Button';
 import { Input } from 'app/components/shadcn/Input';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useRef, useState } from 'react';
@@ -9,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { consoleWrite } from '../consoleStore';
 
 export function ConsoleInput() {
+    const { t } = useAppTranslation();
     const dispatch = useDispatch();
     const inputRef = useRef<HTMLInputElement>(null);
     const { inputHistory } = useTypedSelector((state) => state.console);
@@ -64,10 +66,10 @@ export function ConsoleInput() {
         <div className="flex gap-2 w-full shrink-0">
             <Input
                 className="h-10 text-sm console-text"
-                placeholder="Enter G-code here..."
+                placeholder={t('workspace:console.inputPlaceholder')}
                 ref={inputRef}
                 type="text"
-                aria-label="Console command"
+                aria-label={t('workspace:console.inputLabel')}
                 onKeyDown={(e) => {
                     switch (e.key) {
                         case 'Enter': {
@@ -102,7 +104,7 @@ export function ConsoleInput() {
                 className="h-10 w-24 text-sm"
                 onClick={handleCommandExecute}
             >
-                Run
+                {t('workspace:console.run')}
             </Button>
         </div>
     );

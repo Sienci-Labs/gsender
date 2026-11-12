@@ -6,6 +6,7 @@ import {
     Dot,
     OctagonAlert,
 } from 'lucide-react';
+import { tk, translateKey, useAppTranslation } from 'app/i18n';
 import type { ConsoleMessageType } from '../definitions';
 
 // The console content is always dark-styled, regardless of the app's
@@ -17,32 +18,32 @@ const ICONS: Record<
     gcode: {
         Icon: ChevronRight,
         className: 'text-blue-300',
-        label: 'Sent',
+        label: tk('workspace:console.messageType.sent'),
     },
     response: {
         Icon: Dot,
         className: 'text-content-muted',
-        label: 'Response',
+        label: tk('workspace:console.messageType.response'),
     },
     system: {
         Icon: Cog,
         className: 'text-green-300',
-        label: 'System',
+        label: tk('workspace:console.messageType.system'),
     },
     warning: {
         Icon: AlertTriangle,
         className: 'text-orange-300',
-        label: 'Warning',
+        label: tk('workspace:console.messageType.warning'),
     },
     error: {
         Icon: CircleAlert,
         className: 'text-yellow-400',
-        label: 'Error',
+        label: tk('workspace:console.messageType.error'),
     },
     alarm: {
         Icon: OctagonAlert,
         className: 'text-red-500',
-        label: 'Alarm',
+        label: tk('workspace:console.messageType.alarm'),
     },
 };
 
@@ -51,12 +52,13 @@ const ICONS: Record<
  * badges or filled row backgrounds.
  */
 export function MessageIcon({ type }: { type: ConsoleMessageType }) {
+    useAppTranslation();
     const { Icon, className, label } = ICONS[type] ?? ICONS.response;
 
     return (
         <Icon
             className={`w-3.5 h-3.5 shrink-0 ${className}`}
-            aria-label={label}
+            aria-label={translateKey(label)}
             role="img"
         />
     );

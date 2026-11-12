@@ -11,6 +11,7 @@ import {
     AlertDialogTrigger,
 } from 'app/components/shadcn/AlertDialog.tsx';
 import { Tooltip } from 'app/components/Tooltip';
+import { useAppTranslation } from 'app/i18n';
 import { FaRedo } from 'react-icons/fa';
 
 type ReloadFileAlertProps = {
@@ -22,9 +23,10 @@ export function ReloadFileAlert({
     fileLoaded,
     handleFileReload,
 }: ReloadFileAlertProps) {
+    const { t } = useAppTranslation();
     return (
         <AlertDialog>
-            <Tooltip content="Reload File">
+            <Tooltip content={t('workspace:fileControl.reloadFile')}>
                 <AlertDialogTrigger asChild>
                     <Button
                         disabled={!fileLoaded}
@@ -33,21 +35,25 @@ export function ReloadFileAlert({
                         }
                         variant="ghost"
                         className="h-full rounded-none"
-                        aria-label="Reload File"
+                        aria-label={t('workspace:fileControl.reloadFile')}
                     />
                 </AlertDialogTrigger>
             </Tooltip>
             <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        {t('workspace:fileControl.confirmTitle')}
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                        This will reload the current file from disk.
+                        {t('workspace:fileControl.reloadFileConfirm')}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>
+                        {t('common:actions.cancel')}
+                    </AlertDialogCancel>
                     <AlertDialogAction onClick={handleFileReload}>
-                        Reload File
+                        {t('workspace:fileControl.reloadFile')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

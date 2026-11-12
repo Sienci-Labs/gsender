@@ -1859,8 +1859,8 @@ class Visualizer extends Component {
             ((isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
                 (!isSecondary && activeVisualizer === VISUALIZER_PRIMARY));
         const liteModeActionLabel = state.liteMode
-            ? 'Disable lightweight mode'
-            : 'Enable lightweight mode';
+            ? i18n.t('workspace:visualizer.disableLiteMode')
+            : i18n.t('workspace:visualizer.enableLiteMode');
 
         const setVisualizerRef = (ref) => {
             this.visualizer = ref;
@@ -1930,9 +1930,7 @@ class Visualizer extends Component {
                             <div>
                                 <FrownIcon size={4} />
                                 <span style={{ fontSize: '16px' }}>
-                                    {
-                                        "It looks like your device doesn't support WebGL"
-                                    }
+                                    {i18n.t('workspace:visualizer.noWebGL')}
                                 </span>
                             </div>
                         )}
@@ -1948,7 +1946,9 @@ class Visualizer extends Component {
 
                         {state.isConnected && (
                             <Tooltip
-                                content="Move To Here: press and hold a spot to move the spindle there"
+                                content={i18n.t(
+                                    'workspace:visualizer.moveToHereTooltip',
+                                )}
                                 side="top"
                             >
                                 <button
@@ -1963,7 +1963,9 @@ class Visualizer extends Component {
                                                 !state.moveToHere,
                                         },
                                     )}
-                                    aria-label="Move To Here"
+                                    aria-label={i18n.t(
+                                        'workspace:visualizer.moveToHere',
+                                    )}
                                     aria-pressed={state.moveToHere}
                                     onClick={() => actions.toggleMoveToHere()}
                                 >
@@ -1999,12 +2001,17 @@ class Visualizer extends Component {
                             </button>
                         </Tooltip>
 
-                        <Tooltip content="Go to iso view" side="top">
+                        <Tooltip
+                            content={i18n.t('workspace:visualizer.isoView')}
+                            side="top"
+                        >
                             <button
                                 type="button"
                                 style={cornerViewButtonPosition}
                                 className="absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-gray-400/40 bg-dark-darker/70 text-gray-300 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85"
-                                aria-label="Go to iso view"
+                                aria-label={i18n.t(
+                                    'workspace:visualizer.isoView',
+                                )}
                                 onClick={() =>
                                     actions.camera.toTopLeftCornerView()
                                 }
@@ -2019,8 +2026,12 @@ class Visualizer extends Component {
                         <Tooltip
                             content={
                                 isOrthographic
-                                    ? 'Switch to perspective view'
-                                    : 'Switch to orthographic view'
+                                    ? i18n.t(
+                                          'workspace:visualizer.perspectiveView',
+                                      )
+                                    : i18n.t(
+                                          'workspace:visualizer.orthographicView',
+                                      )
                             }
                             side="top"
                         >
@@ -2038,8 +2049,12 @@ class Visualizer extends Component {
                                 )}
                                 aria-label={
                                     isOrthographic
-                                        ? 'Switch to perspective view'
-                                        : 'Switch to orthographic view'
+                                        ? i18n.t(
+                                              'workspace:visualizer.perspectiveView',
+                                          )
+                                        : i18n.t(
+                                              'workspace:visualizer.orthographicView',
+                                          )
                                 }
                                 aria-pressed={isOrthographic}
                                 onClick={() => actions.toggleProjection()}

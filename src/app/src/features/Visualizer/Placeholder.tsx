@@ -1,9 +1,11 @@
+import { i18n, useAppTranslation } from 'app/i18n';
 import store from 'app/store';
 import pubsub from 'pubsub-js';
 import { useEffect } from 'react';
 import PlaceholderImage from './images/placeholder.png';
 
 export function VisualizerPlaceholder() {
+    const { t } = useAppTranslation();
     useEffect(() => {
         const token = pubsub.subscribe(
             'placeholder:invalidLines',
@@ -20,10 +22,16 @@ export function VisualizerPlaceholder() {
                     const description = (
                         <div className={'flex flex-col gap-2'}>
                             <p>
-                                Detected {count} invalid lines on file load.
-                                Your job may not run correctly.
+                                {i18n.t(
+                                    'notifications:visualizer.invalidLines.description',
+                                    { count },
+                                )}
                             </p>
-                            <p>Sample invalid lines found include:</p>
+                            <p>
+                                {i18n.t(
+                                    'notifications:visualizer.invalidLines.sample',
+                                )}
+                            </p>
                             <ol>
                                 {lineSample.map((line, i) => (
                                     <li className="text-xs" key={i}>
@@ -35,7 +43,9 @@ export function VisualizerPlaceholder() {
                     );
                     pubsub.publish('helper:info', {
                         kind: 'error',
-                        title: 'Invalid lines detected',
+                        title: i18n.t(
+                            'notifications:visualizer.invalidLines.title',
+                        ),
                         description,
                     });
                 }
@@ -48,7 +58,10 @@ export function VisualizerPlaceholder() {
     }, []);
     return (
         <div className="bg-transparent w-full h-full flex items-center justify-center ">
-            <img src={PlaceholderImage} alt={'Louis the dog placeholder'} />
+            <img
+                src={PlaceholderImage}
+                alt={t('workspace:visualizer.placeholderAlt')}
+            />
         </div>
     );
 }

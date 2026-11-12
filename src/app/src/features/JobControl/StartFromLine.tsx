@@ -13,7 +13,7 @@ import { IMPERIAL_UNITS, METRIC_UNITS } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { i18n } from 'app/i18n';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import { convertToImperial } from 'app/lib/units';
@@ -51,6 +51,7 @@ const StartFromLine = ({
     atcValidator,
 }: StartFromLineProps) => {
     const posthog = usePostHog();
+    const { t } = useAppTranslation();
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
     const { units, safeRetractHeight } = useWorkspaceState();
     const { delay = 0 } = useWidgetState('spindle');
@@ -151,8 +152,8 @@ const StartFromLine = ({
                     )}
                     onClick={openModal}
                 >
-                    <MdFormatListNumbered className="text-2xl mr-1" /> Start
-                    From
+                    <MdFormatListNumbered className="text-2xl mr-1" />{' '}
+                    {t('workspace:jobControl.startFromLine.button')}
                 </ShadButton>
             )}
             <Dialog
@@ -165,36 +166,50 @@ const StartFromLine = ({
                     <DialogHeader>
                         <DialogTitle>
                             {state.needsRecovery
-                                ? 'Recovery: Start From Line'
-                                : 'Start From Line'}
+                                ? t(
+                                      'workspace:jobControl.startFromLine.recoveryTitle',
+                                  )
+                                : t('workspace:jobControl.startFromLine.title')}
                         </DialogTitle>
                     </DialogHeader>
                     <div className="">
                         <div className="mb-4">
                             <p className="mb-2">
-                                Recover a job after power loss, mechanical
-                                malfunction, disconnection, or other failure.
+                                {t(
+                                    'workspace:jobControl.startFromLine.description',
+                                )}
                             </p>
                             <p className="mb-0 text-black dark:text-content-primary">
-                                Your job of <b>{lineTotal}</b> lines was last
-                                stopped around line: <b>{lastLine}</b>.
+                                <TransKey
+                                    i18nKey="workspace:jobControl.startFromLine.lastStopped"
+                                    values={{
+                                        total: lineTotal,
+                                        line: lastLine,
+                                    }}
+                                    components={{ bold: <b /> }}
+                                />
                             </p>
                             {state.value > 0 && (
                                 <p>
-                                    For best success, we usually recommend
-                                    resuming about <strong>10 lines</strong>{' '}
-                                    earlier:{' '}
-                                    <strong>
-                                        line{' '}
-                                        {lastLine - 10 >= 0 ? lastLine - 10 : 0}
-                                    </strong>
+                                    <TransKey
+                                        i18nKey="workspace:jobControl.startFromLine.recommendation"
+                                        values={{
+                                            line:
+                                                lastLine - 10 >= 0
+                                                    ? lastLine - 10
+                                                    : 0,
+                                        }}
+                                        components={{ bold: <strong /> }}
+                                    />
                                 </p>
                             )}
                         </div>
                         <div className="mb-4">
                             <div className="grid grid-cols-4 gap-2 items-center">
                                 <label htmlFor="resumeJobLine">
-                                    Resume job at line:
+                                    {t(
+                                        'workspace:jobControl.startFromLine.resumeAtLine',
+                                    )}
                                 </label>
                                 <ControlledInput
                                     id="resumeJobLine"
@@ -225,11 +240,18 @@ const StartFromLine = ({
                                     wont fire onBlur when you click off of it
                                 */}
                                 <Tooltip
-                                    content={`Default Value: ${state.defaultSafeHeight}`}
+                                    content={t(
+                                        'workspace:jobControl.startFromLine.defaultValue',
+                                        {
+                                            value: state.defaultSafeHeight,
+                                        },
+                                    )}
                                 >
                                     <>
                                         <label htmlFor="safeHeight">
-                                            With Safe Height:
+                                            {t(
+                                                'workspace:jobControl.startFromLine.safeHeight',
+                                            )}
                                         </label>
                                         <ControlledInput
                                             id="safeHeight"
@@ -248,15 +270,17 @@ const StartFromLine = ({
                                     </>
                                 </Tooltip>
                                 <span className="text-sm col-span-2">
-                                    (amount above the max height of the file)
+                                    {t(
+                                        'workspace:jobControl.startFromLine.safeHeightHint',
+                                    )}
                                 </span>
                             </div>
                         </div>
                         <div className="mb-4">
                             <p className="text-[#E2943B]">
-                                Calculates all your CNC movements, attributes,
-                                and gSender automations to pick up right where
-                                you left off.
+                                {t(
+                                    'workspace:jobControl.startFromLine.calculates',
+                                )}
                             </p>
                         </div>
                         <div className="flex justify-center">
@@ -267,7 +291,11 @@ const StartFromLine = ({
                                 className="flex flex-row p-3 items-center gap-2 portrait:px-6 portrait:text-xl"
                             >
                                 <FaPlay className="ml-2" />
-                                <span>Start from Line</span>
+                                <span>
+                                    {t(
+                                        'workspace:jobControl.startFromLine.start',
+                                    )}
+                                </span>
                             </Button>
                         </div>
                     </div>

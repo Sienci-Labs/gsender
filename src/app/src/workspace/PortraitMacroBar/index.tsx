@@ -19,7 +19,7 @@ import api from 'app/api';
 import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import cx from 'classnames';
@@ -73,6 +73,7 @@ function SortableMacroButton({
     onRun: (macro: MacroItem) => void;
     isDragging?: boolean;
 }) {
+    const { t } = useAppTranslation();
     const { attributes, listeners, setNodeRef, transform, transition } =
         useSortable({ id: macro.id });
 
@@ -100,7 +101,7 @@ function SortableMacroButton({
                     'text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400',
                     'touch-none',
                 )}
-                title="Drag to reorder"
+                title={t('workspace:macroBar.dragToReorder')}
             >
                 <FaGripVertical className="w-4 h-4" />
             </div>

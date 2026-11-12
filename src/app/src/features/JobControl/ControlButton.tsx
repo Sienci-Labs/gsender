@@ -2,6 +2,7 @@ import { usePostHog } from '@posthog/react';
 import type { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import useKeybinding from 'app/lib/useKeybinding';
 import type { WORKFLOW_STATES_T } from 'app/store/definitions';
@@ -80,6 +81,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     labelOverride,
 }) => {
     const posthog = usePostHog();
+    const { t } = useAppTranslation();
     const [isRunningSDFile, setIsRunningSDFile] = useState<boolean>(false);
     // If we have a name, we a running a SD file - convert to boolean in following useEffect
     const sdRunReported = useTypedSelector(
@@ -343,9 +345,9 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     };
 
     const message: Message = {
-        START: 'Start',
-        PAUSE: 'Pause',
-        STOP: 'Stop',
+        START: t('workspace:jobControl.start'),
+        PAUSE: t('workspace:jobControl.pause'),
+        STOP: t('workspace:jobControl.stop'),
     };
 
     const icons: Icons = {

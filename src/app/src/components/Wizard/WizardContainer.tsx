@@ -2,6 +2,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Fragment, useEffect, useState } from 'react';
 import Button from '../Button';
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function WizardContainer({ subWizard, onWizardExit }: Props) {
+    const { t } = useAppTranslation();
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [completedSteps, setCompletedSteps] = useState<Set<number>>(
         new Set(),
@@ -123,7 +125,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
             {isSingleStep ? (
                 <div className="bg-white dark:bg-surface-raised border-b border-gray-200 px-4 py-2 flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700 dark:text-content-secondary">
-                        {currentStep.title}
+                        {translateKey(currentStep.title)}
                     </span>
                     <Button
                         onClick={onExit}
@@ -142,7 +144,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                         >
                             <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        Exit
+                        {t('common:wizard.exit')}
                     </Button>
                 </div>
             ) : (
@@ -175,15 +177,20 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                             <>
                                 {!isSingleStep && (
                                     <h1 className="text-4xl font-bold text-gray-900 dark:text-content-primary mb-2">
-                                        {currentStep.title}
+                                        {translateKey(currentStep.title)}
                                     </h1>
                                 )}
 
                                 {subWizard.configVersion &&
                                     !subWizard.hideVersionPrintout && (
                                         <p className="text-gray-600 dark:text-content-muted mb-8">
-                                            Configuration File Version:{' '}
-                                            {subWizard.configVersion}
+                                            {t(
+                                                'common:wizard.configFileVersion',
+                                                {
+                                                    version:
+                                                        subWizard.configVersion,
+                                                },
+                                            )}
                                         </p>
                                     )}
 
@@ -230,7 +237,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                                 variant="nothing"
                                 className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 dark:bg-blue-600 dark:hover:bg-blue-700"
                             >
-                                Exit Wizard
+                                {t('common:wizard.exitWizard')}
                             </Button>
                             <Button
                                 onClick={resetWizard}
@@ -238,7 +245,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                                 variant="nothing"
                                 className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 dark:text-content-secondary dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700"
                             >
-                                Restart Wizard
+                                {t('common:wizard.restartWizard')}
                             </Button>
                         </div>
                     ) : (
@@ -258,7 +265,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
               `}
                             >
                                 <ChevronLeft size={20} />
-                                Previous
+                                {t('common:wizard.previous')}
                             </Button>
 
                             <Button
@@ -275,7 +282,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                 }
               `}
                             >
-                                Next
+                                {t('common:wizard.next')}
                                 <ChevronRight size={20} />
                             </Button>
                         </>

@@ -1,4 +1,7 @@
+import { useAppTranslation } from 'app/i18n';
+
 export function UpdateAlert() {
+    const { t } = useAppTranslation();
     return (
         <div
             className="bg-yellow-100 border-t-4 border-yellow-500 rounded-b text-yellow-900 px-4 py-3 shadow-md mt-4 mb-2"
@@ -15,10 +18,9 @@ export function UpdateAlert() {
                     </svg>
                 </div>
                 <div>
-                    <p className="font-bold">Feature In-progress</p>
+                    <p className="font-bold">{t('common:updateAlert.title')}</p>
                     <p className="text-sm">
-                        Look, feel and functionality of this area will be
-                        updated in a later build.
+                        {t('common:updateAlert.description')}
                     </p>
                 </div>
             </div>
