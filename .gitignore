@@ -43,7 +43,6 @@ packages/plugin-sdk/dist
 CLAUDE.md
 */CLAUDE.md
 .agents
-android/
 skills-lock.json
 
 **/tsconfig.tsbuildinfo

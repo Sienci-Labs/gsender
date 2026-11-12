@@ -52,6 +52,8 @@ export default function PendantToolsView({
                                 official={tool.plugin.official}
                                 pinned={pinned}
                                 onTogglePin={onTogglePin}
+                                // Clear the absolute Plugin/Official badges
+                                className="pt-12"
                             />
                         );
                     }

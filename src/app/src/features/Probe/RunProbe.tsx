@@ -40,6 +40,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Actions, State } from './definitions';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
+import { shallowEqual } from 'react-redux';
 
 interface RunProbeProps {
     state: State;
@@ -64,9 +65,12 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         connectivityTest,
         direction,
     } = state;
-    const { probePinStatus } = useTypedSelector((state) => ({
-        probePinStatus: state.controller.state.status?.pinState.P ?? false,
-    }));
+    const { probePinStatus } = useTypedSelector(
+        (state) => ({
+            probePinStatus: state.controller.state.status?.pinState.P ?? false,
+        }),
+        shallowEqual,
+    );
 
     useEffect(() => {
         if (!connectivityTest) {

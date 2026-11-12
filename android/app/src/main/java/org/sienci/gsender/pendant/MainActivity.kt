@@ -20,7 +20,9 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -62,6 +64,9 @@ class MainActivity : Activity() {
     private var pageError: String? = null
     private var launching = false
 
+    /** Set by [WebBridge.restartServer]: drop the page once the old server is gone. */
+    private var restartPending = false
+
     /** Until the service reports anything, show "starting" rather than "stopped". */
     private var awaitingServer = true
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
@@ -71,6 +76,9 @@ class MainActivity : Activity() {
 
     /** A gsender-pendant://pair link waiting for the pendant page to load. */
     private var pendingPairLink: String? = null
+
+    /** Recent renderer crash times, so a crash loop stops reloading. */
+    private val rendererCrashes = ArrayDeque<Long>()
     private val observer: (ServerState) -> Unit = { render(it) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -173,6 +181,12 @@ class MainActivity : Activity() {
 
     private fun render(state: ServerState) {
         if (state !is ServerState.Stopped) awaitingServer = false
+        // Wait for Starting/Installing (not the stale Ready still current when
+        // the restart was asked for) so the reload hits the new server.
+        if (restartPending && (state is ServerState.Starting || state is ServerState.Installing)) {
+            restartPending = false
+            dropWebView()
+        }
         when (state) {
             ServerState.Stopped -> if (awaitingServer) {
                 showProgress(R.string.status_starting, STAGE_WAITING)
@@ -277,6 +291,16 @@ class MainActivity : Activity() {
         view.loadUrl("http://127.0.0.1:$port/pendant/")
     }
 
+    /** Records a renderer crash; false once they come too fast to keep reloading. */
+    private fun recordRendererCrash(): Boolean {
+        val now = System.currentTimeMillis()
+        rendererCrashes.addLast(now)
+        while (rendererCrashes.isNotEmpty() && now - rendererCrashes.first() > RENDERER_CRASH_WINDOW_MS) {
+            rendererCrashes.removeFirst()
+        }
+        return rendererCrashes.size < RENDERER_CRASH_LIMIT
+    }
+
     private fun dropWebView() {
         web?.let {
             webContainer.removeView(it)
@@ -294,6 +318,7 @@ class MainActivity : Activity() {
         // The pendant lays itself out for the screen; don't let the system
         // font scale reflow it.
         settings.textZoom = 100
+        addJavascriptInterface(WebBridge(), BRIDGE_NAME)
         webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 pageError = null
@@ -312,6 +337,24 @@ class MainActivity : Activity() {
                 pageError = error.description?.toString() ?: "error ${error.errorCode}"
                 Log.w(ServerRuntime.TAG, "PAGE_ERROR ${error.errorCode} $pageError")
                 render(ServerRuntime.state)
+            }
+
+            // Without this, a renderer crash or OOM kill takes the whole app
+            // down. Drop the dead WebView and load the page again instead.
+            override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+                Log.e(ServerRuntime.TAG, "RENDERER_GONE crashed=${detail.didCrash()} priority=${detail.rendererPriorityAtExit()}")
+                if (view !== web) {
+                    // An old WebView we already dropped
+                    view.destroy()
+                    return true
+                }
+                dropWebView()
+                if (recordRendererCrash()) {
+                    render(ServerRuntime.state)
+                } else {
+                    showMessage(getString(R.string.error_page, getString(R.string.error_renderer_crash_loop)), R.string.action_retry, isError = true)
+                }
+                return true
             }
         }
         webChromeClient = object : WebChromeClient() {
@@ -378,6 +421,22 @@ class MainActivity : Activity() {
                     filePathCallback = null
                     false
                 }
+            }
+        }
+    }
+
+    /**
+     * Exposed to the page as `window.GSenderAndroid` (src/app/src/lib/restartApp.ts).
+     * Plugin iframes are same-origin and can see it too, so it only offers a
+     * server restart - what plugin install/enable/remove need to remount routes.
+     */
+    private inner class WebBridge {
+        @JavascriptInterface
+        fun restartServer() {
+            runOnUiThread {
+                restartPending = true
+                showProgress(R.string.status_starting, STAGE_STARTING)
+                NodeService.start(this@MainActivity, restart = true)
             }
         }
     }
@@ -510,11 +569,16 @@ class MainActivity : Activity() {
         private const val REQUEST_CAMERA = 3
         private const val PAIR_SCHEME = "gsender-pendant"
         private const val WEB_LOG_TAG = "GSenderPendant-web"
+        private const val BRIDGE_NAME = "GSenderAndroid"
 
         // Rocket heights for each startup stage (see RocketLaunchView).
         private const val STAGE_WAITING = 0.1f
         private const val STAGE_INSTALLING = 0.3f
         private const val STAGE_STARTING = 0.55f
         private const val STAGE_CONNECTING = 0.8f
+
+        // Stop auto-reloading after this many renderer crashes in the window
+        private const val RENDERER_CRASH_LIMIT = 3
+        private const val RENDERER_CRASH_WINDOW_MS = 60_000L
     }
 }

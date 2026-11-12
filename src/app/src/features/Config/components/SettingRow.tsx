@@ -185,12 +185,14 @@ export const SettingRow = React.memo(function SettingRow({
         setSettingsAreDirty(true);
         setEEPROM((prev) => {
             const updated = [...prev];
-            // save the value from before we started editing
-            if (!updated[index].ogValue) {
-                updated[index].ogValue = updated[index].value;
-            }
-            updated[index].value = value;
-            updated[index].dirty = true;
+            const current = updated[index];
+            updated[index] = {
+                ...current,
+                // save the value from before we started editing
+                ogValue: current.ogValue || current.value,
+                value,
+                dirty: true,
+            };
             return updated;
         });
     };

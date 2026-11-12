@@ -3,17 +3,16 @@ import type { RootState } from 'app/store/redux';
 import get from 'lodash/get';
 import { useSelector } from 'react-redux';
 
-export function LimitSwitchIndicators() {
-    const status = useSelector(
-        (state: RootState) => state.controller.state.status,
-    );
+// Select each pin rather than the status object, which is replaced on every
+// status report
+const selectPin = (pin: string) => (state: RootState) =>
+    Boolean(get(state.controller.state.status, ['pinState', pin], false));
 
-    const pinState = get(status, 'pinState', {});
-    // Pins we're using
-    const aAxis = get(pinState, 'A', false);
-    const xAxis = get(pinState, 'X', false);
-    const yAxis = get(pinState, 'Y', false);
-    const zAxis = get(pinState, 'Z', false);
+export function LimitSwitchIndicators() {
+    const aAxis = useSelector(selectPin('A'));
+    const xAxis = useSelector(selectPin('X'));
+    const yAxis = useSelector(selectPin('Y'));
+    const zAxis = useSelector(selectPin('Z'));
 
     return (
         <div className="flex flex-row items-center gap-2 dark:text-content-primary">

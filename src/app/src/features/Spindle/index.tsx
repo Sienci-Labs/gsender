@@ -18,7 +18,7 @@ import posthog from 'posthog-js';
 import pubsub from 'pubsub-js';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, shallowEqual } from 'react-redux';
 import {
     GRBL,
     GRBL_ACTIVE_STATE_IDLE,
@@ -89,33 +89,36 @@ const SpindleWidget = () => {
         laserMin,
         laserXOffset,
         laserYOffset,
-    } = useTypedSelector((state) => ({
-        workflow: state.controller.workflow,
-        isConnected: state.connection.isConnected ?? false,
-        controllerState: state.controller.state ?? {},
-        controllerType: state.controller.type ?? 'grbl',
-        spindleModal: state.controller.modal.spindle ?? 'M5',
-        spindleMin: Number(state.controller.settings.settings.$31 ?? 1000),
-        spindleMax: Number(state.controller.settings.settings.$30 ?? 30000),
-        laserAsSpindle: Number(state.controller.settings.settings.$32 ?? 0),
-        wcs: state.controller.modal.wcs ?? '',
-        wpos: state.controller.wpos ?? { x: 0, y: 0 },
-        units: state.controller.modal.units ?? {},
-        availableSpindles: state.controller.spindles ?? [],
-        $13: state.controller.settings.settings.$13 ?? '0',
-        laserMax: Number(state.controller.settings.settings.$730 ?? 255),
-        laserMin: Number(state.controller.settings.settings.$731 ?? 0),
-        laserXOffset: Number(
-            state.controller.settings.settings.$770 ??
-                state.controller.settings.settings.$741 ??
-                0,
-        ),
-        laserYOffset: Number(
-            state.controller.settings.settings.$771 ??
-                state.controller.settings.settings.$742 ??
-                0,
-        ),
-    }));
+    } = useTypedSelector(
+        (state) => ({
+            workflow: state.controller.workflow,
+            isConnected: state.connection.isConnected ?? false,
+            controllerState: state.controller.state ?? {},
+            controllerType: state.controller.type ?? 'grbl',
+            spindleModal: state.controller.modal.spindle ?? 'M5',
+            spindleMin: Number(state.controller.settings.settings.$31 ?? 1000),
+            spindleMax: Number(state.controller.settings.settings.$30 ?? 30000),
+            laserAsSpindle: Number(state.controller.settings.settings.$32 ?? 0),
+            wcs: state.controller.modal.wcs ?? '',
+            wpos: state.controller.wpos ?? { x: 0, y: 0 },
+            units: state.controller.modal.units ?? {},
+            availableSpindles: state.controller.spindles ?? [],
+            $13: state.controller.settings.settings.$13 ?? '0',
+            laserMax: Number(state.controller.settings.settings.$730 ?? 255),
+            laserMin: Number(state.controller.settings.settings.$731 ?? 0),
+            laserXOffset: Number(
+                state.controller.settings.settings.$770 ??
+                    state.controller.settings.settings.$741 ??
+                    0,
+            ),
+            laserYOffset: Number(
+                state.controller.settings.settings.$771 ??
+                    state.controller.settings.settings.$742 ??
+                    0,
+            ),
+        }),
+        shallowEqual,
+    );
 
     const [isLaserOn, setIsLaserOn] = useState<boolean>(false);
     const [isSpindleOn, setIsSpindleOn] = useState<boolean>(false);

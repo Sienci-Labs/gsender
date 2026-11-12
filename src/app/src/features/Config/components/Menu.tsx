@@ -2,7 +2,7 @@ import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { translateKey, useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 import type React from 'react';
-import type { MouseEventHandler } from 'react';
+import { type MouseEventHandler, useMemo } from 'react';
 import type { IconType } from 'react-icons';
 import type { SettingsMenuSection } from '../assets/SettingsMenu';
 
@@ -110,15 +110,21 @@ export function Menu({
 
     const originalMenuLength = menu.length;
 
-    const filteredSettings = menu.map((section) => {
-        const newSection = { ...section };
-        newSection.settings = section.settings.map((ss) => {
-            const fs = { ...ss };
-            fs.settings = fs.settings.filter((o) => settingsFilter(o));
-            return fs;
-        });
-        return newSection;
-    });
+    // Memoized so scrolling (which changes the active section) doesn't
+    // re-filter every setting
+    const filteredSettings = useMemo(
+        () =>
+            menu.map((section) => {
+                const newSection = { ...section };
+                newSection.settings = section.settings.map((ss) => {
+                    const fs = { ...ss };
+                    fs.settings = fs.settings.filter((o) => settingsFilter(o));
+                    return fs;
+                });
+                return newSection;
+            }),
+        [menu, settingsFilter],
+    );
 
     return (
         <div

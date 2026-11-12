@@ -1,5 +1,6 @@
 import { VISUALIZER_PRIMARY } from 'app/constants';
 import type { BBox } from 'app/definitions/general';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import controller from 'app/lib/controller';
 import { isLaserMode } from 'app/lib/laserMode';
 import { getEstimatorConfig } from 'app/lib/timeEstimator/getEstimatorConfig';
@@ -410,6 +411,8 @@ const uploadToController = async (
     if (!controller.port) {
         return;
     }
+
+    updateToolchangeContext();
 
     const gcodeFile = new File([content], name, { type: 'text/plain' });
     const formData = new FormData();

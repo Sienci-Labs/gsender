@@ -19,7 +19,7 @@ import type { RootState } from 'app/store/redux';
 import { updateAccessibility } from 'app/store/redux/slices/preferences.slice';
 import pubsub from 'pubsub-js';
 import React, { useEffect, useMemo } from 'react';
-import { InView, useInView } from 'react-intersection-observer';
+import { InView } from 'react-intersection-observer';
 import { useDispatch } from 'react-redux';
 import type {
     gSenderSetting,
@@ -34,15 +34,16 @@ import {
     setScrollPosition,
 } from './utils/scrollMemory';
 
-export function Config() {
+interface ConfigProps {
+    // The pendant has no room for the section menu
+    showMenu?: boolean;
+}
+
+export function Config({ showMenu = true }: ConfigProps) {
     const { t } = useAppTranslation();
     const dispatch = useDispatch();
     // const [activeSection, setActiveSection] = React.useState<number>(0);
     // const [showFlashDialog, setShowFlashDialog] = React.useState(false);
-    const { ref: inViewRef } = useInView({
-        threshold: 0.2,
-    });
-
     const eepromScrollRef = React.useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -198,7 +199,7 @@ export function Config() {
 
     return (
         <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-surface-raised">
-            {activeTab === 'config' ? (
+            {!showMenu ? null : activeTab === 'config' ? (
                 <Menu
                     menu={settings}
                     onClick={navigateToSection}
@@ -236,10 +237,7 @@ export function Config() {
                         value="config"
                         className="flex flex-col fixed-config-area"
                     >
-                        <div
-                            className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-                            ref={inViewRef}
-                        >
+                        <div className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative">
                             <EEPROMNotConnectedWarning connected={connected} />
                             {settings.map((item, index) => {
                                 return (
@@ -279,10 +277,7 @@ export function Config() {
                     >
                         <div
                             className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-                            ref={(node) => {
-                                eepromScrollRef.current = node;
-                                inViewRef(node);
-                            }}
+                            ref={eepromScrollRef}
                             onScroll={(e) =>
                                 setScrollPosition(
                                     'eeprom',

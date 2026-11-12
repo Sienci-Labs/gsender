@@ -35,6 +35,7 @@ import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
 import log from 'app/lib/log';
 import * as WebGL from 'app/lib/three/WebGL';
 import { toast } from 'app/lib/toaster';
+import { createSelector } from '@reduxjs/toolkit';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
 import {
@@ -936,16 +937,9 @@ class Visualizer extends Component {
             }
         })*/
 
-        store.on('change', () => {
-            const storeUnits = store.get('workspace.units');
-            const { units } = this.state;
-            if (units !== storeUnits) {
-                this.setState({ units: storeUnits });
-            }
-        });
+        store.on('change', this.handleStoreChange);
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
-        this.subscribe();
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
             displayWebGLErrorMessage();
@@ -958,10 +952,18 @@ class Visualizer extends Component {
         }
     }
 
+    handleStoreChange = () => {
+        const storeUnits = store.get('workspace.units');
+        const { units } = this.state;
+        if (units !== storeUnits) {
+            this.setState({ units: storeUnits });
+        }
+    };
+
     componentWillUnmount() {
         this.unsubscribe();
         this.removeShuttleControlEvents();
-        this.unsubscribe();
+        store.removeListener('change', this.handleStoreChange);
 
         this.orientationMediaQueryList?.removeEventListener(
             'change',
@@ -2068,15 +2070,28 @@ class Visualizer extends Component {
     }
 }
 
+// Memoized on the EEPROM settings object so connect's shallow compare sees the
+// same arrays between status reports; fresh arrays re-rendered the whole
+// visualizer on every redux action
+const selectMotionLimits = createSelector(
+    [(state) => get(state, 'controller.settings.settings')],
+    (eeprom) => ({
+        feedArray: [
+            Number(get(eeprom, '$110', 1500)),
+            Number(get(eeprom, '$111', 1500)),
+            Number(get(eeprom, '$112', 1500)),
+        ],
+        accelArray: [
+            Number(get(eeprom, '$120', 1800000)) * 3600,
+            Number(get(eeprom, '$121', 1800000)) * 3600,
+            Number(get(eeprom, '$122', 1800000)) * 3600,
+        ],
+    }),
+);
+
 export default connect(
     (store) => {
-        const settings = get(store, 'controller.settings');
-        const xMaxFeed = Number(get(settings.settings, '$110', 1500));
-        const yMaxFeed = Number(get(settings.settings, '$111', 1500));
-        const zMaxFeed = Number(get(settings.settings, '$112', 1500));
-        const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
-        const yMaxAccel = Number(get(settings.settings, '$121', 1800000));
-        const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
+        const { feedArray, accelArray } = selectMotionLimits(store);
         const workflow = get(store, 'controller.workflow');
         const renderState = get(store, 'file.renderState');
         const isConnected = get(store, 'connection.isConnected');
@@ -2086,13 +2101,6 @@ export default connect(
         const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
         const isFileLoaded = get(store, 'file.fileLoaded');
         const { activeVisualizer } = store.visualizer;
-
-        const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
-        const accelArray = [
-            xMaxAccel * 3600,
-            yMaxAccel * 3600,
-            zMaxAccel * 3600,
-        ];
 
         const ovF = overrides[0];
         const ovS = overrides[2];

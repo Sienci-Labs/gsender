@@ -10,6 +10,7 @@
     <string name="status_stopped">gSender is stopped.</string>
     <string name="error_title">gSender couldn\'t start</string>
     <string name="error_page">The pendant didn\'t load: %1$s</string>
+    <string name="error_renderer_crash_loop">the page crashed repeatedly</string>
     <string name="action_retry">Retry</string>
     <string name="action_start">Start</string>
     <string name="action_show_details">Show details</string>

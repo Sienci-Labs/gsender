@@ -6,11 +6,11 @@
 #   android/scripts/install-node-runtime.sh [dir with tarballs]
 #   (yarn android:runtime [dir])
 #
-# Default dir: dist/android/node-runtime. In CI, android.yml builds the runtime
-# (or restores it from the Actions cache) and passes its artifact dir here.
-# Locally, either download the `android-node-runtime-*` artifacts of a recent
-# Android workflow run into that dir, or build them on Linux with
-# android/node/build-node.sh.
+# Default dir: dist/android/node-runtime. In CI, android.yml downloads the
+# runtime release from Sienci-Labs/node_24_APK and passes its dir here. Locally:
+#   gh release download "$(bash android/scripts/node-runtime-tag.sh)" \
+#       -R Sienci-Labs/node_24_APK -D dist/android/node-runtime
+# or build it on Linux with android/node/build-node.sh.
 set -euo pipefail
 
 ANDROID_DIR="$(cd "$(dirname "$0")/.." && pwd)"
@@ -25,7 +25,7 @@ abi=arm64-v8a
 asset="node-$NODE_VERSION-android-$arch.tar.gz"
 if [ ! -f "$SRC_DIR/$asset" ]; then
     echo "error: $SRC_DIR/$asset not found." >&2
-    echo "Download the android-node-runtime-$arch artifact from a recent Android workflow run into $SRC_DIR," >&2
+    echo "Download it: gh release download \"\$(bash android/scripts/node-runtime-tag.sh)\" -R Sienci-Labs/node_24_APK -D $SRC_DIR" >&2
     echo "or build it on Linux: android/node/build-node.sh $arch <ndk dir> <work dir> $SRC_DIR" >&2
     exit 1
 fi
