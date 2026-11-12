@@ -63,6 +63,7 @@ interface iSettingsContext {
     eepromIsDefault: (settingData: FilteredEEPROM | gSenderSetting) => boolean;
     isSettingDefault: (v: gSenderSetting) => boolean;
     getEEPROMDefaultValue: (v: EEPROM) => string | number;
+    profileDefaults: EEPROMSettings;
     isFirmwareCurrent: boolean;
     profileChangedSinceDefaults: boolean;
     setProfileChangedSinceDefaults?: React.Dispatch<
@@ -96,6 +97,7 @@ const defaultState: iSettingsContext = {
         return false;
     },
     machineProfile: {} as MachineProfile,
+    profileDefaults: {} as EEPROMSettings,
     firmwareType: 'Grbl',
     connected: false,
     settingsAreDirty: false,
@@ -421,13 +423,20 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     useEffect(() => {
         repopulateSettings();
-        pubsub.subscribe('repopulate', () => {
-            repopulateSettings();
-            repopulateMachineProfile();
-        });
-        pubsub.subscribe('eeprom:repopulate', () => {
-            repopulateEEPROM();
-        });
+        const tokens = [
+            pubsub.subscribe('repopulate', () => {
+                repopulateSettings();
+                repopulateMachineProfile();
+            }),
+            pubsub.subscribe('eeprom:repopulate', () => {
+                repopulateEEPROM();
+            }),
+        ];
+        return () => {
+            tokens.forEach((token) => pubsub.unsubscribe(token));
+            updateEEPROM.cancel();
+            updateDescriptions.cancel();
+        };
     }, []);
 
     useEffect(() => {
@@ -453,6 +462,65 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             boardId,
         );
     }, [detectedEEPROMDescriptions]);
+
+    // Resolving grblHAL defaults copies and remaps the whole defaults map, so do
+    // it once per profile/firmware rather than per setting on every render
+    const profileDefaults: EEPROMSettings = useMemo(
+        () =>
+            controllerType === 'Grbl'
+                ? machineProfile.eepromSettings
+                : resolveGrblCoreDefaults({
+                      firmwareSemver: firmwareVersion,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                      boardId,
+                  }).defaults,
+        [controllerType, machineProfile, firmwareVersion, boardId],
+    );
+
+    const eepromIsDefault = useCallback(
+        (settingData: gSenderSetting | FilteredEEPROM) => {
+            const settingKey =
+                (settingData as gSenderSetting).type === 'hybrid'
+                    ? (settingData as gSenderSetting).eID
+                    : (settingData as FilteredEEPROM).setting;
+            const lookupKey =
+                controllerType === GRBLHAL
+                    ? translateGrblCoreKey(
+                          settingKey as EEPROM,
+                          firmwareVersion,
+                          boardId,
+                      )
+                    : settingKey;
+
+            const inputDefault = get(profileDefaults, lookupKey, '-');
+
+            if (inputDefault === '-') {
+                return true; // default in cases where we don't know the default
+            }
+
+            // if we are checking default for numbers, we need to include decimals
+            if (
+                (settingData as gSenderSetting).type === 'hybrid' ||
+                Number((settingData as FilteredEEPROM).dataType) === 5 || // integer
+                Number((settingData as FilteredEEPROM).dataType) === 6 // decimal
+            ) {
+                return isEqual(
+                    Number(settingData.value).toFixed(3),
+                    Number(inputDefault).toFixed(3),
+                );
+            }
+
+            const numValue = Number(settingData.value);
+            const numDefault = Number(inputDefault);
+            if (!isNaN(numValue) && !isNaN(numDefault)) {
+                return numValue === numDefault;
+            }
+            return isEqual(settingData.value, inputDefault);
+        },
+        [profileDefaults, controllerType, firmwareVersion, boardId],
+    );
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
 
     function checkIfModified(v: gSenderSetting) {
         if (v.type === 'wizard' || v.type === 'event') {
@@ -513,7 +581,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         return `${JSON.stringify(searchChecker)} ${visibleText}`
             .toLowerCase()
-            .includes(searchTerm.trim().toLowerCase());
+            .includes(normalizedSearch);
     }
 
     /**
@@ -562,22 +630,13 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             }
 
             // ***then, consider defaults and searching
-            const modified = checkIfModified(v);
-            const searched = checkSearchTerm(v);
-
-            if (searchTerm.trim().length === 0 || !searchTerm) {
-                // if no search, check modified
-                if (filterNonDefault) {
-                    return modified;
-                }
-                return true;
-            } else {
-                // if search, consider both
-                if (filterNonDefault) {
-                    return modified && searched;
-                }
-                return searched;
+            if (filterNonDefault && !checkIfModified(v)) {
+                return false;
             }
+            if (!normalizedSearch) {
+                return true;
+            }
+            return checkSearchTerm(v);
         },
         [
             connectionState,
@@ -587,130 +646,103 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             firmwareVersion,
             boardId,
             searchTerm,
+            normalizedSearch,
             filterNonDefault,
             settingsValues,
             getPendingOrStore,
+            eepromIsDefault,
         ],
     );
 
-    function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
-        const profileDefaults =
-            controllerType === 'Grbl'
-                ? machineProfile.eepromSettings
-                : resolveGrblCoreDefaults({
-                      firmwareSemver: firmwareVersion,
-                      baseDefaults: machineProfile.grblHALeepromSettings || {},
-                      boardId,
-                  }).defaults;
-
-        const settingKey =
-            (settingData as gSenderSetting).type === 'hybrid'
-                ? (settingData as gSenderSetting).eID
-                : (settingData as FilteredEEPROM).setting;
-        const lookupKey =
-            controllerType === GRBLHAL
-                ? translateGrblCoreKey(
-                      settingKey as EEPROM,
-                      firmwareVersion,
-                      boardId,
-                  )
-                : settingKey;
-
-        const inputDefault = get(profileDefaults, lookupKey, '-');
-
-        if (inputDefault === '-') {
-            return true; // default in cases where we don't know the default
-        }
-
-        // if we are checking default for numbers, we need to include decimals
-        if (
-            (settingData as gSenderSetting).type === 'hybrid' ||
-            Number((settingData as FilteredEEPROM).dataType) === 5 || // integer
-            Number((settingData as FilteredEEPROM).dataType) === 6 // decimal
-        ) {
-            return isEqual(
-                Number(settingData.value).toFixed(3),
-                Number(inputDefault).toFixed(3),
-            );
-        }
-
-        const numValue = Number(settingData.value);
-        const numDefault = Number(inputDefault);
-        if (!isNaN(numValue) && !isNaN(numDefault)) {
-            return numValue === numDefault;
-        }
-        return isEqual(settingData.value, inputDefault);
-    }
-
-    function isSettingDefault(v: gSenderSetting) {
-        if (v.ignoreDefaultCheck) {
-            return true;
-        }
-
-        if (v.type === 'hybrid' && connected && controllerType === GRBLHAL) {
-            return eepromIsDefault(v);
-        }
-        if ('key' in v) {
-            if (v.key === 'workspace.collectUsageDataStatus') {
-                console.log({
-                    key: v.key,
-                    value: v.value,
-                    defaultValue: v.defaultValue,
-                });
+    const isSettingDefault = useCallback(
+        (v: gSenderSetting) => {
+            if (v.ignoreDefaultCheck) {
+                return true;
             }
 
-            return isEqual(v.value, v.defaultValue);
-        }
-        return true; // Default to true, so non-key settings aren't always highlighted.
-    }
+            if (
+                v.type === 'hybrid' &&
+                connected &&
+                controllerType === GRBLHAL
+            ) {
+                return eepromIsDefault(v);
+            }
+            if ('key' in v) {
+                return isEqual(v.value, v.defaultValue);
+            }
+            return true; // Default to true, so non-key settings aren't always highlighted.
+        },
+        [connected, controllerType, eepromIsDefault],
+    );
 
-    function toggleFilterNonDefault() {
-        setFilterNonDefault(!filterNonDefault);
-    }
+    const toggleFilterNonDefault = useCallback(() => {
+        setFilterNonDefault((prev) => !prev);
+    }, []);
 
-    function getEEPROMDefaultValue(key: EEPROM): number | string {
-        const profileDefaults =
-            controllerType === 'Grbl'
-                ? machineProfile.eepromSettings
-                : resolveGrblCoreDefaults({
-                      firmwareSemver: firmwareVersion,
-                      baseDefaults: machineProfile.grblHALeepromSettings || {},
-                      boardId,
-                  }).defaults;
-        const lookupKey =
-            controllerType === GRBLHAL
-                ? translateGrblCoreKey(key, firmwareVersion, boardId)
-                : key;
+    const getEEPROMDefaultValue = useCallback(
+        (key: EEPROM): number | string => {
+            const lookupKey =
+                controllerType === GRBLHAL
+                    ? translateGrblCoreKey(key, firmwareVersion, boardId)
+                    : key;
 
-        return get(profileDefaults, lookupKey, '-');
-    }
+            return get(profileDefaults, lookupKey, '-');
+        },
+        [profileDefaults, controllerType, firmwareVersion, boardId],
+    );
 
-    const payload = {
-        settings,
-        EEPROM,
-        eepromMap,
-        setEEPROM,
-        machineProfile,
-        firmwareType: controllerType,
-        setMachineProfile,
-        connected,
-        settingsAreDirty,
-        setSettingsAreDirty,
-        searchTerm,
-        setSearchTerm,
-        settingsValues,
-        setSettingsValues,
-        settingsFilter,
-        getPendingOrStore,
-        toggleFilterNonDefault,
-        filterNonDefault,
-        eepromIsDefault,
-        isSettingDefault,
-        getEEPROMDefaultValue,
-        isFirmwareCurrent,
-        profileChangedSinceDefaults,
-        setProfileChangedSinceDefaults,
-    };
+    // Memoized so consumers only re-render when something they read changes,
+    // not on every provider render
+    const payload = useMemo(
+        () => ({
+            settings,
+            EEPROM,
+            eepromMap,
+            setEEPROM,
+            machineProfile,
+            firmwareType: controllerType,
+            setMachineProfile,
+            connected,
+            settingsAreDirty,
+            setSettingsAreDirty,
+            searchTerm,
+            setSearchTerm,
+            settingsValues,
+            setSettingsValues,
+            settingsFilter,
+            getPendingOrStore,
+            toggleFilterNonDefault,
+            filterNonDefault,
+            eepromIsDefault,
+            isSettingDefault,
+            getEEPROMDefaultValue,
+            profileDefaults,
+            isFirmwareCurrent,
+            profileChangedSinceDefaults,
+            setProfileChangedSinceDefaults,
+        }),
+        [
+            settings,
+            EEPROM,
+            eepromMap,
+            machineProfile,
+            controllerType,
+            connected,
+            settingsAreDirty,
+            searchTerm,
+            settingsValues,
+            settingsFilter,
+            getPendingOrStore,
+            toggleFilterNonDefault,
+            filterNonDefault,
+            eepromIsDefault,
+            isSettingDefault,
+            getEEPROMDefaultValue,
+            profileDefaults,
+            isFirmwareCurrent,
+            profileChangedSinceDefaults,
+        ],
+    );
 
     return (
         <SettingsContext.Provider value={payload}>

@@ -8,6 +8,7 @@ import store from 'app/store';
 import get from 'lodash/get';
 import { IoClose } from 'react-icons/io5';
 import { TiPin, TiPinOutline } from 'react-icons/ti';
+import { shallowEqual } from 'react-redux';
 
 interface MachineInfoDisplayProps {
     pinned: boolean;
@@ -21,14 +22,17 @@ export function MachineInfoDisplay({
     onClose,
 }: MachineInfoDisplayProps) {
     const { pins, keepoutFlags, modals, isConnected, settings, currentTool } =
-        useTypedSelector((state) => ({
-            pins: state.controller.state.status?.pinState,
-            modals: state.controller.modal,
-            isConnected: state.connection.isConnected,
-            settings: state.controller.settings,
-            currentTool: state.controller.state.status?.currentTool,
-            keepoutFlags: state.controller.state.status?.keepout?.flags,
-        }));
+        useTypedSelector(
+            (state) => ({
+                pins: state.controller.state.status?.pinState,
+                modals: state.controller.modal,
+                isConnected: state.connection.isConnected,
+                settings: state.controller.settings,
+                currentTool: state.controller.state.status?.currentTool,
+                keepoutFlags: state.controller.state.status?.keepout?.flags,
+            }),
+            shallowEqual,
+        );
     const probeSelection = store.get('widgets.probe.probeCommand');
     const stepperState = get(settings, 'settings.$1', '0');
     // We do some firmware version finagling

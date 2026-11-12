@@ -1,3 +1,4 @@
+import { cn } from 'app/lib/utils';
 import cx from 'classnames';
 import type { IconType } from 'react-icons';
 import { TbPlug, TbShieldCheck, TbUsers } from 'react-icons/tb';
@@ -14,6 +15,7 @@ type PluginToolCardProps = {
     official: boolean;
     pinned?: boolean;
     onTogglePin?: () => void;
+    className?: string;
 };
 
 const PluginToolCard = ({
@@ -26,17 +28,19 @@ const PluginToolCard = ({
     official,
     pinned = false,
     onTogglePin,
+    className,
 }: PluginToolCardProps) => {
     const CardContent = (
         <div
             onClick={onClick}
-            className={cx(
+            className={cn(
                 'relative cursor-pointer rounded-lg shadow-sm p-4 pt-5',
                 'flex flex-col items-center justify-between text-center gap-4',
                 'transition-all duration-300 ease-in-out h-full min-h-56',
                 'hover:bg-gray-300 bg-gray-100 dark:bg-surface-raised',
                 'border border-t-[3px]',
                 official ? 'border-teal-600' : 'border-purple-400',
+                className,
             )}
         >
             <div

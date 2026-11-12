@@ -13,6 +13,8 @@
  *                             src/android/stubs.js
  *     server/public/          files deps read relative to __dirname
  *     server/pendant/         pendant UI (vite build of src/pendant)
+ *     plugin-sdk/             browser SDK runtime plugin iframes import via
+ *                             their import map (served at /plugin-sdk)
  *     app/index.html          placeholder; the prod vite-server scans ../app
  *     payload.json            version + commit, shown on the app's error screen
  *   dist/android/meta.json    esbuild metafile (inspect bundle contents)
@@ -46,6 +48,12 @@ const STUBBED = {
 // bundled, __dirname is server/, so they're mirrored there.
 // [source relative to repo, destination relative to server/]
 const RUNTIME_ASSETS = [['node_modules/errorhandler/public', 'public']];
+
+// Plugin UIs resolve @sienci/gsender-plugin-sdk to /plugin-sdk/*.js; the server
+// only mounts that route if <build>/plugin-sdk exists (settings.base.js
+// getPluginSdkDir). Same files scripts/prepare-default-plugins.js ships on desktop.
+const PLUGIN_SDK_DIR = path.join(ROOT, 'packages/plugin-sdk');
+const PLUGIN_SDK_FILES = ['index.js', 'react.js', 'viewer.js'];
 
 // consolidate require()s ~50 template engines lazily, inside each render
 // function. The server never renders with them, so they stay out of the bundle.
@@ -156,6 +164,25 @@ async function buildServer(version) {
     }
 }
 
+function copyPluginSdk() {
+    const dist = path.join(PLUGIN_SDK_DIR, 'dist');
+    if (!PLUGIN_SDK_FILES.every((file) => fs.existsSync(path.join(dist, file)))) {
+        const yarn = (args) =>
+            execFileSync('yarn', ['--cwd', path.relative(ROOT, PLUGIN_SDK_DIR), ...args], { cwd: ROOT, stdio: 'inherit' });
+        // The SDK isn't a root workspace, so a clean checkout (CI) has none of
+        // its build deps (tsup) until they're installed here.
+        if (!fs.existsSync(path.join(PLUGIN_SDK_DIR, 'node_modules'))) yarn(['install', '--non-interactive']);
+        yarn(['run', 'build']);
+    }
+    const dest = path.join(PAYLOAD, 'plugin-sdk');
+    fs.mkdirSync(dest, { recursive: true });
+    for (const file of PLUGIN_SDK_FILES) {
+        const src = path.join(dist, file);
+        if (!fs.existsSync(src)) throw new Error(`Plugin SDK build output missing: ${file}`);
+        fs.copyFileSync(src, path.join(dest, file));
+    }
+}
+
 function buildPendant() {
     const vite = path.join(ROOT, 'node_modules/vite/bin/vite.js');
     execFileSync(
@@ -199,6 +226,7 @@ function dirStats(dir) {
     if (keepPendant) fs.renameSync(path.join(OUT, 'pendant.keep'), path.join(SERVER, 'pendant'));
 
     await buildServer(version);
+    copyPluginSdk();
     if (!skipPendant) buildPendant();
     if (!fs.existsSync(path.join(SERVER, 'pendant/index.html'))) {
         throw new Error('pendant UI missing (run without --skip-pendant first)');

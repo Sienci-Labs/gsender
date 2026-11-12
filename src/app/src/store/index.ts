@@ -675,6 +675,7 @@ const fetchWithRetry = async (): Promise<StoreData> => {
     }
 };
 
+
 const reportLoadFailure = (err: unknown): void => {
     log.error('Unable to load preferences from the server', err);
     // using the sonner toaster directly because our wrapper saves to the store

@@ -92,6 +92,14 @@ export const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
     },
 };
 
+// Pendant state only changes on status reports and gestures, so draw on
+// change rather than every frame; the bit's tween between reports runs at
+// 30fps, which reads smooth for a crosshair at a fraction of the cost.
+export const PENDANT_RENDER_OPTIONS = {
+    onDemand: true,
+    maxAnimationFps: 30,
+} as const;
+
 // Everything the bed rectangle depends on. All low-frequency, so options are
 // rebuilt only when this key changes, not on every status report.
 export const selectMachineBedKey = (s: RootState): string => {
@@ -157,6 +165,7 @@ function VisualizerImpl(
             ...BASE_OPTIONS,
             machineBed: buildMachineBedOptions({ ignoreUserToggle: true }),
             render: {
+                ...PENDANT_RENDER_OPTIONS,
                 antialias: true,
                 theme: buildViewerTheme(currentViewerThemeName()),
             },

@@ -18,7 +18,7 @@ import includes from 'lodash/includes';
 import { useCallback } from 'react';
 import { FaWater } from 'react-icons/fa';
 import { FaBan, FaShower } from 'react-icons/fa6';
-import { connect } from 'react-redux';
+import { connect, shallowEqual } from 'react-redux';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -27,12 +27,15 @@ export interface CoolantProps {
 
 export function Coolant({ mistActive, floodActive }: CoolantProps) {
     const { workflow, isConnected, controllerState, controllerType } =
-        useTypedSelector((state) => ({
-            workflow: state.controller.workflow,
-            isConnected: state.connection.isConnected ?? false,
-            controllerState: state.controller.state ?? {},
-            controllerType: state.controller.type ?? 'grbl',
-        }));
+        useTypedSelector(
+            (state) => ({
+                workflow: state.controller.workflow,
+                isConnected: state.connection.isConnected ?? false,
+                controllerState: state.controller.state ?? {},
+                controllerType: state.controller.type ?? 'grbl',
+            }),
+            shallowEqual,
+        );
 
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;

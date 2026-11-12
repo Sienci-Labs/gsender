@@ -1,6 +1,7 @@
 import { usePostHog } from '@posthog/react';
 import type { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { i18n } from 'app/i18n';
+import { useCarveVisible } from 'app/hooks/useCarveVisible';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import isElectron from 'is-electron';
@@ -26,10 +27,15 @@ type ConsoleProps = {
     showActions?: boolean;
 };
 
-const Console = ({ isActive, isChildWindow, showActions = true }: ConsoleProps) => {
+const Console = ({
+    isActive,
+    isChildWindow,
+    showActions = true,
+}: ConsoleProps) => {
     const [port, setPort] = useState(controller.port);
     const [filter, setFilter] = useState<ConsoleFilter>('all');
     const posthog = usePostHog();
+    const carveVisible = useCarveVisible();
 
     // Joining a port makes the server send this window another
     // 'serialport:open', which would ask us to join again. Track what we have
@@ -230,7 +236,7 @@ const Console = ({ isActive, isChildWindow, showActions = true }: ConsoleProps) 
                 />
                 <ConsoleList
                     messages={visibleMessages}
-                    isActive={isActive}
+                    isActive={isActive && carveVisible}
                     isFiltered={filter !== 'all' && messages.length > 0}
                 />
                 <ConsoleInput />

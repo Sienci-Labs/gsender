@@ -15,6 +15,12 @@ on:
   pull_request:
     branches: [ "master" ]
 
+# Superseded branch/PR runs are cancelled when a newer commit lands on the same
+# ref. Tag (release) builds always run to completion.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
 env:
   GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
   NODE_OPTIONS: --max-old-space-size=8192
@@ -22,19 +28,90 @@ env:
   VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
 
 jobs:
+  # Builds the platform-independent part of the app (server/main esbuild
+  # bundles, React renderer, pendant UI, default plugins) once. The packaging
+  # jobs download it and only run electron-builder, which installs the
+  # per-platform production deps (incl. native prebuilds) itself.
+  build-web:
+    name: Build web bundle
+    runs-on: ubuntu-latest
+    environment: CI
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+      # No committed lockfile, so key the yarn download cache on package.json
+      # and fall back to the latest cache (resolution still happens fresh).
+      - name: Configure yarn cache
+        run: echo "YARN_CACHE_FOLDER=${{ runner.temp }}/yarn-cache" >> "$GITHUB_ENV"
+      - name: Cache yarn downloads
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/yarn-cache
+          key: yarn-web-${{ hashFiles('package.json', 'src/app/package.json', 'src/pendant/package.json') }}
+          restore-keys: yarn-web-
+      - name: Install dependencies
+        run: yarn install --prefer-offline
+      - name: Sync package and install src deps
+        run: |
+          npm run package-sync
+          yarn --cwd src install --production --ignore-scripts --non-interactive --prefer-offline
+      - name: Prebuild (tag)
+        if: github.ref_type == 'tag'
+        run: npm run prebuild-prod
+      - name: Prebuild (branch)
+        if: github.ref_type == 'branch'
+        run: npm run prebuild-latest
+      - name: Build (tag)
+        if: github.ref_type == 'tag'
+        run: yarn run build
+      - name: Build (branch)
+        if: github.ref_type == 'branch'
+        run: yarn run build-latest
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          # src/package.json carries the version stamped by prebuild; the
+          # packaging jobs read it to name release assets.
+          path: |
+            dist/gsender
+            src/package.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
   build-linux:
     name: Build Linux packages
+    needs: build-web
     runs-on: ubuntu-latest
     environment: CI
     permissions:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup and build
-        uses: ./.github/actions/setup-build
+        uses: actions/checkout@v4
+      - name: Setup packaging
+        uses: ./.github/actions/setup-package
       - name: Build Linux binaries
         run: yarn run build:linux
+      - name: Verify arm64 package has no host-arch native builds
+        shell: bash
+        run: |
+          # Native modules must load from their per-arch prebuilds/. A build/Release
+          # (compiled for the x64 runner) would shadow them and break arm64 users.
+          bad=$(find output/linux-arm64-unpacked -name '*.node' -path '*build/Release*' -print)
+          if [ -n "$bad" ]; then
+            echo "Host-arch native builds leaked into the arm64 package:"; echo "$bad"; exit 1
+          fi
+          if find output/linux-arm64-unpacked -name '*.node' -path '*linux-arm64*' -exec file {} + | grep -q 'x86-64'; then
+            echo "x86-64 binary found in arm64 prebuilds"; exit 1
+          fi
+          echo "Native modules in arm64 package:"
+          find output/linux-arm64-unpacked -name '*.node' -path '*linux-arm64*' -exec file {} +
       - name: Prepare release assets
         shell: bash
         run: |
@@ -71,10 +148,21 @@ jobs:
           prerelease: true
           draft: true
 
+  # One leg per arch so the two (slow) sign + notarize passes run in parallel
+  # on separate runners instead of back to back.
   build-macos:
-    name: Build macOS packages
+    needs: build-web
+    name: Build macOS packages (${{ matrix.arch }})
     environment: CI
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            label: Mac-Intel
+          - arch: arm64
+            label: Mac-Silicon
     env:
       GH_TOKEN: ${{ secrets.CI_TOKEN }}
       APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
@@ -88,13 +176,11 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Pip setuptools
-        run: sudo -H pip install setuptools
-      - name: Setup and build
-        uses: ./.github/actions/setup-build
+        uses: actions/checkout@v4
+      - name: Setup packaging
+        uses: ./.github/actions/setup-package
       - name: Build macOS binaries
-        run: yarn run build:macos
+        run: yarn run build:macos-${{ matrix.arch }}
       - name: Prepare release assets
         shell: bash
         run: |
@@ -103,16 +189,17 @@ jobs:
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/macos
           ls -al output
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Intel.dmg"
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-${{ matrix.arch }}.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-${{ matrix.label }}.dmg"
           ls -al output releases/macos
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
+            # Each leg only replaces its own asset so the parallel legs don't
+            # delete each other's upload.
             yarn github-release delete \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
-              "*-macos*";
+              "*-${{ matrix.label }}*";
             yarn github-release upload \
               --owner=gSender \
               --repo=gsender \
@@ -131,22 +218,21 @@ jobs:
       - name: Upload Mac Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mac_artifact
+          name: mac_artifact_${{ matrix.arch }}
           path: releases/macos/*.dmg
           compression-level: 0 # no compression
           retention-days: 2
 
   build-windows:
+    needs: build-web
     name: Build Windows packages
     environment: CI
     runs-on: windows-latest
     permissions:
       contents: write
     steps:
-      - name: Prepare VC++ Runtime
-        run: choco install -y vcredist2017
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Write client auth certificate
         if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
@@ -192,8 +278,8 @@ jobs:
             Select-Object -First 1
           if (-not $signtool) { throw "signtool.exe not found in Windows SDK" }
           $signtool.DirectoryName | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
-      - name: Setup and build
-        uses: ./.github/actions/setup-build
+      - name: Setup packaging
+        uses: ./.github/actions/setup-package
       - name: Build Windows binaries
         env:
           SM_API_KEY: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_API_KEY || '' }}
@@ -258,7 +344,15 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      # docker-container builder, required for the GitHub Actions layer cache
+      # used by scripts/build-pi.sh (--cache-from/--cache-to type=gha).
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # Exposes ACTIONS_RUNTIME_TOKEN / cache URLs to run steps so the plain
+      # `docker buildx build` in build-pi.sh can reach the gha cache backend.
+      - name: Expose GitHub runtime for buildx cache
+        uses: crazy-max/ghaction-github-runtime@v3
       - name: Build Pi binaries using docker
         shell: bash
         run: |

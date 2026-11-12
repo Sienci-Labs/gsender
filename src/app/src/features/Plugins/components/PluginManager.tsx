@@ -17,6 +17,7 @@ import { Tooltip } from 'app/components/Tooltip';
 import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import isElectron from 'is-electron';
+import { canRestartApp, restartApp } from 'app/lib/restartApp';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { usePlugins } from '../hooks/usePlugins';
@@ -55,12 +56,6 @@ const PluginManager = () => {
         } catch {
             // Opening the folder is best-effort; ignore failures silently.
         }
-    };
-
-    const handleRestart = () => {
-        (window as unknown as { ipcRenderer?: any }).ipcRenderer?.send(
-            'app-restart',
-        );
     };
 
     const handleUninstall = async () => {
@@ -132,8 +127,8 @@ const PluginManager = () => {
                             Restart gSender to apply plugin changes. Mount
                             routes are registered when the server starts.
                         </span>
-                        {isElectron() && (
-                            <Button onClick={handleRestart} size="sm">
+                        {canRestartApp() && (
+                            <Button onClick={restartApp} size="sm">
                                 Restart now
                             </Button>
                         )}

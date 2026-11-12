@@ -39,8 +39,7 @@ export const SettingSection = React.memo(
 
                     setSettingsValues((prev) => {
                         const updated = [...prev];
-                        updated[i].value = v;
-                        updated[i].dirty = true;
+                        updated[i] = { ...updated[i], value: v, dirty: true };
 
                         const curSetting = updated[i];
                         // For just switches for now - if onDisable and false, run onDisable

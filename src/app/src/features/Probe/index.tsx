@@ -67,6 +67,7 @@ import type {
 } from './definitions';
 import Probe from './Probe';
 import RunProbe from './RunProbe';
+import { shallowEqual } from 'react-redux';
 
 const ProbeWidget = () => {
     const posthog = usePostHog();
@@ -79,18 +80,21 @@ const ProbeWidget = () => {
         $13,
         activeState,
         $22,
-    } = useTypedSelector((state) => ({
-        distance: state.controller.state.parserstate?.modal.distance,
-        probePinStatus: state.controller.state.status?.pinState.P ?? false,
-        type: state.controller.type,
-        workflow: state.controller.workflow,
-        isConnected: state.connection.isConnected,
-        $13: state.controller.settings.settings.$13 ?? '0',
-        $22: state.controller.settings.settings.$22 ?? '0',
-        activeState: state.controller.state.status?.activeState,
-        mpos: state.controller.mpos,
-        zMaxTravel: state.controller.settings.settings.$132 ?? '170',
-    }));
+    } = useTypedSelector(
+        (state) => ({
+            distance: state.controller.state.parserstate?.modal.distance,
+            probePinStatus: state.controller.state.status?.pinState.P ?? false,
+            type: state.controller.type,
+            workflow: state.controller.workflow,
+            isConnected: state.connection.isConnected,
+            $13: state.controller.settings.settings.$13 ?? '0',
+            $22: state.controller.settings.settings.$22 ?? '0',
+            activeState: state.controller.state.status?.activeState,
+            mpos: state.controller.mpos,
+            zMaxTravel: state.controller.settings.settings.$132 ?? '170',
+        }),
+        shallowEqual,
+    );
 
     const { actions: config } = getWidgetConfigContext();
 

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 __dirname="$(CDPATH= cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-electron_version=$(electron --version)
 
 display_usage() {
     ./node_modules/.bin/electron-builder -- --help
@@ -80,19 +79,15 @@ fi
 
 popd
 
-REBUILD_MARKER="$DIST_DIR/.rebuild-${electron_version}"
-
-if [ ! -f "$REBUILD_MARKER" ]; then
-    echo "Rebuilding pendant native modules for electron ${electron_version}"
-    ./node_modules/.bin/electron-rebuild \
-        --version=${electron_version:1} \
-        --module-dir=dist/gsender-pendant \
-        --which-module=serialport
-
-    touch "$REBUILD_MARKER"
-else
-    echo "✓ Pendant native modules already rebuilt for electron ${electron_version}, skipping..."
-fi
+# No electron-rebuild step: the native deps are N-API prebuildify modules whose
+# shipped prebuilds load in Electron as-is. A host-arch rebuild writes
+# build/Release, which node-gyp-build prefers over prebuilds/, breaking the
+# other arch in multi-arch builds (--x64 --arm64). See electron-builder.sh.
+echo "Removing locally compiled native builds so per-arch prebuilds are used"
+find "$NODE_MODULES_DIR" -type d -name build \
+    \( -path '*/@serialport/bindings-cpp/build' -o -path '*/node_modules/usb/build' \) \
+    -prune -exec rm -rf {} +
+rm -f "$DIST_DIR"/.rebuild-*
 
 echo "Building pendant with electron-builder..."
 CSC_IDENTITY_AUTO_DISCOVERY_VALUE=false

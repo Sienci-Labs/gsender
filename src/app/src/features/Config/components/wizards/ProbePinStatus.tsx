@@ -6,11 +6,10 @@ import { useSelector } from 'react-redux';
 
 export function ProbePinStatus() {
     const { t } = useAppTranslation();
-    const status = useSelector(
-        (state: RootState) => state.controller.state.status,
+    // Select the pin itself; the status object is replaced on every report
+    const probeOn = useSelector((state: RootState) =>
+        Boolean(get(state.controller.state.status, 'pinState.P', false)),
     );
-    const pinState = get(status, 'pinState', {});
-    const probeOn = get(pinState, 'P', false);
 
     return (
         <div className="flex flex-row items-center gap-2">

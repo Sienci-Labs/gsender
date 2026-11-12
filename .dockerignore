@@ -1,0 +1,6 @@
+# Used by DockerfilePi. Dependencies are installed inside the image; host
+# node_modules (possibly another OS/arch) must not be copied over them.
+**/node_modules
+dist
+output
+releases

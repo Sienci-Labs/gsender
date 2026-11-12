@@ -4,7 +4,8 @@ import api from 'app/api';
 import type { PluginInstallPlan } from '../../types';
 import InstallPluginDialog from '../InstallPluginDialog';
 
-jest.mock('is-electron', () => () => true);
+let mockIsElectron = true;
+jest.mock('is-electron', () => () => mockIsElectron);
 jest.mock('app/api', () => ({
     __esModule: true,
     default: {
@@ -29,6 +30,8 @@ const ipcSend = jest.fn();
 beforeEach(() => {
     jest.clearAllMocks();
     sourceHandler = null;
+    mockIsElectron = true;
+    delete (window as any).GSenderAndroid;
 
     (window as any).ipcRenderer = {
         send: ipcSend,
@@ -285,6 +288,29 @@ describe('InstallPluginDialog', () => {
             screen.getByRole('button', { name: /restart now/i }),
         );
         expect(ipcSend).toHaveBeenCalledWith('app-restart');
+    });
+
+    it('restarts through the Android bridge outside Electron', async () => {
+        const restartServer = jest.fn();
+        plugins.installCommit.mockResolvedValue({
+            data: { ok: true, restartRequired: true, replaced: false, log: [] },
+        });
+        renderDialog();
+        await advanceToReview(makePlan());
+
+        mockIsElectron = false;
+        (window as any).GSenderAndroid = { restartServer };
+        await userEvent.click(
+            screen.getByRole('button', { name: /^install$/i }),
+        );
+
+        const restart = await screen.findByRole('button', {
+            name: /restart now/i,
+        });
+        expect(restart).toBeEnabled();
+        await userEvent.click(restart);
+        expect(restartServer).toHaveBeenCalled();
+        expect(ipcSend).not.toHaveBeenCalledWith('app-restart');
     });
 
     it('says the previous version was restored when the install fails', async () => {
