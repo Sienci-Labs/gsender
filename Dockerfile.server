@@ -1,0 +1,80 @@
+# syntax=docker/dockerfile:1.7
+#
+# gSender headless server image
+#
+# Runs the gSender server directly under Node.js, without Electron, and serves
+# the web UI on port 8000. No display, X server or Xvfb is needed.
+#
+# See DOCKER.md for usage.
+
+# ---- Build stage: same steps as .github/actions/setup-build ----
+FROM node:24-bookworm AS builder
+
+ARG NODE_OPTIONS="--max-old-space-size=8192"
+ENV NODE_OPTIONS=${NODE_OPTIONS}
+
+# Toolchain and headers for the native modules (serialport, usb)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    libudev-dev \
+    libusb-1.0-0-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN yarn global add node-gyp
+
+WORKDIR /app
+
+# Install dependencies first so this layer is cached across source changes
+COPY package.json ./
+RUN yarn install --network-timeout 300000
+
+COPY . .
+
+# Generate src/package.json (the server's runtime dependency list), then
+# build the server bundle (esbuild) and the web UI (Vite) into dist/gsender
+RUN npm run prebuild-prod
+RUN yarn run build
+
+# ---- Runtime dependencies: only what the server needs, not the UI's ----
+FROM builder AS runtime-deps
+
+WORKDIR /runtime
+COPY --from=builder /app/dist/gsender/package.json ./
+RUN yarn install --production --non-interactive --network-timeout 300000 \
+    && yarn cache clean
+
+# ---- Runtime stage ----
+FROM node:24-bookworm-slim AS runtime
+
+# libudev/libusb: shared libraries for the serialport and usb modules.
+# udev: provides udevadm, used to enumerate serial ports.
+# tini: PID 1 that forwards signals, so the container stops promptly.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libudev1 \
+    libusb-1.0-0 \
+    udev \
+    tini \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/bin ./bin
+COPY --from=builder /app/package.json ./package.json
+COPY --from=runtime-deps /runtime/node_modules ./node_modules
+
+# gSender keeps its settings (.sender_rc), sessions and uploads in the home
+# directory. Point it at /data so one volume persists everything.
+ENV NODE_ENV=production \
+    HOME=/data
+RUN mkdir -p /data
+VOLUME /data
+
+EXPOSE 8000
+
+# --allow-remote-access lets browsers on other hosts connect. Arguments given
+# after the image name are appended, e.g. `... gsender -w /watch -vv`.
+ENTRYPOINT ["tini", "--", "node", "bin/gsender", "--allow-remote-access"]
