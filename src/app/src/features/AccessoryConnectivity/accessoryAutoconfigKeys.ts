@@ -12,6 +12,22 @@ export const ACCESSORY_AUTOCONFIG_KEYS = [
 
 export type AccessoryAutoconfigKey = (typeof ACCESSORY_AUTOCONFIG_KEYS)[number];
 
+const ACCESSORY_INSTALLER_ROUTE = '/tools/accessoryInstall';
+
+// Accessories with their own installer wizard; the rest open the installer's list
+const ACCESSORY_WIZARD_IDS: Partial<Record<AccessoryAutoconfigKey, string>> = {
+    AUTOSPIN: 'autospin',
+    ATCEXP: 'sienci-atc',
+    TLS: 'sienci-tls',
+};
+
+export function accessoryManageRoute(key: string): string {
+    const wizardId = ACCESSORY_WIZARD_IDS[key as AccessoryAutoconfigKey];
+    return wizardId
+        ? `${ACCESSORY_INSTALLER_ROUTE}/${wizardId}`
+        : ACCESSORY_INSTALLER_ROUTE;
+}
+
 export function isAccessoryConnected(
     rawValue: string | null | undefined,
 ): boolean {

@@ -9,6 +9,8 @@ type Props = {
     ) => void;
     disabled?: boolean;
     label?: string;
+    // Names the checkbox for assistive tech when the visible label doesn't
+    ariaLabel?: string;
     className?: string;
     position?: 'horizontal' | 'vertical';
     id?: string;
@@ -19,6 +21,7 @@ const Toggle = ({
     checked = false,
     onChange,
     label,
+    ariaLabel,
     position = 'horizontal',
     disabled = false,
     id,
@@ -45,7 +48,7 @@ const Toggle = ({
                     className="sr-only peer"
                     disabled={disabled}
                     value={value}
-                    aria-label={label || 'Toggle'}
+                    aria-label={ariaLabel || label || 'Toggle'}
                 />
                 <div
                     className={cn(

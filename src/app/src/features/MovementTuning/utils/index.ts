@@ -18,10 +18,12 @@ export const calculateNewStepsPerMM = ({
     actualDistanceMoved: number;
 }) => {
     if (actualDistanceMoved === 0) return 0;
+    // Only the size of the move matters: Z tunes downward (e.g. -50 mm), but a
+    // measured distance is naturally entered as positive
     return Number(
         (
             originalStepsPerMM *
-            (givenDistanceMoved / actualDistanceMoved)
+            (Math.abs(givenDistanceMoved) / Math.abs(actualDistanceMoved))
         ).toFixed(2),
     );
 };

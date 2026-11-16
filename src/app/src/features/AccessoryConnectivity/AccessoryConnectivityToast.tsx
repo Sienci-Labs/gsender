@@ -6,6 +6,7 @@ interface AccessoryConnectivityToastProps {
     status: AccessoryStatus;
     accessoryName: string;
     onDismiss: () => void;
+    onManage?: () => void;
 }
 
 const SUBTITLE: Record<AccessoryStatus, string> = {
@@ -124,6 +125,7 @@ export function AccessoryConnectivityToast({
     status,
     accessoryName,
     onDismiss,
+    onManage,
 }: AccessoryConnectivityToastProps) {
     const isConnected = status === 'connected';
     const title = `${accessoryName} ${status}`;
@@ -139,7 +141,8 @@ export function AccessoryConnectivityToast({
                 // which renders this outside sonner's toast pipeline entirely —
                 // sonner's toast-container box is sized/anchored for its default
                 // compact toasts and can't cleanly host a card this large.
-                'relative isolate grid w-[calc(100vw-32px)] grid-cols-[86px_1fr] items-center gap-5 overflow-hidden rounded-[22px] border border-border bg-card py-5 pr-4 pl-6 shadow-[0_21px_42px_-23px_rgba(0,0,0,0.82)] sm:w-[552px] sm:grid-cols-[106px_1fr] sm:gap-8 sm:py-7 sm:pr-6 sm:pl-7',
+                // The host is click-through, so the card opts back in to clicks.
+                'pointer-events-auto relative isolate grid w-[calc(100vw-32px)] grid-cols-[86px_1fr] items-center gap-5 overflow-hidden rounded-[22px] border border-border bg-card py-5 pr-4 pl-6 shadow-[0_21px_42px_-23px_rgba(0,0,0,0.82)] sm:w-[552px] sm:grid-cols-[106px_1fr] sm:gap-8 sm:py-7 sm:pr-6 sm:pl-7',
             )}
             style={{ ['--accent' as string]: accentColor }}
             aria-label={title}
@@ -208,10 +211,10 @@ export function AccessoryConnectivityToast({
                 <CloseIcon />
             </button>
 
-            {isConnected && (
+            {isConnected && onManage && (
                 <button
                     type="button"
-                    onClick={() => {}}
+                    onClick={onManage}
                     className="absolute right-5 bottom-5 z-[4] inline-flex h-[43px] min-w-[122px] items-center justify-center gap-3 rounded-full bg-purple-100 px-4 text-sm font-semibold text-purple-600 hover:bg-purple-200 focus-visible:ring-2 focus-visible:ring-ring sm:h-[49px] sm:min-w-[143px] sm:text-base dark:bg-purple-600/70 dark:text-white dark:hover:bg-purple-600/85"
                 >
                     Manage

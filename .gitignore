@@ -48,3 +48,5 @@ skills-lock.json
 
 **/tsconfig.tsbuildinfo
 **/tsconfig.node.tsbuildinfo
+*storybook.log
+storybook-static
