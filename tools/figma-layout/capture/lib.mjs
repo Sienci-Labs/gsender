@@ -207,6 +207,81 @@ export async function pageTarget(port, match) {
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* -------------------------------------------------------------------- */
+/* Layouts                                                              */
+/* -------------------------------------------------------------------- */
+
+// The three shapes gSender ships in. `pendant` and `android` are the same
+// app (src/pendant): the pendant build runs in an 800×1280 portrait Electron
+// window, the Android build in a WebView filling a tablet's screen.
+export const LAYOUTS = {
+    desktop: {
+        label: 'Desktop',
+        width: 1440,
+        height: 900,
+        url: 'http://localhost:5173/',
+    },
+    pendant: {
+        label: 'Pendant',
+        width: 800,
+        height: 1280,
+        url: 'http://localhost:5174/',
+    },
+    android: {
+        label: 'Android',
+        // A 10" tablet in landscape, in CSS pixels. The Android shell doesn't
+        // turn on the WebView's wide viewport, so the page's
+        // <meta viewport width=768> is ignored and it lays out to the screen.
+        width: 1280,
+        height: 800,
+        url: 'http://localhost:5174/',
+    },
+};
+
+const ANDROID_UA =
+    'Mozilla/5.0 (Linux; Android 14; SM-X210 Build/UP1A.231005.007; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/131.0.0.0 Safari/537.36';
+
+// What the Android shell (android/.../MainActivity.kt) adds to the page: its
+// JavaScript bridge, and no Electron API. Runs before the app's own scripts.
+const ANDROID_BRIDGE = `(() => {
+    if (window.GSenderAndroid) return;
+    window.GSenderAndroid = { restartServer() {} };
+})();`;
+
+// Resolves the viewport for a layout. `portrait`/`landscape` turn it; an
+// explicit width or height wins.
+export function layoutSize(layout, { width, height, orientation } = {}) {
+    const preset = LAYOUTS[layout] || LAYOUTS.desktop;
+    let w = preset.width;
+    let h = preset.height;
+    if (
+        (orientation === 'portrait' && w > h) ||
+        (orientation === 'landscape' && h > w)
+    )
+        [w, h] = [h, w];
+    return { width: Number(width) || w, height: Number(height) || h };
+}
+
+// Makes the page behave as it does on the device for this layout. For
+// Android that is a touch screen, the WebView's user agent and the shell's
+// bridge; the other layouts need nothing. Call before navigating.
+export async function applyLayout(cdp, layout) {
+    if (layout !== 'android') return;
+    await cdp.send('Emulation.setUserAgentOverride', {
+        userAgent: ANDROID_UA,
+        platform: 'Linux armv81',
+    });
+    await cdp.send('Emulation.setTouchEmulationEnabled', {
+        enabled: true,
+        maxTouchPoints: 5,
+    });
+    await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+        source: ANDROID_BRIDGE,
+    });
+    // An already-loaded page (live mode, --connect) gets the bridge too.
+    await cdp.evaluate(ANDROID_BRIDGE).catch(() => {});
+}
+
+/* -------------------------------------------------------------------- */
 /* Capture                                                              */
 /* -------------------------------------------------------------------- */
 
@@ -263,7 +338,7 @@ export async function waitForStableDom(cdp, timeout = 30000, stableMs = 1000) {
     return last;
 }
 
-async function screenshotRasters(cdp, doc, fullPage) {
+export async function screenshotRasters(cdp, doc, fullPage) {
     if (!doc.rasters.length) return;
     const byId = new Map();
     (function index(n) {
@@ -309,6 +384,10 @@ async function screenshotRasters(cdp, doc, fullPage) {
     await cdp.send('Emulation.setDefaultBackgroundColorOverride', {});
 }
 
+export async function injectSerializer(cdp) {
+    await cdp.evaluate(`window.__L2F_NO_AUTORUN = true; ${serializer()}; true`);
+}
+
 // Serializes whatever the page shows right now, then screenshots the
 // elements that can only be represented as images. With `states`, also
 // cycles through every tab group and opens every popup (menus, popovers,
@@ -328,7 +407,7 @@ export async function serializePage(
     await cdp.evaluate(
         `document.fonts && document.fonts.ready.then(() => true)`,
     );
-    await cdp.evaluate(`window.__L2F_NO_AUTORUN = true; ${serializer()}; true`);
+    await injectSerializer(cdp);
     // Endless animations (spinners, rotating borders) would be caught at a
     // random frame; show their first frame instead. Finite ones (a dialog
     // fading in) are left alone, since their first frame is often invisible.
@@ -526,13 +605,24 @@ async function captureStates(cdp, doc, found, raster, onProgress) {
     return out;
 }
 
+// For file names that sort by when they were captured: 20261116-143005
+export function stamp(date = new Date()) {
+    return date
+        .toISOString()
+        .replace(/[-:]/g, '')
+        .replace('T', '-')
+        .slice(0, 15);
+}
+
 export function fileName(doc, used = new Set()) {
     const u = new URL(doc.source.url);
     const route =
         (u.pathname + u.hash)
             .replace(/^[/#]+|[/#]+$/g, '')
             .replace(/[^\w-]+/g, '-') || 'index';
-    let base = `${route}-${doc.viewport.width}x${doc.viewport.height}-${doc.theme.toLowerCase()}`;
+    const layout =
+        doc.layout && doc.layout !== 'desktop' ? `${doc.layout}-` : '';
+    let base = `${layout}${route}-${doc.viewport.width}x${doc.viewport.height}-${doc.theme.toLowerCase()}`;
     let name = base;
     for (let i = 2; used.has(name); i++) name = `${base}-${i}`;
     used.add(name);
@@ -545,7 +635,7 @@ export function fileName(doc, used = new Set()) {
 
 const metaCache = new Map();
 
-function listCaptures(dir) {
+export function listCaptures(dir) {
     if (!fs.existsSync(dir)) return [];
     return fs
         .readdirSync(dir)
@@ -559,8 +649,20 @@ function listCaptures(dir) {
                 const doc = JSON.parse(
                     fs.readFileSync(path.join(dir, f), 'utf8'),
                 );
+                const storybook = doc.kind === 'storybook';
                 meta = {
-                    title: doc.root.name,
+                    kind: storybook ? 'storybook' : 'screen',
+                    layout: doc.layout || 'desktop',
+                    title: storybook
+                        ? `Storybook (${doc.components.length} components)`
+                        : doc.root.name,
+                    variants: storybook
+                        ? doc.components.reduce(
+                              (n, c) => n + c.variants.length,
+                              0,
+                          )
+                        : undefined,
+                    masked: !!doc.mask,
                     url: doc.source.url,
                     theme: doc.theme,
                     width: doc.viewport.width,

@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Layout → Figma</title>
+<style>
+    :root {
+        color-scheme: light dark;
+        --bg: #f6f7f9;
+        --panel: #ffffff;
+        --text: #1b1f24;
+        --muted: #636b76;
+        --border: #dde1e6;
+        --accent: #1f6feb;
+        --accent-text: #ffffff;
+        --danger: #c62222;
+        --ok: #14854f;
+        --code-bg: #10141a;
+        --code-text: #d6dde6;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg: #14171c;
+            --panel: #1c2027;
+            --text: #e6e9ee;
+            --muted: #9aa3ae;
+            --border: #2e343d;
+            --accent: #4c8dff;
+            --code-bg: #0c0f13;
+        }
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font: 14px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+    }
+    header {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        padding: 16px 24px 0;
+    }
+    h1 { font-size: 18px; margin: 0; }
+    header span { color: var(--muted); }
+    main {
+        display: grid;
+        grid-template-columns: minmax(300px, 380px) 1fr;
+        gap: 16px;
+        padding: 16px 24px 24px;
+        align-items: start;
+    }
+    @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+    .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+    }
+    h2 { font-size: 13px; margin: 0 0 10px; }
+    fieldset { border: 0; margin: 0 0 14px; padding: 0; }
+    legend { padding: 0; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+    .seg { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .seg label { flex: 1; text-align: center; cursor: pointer; }
+    .seg input { position: absolute; opacity: 0; pointer-events: none; }
+    .seg span { display: block; padding: 7px 6px; }
+    .seg label + label span { border-left: 1px solid var(--border); }
+    .seg input:checked + span { background: var(--accent); color: var(--accent-text); }
+    .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .field { display: grid; gap: 4px; margin-bottom: 10px; }
+    .field > span { font-size: 13px; }
+    .hint { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
+    input[type='text'], input[type='number'], select, textarea {
+        width: 100%;
+        font: inherit;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 8px;
+    }
+    textarea { resize: vertical; min-height: 54px; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+    .check small { display: block; color: var(--muted); }
+    button {
+        font: inherit;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        padding: 7px 12px;
+        cursor: pointer;
+    }
+    button:disabled { opacity: 0.45; cursor: default; }
+    button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+    button.danger { color: var(--danger); }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .status { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; }
+    .dot.on { background: var(--ok); }
+    .dot.bad { background: var(--danger); }
+    pre {
+        margin: 0;
+        height: 260px;
+        overflow: auto;
+        background: var(--code-bg);
+        color: var(--code-text);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    .right { display: grid; gap: 16px; min-width: 0; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    th { color: var(--muted); font-weight: 600; font-size: 12px; }
+    td.name { white-space: normal; word-break: break-all; min-width: 200px; }
+    .tag { display: inline-block; padding: 0 6px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); font-size: 11px; margin-left: 4px; }
+    .error { color: var(--danger); }
+    [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+    <h1>Layout → Figma</h1>
+    <span>Capture gSender's layouts and Storybook states for the Layout Importer plugin</span>
+</header>
+
+<main>
+    <form class="panel" id="form">
+        <fieldset>
+            <legend>What to capture</legend>
+            <div class="seg" role="radiogroup" aria-label="What to capture">
+                <label><input type="radio" name="mode" value="capture" checked /><span>Screens</span></label>
+                <label><input type="radio" name="mode" value="live" /><span>Live</span></label>
+                <label><input type="radio" name="mode" value="storybook" /><span>Storybook</span></label>
+            </div>
+            <p class="hint" id="modeHint"></p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Layout</legend>
+            <div class="seg" role="radiogroup" aria-label="Layout">
+                <label><input type="radio" name="layout" value="desktop" checked /><span>Desktop</span></label>
+                <label><input type="radio" name="layout" value="pendant" /><span>Pendant</span></label>
+                <label><input type="radio" name="layout" value="android" /><span>Android</span></label>
+                <label id="layoutAll" hidden><input type="radio" name="layout" value="all" /><span>All</span></label>
+            </div>
+            <p class="hint" id="layoutHint"></p>
+        </fieldset>
+
+        <fieldset id="sizeFields">
+            <label class="field" id="orientationField">
+                <span>Orientation</span>
+                <select name="orientation">
+                    <option value="">Layout default</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+            </label>
+            <div class="pair">
+                <label class="field"><span>Width (px)</span><input type="number" name="width" min="200" max="8000" placeholder="default" /></label>
+                <label class="field"><span>Height (px)</span><input type="number" name="height" min="200" max="8000" placeholder="default" /></label>
+            </div>
+            <label class="field" id="themeField">
+                <span>Theme</span>
+                <select name="theme">
+                    <option value="">As the app renders</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="both">Both (one capture each)</option>
+                </select>
+            </label>
+        </fieldset>
+
+        <fieldset id="screenFields">
+            <label class="field">
+                <span>Tabs and menus to break out</span>
+                <select name="states">
+                    <option value="main">Main area only</option>
+                    <option value="header">Main area and header</option>
+                    <option value="all">Everywhere</option>
+                    <option value="none">None (just what's on screen)</option>
+                </select>
+            </label>
+            <label class="field">
+                <span>Machine</span>
+                <select name="machineChoice">
+                    <option value="twin">grblHAL twin (127.0.0.1:23)</option>
+                    <option value="none">Don't connect</option>
+                    <option value="custom">Another address…</option>
+                </select>
+            </label>
+            <label class="field" id="machineCustom" hidden>
+                <span>Machine address</span>
+                <input type="text" name="machine" placeholder="192.168.5.1:23" />
+            </label>
+            <label class="field" id="urlField">
+                <span>Screens (one URL per line; blank for the main screen)</span>
+                <textarea name="urls" placeholder="http://localhost:5173/#/configuration"></textarea>
+            </label>
+        </fieldset>
+
+        <fieldset id="storyFields" hidden>
+            <label class="field">
+                <span>Control states</span>
+                <select name="controls">
+                    <option value="primary">Each component's first story</option>
+                    <option value="all">Every story (slow)</option>
+                    <option value="none">Stories only</option>
+                </select>
+            </label>
+            <label class="check">
+                <input type="checkbox" name="interaction" />
+                <span>Hover, focus and pressed<small>For stories that show a single button or input</small></span>
+            </label>
+            <label class="field">
+                <span>Only these components (one per line; blank for all)</span>
+                <textarea name="stories" placeholder="components/Button&#10;features/Jogging"></textarea>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <label class="check" id="stampField">
+                <input type="checkbox" name="stamp" checked />
+                <span>Keep earlier captures<small>Put the time in each file name, so captures can be compared later</small></span>
+            </label>
+            <label class="check">
+                <input type="checkbox" name="keep" />
+                <span>Leave dev servers running<small>Faster next time; otherwise servers this started are stopped</small></span>
+            </label>
+        </fieldset>
+
+        <div class="actions">
+            <button class="primary" type="submit" id="run">Start</button>
+            <button type="button" id="captureNow" hidden>Capture now</button>
+            <button type="button" class="danger" id="stop" disabled>Stop</button>
+        </div>
+        <p class="hint error" id="formError" role="alert"></p>
+    </form>
+
+    <div class="right">
+        <section class="panel">
+            <div class="status">
+                <span class="dot" id="dot"></span>
+                <b id="jobLabel">Idle</b>
+                <span class="hint" id="jobHint" style="margin: 0"></span>
+            </div>
+            <pre id="log" aria-live="polite" aria-label="Output"></pre>
+        </section>
+
+        <section class="panel">
+            <h2>Captures</h2>
+            <p class="hint" style="margin: 0 0 10px" id="captureHint"></p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Baseline</th><th>Compare</th><th>Capture</th><th>Layout</th><th>Theme</th><th>Size</th><th>When</th></tr>
+                    </thead>
+                    <tbody id="captures"></tbody>
+                </table>
+            </div>
+            <div class="actions" style="margin-top: 12px">
+                <button type="button" id="diff" disabled>Save differences only</button>
+                <button type="button" id="open">Open folder</button>
+            </div>
+            <p class="hint" id="diffResult" role="status"></p>
+        </section>
+    </div>
+</main>
+
+<script>
+    const $ = (id) => document.getElementById(id);
+    const form = $('form');
+    const field = (name) => form.elements[name];
+
+    const MODE_HINTS = {
+        capture: 'Starts the dev servers if needed, captures each screen with its tabs and menus, then stops.',
+        live: 'Opens gSender in its own window and keeps it open. Get the UI into any state, then capture it with Capture now, ⌥⇧F in the window, or its ◧ button.',
+        storybook: 'Captures every story and the states its controls reach. Each component becomes a component set with a variant per state. Takes a few minutes for everything.',
+    };
+    const LAYOUT_HINTS = {
+        desktop: '1440×900, the desktop app.',
+        pendant: '800×1280 portrait, the pendant build.',
+        android: '1280×800 landscape tablet with touch input, as the Android app shows the pendant UI.',
+        all: 'Desktop stories, and pendant stories at both the pendant and Android sizes.',
+    };
+
+    function syncForm() {
+        const mode = field('mode').value;
+        const story = mode === 'storybook';
+        $('layoutAll').hidden = !story;
+        if (!story && field('layout').value === 'all') field('layout').value = 'desktop';
+        const layout = field('layout').value;
+        $('modeHint').textContent = MODE_HINTS[mode];
+        $('layoutHint').textContent = story && layout !== 'all'
+            ? (layout === 'desktop' ? "The app's stories at 1440×900." : `The pendant's stories at ${layout === 'android' ? '1280×800' : '800×1280'}.`)
+            : LAYOUT_HINTS[layout];
+        $('screenFields').hidden = story;
+        $('storyFields').hidden = !story;
+        $('urlField').hidden = mode !== 'capture';
+        $('themeField').hidden = mode === 'live';
+        $('stampField').hidden = mode === 'live';
+        $('orientationField').hidden = layout === 'desktop' || layout === 'all';
+        $('machineCustom').hidden = field('machineChoice').value !== 'custom';
+    }
+    form.addEventListener('change', syncForm);
+    syncForm();
+
+    const lines = (text) => text.split('\n').map((s) => s.trim()).filter(Boolean);
+
+    function readForm() {
+        const choice = field('machineChoice').value;
+        return {
+            mode: field('mode').value,
+            layout: field('layout').value,
+            orientation: field('orientation').value,
+            width: field('width').value,
+            height: field('height').value,
+            theme: field('theme').value,
+            states: field('states').value,
+            machine: choice === 'custom' ? field('machine').value : choice,
+            urls: lines(field('urls').value),
+            controls: field('controls').value,
+            interaction: field('interaction').checked,
+            stories: lines(field('stories').value),
+            stamp: field('stamp').checked,
+            keep: field('keep').checked,
+        };
+    }
+
+    async function post(path, body) {
+        const res = await fetch(path, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {}),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+        return data;
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        $('formError').textContent = '';
+        try {
+            since = 0;
+            $('log').textContent = '';
+            await post('/api/run', readForm());
+            refresh();
+        } catch (err) {
+            $('formError').textContent = err.message;
+        }
+    });
+    $('stop').addEventListener('click', () => post('/api/stop').then(refresh));
+    $('captureNow').addEventListener('click', () =>
+        post('/api/capture-now').catch((err) => ($('formError').textContent = err.message)),
+    );
+    $('open').addEventListener('click', () => post('/api/open'));
+
+    /* Captures --------------------------------------------------------- */
+
+    let baseline = null;
+    let against = null;
+    let captureNames = '';
+
+    function ago(ms) {
+        const s = Math.round((Date.now() - ms) / 1000);
+        if (s < 60) return 'just now';
+        if (s < 3600) return `${Math.round(s / 60)} min ago`;
+        if (s < 86400) return `${Math.round(s / 3600)} h ago`;
+        return new Date(ms).toLocaleDateString();
+    }
+
+    function renderCaptures(list) {
+        // Only rebuild when the set changes, so a selection survives polling.
+        const names = list.map((c) => c.name + c.mtimeMs).join('|');
+        if (names === captureNames) return;
+        captureNames = names;
+        if (!list.some((c) => c.name === baseline)) baseline = null;
+        if (!list.some((c) => c.name === against)) against = null;
+        const body = $('captures');
+        body.innerHTML = '';
+        for (const c of list) {
+            const tr = document.createElement('tr');
+            const radio = (group, current, set) => {
+                const td = document.createElement('td');
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = group;
+                input.checked = current === c.name;
+                input.setAttribute('aria-label', `${group === 'baseline' ? 'Baseline' : 'Compare'}: ${c.name}`);
+                input.addEventListener('change', () => {
+                    set(c.name);
+                    syncDiff();
+                });
+                td.appendChild(input);
+                return td;
+            };
+            const cell = (text, cls) => {
+                const td = document.createElement('td');
+                td.textContent = text;
+                if (cls) td.className = cls;
+                return td;
+            };
+            const name = cell(c.title, 'name');
+            name.title = c.name;
+            for (const [show, text] of [[c.kind === 'storybook', `${c.variants} states`], [c.masked, 'differences only']]) {
+                if (!show) continue;
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.textContent = text;
+                name.appendChild(tag);
+            }
+            tr.append(
+                radio('baseline', baseline, (v) => (baseline = v)),
+                radio('against', against, (v) => (against = v)),
+                name,
+                cell(c.layout),
+                cell(c.theme),
+                cell(`${c.width}×${c.height}`),
+                cell(ago(c.mtimeMs)),
+            );
+            body.appendChild(tr);
+        }
+        if (!list.length) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 7;
+            td.className = 'hint';
+            td.textContent = 'No captures yet.';
+            tr.appendChild(td);
+            body.appendChild(tr);
+        }
+        syncDiff();
+    }
+
+    function syncDiff() {
+        $('diff').disabled = !baseline || !against || baseline === against;
+    }
+    $('diff').addEventListener('click', async () => {
+        $('diffResult').className = 'hint';
+        $('diffResult').textContent = 'Comparing…';
+        try {
+            const r = await post('/api/diff', { base: baseline, against });
+            $('diffResult').textContent = r.file ? `${r.summary} Saved as ${r.file}.` : r.summary;
+            refresh();
+        } catch (err) {
+            $('diffResult').className = 'hint error';
+            $('diffResult').textContent = err.message;
+        }
+    });
+
+    /* Polling ---------------------------------------------------------- */
+
+    let since = 0;
+    let timer;
+
+    async function refresh() {
+        clearTimeout(timer);
+        try {
+            const s = await (await fetch(`/api/state?since=${since}`, { cache: 'no-store' })).json();
+            const log = $('log');
+            if (s.log.length) {
+                const pinned = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;
+                log.textContent += s.log.map((l) => l.text).join('\n') + '\n';
+                since = s.log[s.log.length - 1].n;
+                if (pinned) log.scrollTop = log.scrollHeight;
+            }
+            const running = !!(s.job && s.job.running);
+            $('dot').className = 'dot' + (running ? ' on' : s.job && s.job.exit ? ' bad' : '');
+            $('jobLabel').textContent = !s.job
+                ? 'Idle'
+                : running
+                  ? `Running: ${s.job.label}`
+                  : s.job.exit === 0
+                    ? `Finished: ${s.job.label}`
+                    : `Stopped: ${s.job.label}`;
+            $('run').disabled = running;
+            $('stop').disabled = !running;
+            $('captureNow').hidden = !(running && s.job.mode === 'live');
+            $('captureHint').textContent = s.livePort
+                ? `In ${s.outDir}. The Figma plugin's Live panel lists them while this page's server runs. To import only what changed, pick a baseline and a capture to compare, or do the same in the plugin.`
+                : `In ${s.outDir}. Drop them into the Figma plugin to import.`;
+            renderCaptures(s.captures);
+        } catch (e) {
+            $('dot').className = 'dot bad';
+            $('jobLabel').textContent = 'Launcher not reachable. Is yarn figma:ui still running?';
+        }
+        timer = setTimeout(refresh, 1000);
+    }
+    refresh();
+</script>
+</body>
+</html>

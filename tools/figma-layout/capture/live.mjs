@@ -14,14 +14,18 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { parseArgs } from 'node:util';
 import {
+    applyLayout,
     CDP,
     fileName,
+    LAYOUTS,
     launchChrome,
+    layoutSize,
     pageIsBlank,
     pageTarget,
     serializePage,
     serveCaptures,
     sleep,
+    stamp,
     waitForStableDom,
 } from './lib.mjs';
 
@@ -33,11 +37,20 @@ Opens the app in a Chrome window and captures it on demand: press Alt+Shift+F
 New captures show up in the Figma plugin's Live panel.
 
 Options
-      --url <url>          Page to open (default: http://localhost:5173/)
+      --url <url>          Page to open (default: the layout's dev server)
   -o, --out <dir>          Output directory (default: ./figma-captures)
-  -w, --width <px>         Window width (default: 1440)
-  -h, --height <px>        Window height (default: 900)
+      --layout <desktop|pendant|android>
+                           Which gSender layout this is (default: desktop).
+                           Sets the window size and default URL; android also
+                           emulates the tablet (touch input, the WebView's
+                           user agent, the Android shell's bridge).
+      --portrait, --landscape
+                           Turn the pendant/android screen
+  -w, --width <px>         Window width (default: the layout's)
+  -h, --height <px>        Window height (default: the layout's)
       --serve-port <port>  Port the Figma plugin polls (default: 7777)
+      --no-serve           Don't serve captures to the plugin (the launcher
+                           does, when it started this)
       --setup <js>         JavaScript to run once the page has loaded
       --no-states          Capture only what's on screen; don't click through
                            tabs or open menus to record their other states
@@ -56,11 +69,15 @@ Options
 const { values: opts, positionals } = parseArgs({
     allowPositionals: true,
     options: {
-        url: { type: 'string', default: 'http://localhost:5173/' },
+        url: { type: 'string' },
         out: { type: 'string', short: 'o', default: 'figma-captures' },
-        width: { type: 'string', short: 'w', default: '1440' },
-        height: { type: 'string', short: 'h', default: '900' },
+        layout: { type: 'string', default: 'desktop' },
+        portrait: { type: 'boolean', default: false },
+        landscape: { type: 'boolean', default: false },
+        width: { type: 'string', short: 'w' },
+        height: { type: 'string', short: 'h' },
         'serve-port': { type: 'string', default: '7777' },
+        'no-serve': { type: 'boolean', default: false },
         setup: { type: 'string' },
         'no-states': { type: 'boolean', default: false },
         'states-in': { type: 'string' },
@@ -77,7 +94,21 @@ if (opts.help) {
     process.exit(0);
 }
 
+if (!LAYOUTS[opts.layout]) {
+    console.error('--layout takes desktop, pendant or android.');
+    process.exit(1);
+}
 if (positionals[0]) opts.url = positionals[0];
+if (!opts.url) opts.url = LAYOUTS[opts.layout].url;
+const SIZE = layoutSize(opts.layout, {
+    width: opts.width,
+    height: opts.height,
+    orientation: opts.portrait
+        ? 'portrait'
+        : opts.landscape
+          ? 'landscape'
+          : undefined,
+});
 const OUT = path.resolve(opts.out);
 const BINDING = '__l2fCapture';
 
@@ -174,12 +205,8 @@ async function capture(cdp) {
             statesSkip: opts['states-skip'],
             onProgress: (text) => toast(`Capturing ${text}…`, true),
         });
-        const stamp = new Date()
-            .toISOString()
-            .replace(/[-:]/g, '')
-            .replace('T', '-')
-            .slice(0, 15);
-        const name = `${stamp}-${fileName(doc)}`;
+        doc.layout = opts.layout;
+        const name = `${stamp()}-${fileName(doc)}`;
         fs.writeFileSync(path.join(OUT, name), JSON.stringify(doc));
         const secs = ((Date.now() - started) / 1000).toFixed(1);
         console.log(`✔ ${name} (${secs}s)`);
@@ -258,15 +285,17 @@ async function keepOnScreen(cdp, width, height) {
 
 async function main() {
     fs.mkdirSync(OUT, { recursive: true });
-    const server = await serveCaptures(OUT, opts['serve-port']);
+    const server = opts['no-serve']
+        ? { close() {} }
+        : await serveCaptures(OUT, opts['serve-port']);
 
     let browser = null;
     let port = opts.connect;
     if (!port) {
         browser = await launchChrome({
             chrome: opts.chrome,
-            width: opts.width,
-            height: opts.height,
+            width: SIZE.width,
+            height: SIZE.height,
             headful: true,
             app: opts.url,
         });
@@ -277,9 +306,14 @@ async function main() {
     await cdp.send('Page.enable');
     await cdp.send('Runtime.enable');
     if (browser)
-        keepOnScreen(cdp, Number(opts.width), Number(opts.height)).catch(
+        keepOnScreen(cdp, SIZE.width, SIZE.height).catch(
             () => {},
         );
+    // Before the first reload below, so the app starts up as it would on
+    // the device.
+    await applyLayout(cdp, opts.layout);
+    if (opts.layout === 'android' && browser)
+        await cdp.send('Page.reload', { ignoreCache: true });
     await cdp.send('Runtime.addBinding', { name: BINDING });
     await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
         source: OVERLAY,
@@ -328,11 +362,11 @@ async function main() {
   Capture the current screen: ⌥⇧F / Alt+Shift+F in the page, the ◧ Capture
   button in its bottom-right corner, or Enter here. Ctrl+C or close the window to stop.
   Files: ${OUT}
-  Figma: run Layout Importer; new captures appear in its Live panel
-         (served from http://localhost:${opts['serve-port']}).
+  Figma: run Layout Importer; new captures appear in its Live panel.
 `);
 
-    if (process.stdin.isTTY) {
+    // The launcher page drives this over a pipe rather than a terminal.
+    if (process.stdin.isTTY || process.env.L2F_STDIN_CAPTURE) {
         const rl = readline.createInterface({ input: process.stdin });
         rl.on('line', () => capture(cdp));
     }

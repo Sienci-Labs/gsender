@@ -50,9 +50,12 @@ export const Idle = {
         const command = spyOn(controller, 'command');
         // Normal preset: 5 mm XY steps at 3000 mm/min
         await userEvent.click(jogButton(canvas, 'Jog X plus'));
-        await expect(command).toHaveBeenCalledWith('gcode', [
-            '$J=G21 G91 X5 F3000',
-        ]);
+        await expect(command).toHaveBeenCalledWith(
+            'jog:feed',
+            { X: 5 },
+            3000,
+            'mm',
+        );
     },
 };
 
@@ -66,9 +69,12 @@ export const RapidPreset = {
             canvas.getByRole('button', { name: 'Set to Rapid jog preset' }),
         ).toHaveAttribute('aria-pressed', 'true');
         await userEvent.click(jogButton(canvas, 'Jog Y minus'));
-        await expect(command).toHaveBeenCalledWith('gcode', [
-            '$J=G21 G91 Y-20 F5000',
-        ]);
+        await expect(command).toHaveBeenCalledWith(
+            'jog:feed',
+            { Y: -20 },
+            5000,
+            'mm',
+        );
     },
 };
 
@@ -77,9 +83,12 @@ export const KeyboardJog = {
         const command = spyOn(controller, 'command');
         jogButton(canvas, 'Jog X minus Y plus').focus();
         await userEvent.keyboard('{Enter}');
-        await expect(command).toHaveBeenCalledWith('gcode', [
-            '$J=G21 G91 X-5 Y5 F3000',
-        ]);
+        await expect(command).toHaveBeenCalledWith(
+            'jog:feed',
+            { X: -5, Y: 5 },
+            3000,
+            'mm',
+        );
     },
 };
 
@@ -156,9 +165,12 @@ export const KeyboardBlockedOnRotaryDisabledSegments = {
         // X-only segments stay enabled in rotary mode
         jogButton(canvas, 'Jog X plus').focus();
         await userEvent.keyboard('{Enter}');
-        await expect(command).toHaveBeenCalledWith('gcode', [
-            '$J=G21 G91 X5 F3000',
-        ]);
+        await expect(command).toHaveBeenCalledWith(
+            'jog:feed',
+            { X: 5 },
+            3000,
+            'mm',
+        );
     },
 };
 

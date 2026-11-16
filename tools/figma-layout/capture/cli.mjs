@@ -11,13 +11,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import {
+    applyLayout,
     CDP,
     fileName,
+    LAYOUTS,
     launchChrome,
+    layoutSize,
     pageIsBlank,
     pageTarget,
     serializePage,
     sleep,
+    stamp,
     waitFor,
     waitForStableDom,
 } from './lib.mjs';
@@ -28,14 +32,24 @@ const SETUP_TIMEOUT = 60000;
 const HELP = `
 Usage: node tools/figma-layout/capture/cli.mjs [options] [url ...]
 
-Captures each URL (default http://localhost:5173/) at the given viewport and
+Captures each URL (default: the layout's dev server) at the given viewport and
 writes <out>/<name>.figma-layout.json. Import the files with the Figma plugin
 in tools/figma-layout/figma-plugin.
 
 Options
   -o, --out <dir>          Output directory (default: ./figma-captures)
-  -w, --width <px>         Viewport width (default: 1440)
-  -h, --height <px>        Viewport height (default: 900)
+      --layout <desktop|pendant|android>
+                           Which gSender layout this is (default: desktop).
+                           Sets the viewport (1440×900, 800×1280, 1280×800)
+                           and default URL; android also emulates the tablet:
+                           touch input, the WebView's user agent and the
+                           Android shell's JavaScript bridge.
+      --portrait, --landscape
+                           Turn the pendant/android screen
+  -w, --width <px>         Viewport width (default: the layout's)
+  -h, --height <px>        Viewport height (default: the layout's)
+      --stamp              Put the time in the file name instead of
+                           overwriting the previous capture of this screen
       --theme <light|dark|both>
                            Toggle the \`dark\` class on <html> before capture
                            (Tailwind darkMode: 'class'). "both" captures twice.
@@ -81,8 +95,12 @@ const { values: opts, positionals: urls } = parseArgs({
     allowPositionals: true,
     options: {
         out: { type: 'string', short: 'o', default: 'figma-captures' },
-        width: { type: 'string', short: 'w', default: '1440' },
-        height: { type: 'string', short: 'h', default: '900' },
+        layout: { type: 'string', default: 'desktop' },
+        portrait: { type: 'boolean', default: false },
+        landscape: { type: 'boolean', default: false },
+        width: { type: 'string', short: 'w' },
+        height: { type: 'string', short: 'h' },
+        stamp: { type: 'boolean', default: false },
         theme: { type: 'string' },
         'wait-for': { type: 'string' },
         delay: { type: 'string', default: '1500' },
@@ -104,6 +122,10 @@ const { values: opts, positionals: urls } = parseArgs({
 if (opts.help) {
     console.log(HELP);
     process.exit(0);
+}
+if (!LAYOUTS[opts.layout]) {
+    console.error('--layout takes desktop, pendant or android.');
+    process.exit(1);
 }
 if (typeof WebSocket === 'undefined') {
     console.error(
@@ -160,33 +182,42 @@ async function capturePage(cdp, { url, setup, theme }) {
     // asynchronously; let it settle again.
     if (scripts.length) await waitForStableDom(cdp);
     await sleep(Number(opts.delay));
-    return serializePage(cdp, {
+    const doc = await serializePage(cdp, {
         fullPage: opts['full-page'],
         raster: !opts['no-raster'],
         states: !opts['no-states'],
         statesIn: opts['states-in'],
         statesSkip: opts['states-skip'],
     });
+    doc.layout = opts.layout;
+    return doc;
 }
 
 async function main() {
-    const width = Number(opts.width);
-    const height = Number(opts.height);
+    const { width, height } = layoutSize(opts.layout, {
+        width: opts.width,
+        height: opts.height,
+        orientation: opts.portrait
+            ? 'portrait'
+            : opts.landscape
+              ? 'landscape'
+              : undefined,
+    });
     const themes =
         opts.theme === 'both' ? ['light', 'dark'] : [opts.theme || null];
     const targets = urls.length
         ? urls
         : opts.connect
           ? [null]
-          : ['http://localhost:5173/'];
+          : [LAYOUTS[opts.layout].url];
 
     let browser = null;
     let port = opts.connect;
     if (!port) {
         browser = await launchChrome({
             chrome: opts.chrome,
-            width: opts.width,
-            height: opts.height,
+            width,
+            height,
             headful: opts.headful,
         });
         port = browser.port;
@@ -203,6 +234,7 @@ async function main() {
             mobile: false,
         });
     }
+    await applyLayout(cdp, opts.layout);
 
     fs.mkdirSync(opts.out, { recursive: true });
     const used = new Set();
@@ -217,7 +249,10 @@ async function main() {
                     `• ${url || page.url}${theme ? ` [${theme}]` : ''} … `,
                 );
                 const doc = await capturePage(cdp, { url, setup, theme });
-                const file = path.join(opts.out, fileName(doc, used));
+                const file = path.join(
+                    opts.out,
+                    (opts.stamp ? `${stamp()}-` : '') + fileName(doc, used),
+                );
                 fs.writeFileSync(file, JSON.stringify(doc));
                 const kb = Math.round(fs.statSync(file).size / 1024);
                 console.log(

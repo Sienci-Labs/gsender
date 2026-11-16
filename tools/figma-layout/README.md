@@ -5,15 +5,49 @@ layers: frames with fills, borders, radii and shadows, real text layers, SVG
 icons as vectors, images, Tailwind colors as Figma variables, and flex
 containers as auto layout.
 
-It has two parts:
+It captures three layouts (desktop, pendant, and the pendant as the Android
+app shows it), and it can capture Storybook instead of the running app, which
+turns every story and control state into a Figma component variant.
 
 | Part | What it does |
 | --- | --- |
 | `capture/` | Reads the rendered DOM (computed styles + measured boxes) and writes a `.figma-layout.json` file. |
-| `figma-plugin/` | A Figma plugin, **Layout Importer**, that builds those files into frames. |
+| `figma-plugin/` | A Figma plugin, **Layout Importer**, that builds those files into frames and component sets. |
+| `launcher/` | A local web page for running all of it without the flags (`yarn figma:ui`). |
+| `shared/` | Logic used by both Node and the plugin: comparing captures, matching layers for linked prototypes. |
 
-Neither part needs `npm install`. The capture CLI uses Node 22+ and the
-Chrome already on your machine.
+None of it needs `npm install` beyond the repo's own. The capture scripts use
+Node 22+ and the Chrome already on your machine.
+
+| I want to… | Run |
+| --- | --- |
+| Pick options on a page instead of the command line | `yarn figma:ui` |
+| Capture the main screen | `yarn figma` (`--pendant`, `--android`) |
+| Capture whatever state I put the app in | `yarn figma:live` |
+| Capture every story and its control states | `yarn figma:storybook` |
+| Import only what changed since an earlier capture | `yarn figma:diff old.json new.json`, or **Only import differences** in the plugin |
+| Make imported screens follow my prototype | **Prototype** in the plugin |
+
+## Launcher
+
+```bash
+yarn figma:ui
+```
+
+Opens `http://localhost:7780`: choose what to capture (screens, live, or
+Storybook), the layout, theme, size, which tabs and menus to break out, and
+the machine to connect to, then **Start**. The page shows the tool's output
+as it runs, has **Stop**, and in live mode a **Capture now** button.
+
+Below that it lists the captures in `./figma-captures/`. Pick one as
+**Baseline** and one to **Compare**, and **Save differences only** writes a
+`….changes.figma-layout.json` holding just what differs (see
+[Only import differences](#only-import-differences)).
+
+While the launcher is open it also serves the captures folder to the Figma
+plugin's Live panel, in every mode, so new captures show up in Figma by
+themselves. It listens on this machine only, and only ever starts
+`start.mjs` with arguments built from the page's options.
 
 ## Quick start
 
@@ -39,7 +73,9 @@ It takes every capture option below, plus:
 | `--no-machine` | Capture disconnected. |
 | `--header-states` | Also break out the header's menus: connection, machine info, notifications (see [Tabs, menus and popovers](#tabs-menus-and-popovers)). |
 | `--all-states` | Also break out the header's and sidebar's menus (see [Tabs, menus and popovers](#tabs-menus-and-popovers)). |
-| `--pendant` | Capture the pendant (tablet) UI instead of the desktop one (see [Pendant](#pendant)). |
+| `--pendant` | Capture the pendant (tablet) UI instead of the desktop one (see [Pendant and Android](#pendant-and-android)). |
+| `--android` | Capture the pendant UI the way the Android app shows it. |
+| `--storybook` | Capture Storybook instead of the app (see [Storybook](#storybook)). |
 
 If nothing answers at the machine address, it says so and captures
 disconnected. If the backend is already connected to a machine (say you
@@ -117,7 +153,10 @@ Useful options (`yarn figma:capture --help` lists them all):
 | Option | |
 | --- | --- |
 | `--theme light\|dark\|both` | Toggle the `dark` class on `<html>` before capturing. `both` gives one file per theme. |
-| `-w 1280 -h 800` | Viewport size (default 1440×900). |
+| `--layout desktop\|pendant\|android` | Which layout this is; sets the viewport and default URL (`yarn figma --pendant`/`--android` pass it for you). |
+| `--portrait`, `--landscape` | Turn the pendant/Android screen. |
+| `-w 1280 -h 800` | Viewport size (default: the layout's, 1440×900 for desktop). |
+| `--stamp` | Put the time in the file name instead of overwriting the last capture of that screen, so the two can be compared. |
 | `--setup "<js>"` | Run JS on every page before `--eval` (this is how `yarn figma` connects the machine). |
 | `--eval "<js>"` | Run JS before capturing, e.g. open a dialog: `--eval "document.querySelector('[data-testid=load-file]').click()"`. |
 | `--wait-for "<css>"` | Wait for a selector instead of waiting for the DOM to settle. |
@@ -146,7 +185,7 @@ yarn figma:capture --connect 9222
 
 Use `--target <text>` to pick a window by URL or title if there is more than one.
 
-### Pendant
+### Pendant and Android
 
 `--pendant` captures the pendant UI (`src/pendant`), the tablet app that is
 also what the desktop app shows with "use pendant view as default UI". It
@@ -164,6 +203,92 @@ it). The pendant switches screens in-app rather than by URL, so a batch
 capture records the screen it starts on; use live mode to capture the others.
 Connecting to the machine works the same way. Tabs and menus are broken out
 everywhere, since the pendant has no `<main>` area to limit them to.
+
+`--android` captures the same UI as the Android app (`android/`) shows it.
+That app is a WebView around the pendant, so the layout differs from the
+pendant build only in what the device gives the page:
+
+```bash
+yarn figma --android
+yarn figma:live --android --portrait
+```
+
+- a 1280×800 landscape tablet screen (`--portrait` turns it, `-w`/`-h`
+  set another size). The Android shell leaves the WebView's wide viewport
+  off, so the page's `<meta viewport width=768>` doesn't apply and the UI
+  lays out to the screen, which is what this reproduces;
+- touch input, and the Android WebView's user agent;
+- the shell's `window.GSenderAndroid` bridge and no Electron API, so
+  controls that depend on either (restart, quit, the file picker) show the
+  way they do on the tablet.
+
+It can't reproduce what only the device has: its fonts, system bar insets,
+and the on-screen keyboard. To capture the real thing, attach to the
+tablet's WebView instead: with a debug build connected over USB, run
+`adb forward tcp:9222 localabstract:webview_devtools_remote_<pid>` (the pid
+is in `adb shell cat /proc/net/unix | grep webview_devtools`), then
+`yarn figma:capture --connect 9222 --layout android`.
+
+Files and Figma frames carry the layout in their name
+(`android-index-1280x800-dark…`, `… — Android 1280×800 Dark`).
+
+## Storybook
+
+```bash
+yarn figma:storybook
+```
+
+Where a screen capture drills into tabs and menus, this drills into
+component states. It starts Storybook if it isn't running (`yarn storybook`,
+port 6006; no backend or machine needed), then for every component:
+
+- renders **each story**, waits for it to finish (including its `play`
+  function, so a story that opens a dialog is captured with it open), and
+  records what it painted, cropped to the content;
+- on the component's first story, sets **each control** to each value it
+  can take and records the result. Controls that are a switch or a list of
+  options count (boolean, select, radio); free-form ones (text, objects)
+  don't. Component props are tried in every combination when that is 36
+  states or fewer (variant × size × disabled), otherwise one at a time.
+  The machine state controls every feature story gets from
+  `.storybook/machine-args.js` (preset, firmware, homed, units) change one
+  at a time;
+- drops states that look exactly like one it already has, so a control
+  that changes nothing adds nothing. Stories themselves are always kept.
+
+The result is one file per layout,
+`storybook-<layout>-<size>-<theme>.figma-layout.json`. Stories under
+`src/pendant` are captured at the pendant's size and the rest at the
+desktop's.
+
+In Figma each component becomes a **component set** named after its
+Storybook title (`Features/Jogging`), with a variant per state. The variant
+properties are `Story` plus each control the states actually differ in, so
+an instance's properties panel reads like Storybook's controls:
+
+```
+Story=Idle, machinePreset=alarm
+Story=Primary, variant=outline, disabled=true
+```
+
+| Option | |
+| --- | --- |
+| `--stories <text>` | Only components whose title, id or file contains this. Repeatable: `--stories components/Button --stories Jogging`. |
+| `--controls none\|primary\|all` | Cycle controls on no story, each component's first (default), or every story (slow). |
+| `--interaction-states` | Also force hover, focus and pressed on stories that show a single button or input, as an `Interaction` property. |
+| `--layout desktop\|pendant\|android\|all` | Which stories and at what size. `android` takes the pendant's stories at 1280×800 with touch emulation. Default: desktop and pendant. |
+| `--theme light\|dark\|both` | Toggle the `dark` class before capturing. |
+| `--max-variants <n>` | Most states per component (default 60). |
+| `--stamp` | Keep earlier captures (time in the file name). |
+
+A full run is a few hundred renders and takes several minutes. Stories that
+fail to render or paint nothing are listed and skipped. To capture a
+Storybook that is already running somewhere else (another port, or a
+deployed one), run the capture script directly:
+`node tools/figma-layout/capture/storybook.mjs --url http://localhost:6007`.
+
+Control states are rendered by changing the story's args in place, so they
+show the story after its `play` function ran, with the control changed.
 
 ### Without the CLI
 
@@ -188,7 +313,7 @@ CLI can screenshot them.
    top.
 
 Each capture becomes one top-level frame, placed to the right of anything
-already on the page.
+already on the page. A Storybook capture becomes a section of component sets.
 
 Options (remembered between runs):
 
@@ -214,6 +339,74 @@ Options (remembered between runs):
   one. Turn it off to keep them transparent.
 - **Flatten wrappers**: drops `<div>`s that paint nothing, and wrappers that
   only pass a single same-sized child through.
+
+### Only import differences
+
+To bring in just what changed since an earlier capture, give the plugin
+that capture as a baseline: drop it on **Only import differences**, or click
+**Compare** next to it in the Live list. Every import after that is compared
+with the baseline first:
+
+- **Screens**: the frame keeps its size but holds only the layers that
+  differ, where they were, inside their original (now unpainted) parent
+  frames. A component that changed comes through whole; a large container
+  whose own background or size changed keeps its paint but only its changed
+  children. Layers that only moved or were reordered, or were renamed
+  without looking different, don't count. Tab and menu components are kept
+  only if they changed.
+- **Storybook**: only the states that are new or look different are
+  imported; components with none are left out.
+
+A capture identical to its baseline isn't imported at all, and the status
+line says what was found. With several baselines loaded, each import is
+compared with the one for the same screen, layout and theme. Remove the
+baselines to import in full again.
+
+The same comparison is available outside Figma:
+
+```bash
+yarn figma:diff figma-captures/old.figma-layout.json figma-captures/new.figma-layout.json
+```
+
+writes `new.changes.figma-layout.json`, which imports like any capture. The
+launcher's **Save differences only** does this for two captures picked from
+its list. Capture with `--stamp` (the launcher does by default) so the
+earlier capture isn't overwritten by the next one.
+
+Things removed since the baseline can't be shown; they are counted in the
+summary.
+
+### Linked prototypes
+
+If the file has a prototype (screens wired together with interactions), new
+imports can pick those interactions up instead of being wired by hand.
+
+1. Open the page that holds the prototype and click **Use this page as
+   master**. The choice is saved in the file.
+2. Go to the page you import into. With **Link imports to the master** on,
+   every screen you import is linked as it lands. **Link this page now**
+   does the same for screens already there (the selected ones, or all).
+
+Linking works in two steps, both by similarity rather than exact names:
+
+- Each imported **screen** is paired with a master screen: the one captured
+  from the same route if the master's screens are imports too, otherwise
+  the one whose name shares the most words ("Configuration" pairs with
+  "gSender #/configuration — 1440×900 Light").
+- Within a pair, each master **layer that has an interaction** is matched to
+  the imported layer most like it: by name, by its chain of parent layers
+  (tolerating extra or missing wrappers), and by where it sits in the
+  screen. A layer with a generic name only matches when both its place in
+  the tree and its position agree.
+
+Matched layers get a copy of the interaction (trigger, animation, overlay
+settings) with its destination swapped for the corresponding screen on the
+import page. Flow starting points are copied too. The status line reports
+how many interactions were linked, how many layers found no match, and how
+many links were dropped because their destination has no counterpart on the
+page (Figma can't link across pages). If you import onto the master page
+itself, links to screens that weren't re-imported keep pointing at the
+master's originals.
 
 ### Tabs, menus and popovers
 
@@ -282,6 +475,18 @@ components come through too.
   element's computed color. That's how custom theme colors and
   `var(--primary)` colors resolve to the right value in the current theme.
 
+## Developing the tool
+
+```bash
+yarn figma:test          # masking, matching, state planning, launcher arguments
+yarn figma:sync-plugin   # after editing shared/*.cjs
+```
+
+A Figma plugin is two files that can't import anything, so
+`shared/diff.cjs` and `shared/match.cjs` are pasted into `ui.html` and
+`code.js` between marker comments by `sync-plugin.mjs`. Edit the files in
+`shared/`, run the sync, and commit both; the tests fail if they drift.
+
 ## Limitations
 
 - Fonts: CSS generic families map to fonts you are likely to have
@@ -300,7 +505,12 @@ components come through too.
   still blank, re-import with **Font → Inter + Inconsolata**.
 - `::before`/`::after` boxes are not captured, except icon-font glyphs, which
   are screenshotted.
-- Hover, focus and animation states are captured as they were at that moment.
+- Hover, focus and animation states are captured as they were at that moment
+  (the Storybook capture's `--interaction-states` forces them for
+  single-control stories).
+- Linked prototypes and difference imports run inside Figma and have only
+  been exercised through their shared logic's tests, not against every kind
+  of file; check a linked flow in Figma's prototype view before relying on it.
 - Only the popups visible on the captured screen are opened. Menus inside other
   tabs, and nested submenus, aren't.
 - Grid containers stay absolutely positioned. Only non-wrapping flex

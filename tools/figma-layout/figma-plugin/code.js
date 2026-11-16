@@ -1,11 +1,20 @@
 /*
  * Layout Importer — rebuilds a .figma-layout.json capture (see
  * ../capture/serialize.js) as Figma frames, text, vectors and images.
+ * Storybook captures (../capture/storybook.mjs) become component sets, and
+ * imported screens can be wired up to follow a master prototype.
  */
-figma.showUI(__html__, { width: 320, height: 660, themeColors: true });
+figma.showUI(__html__, { width: 340, height: 720, themeColors: true });
 figma.clientStorage.getAsync('options').then((options) => {
     if (options) figma.ui.postMessage({ type: 'options', options });
 });
+const LAYOUT_LABELS = { desktop: 'Desktop', pendant: 'Pendant', android: 'Android' };
+// Desktop captures keep the name they always had.
+function layoutLabel(doc) {
+    return doc.layout && doc.layout !== 'desktop'
+        ? `${LAYOUT_LABELS[doc.layout] || doc.layout} `
+        : '';
+}
 
 const COLLECTION_NAME = 'Tailwind colors';
 const FALLBACK_FONT = { family: 'Inter', style: 'Regular' };
@@ -67,14 +76,75 @@ figma.ui.onmessage = async (msg) => {
         await figma.clientStorage.setAsync('options', msg.options);
         return;
     }
+    if (msg.type === 'mark-master' || msg.type === 'clear-master') {
+        figma.root.setPluginData(
+            MASTER_KEY,
+            msg.type === 'mark-master' ? figma.currentPage.id : '',
+        );
+        await postMaster();
+        return;
+    }
+    if (msg.type === 'link-now') {
+        try {
+            const picked = screensOf(figma.currentPage).filter((n) =>
+                figma.currentPage.selection.some(
+                    (sel) => sel === n || isInside(sel, n),
+                ),
+            );
+            const master = await masterPage();
+            if (!picked.length && master === figma.currentPage)
+                throw new Error(
+                    'This page is the master. Select the screens on it to link, or switch to the page with your imports.',
+                );
+            const targets = picked.length
+                ? picked
+                : screensOf(figma.currentPage);
+            if (!targets.length)
+                throw new Error('There are no screens on this page to link.');
+            progress('Linking to the master prototype…');
+            const linked = await linkToMaster(targets);
+            figma.ui.postMessage({ type: 'done', text: linkSummary(linked) });
+        } catch (e) {
+            console.error(e);
+            figma.ui.postMessage({
+                type: 'error',
+                text: String((e && e.message) || e),
+            });
+        }
+        return;
+    }
     if (msg.type !== 'import') return;
     try {
         const created = [];
+        const screens = [];
         const texts = [];
         const fontsUsed = {};
+        let components = 0;
+        let variants = 0;
         let x = nextFreeX();
         for (let i = 0; i < msg.docs.length; i++) {
             const doc = msg.docs[i];
+            if (doc.kind === 'storybook') {
+                progress(
+                    `Importing ${i + 1}/${msg.docs.length}: Storybook (${doc.components.length} components)`,
+                );
+                const section = await importStorybook(
+                    doc,
+                    msg.options,
+                    texts,
+                    fontsUsed,
+                );
+                section.x = x;
+                section.y = 0;
+                x += section.width + 200;
+                created.push(section);
+                components += doc.components.length;
+                variants += doc.components.reduce(
+                    (n, c) => n + c.variants.length,
+                    0,
+                );
+                continue;
+            }
             progress(`Importing ${i + 1}/${msg.docs.length}: ${doc.root.name}`);
             const { frame, section } = await importDoc(
                 doc,
@@ -86,6 +156,7 @@ figma.ui.onmessage = async (msg) => {
             frame.y = 0;
             x += frame.width + 200;
             created.push(frame);
+            screens.push(frame);
             if (section) {
                 section.x = x - 100;
                 section.y = 0;
@@ -101,30 +172,51 @@ figma.ui.onmessage = async (msg) => {
             const k = f === figma.mixed ? 'mixed' : `${f.family} ${f.style}`;
             tally[k] = (tally[k] || 0) + 1;
         }
+        // After everything is built, so links can point at any new screen.
+        let linked = '';
+        if (msg.options.linkProto && screens.length) {
+            try {
+                if (await masterPage()) {
+                    progress('Linking to the master prototype…');
+                    linked = ` ${linkSummary(await linkToMaster(screens))}`;
+                }
+            } catch (e) {
+                console.error(e);
+                linked = ` Not linked to the master: ${(e && e.message) || e}`;
+            }
+        }
         figma.currentPage.selection = created;
         figma.viewport.scrollAndZoomIntoView(created);
-        const tabs = msg.docs.reduce(
+        const screenDocs = msg.docs.filter((d) => d.kind !== 'storybook');
+        const tabs = screenDocs.reduce(
             (n, d) =>
                 n + (d.states || []).filter((st) => st.kind === 'tabs').length,
             0,
         );
-        const pops = msg.docs.reduce(
+        const pops = screenDocs.reduce(
             (n, d) =>
                 n +
                 (d.states || []).filter((st) => st.kind === 'popover').length,
             0,
         );
-        const extras =
-            msg.options.states === false || !(tabs || pops)
-                ? ''
-                : `${tabs} tab group(s) and ${pops} menu(s)/popover(s) as components`;
+        const parts = [];
+        if (screens.length) parts.push(`${screens.length} screen(s)`);
+        if (components)
+            parts.push(
+                `${components} Storybook component(s) with ${variants} state(s)`,
+            );
+        parts.push(`${texts.length} text layers`);
+        if (msg.options.states !== false && (tabs || pops))
+            parts.push(
+                `${tabs} tab group(s) and ${pops} menu(s)/popover(s) as components`,
+            );
         const fonts = Object.keys(tally)
             .sort((a, b) => tally[b] - tally[a])
             .map((k) => `${k} ×${tally[k]}`)
             .join(', ');
         figma.ui.postMessage({
             type: 'done',
-            text: `Imported ${msg.docs.length} screen(s), ${texts.length} text layers${extras ? `, ${extras}` : ''}.${fonts ? ` Fonts: ${fonts}.` : ''}${failedFonts.length ? ` Couldn't load: ${failedFonts.splice(0).join(', ')}.` : ''}`,
+            text: `${msg.note ? `${msg.note} ` : ''}Imported ${parts.join(', ')}.${linked}${fonts ? ` Fonts: ${fonts}.` : ''}${failedFonts.length ? ` Couldn't load: ${failedFonts.splice(0).join(', ')}.` : ''}`,
         });
     } catch (e) {
         console.error(e);
@@ -179,8 +271,9 @@ async function importDoc(doc, options, texts, fontsUsed) {
         stateNodes: {},
     };
     const frame = await build(root, state);
-    frame.name = `${doc.root.name} — ${doc.viewport.width}×${doc.viewport.height} ${doc.theme}`;
+    frame.name = `${doc.root.name} — ${layoutLabel(doc)}${doc.viewport.width}×${doc.viewport.height} ${doc.theme}`;
     frame.setPluginData('sourceUrl', doc.source.url);
+    frame.setPluginData('layout', doc.layout || 'desktop');
     frame.setPluginData('capturedAt', doc.source.capturedAt);
     const section = states.length
         ? await buildStates(states, frame, state)
@@ -198,6 +291,543 @@ async function importDoc(doc, options, texts, fontsUsed) {
         }
     }
     return { frame, section };
+}
+
+/* -------------------------------------------------------------------- */
+/* Storybook                                                            */
+/* -------------------------------------------------------------------- */
+
+const SET_GAP = 120;
+const SET_COLUMN_HEIGHT = 6000;
+const SET_MAX_WIDTH = 2400;
+
+// A Storybook capture holds components rather than a screen. Each becomes a
+// component set with one variant per story or control state; the variant
+// properties are `Story` plus each control the states differ in, so the
+// state can be picked from an instance's properties like a tab can.
+async function importStorybook(doc, options, texts, fontsUsed) {
+    const roots = [];
+    for (const comp of doc.components) {
+        for (const v of comp.variants) {
+            if (options.simplify) v.node = simplify(v.node, true);
+            roots.push(v.node);
+        }
+    }
+    const state = {
+        options,
+        doc,
+        total: roots.reduce((n, r) => n + countNodes(r), 0),
+        done: 0,
+        fonts: await prepareFonts(roots, options.font, fontsUsed),
+        texts,
+        colorVars: options.variables ? await colorVariables(doc) : null,
+        imageHashes: {},
+        stateNodes: {},
+    };
+    const section = figma.createSection();
+    section.name = `Storybook — ${layoutLabel(doc)}${doc.viewport.width}×${doc.viewport.height} ${doc.theme}${doc.mask ? ' (changes)' : ''}`;
+    section.setPluginData('layout', doc.layout || 'desktop');
+    section.setPluginData('capturedAt', doc.source.capturedAt);
+    let x = SECTION_PADDING;
+    let y = SECTION_PADDING;
+    let columnWidth = 0;
+    let bottom = SECTION_PADDING;
+    for (const comp of doc.components) {
+        progress(`Building ${comp.title} (${comp.variants.length} states)…`);
+        const variants = [];
+        for (const v of comp.variants) {
+            const built = await build(v.node, state);
+            const c = figma.createComponentFromNode(built);
+            c.name = v.name;
+            if (v.storyId) c.setPluginData('storyId', v.storyId);
+            if (v.args) c.setPluginData('args', JSON.stringify(v.args));
+            variants.push(c);
+        }
+        const set = figma.combineAsVariants(variants, section);
+        set.name = comp.title;
+        if (comp.description) set.description = comp.description;
+        if (comp.importPath) set.setPluginData('storyFile', comp.importPath);
+        layoutVariants(set, variants);
+        if (y > SECTION_PADDING && y + set.height > SET_COLUMN_HEIGHT) {
+            x += columnWidth + SET_GAP;
+            y = SECTION_PADDING;
+            columnWidth = 0;
+        }
+        set.x = x;
+        set.y = y;
+        y += set.height + SET_GAP;
+        columnWidth = Math.max(columnWidth, set.width);
+        bottom = Math.max(bottom, y - SET_GAP);
+    }
+    section.resizeWithoutConstraints(
+        x + columnWidth + SECTION_PADDING,
+        bottom + SECTION_PADDING,
+    );
+    if (state.colorVars) {
+        try {
+            section.setExplicitVariableModeForCollection(
+                state.colorVars.collection,
+                state.colorVars.modeId,
+            );
+        } catch (e) {
+            console.warn('variable mode not set', e);
+        }
+    }
+    return section;
+}
+
+// Small states (buttons) flow in rows; a set of big ones is a column.
+function layoutVariants(set, variants) {
+    const gap = 40;
+    const pad = 40;
+    const widest = variants.reduce((w, v) => Math.max(w, v.width), 0);
+    const total =
+        variants.reduce((w, v) => w + v.width, 0) + gap * (variants.length - 1);
+    set.paddingTop = set.paddingRight = set.paddingBottom = set.paddingLeft = pad;
+    set.itemSpacing = gap;
+    try {
+        set.layoutMode = 'HORIZONTAL';
+        set.layoutWrap = 'WRAP';
+        set.counterAxisSpacing = gap;
+        set.primaryAxisSizingMode = 'FIXED';
+        set.counterAxisSizingMode = 'AUTO';
+        set.resize(
+            Math.min(total, Math.max(widest, SET_MAX_WIDTH)) + pad * 2,
+            set.height,
+        );
+    } catch (e) {
+        // Wrapping auto layout isn't available everywhere.
+        set.layoutMode = 'VERTICAL';
+        set.primaryAxisSizingMode = 'AUTO';
+        set.counterAxisSizingMode = 'AUTO';
+    }
+}
+
+/* -------------------------------------------------------------------- */
+/* Linked prototypes                                                    */
+/* -------------------------------------------------------------------- */
+
+/* <shared:match> */
+/* Generated from shared/match.cjs by sync-plugin.mjs. Don't edit here. */
+/*
+ * Linked prototypes: finds which layer of an imported screen corresponds to
+ * a layer of the master prototype, by how alike their names are and where
+ * they sit in the layer tree.
+ *
+ * Plain ES2017 with no imports: it runs in Node (tests) and inside the
+ * Figma plugin, where sync-plugin.mjs pastes it into code.js. Edit it here,
+ * then run `yarn figma:sync-plugin`.
+ *
+ * It works on plain descriptors rather than Figma nodes:
+ *   { name, path: [ancestor names, outermost first], cx, cy, w, h }
+ * with cx/cy the layer's centre and w/h its size, as fractions of the frame.
+ */
+var L2FMatch = (function () {
+    // Words that say how a screen was captured rather than which screen it
+    // is: sizes, themes, layouts, and the suffixes the importer adds.
+    var NOISE = {
+        light: 1,
+        dark: 1,
+        desktop: 1,
+        changes: 1,
+        gsender: 1,
+        http: 1,
+        https: 1,
+        localhost: 1,
+        index: 1,
+        html: 1,
+    };
+
+    function tokens(name) {
+        var out = [];
+        String(name || '')
+            // Before the camelCase split turns it into "g" and "sender"
+            .replace(/gsender/gi, ' ')
+            // camelCase and PascalCase component names split into words
+            .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+            .toLowerCase()
+            .replace(/\d+\s*[×x]\s*\d+/g, ' ')
+            .split(/[^a-z0-9]+/)
+            .forEach(function (t) {
+                if (!t || NOISE[t] || /^\d+$/.test(t)) return;
+                out.push(t);
+            });
+        return out;
+    }
+
+    // 0..1. Exact (ignoring case and noise) is 1; otherwise shared words,
+    // counting a name wholly contained in the other ("Configuration" in
+    // "gSender #/configuration") as a strong match.
+    function nameSimilarity(a, b) {
+        var ta = tokens(a);
+        var tb = tokens(b);
+        if (!ta.length || !tb.length)
+            return String(a || '').trim().toLowerCase() ===
+                String(b || '').trim().toLowerCase() && String(a || '').trim()
+                ? 1
+                : 0;
+        var setB = {};
+        tb.forEach(function (t) {
+            setB[t] = 1;
+        });
+        var setA = {};
+        var shared = 0;
+        ta.forEach(function (t) {
+            if (setA[t]) return;
+            setA[t] = 1;
+            if (setB[t]) shared++;
+        });
+        var sizeA = Object.keys(setA).length;
+        var sizeB = Object.keys(setB).length;
+        var jaccard = shared / (sizeA + sizeB - shared);
+        var contained = shared / Math.min(sizeA, sizeB);
+        return 0.5 * jaccard + 0.5 * contained;
+    }
+
+    // 0..1: how alike two ancestor chains are. The longest run of matching
+    // names in order, with ancestors nearer the layer counting for more, so
+    // extra wrappers near the top of one tree cost little.
+    function pathSimilarity(a, b) {
+        a = a || [];
+        b = b || [];
+        if (!a.length && !b.length) return 1;
+        if (!a.length || !b.length) return 0.3;
+        var n = a.length;
+        var m = b.length;
+        var weight = function (i, len) {
+            return 1 + (2 * (i + 1)) / len;
+        };
+        var dp = [];
+        for (var i = 0; i <= n; i++) {
+            dp.push([]);
+            for (var j = 0; j <= m; j++) dp[i].push(0);
+        }
+        for (var x = 1; x <= n; x++) {
+            for (var y = 1; y <= m; y++) {
+                var sim = nameSimilarity(a[x - 1], b[y - 1]);
+                var take =
+                    sim >= 0.6
+                        ? dp[x - 1][y - 1] +
+                          (sim * (weight(x - 1, n) + weight(y - 1, m))) / 2
+                        : 0;
+                dp[x][y] = Math.max(dp[x - 1][y], dp[x][y - 1], take);
+            }
+        }
+        var total = function (len) {
+            var t = 0;
+            for (var k = 0; k < len; k++) t += weight(k, len);
+            return t;
+        };
+        return dp[n][m] / Math.max(total(n), total(m));
+    }
+
+    function positionSimilarity(a, b) {
+        var dx = (a.cx || 0) - (b.cx || 0);
+        var dy = (a.cy || 0) - (b.cy || 0);
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var size =
+            Math.abs((a.w || 0) - (b.w || 0)) + Math.abs((a.h || 0) - (b.h || 0));
+        return Math.max(0, 1 - dist / 0.3) * 0.75 + Math.max(0, 1 - size / 0.3) * 0.25;
+    }
+
+    function score(a, b) {
+        var name = nameSimilarity(a.name, b.name);
+        var path = pathSimilarity(a.path, b.path);
+        var pos = positionSimilarity(a, b);
+        // A layer with a generic name ("div", "button") can still match on
+        // where it is, but only when both its place in the tree and its
+        // position agree.
+        if (name < 0.6 && !(name >= 0.3 && path >= 0.8 && pos >= 0.8)) return 0;
+        return 0.45 * name + 0.35 * path + 0.2 * pos;
+    }
+
+    var THRESHOLD = 0.55;
+
+    // Index of the best candidate for `target`, or -1.
+    function bestMatch(target, candidates, threshold) {
+        var best = -1;
+        var bestScore = threshold === undefined ? THRESHOLD : threshold;
+        for (var i = 0; i < candidates.length; i++) {
+            var s = score(target, candidates[i]);
+            if (s > bestScore) {
+                best = i;
+                bestScore = s;
+            }
+        }
+        return best;
+    }
+
+    // Pairs screens of the master with imported screens, each used once,
+    // best pairs first. `masters` and `imports` are [{ name, url }]; a
+    // shared source URL (both are captures of the same route) wins outright.
+    // Returns [{ master, target, score }] of indexes.
+    function matchFrames(masters, imports, threshold) {
+        var min = threshold === undefined ? 0.5 : threshold;
+        var pairs = [];
+        for (var i = 0; i < masters.length; i++) {
+            for (var j = 0; j < imports.length; j++) {
+                var a = masters[i];
+                var b = imports[j];
+                var s =
+                    a.url && b.url && routeOf(a.url) === routeOf(b.url)
+                        ? 1
+                        : nameSimilarity(a.name, b.name);
+                // Same route captured for another layout is a weaker match
+                // than the same route in the same layout.
+                if (a.layout && b.layout && a.layout !== b.layout) s *= 0.8;
+                if (s >= min) pairs.push({ master: i, target: j, score: s });
+            }
+        }
+        pairs.sort(function (p, q) {
+            return q.score - p.score;
+        });
+        var usedM = {};
+        var usedT = {};
+        return pairs.filter(function (p) {
+            if (usedM[p.master] || usedT[p.target]) return false;
+            usedM[p.master] = usedT[p.target] = true;
+            return true;
+        });
+    }
+
+    function routeOf(url) {
+        var m = String(url).match(/^[a-z]+:\/\/[^/]+(.*)$/i);
+        return (m ? m[1] : String(url)).replace(/\/+$/, '') || '/';
+    }
+
+    return {
+        tokens: tokens,
+        nameSimilarity: nameSimilarity,
+        pathSimilarity: pathSimilarity,
+        positionSimilarity: positionSimilarity,
+        score: score,
+        bestMatch: bestMatch,
+        matchFrames: matchFrames,
+    };
+})();
+/* </shared:match> */
+
+const MASTER_KEY = 'masterPage';
+const SCREEN_TYPES = ['FRAME', 'COMPONENT', 'INSTANCE'];
+
+async function masterPage() {
+    const id = figma.root.getPluginData(MASTER_KEY);
+    if (!id) return null;
+    const page = await figma.getNodeByIdAsync(id);
+    return page && page.type === 'PAGE' ? page : null;
+}
+
+async function postMaster() {
+    const page = await masterPage();
+    figma.ui.postMessage({
+        type: 'master',
+        name: page ? page.name : null,
+        current: !!page && page === figma.currentPage,
+        page: figma.currentPage.name,
+    });
+}
+
+// Screens are the frames directly on a page, or inside its sections.
+function screensOf(parent) {
+    const out = [];
+    for (const n of parent.children) {
+        if (n.type === 'SECTION') out.push(...screensOf(n));
+        else if (SCREEN_TYPES.includes(n.type)) out.push(n);
+    }
+    return out;
+}
+
+function screenOf(node) {
+    let n = node;
+    while (n.parent && n.parent.type !== 'PAGE' && n.parent.type !== 'SECTION')
+        n = n.parent;
+    return n;
+}
+
+function isInside(node, ancestor) {
+    for (let p = node.parent; p; p = p.parent) if (p === ancestor) return true;
+    return false;
+}
+
+function screenInfo(n) {
+    return {
+        name: n.name,
+        url: n.getPluginData('sourceUrl'),
+        layout: n.getPluginData('layout'),
+    };
+}
+
+// A layer as shared/match.cjs sees it: its name, its ancestors' names, and
+// where it sits in its screen.
+function describeLayer(node, screen) {
+    const path = [];
+    for (let p = node.parent; p && p !== screen && p.type !== 'PAGE'; p = p.parent)
+        path.unshift(p.name);
+    const a = node.absoluteBoundingBox;
+    const s = screen.absoluteBoundingBox;
+    if (!a || !s || !s.width || !s.height)
+        return { name: node.name, path, cx: 0.5, cy: 0.5, w: 0, h: 0 };
+    return {
+        name: node.name,
+        path,
+        cx: (a.x + a.width / 2 - s.x) / s.width,
+        cy: (a.y + a.height / 2 - s.y) / s.height,
+        w: a.width / s.width,
+        h: a.height / s.height,
+    };
+}
+
+// Copies the master prototype's interactions onto `targets` (screens on the
+// current page). Each master screen is paired with the target it most
+// resembles by name or captured route; within a pair, every layer that has
+// an interaction is matched to the target layer most like it in name and
+// place in the layer tree, and its interactions are copied there with
+// their destinations swapped for the corresponding screens on this page.
+async function linkToMaster(targets) {
+    const master = await masterPage();
+    if (!master)
+        throw new Error(
+            'No master prototype yet. Open the page that holds your prototype and click “Use this page as master”.',
+        );
+    await master.loadAsync();
+    const page = figma.currentPage;
+    const samePage = page === master;
+    const targetIds = {};
+    for (const t of targets) targetIds[t.id] = true;
+    const masterScreens = screensOf(master).filter((n) => !targetIds[n.id]);
+    // A link's destination can be any screen here, not only the new ones.
+    const local = samePage ? targets : screensOf(page);
+    const counterpart = {};
+    for (const pair of L2FMatch.matchFrames(
+        masterScreens.map(screenInfo),
+        local.map(screenInfo),
+    ))
+        counterpart[masterScreens[pair.master].id] = local[pair.target];
+
+    const layersOf = {};
+    const layers = (screen) => {
+        if (!layersOf[screen.id]) {
+            const nodes = [screen].concat(screen.findAll(() => true));
+            layersOf[screen.id] = {
+                nodes,
+                descs: nodes.map((n) => describeLayer(n, screen)),
+            };
+        }
+        return layersOf[screen.id];
+    };
+    const twin = (node, from, to) => {
+        if (node === from) return to;
+        const l = layers(to);
+        const i = L2FMatch.bestMatch(describeLayer(node, from), l.descs);
+        return i >= 0 ? l.nodes[i] : null;
+    };
+
+    const result = {
+        master: master.name,
+        screens: 0,
+        links: 0,
+        unmatched: 0,
+        dropped: 0,
+        unpaired: 0,
+    };
+    for (const m of masterScreens) {
+        const t = counterpart[m.id];
+        if (!t || !targetIds[t.id]) continue;
+        result.screens++;
+        const sources = [m]
+            .concat(m.findAll((n) => 'reactions' in n && n.reactions.length > 0))
+            .filter((n) => 'reactions' in n && n.reactions.length > 0);
+        for (const src of sources) {
+            const dest = twin(src, m, t);
+            if (!dest || !('setReactionsAsync' in dest)) {
+                result.unmatched++;
+                continue;
+            }
+            const reactions = [];
+            for (const reaction of src.reactions) {
+                const copy = await remapReaction(
+                    reaction,
+                    counterpart,
+                    samePage,
+                    twin,
+                );
+                if (copy) reactions.push(copy);
+                else result.dropped++;
+            }
+            if (!reactions.length) continue;
+            try {
+                await dest.setReactionsAsync(reactions);
+                result.links += reactions.length;
+            } catch (e) {
+                console.warn('interaction not copied', src.name, e);
+                result.unmatched++;
+            }
+        }
+    }
+    result.unpaired = targets.filter(
+        (t) => !masterScreens.some((m) => counterpart[m.id] === t),
+    ).length;
+
+    // Flows that start on a paired screen start on its copy too.
+    try {
+        const flows = page.flowStartingPoints.slice();
+        for (const flow of master.flowStartingPoints) {
+            const t = counterpart[flow.nodeId];
+            if (!t || !targetIds[t.id]) continue;
+            if (flows.some((f) => f.nodeId === t.id)) continue;
+            flows.push({ nodeId: t.id, name: flow.name });
+        }
+        page.flowStartingPoints = flows;
+    } catch (e) {
+        console.warn('flow starting points not copied', e);
+    }
+    return result;
+}
+
+// A copy of one interaction with every destination pointed at this page's
+// version of the screen, or null if none of its destinations exist here.
+async function remapReaction(reaction, counterpart, samePage, twin) {
+    const copy = JSON.parse(JSON.stringify(reaction));
+    const actions = copy.actions || (copy.action ? [copy.action] : []);
+    const kept = [];
+    for (const action of actions) {
+        if (!action || !action.destinationId) {
+            // Back, close overlay, open URL, set variable: nothing to remap.
+            if (action) kept.push(action);
+            continue;
+        }
+        const dest = await figma.getNodeByIdAsync(action.destinationId);
+        if (!dest) continue;
+        const screen = screenOf(dest);
+        const mapped = counterpart[screen.id];
+        if (mapped) {
+            const node = twin(dest, screen, mapped);
+            if (!node) continue;
+            action.destinationId = node.id;
+            kept.push(action);
+        } else if (samePage) {
+            // No copy of that screen; keep pointing at the master's.
+            kept.push(action);
+        }
+    }
+    if (!kept.length) return null;
+    copy.actions = kept;
+    // `action` is the deprecated single-action form; Figma rejects both.
+    delete copy.action;
+    return copy;
+}
+
+function linkSummary(r) {
+    if (!r.screens)
+        return `No screen here matches one on the master page “${r.master}”. Screens are matched by name or by the route they were captured from.`;
+    const notes = [];
+    if (r.unmatched)
+        notes.push(`${r.unmatched} layer(s) with interactions had no match`);
+    if (r.dropped)
+        notes.push(`${r.dropped} link(s) go to screens that aren't on this page`);
+    if (r.unpaired)
+        notes.push(`${r.unpaired} screen(s) have no counterpart on the master`);
+    return `Linked ${r.links} interaction(s) on ${r.screens} screen(s) to follow “${r.master}”${notes.length ? ` (${notes.join('; ')})` : ''}.`;
 }
 
 /* -------------------------------------------------------------------- */
@@ -1076,3 +1706,9 @@ async function colorVariables(doc) {
     }
     return { collection, modeId: mode.modeId, vars };
 }
+
+/* -------------------------------------------------------------------- */
+
+// Last, once everything above is defined.
+postMaster();
+figma.on('currentpagechange', postMaster);

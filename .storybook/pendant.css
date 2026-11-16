@@ -1,0 +1,8 @@
+/* The pendant (tablet) app's stylesheet, built with the pendant's own Tailwind
+   config so its pendant-only tokens (state-*, axis-*, action-*, laser, the IBM
+   Plex font stacks) generate utilities. Storybook's PostCSS setup points at
+   src/app, whose config has none of those; @config overrides it for this file
+   only. Imported with ?inline by pendant.jsx and mounted only while a pendant
+   story is on screen, so desktop stories never see the pendant's globals. */
+@import "../src/pendant/src/index.css";
+@config "../src/pendant/tailwind.config.ts";

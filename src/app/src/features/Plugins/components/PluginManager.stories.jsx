@@ -224,12 +224,16 @@ export const InstallNeedsDesktopApp = {
             }),
         );
 
-        // Picking a source opens a native dialog, which only the Electron app has
+        // Picking a folder opens a native dialog, which only the Electron app has;
+        // a .zip falls back to a browser file input
         await expect(
-            dialog.getByText(/Picking a file needs the gSender desktop app/),
+            dialog.getByText(/Picking a folder needs the gSender desktop app/),
         ).toBeVisible();
         await expect(
             dialog.getByRole('button', { name: /From folder/ }),
         ).toBeDisabled();
+        await expect(
+            dialog.getByRole('button', { name: /From \.zip/ }),
+        ).toBeEnabled();
     },
 };

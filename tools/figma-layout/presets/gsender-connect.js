@@ -12,7 +12,12 @@
  * URL the page itself uses, or this gets a second controller of its own.
  */
 // biome-ignore lint/correctness/noUnusedVariables: called from the --setup string
-async function l2fConnectMachine(host, ethernetPort, appSrc = '/src/') {
+async function l2fConnectMachine(
+    host,
+    ethernetPort,
+    appSrc = '/src/',
+    viaWidget = false,
+) {
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     let controller;
     let store;
@@ -36,6 +41,29 @@ async function l2fConnectMachine(host, ethernetPort, appSrc = '/src/') {
 
     // A fresh page learns about an existing connection over the socket.
     for (let i = 0; i < 10 && !controller.port; i++) await sleep(200);
+
+    // The pendant's connection widget keeps its own state: it only shows
+    // "connected" for a connection it opened. Ask it to connect, the way
+    // the app's own reconnect requests do, and fall through to connecting
+    // directly if it isn't there to answer.
+    if (!controller.port && viaWidget) {
+        const entry = performance
+            .getEntriesByType('resource')
+            .find((e) => /\/pubsub-js\.js/.test(e.name));
+        if (entry) {
+            try {
+                // The same URL the app loaded, so it is the same instance.
+                const pubsub = (await import(entry.name)).default;
+                store.set('widgets.connection.port', host);
+                store.set('widgets.connection.ethernetPort', ethernetPort);
+                pubsub.publish('reconnect');
+                for (let i = 0; i < 40 && !controller.port; i++)
+                    await sleep(200);
+            } catch (e) {
+                console.warn('[layout-to-figma] widget connect failed', e);
+            }
+        }
+    }
 
     if (!controller.port) {
         // No reply means the page has no working socket (a broken build).

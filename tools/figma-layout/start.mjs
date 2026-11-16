@@ -15,6 +15,9 @@
  *   yarn figma --header-states                   also break out header menus
  *   yarn figma --all-states                      ...and the sidebar's too
  *   yarn figma --pendant                         the pendant (tablet) UI
+ *   yarn figma --android                         the pendant as the Android app shows it
+ *   yarn figma --storybook                       every story and its control states
+ *   yarn figma:ui                                all of the above from a web page
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -30,7 +33,7 @@ const RENDERER_URL = 'http://localhost:5173/';
 // The pendant SPA (src/pendant) has its own dev server; it proxies /api and
 // /socket.io to the same backend. Its window is a portrait tablet.
 const PENDANT_URL = 'http://localhost:5174/';
-const PENDANT_SIZE = ['800', '1280'];
+const STORYBOOK_URL = 'http://localhost:6006/';
 const START_TIMEOUT = 5 * 60 * 1000; // a cold `yarn dev` builds first
 const isWindows = process.platform === 'win32';
 // grblHAL digital twin; gSender shows its full UI only with a machine attached.
@@ -49,6 +52,8 @@ const own = {
     allStates: false,
     headerStates: false,
     pendant: false,
+    android: false,
+    storybook: false,
     machine: undefined, // default depends on the mode, see below
 };
 const passthrough = [];
@@ -60,6 +65,8 @@ for (let i = 0; i < args.length; i++) {
     else if (a === '--all-states') own.allStates = true;
     else if (a === '--header-states') own.headerStates = true;
     else if (a === '--pendant') own.pendant = true;
+    else if (a === '--android') own.android = true;
+    else if (a === '--storybook') own.storybook = true;
     else if (a === '--help') own.help = true;
     else if (a === '--no-machine') own.machine = null;
     else if (a === '--machine') own.machine = args[++i];
@@ -69,10 +76,20 @@ for (let i = 0; i < args.length; i++) {
 // Live mode leaves connecting to you (use the app's Connect menu as usual);
 // a batch capture connects to the twin unless told otherwise.
 if (own.machine === undefined) own.machine = own.live ? null : DEFAULT_MACHINE;
+// The Android app is the pendant UI in a WebView, so both use its dev server.
+const usesPendant = own.pendant || own.android;
+const layout = own.android ? 'android' : own.pendant ? 'pendant' : 'desktop';
+if (own.storybook && own.live) {
+    console.error(
+        '--storybook captures every story by itself; it has no live mode. Drop one of the two.',
+    );
+    process.exit(1);
+}
 
 if (own.help) {
     console.log(`
-Usage: yarn figma [--live] [--keep] [--open] [--machine host:port] [capture options] [url ...]
+Usage: yarn figma [--live | --storybook] [--pendant | --android] [--keep] [--open]
+                  [--machine host:port] [capture options] [url ...]
 
 Starts the gSender dev servers if needed, connects to a machine, captures,
 and stops the servers again.
@@ -89,11 +106,21 @@ and stops the servers again.
                         machine info, notifications)
   --pendant             Capture the pendant (tablet) UI instead: starts its
                         dev server on 5174 and uses an 800×1280 window
+  --android             Capture the pendant UI the way the Android app shows
+                        it: a 1280×800 landscape tablet with touch input, the
+                        WebView's user agent and the Android shell's bridge.
+                        --portrait turns it.
+  --storybook           Capture Storybook instead of the running app: every
+                        story of every component, and the states its controls
+                        reach, as component sets. Starts Storybook if needed;
+                        the backend and machine aren't used. With --pendant
+                        or --android, only the pendant's stories, at that
+                        layout's size.
   --all-states          Also break out tabs and menus in the header and
                         sidebar (by default only the main area's are, same as
                         --states-in ${DEFAULT_STATES_IN})
 
-${own.live ? 'Live' : 'Capture'} options (passed through):`);
+${own.storybook ? 'Storybook' : own.live ? 'Live' : 'Capture'} options (passed through):`);
     await run(process.execPath, [path.join(HERE, captureScript()), '--help']);
     process.exit(0);
 }
@@ -111,9 +138,15 @@ const attaching = passthrough.includes('--connect');
 
 try {
     let setup = [];
-    if (!attaching) {
+    if (own.storybook) {
+        await ensure('storybook', STORYBOOK_URL, [
+            'storybook',
+            '--ci',
+            '--no-open',
+        ]);
+    } else if (!attaching) {
         await ensure('backend', BACKEND_URL, ['dev']);
-        if (own.pendant)
+        if (usesPendant)
             await ensure('pendant', PENDANT_URL, ['vite:dev:pendant']);
         else await ensure('renderer', RENDERER_URL, ['vite:dev']);
         setup = await machineSetup(own.machine);
@@ -136,17 +169,23 @@ try {
 
 async function runCapture(setup) {
     console.log(
-        own.live ? '\n▶ Opening gSender for live capture…' : '\n▶ Capturing…',
+        own.live
+            ? '\n▶ Opening gSender for live capture…'
+            : own.storybook
+              ? '\n▶ Capturing Storybook (a few minutes for every story)…'
+              : '\n▶ Capturing…',
     );
     const code = await run(
         process.execPath,
-        [
-            path.join(HERE, captureScript()),
-            ...setup,
-            ...statesScope(),
-            ...pendantArgs(),
-            ...passthrough,
-        ],
+        own.storybook
+            ? [path.join(HERE, captureScript()), ...layoutArgs(), ...passthrough]
+            : [
+                  path.join(HERE, captureScript()),
+                  ...setup,
+                  ...statesScope(),
+                  ...layoutArgs(),
+                  ...passthrough,
+              ],
         {
             cwd: ROOT,
         },
@@ -161,13 +200,21 @@ async function runCapture(setup) {
 Next, in the Figma desktop app, open a Design file (not FigJam), then:
   1. First time only: press ⌘/ (Ctrl+/ on Windows), run "Import plugin from manifest",
      and choose ${path.join(HERE, 'figma-plugin', 'manifest.json')}
-  2. Press ⌘/ again, run "Layout Importer", and drop in the .json files.`);
+  2. Press ⌘/ again, run "Layout Importer", and drop in the .json files.${
+      own.storybook
+          ? '\n     Each component becomes a component set with a variant per story and control state.'
+          : ''
+  }`);
         if (own.open) openPath(outDir);
     }
 }
 
 function captureScript() {
-    return own.live ? 'capture/live.mjs' : 'capture/cli.mjs';
+    return own.storybook
+        ? 'capture/storybook.mjs'
+        : own.live
+          ? 'capture/live.mjs'
+          : 'capture/cli.mjs';
 }
 
 async function ensure(name, url, yarnArgs) {
@@ -230,12 +277,12 @@ async function machineSetup(machine) {
     );
     // The pendant reaches the app's modules through its `app` alias, which
     // Vite serves from outside its root.
-    const appSrc = own.pendant
+    const appSrc = usesPendant
         ? `/@fs${ROOT.split(path.sep).join('/').replace(/^(?=[A-Za-z]:)/, '/')}/src/app/src/`
         : '/src/';
     return [
         '--setup',
-        `${preset}\nawait l2fConnectMachine(${JSON.stringify(host)}, ${port}, ${JSON.stringify(appSrc)});`,
+        `${preset}\nawait l2fConnectMachine(${JSON.stringify(host)}, ${port}, ${JSON.stringify(appSrc)}, ${usesPendant});`,
     ];
 }
 
@@ -244,23 +291,19 @@ function statesScope() {
         /^--(states-in|states-skip|no-states)(=|$)/.test(a),
     );
     // The pendant has no <main>; its screens are small, so look everywhere.
-    if (own.allStates || own.pendant || custom) return [];
+    if (own.allStates || usesPendant || custom) return [];
     const scope = own.headerStates
         ? `${DEFAULT_STATES_IN}, header`
         : DEFAULT_STATES_IN;
     return ['--states-in', scope];
 }
 
-// The pendant's URL and window size, unless given on the command line.
-function pendantArgs() {
-    if (!own.pendant) return [];
-    const out = [];
-    if (!passthrough.some((a) => /^(-w|--width)(=|$)/.test(a)))
-        out.push('--width', PENDANT_SIZE[0], '--height', PENDANT_SIZE[1]);
-    if (!passthrough.some((a) => /^https?:/.test(a)) &&
-        !passthrough.some((a) => /^--url(=|$)/.test(a)))
-        out.push(PENDANT_URL);
-    return out;
+// Tells the capture script which layout this is; it knows each one's URL
+// and window size. Storybook picks its own layouts unless one was asked for.
+function layoutArgs() {
+    if (passthrough.some((a) => /^--layout(=|$)/.test(a))) return [];
+    if (own.storybook && layout === 'desktop') return [];
+    return ['--layout', layout];
 }
 
 function isTcpOpen(host, port) {

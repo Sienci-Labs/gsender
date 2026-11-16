@@ -1941,8 +1941,134 @@
         return { node, rasters: ctx.rasters, tokens: { ...tokens } };
     }
 
+    // The box around everything a subtree paints, following clipping, or
+    // null if it paints nothing.
+    function paintedBounds(n, clip) {
+        let box = { l: n.x, t: n.y, r: n.x + n.w, b: n.y + n.h };
+        if (clip) {
+            box = {
+                l: Math.max(box.l, clip.l),
+                t: Math.max(box.t, clip.t),
+                r: Math.min(box.r, clip.r),
+                b: Math.min(box.b, clip.b),
+            };
+            if (box.r <= box.l || box.b <= box.t) return null;
+        }
+        const paints =
+            n.type !== 'FRAME' ||
+            n.fills ||
+            n.stroke ||
+            n.effects ||
+            n.raster ||
+            n.image;
+        let out = paints ? box : null;
+        const inner = n.clip ? box : clip;
+        for (const c of n.children || []) {
+            const b = paintedBounds(c, inner);
+            if (!b) continue;
+            out = out
+                ? {
+                      l: Math.min(out.l, b.l),
+                      t: Math.min(out.t, b.t),
+                      r: Math.max(out.r, b.r),
+                      b: Math.max(out.b, b.b),
+                  }
+                : b;
+        }
+        return out;
+    }
+
+    // Serializes the whole page, cropped to what it actually paints plus
+    // `padding`. Used for Storybook stories, which render one component in
+    // an otherwise empty page (dialogs and menus it opens are portalled to
+    // <body>, so the story's own root element isn't enough).
+    async function captureContent(prefix, options = {}) {
+        idPrefix = prefix;
+        nextId = 1;
+        document
+            .querySelectorAll('[data-l2f-raster]')
+            .forEach((e) => e.removeAttribute('data-l2f-raster'));
+        const page = document.documentElement;
+        const vw = page.clientWidth;
+        const vh = Math.max(page.scrollHeight, window.innerHeight);
+        const rootRect = {
+            left: 0,
+            top: 0,
+            right: vw,
+            bottom: vh,
+            width: vw,
+            height: vh,
+        };
+        const ctx = {
+            dx: window.scrollX,
+            dy: window.scrollY,
+            clip: rootRect,
+            root: rootRect,
+            rasters: [],
+            hoisted: [],
+            raster: !!options.raster,
+        };
+        const body = await walk(document.body, ctx);
+        const children = [].concat(body || []);
+        ctx.hoisted.sort((a, b) => a.order - b.order);
+        children.push(...ctx.hoisted);
+        if (probeHost) {
+            probeHost.remove();
+            probeHost = null;
+        }
+        const pad = options.padding === undefined ? 16 : options.padding;
+        let box = null;
+        for (const c of children) {
+            const b = paintedBounds(c, null);
+            if (!b) continue;
+            box = box
+                ? {
+                      l: Math.min(box.l, b.l),
+                      t: Math.min(box.t, b.t),
+                      r: Math.max(box.r, b.r),
+                      b: Math.max(box.b, b.b),
+                  }
+                : b;
+        }
+        if (!box) return null;
+        const x = Math.max(0, box.l - pad);
+        const y = Math.max(0, box.t - pad);
+        const canvasBg = [
+            getComputedStyle(page).backgroundColor,
+            getComputedStyle(document.body).backgroundColor,
+        ]
+            .map(parseColor)
+            .find(visible) || { r: 1, g: 1, b: 1, a: 1 };
+        const node = {
+            type: 'FRAME',
+            id: prefix + 'root',
+            name: options.name || document.title,
+            x,
+            y,
+            w: Math.min(vw, box.r + pad) - x,
+            h: Math.min(vh, box.b + pad) - y,
+            clip: true,
+            fills: [
+                {
+                    type: 'SOLID',
+                    color: canvasBg,
+                    token: colorToken(document.body, 'bg', canvasBg),
+                },
+            ],
+            children,
+        };
+        return {
+            node,
+            rasters: ctx.rasters,
+            tokens: { ...tokens },
+            theme: page.classList.contains('dark') ? 'Dark' : 'Light',
+        };
+    }
+
     window.__layoutToFigma = {
         capture,
+        captureContent,
+        resetCapture,
         download,
         findStates,
         clickTab,

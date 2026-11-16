@@ -113,9 +113,12 @@ export const XAxisNeedsCorrection = {
         await runTuning(canvas, userEvent, 'X', 99);
 
         // Moves with a jog command, so the machine's modal state is untouched
-        await expect(command).toHaveBeenCalledWith('gcode', [
-            '$J=G21 G91 X100 F1000',
-        ]);
+        await expect(command).toHaveBeenCalledWith(
+            'jog:feed',
+            { X: 100 },
+            1000,
+            'mm',
+        );
         await expect(
             await canvas.findByText(/movement was\s+off by/),
         ).toHaveTextContent('off by 1 mm.');
@@ -144,9 +147,12 @@ export const TuneZAxis = {
         await chooseAxis(canvas, userEvent, 'Z-Axis');
         // Z tunes downward: it moves -50 mm
         await runTuning(canvas, userEvent, 'Z', -50, { started: true });
-        await expect(command).toHaveBeenCalledWith('gcode', [
-            '$J=G21 G91 Z-50 F1000',
-        ]);
+        await expect(command).toHaveBeenCalledWith(
+            'jog:feed',
+            { Z: -50 },
+            1000,
+            'mm',
+        );
         await expect(
             await canvas.findByText(/Z-axis looks accurate/),
         ).toBeVisible();
