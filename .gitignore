@@ -6,6 +6,7 @@ package-lock.json
 /dist
 /docs
 /output
+/figma-captures
 /releases
 .idea
 electron-builder.yml
