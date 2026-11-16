@@ -275,10 +275,37 @@ const IN_PAGE = `(() => {
     return true;
 })()`;
 
+// A call into the page that the page never answers (it reloaded while the
+// call was in flight) must fail rather than hang.
+const CALL_TIMEOUT = 45000;
+function answered(promise, what) {
+    let timer;
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+            timer = setTimeout(
+                () => reject(new Error(`page stopped responding (${what})`)),
+                CALL_TIMEOUT,
+            );
+        }),
+    ]).finally(() => clearTimeout(timer));
+}
+
 const call = (cdp, method, ...args) =>
-    cdp.evaluate(
-        `window.__l2fSb.${method}(${args.map((a) => JSON.stringify(a)).join(', ')})`,
+    answered(
+        cdp.evaluate(
+            `window.__l2fSb.${method}(${args.map((a) => JSON.stringify(a)).join(', ')})`,
+        ),
+        method,
     );
+
+// Vite's dev server reloads the page when a story file pulls in a
+// dependency it hasn't bundled yet (the first capture after stories are
+// added), which cuts off whatever was being captured. The reload fixes the
+// cause, so capturing that component again works. After a reload the
+// helpers this script put in the page are gone too, hence the last few.
+const RELOADED =
+    /navigated or closed|Timed out waiting for Page|context was destroyed|Cannot find context|Execution context|stopped responding|__l2fSb|__layoutToFigma|Cannot read properties of undefined \(reading '(ready|show|setArgs|resetArgs|describe|markInteractive|captureContent)'\)/i;
 
 /* -------------------------------------------------------------------- */
 /* Planning                                                             */
@@ -321,8 +348,11 @@ async function loadIndex() {
 async function snapshot(cdp, doc, prefix, name) {
     await waitForStableDom(cdp, 4000, 300);
     const raster = !opts['no-raster'];
-    const json = await cdp.evaluate(
-        `window.__layoutToFigma.captureContent(${JSON.stringify(prefix)}, ${JSON.stringify({ raster, name })}).then(JSON.stringify)`,
+    const json = await answered(
+        cdp.evaluate(
+            `window.__layoutToFigma.captureContent(${JSON.stringify(prefix)}, ${JSON.stringify({ raster, name })}).then(JSON.stringify)`,
+        ),
+        'capture',
     );
     const sub = JSON.parse(json);
     if (!sub) return null;
@@ -562,23 +592,37 @@ async function captureLayout(layout, groups, theme) {
             const title = displayTitle(groups[i].title);
             process.stdout.write(`  ${title} … `);
             try {
-                // A story that never settles (or a dev server that reloads
-                // the page under us) must not hold up the rest.
-                let timer;
-                const { component, stats } = await Promise.race([
-                    captureComponent(cdp, doc, groups[i], i, theme),
-                    new Promise((_, reject) => {
-                        timer = setTimeout(
-                            () =>
-                                reject(
-                                    new Error(
-                                        `gave up after ${COMPONENT_TIMEOUT / 60000} minutes`,
+                // A story that never settles must not hold up the rest.
+                const attempt = () => {
+                    let timer;
+                    return Promise.race([
+                        captureComponent(cdp, doc, groups[i], i, theme),
+                        new Promise((_, reject) => {
+                            timer = setTimeout(
+                                () =>
+                                    reject(
+                                        new Error(
+                                            `gave up after ${COMPONENT_TIMEOUT / 60000} minutes`,
+                                        ),
                                     ),
-                                ),
-                            COMPONENT_TIMEOUT,
-                        );
-                    }),
-                ]).finally(() => clearTimeout(timer));
+                                COMPONENT_TIMEOUT,
+                            );
+                        }),
+                    ]).finally(() => clearTimeout(timer));
+                };
+                let result;
+                for (let tries = 0; ; tries++) {
+                    try {
+                        result = await attempt();
+                        break;
+                    } catch (e) {
+                        if (tries >= 2 || !RELOADED.test(e.message)) throw e;
+                        process.stdout.write('(page reloaded, again) ');
+                        // Let the reload finish before navigating again.
+                        await sleep(3000);
+                    }
+                }
+                const { component, stats } = result;
                 if (component.variants.length) doc.components.push(component);
                 const stories = new Set(component.variants.map((v) => v.story));
                 console.log(
