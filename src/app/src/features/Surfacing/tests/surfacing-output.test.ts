@@ -2,7 +2,9 @@ import {
     IMPERIAL_UNITS,
     METRIC_UNITS,
     SPIRAL_MOVEMENT,
+    START_POSITION_BACK_LEFT,
     START_POSITION_CENTER,
+    ZIG_ZAG_MOVEMENT,
 } from 'app/constants';
 import defaultState from 'app/store/defaultState';
 import Toolpath from '../utils/gcode-toolpath';
@@ -168,6 +170,35 @@ describe('Surfacing Output', () => {
             {
                 name: 'cut direction flipped',
                 overrides: { cutDirectionFlipped: true },
+            },
+            {
+                name: 'cut depth greater than max depth',
+                overrides: { skimDepth: 3, maxDepth: 2 },
+            },
+            {
+                name: 'cut depth greater than max depth, flipped',
+                overrides: {
+                    skimDepth: 3,
+                    maxDepth: 2,
+                    cutDirectionFlipped: true,
+                },
+            },
+            {
+                name: 'cut depth greater than max depth, corner start',
+                overrides: {
+                    skimDepth: 3,
+                    maxDepth: 2,
+                    startPosition: START_POSITION_BACK_LEFT,
+                },
+            },
+            {
+                name: 'cut depth greater than max depth, zig-zag',
+                overrides: {
+                    skimDepth: 3,
+                    maxDepth: 2,
+                    type: ZIG_ZAG_MOVEMENT,
+                    startPosition: START_POSITION_BACK_LEFT,
+                },
             },
         ];
 

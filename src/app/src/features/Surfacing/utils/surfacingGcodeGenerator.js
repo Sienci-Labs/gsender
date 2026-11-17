@@ -202,9 +202,10 @@ export default class Generator {
     rampIntoMaterial = (z, direction = { axis: 'Y', factor: 1 }) => {
         const { axis, factor } = direction;
         const degrees = this.rampingDegrees;
-        const { skimDepth } = this.surfacing;
+        const { skimDepth, maxDepth } = this.surfacing;
         const units = store.get('workspace.units');
-        const depth = skimDepth;
+        // if cut depth > max depth, it must not ramp past max depth
+        const depth = Math.min(skimDepth, maxDepth);
         const EXTRA_LENGTH = units === METRIC_UNITS ? 1 : convertToImperial(1);
         const safeHeight = this.getSafeZValue();
         const EXTRA_RAMP_COAST =
@@ -556,7 +557,12 @@ export default class Generator {
 
         const safeHeight = this.getSafeZValue();
         const zValue = toFixedValue(
-            safeHeight - (depth - this.surfacing.skimDepth),
+            // if cut depth > max depth, this could be a positive number
+            // moving up is pretty useless, so choose the min to avoid this
+            Math.min(
+                safeHeight,
+                safeHeight - (depth - this.surfacing.skimDepth),
+            ),
         );
         const defaultSurfacingState = get(
             defaultState,
