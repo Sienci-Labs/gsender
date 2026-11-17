@@ -215,10 +215,18 @@
     /* ------------------------------------------------------------------ */
 
     function reactComponentName(el) {
+        const names = reactComponentNames(el);
+        return names.length ? names[names.length - 1] : null;
+    }
+
+    // Every React component whose root is this element, innermost first.
+    // The plugin matches them to Storybook components ("MacroWidget" inside
+    // a "Widget" wrapper is still the Macros story's component).
+    function reactComponentNames(el) {
         const key = Object.keys(el).find((k) => k.startsWith('__reactFiber$'));
-        if (!key) return null;
+        if (!key) return [];
         let fiber = el[key];
-        let name = null;
+        const names = [];
         // Walk up until the previous host (DOM) element: every composite in
         // between renders this element as its root.
         for (
@@ -241,10 +249,10 @@
                     n,
                 )
             ) {
-                name = n;
+                if (!names.includes(n)) names.push(n);
             }
         }
-        return name;
+        return names;
     }
 
     function layerName(el) {
@@ -1155,6 +1163,10 @@
             type: 'FRAME',
             id: newId(),
             name: layerName(el),
+            react: (() => {
+                const names = reactComponentNames(el);
+                return names.length ? names : undefined;
+            })(),
             x: rect.left,
             y: rect.top,
             w,

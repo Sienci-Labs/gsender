@@ -151,26 +151,52 @@ export function buildArgs(o = {}) {
                 throw new Error(`"${text}" must be an http(s) URL.`);
             args.push(url.href);
         }
+        // Screens and the states of the components on them, in one go: the
+        // plugin lays each component's states out beneath the screens.
+        if (o.withStories) {
+            const next = buildArgs({ ...o, mode: 'storybook', stories: [] }).args;
+            return { mode, layout, args, next };
+        }
     }
     return { mode, layout, args };
 }
 
+const LABELS = { capture: 'Capture', live: 'Live capture', storybook: 'Storybook' };
+
 function start(options) {
     if (job && job.exit === null) throw new Error('A capture is already running.');
-    const { mode, layout, args } = buildArgs(options);
+    const { mode, layout, args, next } = buildArgs(options);
     log.length = 0;
     partial = '';
-    const label = `${mode === 'storybook' ? 'Storybook' : mode === 'live' ? 'Live capture' : 'Capture'} · ${layout === 'all' ? 'all layouts' : LAYOUTS[layout].label}`;
-    addLog(`$ yarn figma ${args.join(' ')}\n`);
+    const where = layout === 'all' ? 'all layouts' : LAYOUTS[layout].label;
+    const steps = [{ mode, args, label: `${LABELS[mode]} · ${where}` }];
+    if (next) {
+        steps[0].label = `Screens · ${where} (1 of 2)`;
+        steps.push({ mode: 'storybook', args: next, label: `Storybook states · ${where} (2 of 2)` });
+    }
+    runStep(steps, 0);
+}
+
+// A PORT meant for whatever started the launcher would otherwise move the
+// dev servers (Storybook listens on $PORT over its -p flag).
+function childEnv() {
+    const env = { ...process.env, L2F_STDIN_CAPTURE: '1', FORCE_COLOR: '0' };
+    delete env.PORT;
+    return env;
+}
+
+function runStep(steps, i) {
+    const { mode, args, label } = steps[i];
+    addLog(`${i ? '\n' : ''}$ yarn figma ${args.join(' ')}\n`);
     const child = spawn(process.execPath, [path.join(HERE, '../start.mjs'), ...args], {
         cwd: ROOT,
         stdio: ['pipe', 'pipe', 'pipe'],
         // Its own process group, so Stop reaches the capture script and
         // Chrome as well as start.mjs.
         detached: !isWindows,
-        env: { ...process.env, L2F_STDIN_CAPTURE: '1', FORCE_COLOR: '0' },
+        env: childEnv(),
     });
-    job = { child, mode, label, args, startedAt: Date.now(), exit: null };
+    job = { child, mode, label, args, startedAt: Date.now(), exit: null, step: i + 1, steps: steps.length };
     const mine = job;
     child.stdout.on('data', (d) => addLog(d));
     child.stderr.on('data', (d) => addLog(d));
@@ -179,7 +205,13 @@ function start(options) {
         mine.exit = 1;
     });
     child.on('exit', (code, signal) => {
-        mine.exit = code ?? (signal ? 130 : 1);
+        const exit = code ?? (signal ? 130 : 1);
+        if (exit === 0 && !mine.stopped && i + 1 < steps.length) {
+            addLog('', true);
+            runStep(steps, i + 1);
+            return;
+        }
+        mine.exit = exit;
         addLog(
             `\n${
                 mine.exit === 0
@@ -269,6 +301,7 @@ function state(since) {
         log: log.filter((l) => l.n > since),
         captures: listCaptures(OUT),
         outDir: OUT,
+        manifest: path.join(HERE, '../figma-plugin/manifest.json'),
         livePort: liveServing ? Number(opts['serve-port']) : null,
     };
 }

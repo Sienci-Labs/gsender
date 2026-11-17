@@ -227,6 +227,18 @@ test('a layer is matched by name and place in the tree, not name alone', () => {
     );
 });
 
+test('screen layers find their Storybook component by React name', () => {
+    const keys = match.setKeys('Features/Macros', 'MacroWidget');
+    // The rendered component, however it is wrapped
+    assert.ok(match.layerKeys('Widget', 'MacroWidget,Widget').some((k) => keys.includes(k)));
+    // A layer name from an older capture
+    assert.ok(match.layerKeys('Macros #macros', '').some((k) => keys.includes(k)));
+    // Bare tags never match
+    assert.deepEqual(match.layerKeys('div #root', ''), []);
+    assert.deepEqual(match.setKeys('Components/Button', 'Button'), ['button']);
+    assert.ok(!match.layerKeys('ButtonGroup', '').includes('button'));
+});
+
 /* --------------------------------------------------------------- storybook */
 
 test('props are cycled in combination, app state one control at a time', () => {
@@ -296,6 +308,11 @@ test('the launcher builds start.mjs arguments from its options', () => {
         buildArgs({ states: 'header', machine: 'none', urls: ['http://localhost:5173/#/tools'], stamp: false }).args,
         ['--header-states', '--no-machine', 'http://localhost:5173/#/tools'],
     );
+    // Screens with Storybook states: a Storybook run for the same layout follows
+    const both = buildArgs({ layout: 'pendant', withStories: true, stories: ['Button'] });
+    assert.deepEqual(both.args, ['--pendant', '--stamp']);
+    assert.deepEqual(both.next, ['--storybook', '--pendant', '--stamp', '--controls', 'primary']);
+    assert.equal(buildArgs({ mode: 'live', withStories: true }).next, undefined);
 });
 
 test('the launcher rejects what it cannot pass on safely', () => {

@@ -25,6 +25,7 @@ Node 22+ and the Chrome already on your machine.
 | Capture the main screen | `yarn figma` (`--pendant`, `--android`) |
 | Capture whatever state I put the app in | `yarn figma:live` |
 | Capture every story and its control states | `yarn figma:storybook` |
+| See each screen's buttons and widgets in all their states | **Screens** in `yarn figma:ui` with **Include component states from Storybook** (on by default) |
 | Import only what changed since an earlier capture | `yarn figma:diff old.json new.json`, or **Only import differences** in the plugin |
 | Make imported screens follow my prototype | **Prototype** in the plugin |
 
@@ -35,8 +36,13 @@ yarn figma:ui
 ```
 
 Opens `http://localhost:7780`: choose what to capture (screens, live, or
-Storybook), the layout, theme, size, which tabs and menus to break out, and
-the machine to connect to, then **Start**. The page shows the tool's output
+Storybook only), the layout, theme, size, which tabs and menus to break out, and
+the machine to connect to, then **Start**. Screens mode includes
+**component states from Storybook** by default: after the screens it captures
+Storybook for the same layout, and the plugin lays each component's states
+out beneath the screens that use it (see
+[Storybook states beside screens](#storybook-states-beside-screens)). The
+page's **Then, in Figma** box has the steps for getting captures into Figma. The page shows the tool's output
 as it runs, has **Stop**, and in live mode a **Capture now** button.
 
 Below that it lists the captures in `./figma-captures/`. Pick one as
@@ -289,6 +295,30 @@ deployed one), run the capture script directly:
 
 Control states are rendered by changing the story's args in place, so they
 show the story after its `play` function ran, with the control changed.
+
+### Storybook states beside screens
+
+A Storybook capture on its own is a library of component sets. To see which
+of those states belong to a screen, import both (in either order, in one
+batch or apart, with **Show states beside screens** on in the plugin): each
+screen gets a **Storybook states** section beneath it with, for every
+Storybook component the screen shows, an instance of each of its states,
+labelled, and where the component sits in the screen (`JogInput › Button,
+31×`).
+
+A screen layer counts as showing a component when one of the React
+components that rendered it has that component's name (the story's
+`component`, `Connect(DRO)` included, or the last part of its title). Case,
+a `Widget` suffix and plurals are ignored, so `MacroWidget` matches
+`Features/Macros`. Desktop screens use desktop stories; pendant and Android
+screens use pendant stories. When the file has several captures of a
+component, the newest for the screen's layout is used.
+
+**Place states for this page** in the plugin redoes it for the selected
+screens (or all captured screens on the page), replacing each screen's
+earlier section where it was. Captures from before this matching existed
+(no React names in them) fall back to layer names, which hold only the
+outermost component.
 
 ### Without the CLI
 

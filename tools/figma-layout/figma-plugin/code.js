@@ -113,8 +113,39 @@ figma.ui.onmessage = async (msg) => {
         }
         return;
     }
+    if (msg.type === 'attach-states') {
+        try {
+            const page = figma.currentPage;
+            const all = capturedScreens(page);
+            const picked = all.filter((n) =>
+                page.selection.some((sel) => sel === n || isInside(sel, n)),
+            );
+            const targets = picked.length ? picked : all;
+            if (!targets.length)
+                throw new Error(
+                    'There are no captured screens on this page. Import a Screens or Live capture first.',
+                );
+            const r = await attachStoryStates(targets);
+            if (r.sections.length) {
+                page.selection = r.sections;
+                figma.viewport.scrollAndZoomIntoView(r.sections);
+            }
+            figma.ui.postMessage({ type: 'done', text: storySummary(r) });
+        } catch (e) {
+            console.error(e);
+            figma.ui.postMessage({
+                type: 'error',
+                text: String((e && e.message) || e),
+            });
+        }
+        return;
+    }
     if (msg.type !== 'import') return;
     try {
+        // Storybook first, so the screens in the same batch can use it.
+        msg.docs = msg.docs
+            .filter((d) => d.kind === 'storybook')
+            .concat(msg.docs.filter((d) => d.kind !== 'storybook'));
         const created = [];
         const screens = [];
         const texts = [];
@@ -185,6 +216,25 @@ figma.ui.onmessage = async (msg) => {
                 linked = ` Not linked to the master: ${(e && e.message) || e}`;
             }
         }
+        // A new Storybook capture applies to every screen on the page; new
+        // screens use whatever Storybook capture the file already has.
+        let stories = '';
+        if (msg.options.storyStates !== false) {
+            const targets = components
+                ? capturedScreens(figma.currentPage)
+                : screens;
+            if (targets.length) {
+                try {
+                    progress('Placing Storybook states…');
+                    const r = await attachStoryStates(targets);
+                    created.push(...r.sections);
+                    if (r.sets) stories = ` ${storySummary(r)}`;
+                } catch (e) {
+                    console.error(e);
+                    stories = ` Storybook states not placed: ${(e && e.message) || e}`;
+                }
+            }
+        }
         figma.currentPage.selection = created;
         figma.viewport.scrollAndZoomIntoView(created);
         const screenDocs = msg.docs.filter((d) => d.kind !== 'storybook');
@@ -216,7 +266,7 @@ figma.ui.onmessage = async (msg) => {
             .join(', ');
         figma.ui.postMessage({
             type: 'done',
-            text: `${msg.note ? `${msg.note} ` : ''}Imported ${parts.join(', ')}.${linked}${fonts ? ` Fonts: ${fonts}.` : ''}${failedFonts.length ? ` Couldn't load: ${failedFonts.splice(0).join(', ')}.` : ''}`,
+            text: `${msg.note ? `${msg.note} ` : ''}Imported ${parts.join(', ')}.${linked}${stories}${fonts ? ` Fonts: ${fonts}.` : ''}${failedFonts.length ? ` Couldn't load: ${failedFonts.splice(0).join(', ')}.` : ''}`,
         });
     } catch (e) {
         console.error(e);
@@ -347,6 +397,7 @@ async function importStorybook(doc, options, texts, fontsUsed) {
         set.name = comp.title;
         if (comp.description) set.description = comp.description;
         if (comp.importPath) set.setPluginData('storyFile', comp.importPath);
+        set.setPluginData('storyComponent', comp.componentName || '');
         layoutVariants(set, variants);
         if (y > SECTION_PADDING && y + set.height > SET_COLUMN_HEIGHT) {
             x += columnWidth + SET_GAP;
@@ -595,7 +646,58 @@ var L2FMatch = (function () {
         return (m ? m[1] : String(url)).replace(/\/+$/, '') || '/';
     }
 
+    /*
+     * Storybook states beside screens: a screen layer shows a Storybook
+     * component when one of the React components it was rendered by has
+     * that component's name. Keys ignore case, punctuation, a "Widget"
+     * suffix and a plural, so "MacroWidget", "Macros" and "macro" agree.
+     */
+    function componentKey(name) {
+        var k = String(name || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '')
+            .replace(/widget$/, '');
+        if (k.length > 3) k = k.replace(/s$/, '');
+        return k;
+    }
+
+    // Keys for a Storybook component set: the story's component and the
+    // last part of its title ("Features/Jogging" → "jogging").
+    function setKeys(title, componentName) {
+        var out = [];
+        var last = String(title || '').split('/').pop();
+        [componentName, last].forEach(function (n) {
+            var k = componentKey(n);
+            if (k && out.indexOf(k) < 0) out.push(k);
+        });
+        return out;
+    }
+
+    // Keys for a screen layer: every React component it was rendered by
+    // (`react`, a list or comma-separated), or else the component name the
+    // capture put first in its layer name. Bare tags ("div #root") aren't.
+    function layerKeys(name, react) {
+        var names = Array.isArray(react)
+            ? react
+            : react
+              ? String(react).split(',')
+              : [];
+        if (!names.length) {
+            var first = String(name || '').split(' ')[0];
+            if (/^[A-Z]/.test(first)) names = [first];
+        }
+        var out = [];
+        names.forEach(function (n) {
+            var k = componentKey(n);
+            if (k && out.indexOf(k) < 0) out.push(k);
+        });
+        return out;
+    }
+
     return {
+        componentKey: componentKey,
+        setKeys: setKeys,
+        layerKeys: layerKeys,
         tokens: tokens,
         nameSimilarity: nameSimilarity,
         pathSimilarity: pathSimilarity,
@@ -831,6 +933,300 @@ function linkSummary(r) {
 }
 
 /* -------------------------------------------------------------------- */
+/* Storybook states beside screens                                      */
+/* -------------------------------------------------------------------- */
+
+const STORY_FOR = 'storyStatesFor';
+const STORY_ROW_WIDTH = 2400;
+
+// Screens that came from a capture, as opposed to components and sections
+// the importer laid out beside them.
+function capturedScreens(page) {
+    return screensOf(page).filter((n) => n.getPluginData('sourceUrl'));
+}
+
+function layoutOf(node) {
+    for (let p = node; p && p.type !== 'DOCUMENT'; p = p.parent) {
+        const l = p.getPluginData('layout');
+        if (l) return l;
+    }
+    return '';
+}
+
+// How well a component set captured for one layout suits a screen of
+// another: the Android app shows the pendant UI, so pendant stories suit it.
+function layoutFit(screenLayout, setLayout) {
+    const s = screenLayout || 'desktop';
+    const c = setLayout || 'desktop';
+    if (s === c) return 2;
+    if ((s === 'android' || s === 'pendant') && (c === 'android' || c === 'pendant'))
+        return 1;
+    return 0;
+}
+
+// Every Storybook component set in the file, by key (see setKeys in
+// shared/match.cjs).
+async function storySetIndex() {
+    await figma.loadAllPagesAsync();
+    const index = {};
+    let count = 0;
+    for (const set of figma.root.findAllWithCriteria({ types: ['COMPONENT_SET'] })) {
+        if (!set.getPluginData('storyFile') && !set.getPluginData('storyComponent'))
+            continue;
+        count++;
+        let at = '';
+        for (let p = set.parent; p && p.type !== 'PAGE'; p = p.parent)
+            at = at || p.getPluginData('capturedAt');
+        const entry = { set, layout: layoutOf(set), capturedAt: at };
+        for (const k of L2FMatch.setKeys(set.name, set.getPluginData('storyComponent')))
+            (index[k] = index[k] || []).push(entry);
+    }
+    return { index, count };
+}
+
+// The set for one key that suits a screen of `layout`: same layout first,
+// then the newest capture.
+function pickSet(entries, layout) {
+    let best = null;
+    for (const e of entries || []) {
+        const fit = layoutFit(layout, e.layout);
+        if (!fit) continue;
+        if (
+            !best ||
+            fit > best.fit ||
+            (fit === best.fit && e.capturedAt > best.capturedAt)
+        )
+            best = { fit, capturedAt: e.capturedAt, set: e.set };
+    }
+    return best && best.set;
+}
+
+// The Storybook components a screen shows: walks its layers and records,
+// for each component set, the outermost layers rendered by its component.
+function componentsIn(screen, index) {
+    const layout = screen.getPluginData('layout') || 'desktop';
+    const found = new Map(); // set id → { set, layers }
+    const walk = (node, active) => {
+        let inside = active;
+        if (node.type === 'FRAME' || node.type === 'INSTANCE' || node.type === 'COMPONENT') {
+            for (const k of L2FMatch.layerKeys(node.name, node.getPluginData('react'))) {
+                const set = pickSet(index[k], layout);
+                if (!set || inside.has(set.id)) continue;
+                if (!found.has(set.id)) found.set(set.id, { set, layers: [] });
+                found.get(set.id).layers.push(node);
+                if (inside === active) inside = new Set(active);
+                inside.add(set.id);
+            }
+        }
+        if ('children' in node) for (const c of node.children) walk(c, inside);
+    };
+    walk(screen, new Set());
+    // In reading order of where each first appears.
+    const box = (n) => n.absoluteBoundingBox || { x: 0, y: 0 };
+    return [...found.values()].sort((a, b) => {
+        const p = box(a.layers[0]);
+        const q = box(b.layers[0]);
+        return Math.abs(p.y - q.y) > 8 ? p.y - q.y : p.x - q.x;
+    });
+}
+
+let storyFontsLoaded = null;
+async function storyFonts() {
+    if (storyFontsLoaded === null) {
+        try {
+            await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+            await figma.loadFontAsync({ family: 'Inter', style: 'Semi Bold' });
+            storyFontsLoaded = true;
+        } catch (e) {
+            console.warn('Inter not available for Storybook captions', e);
+            storyFontsLoaded = false;
+        }
+    }
+    return storyFontsLoaded;
+}
+
+function caption(text, size, bold) {
+    if (!storyFontsLoaded) return null;
+    const t = figma.createText();
+    t.fontName = { family: 'Inter', style: bold ? 'Semi Bold' : 'Regular' };
+    t.fontSize = size;
+    t.characters = text;
+    t.fills = [{ type: 'SOLID', color: bold ? { r: 0.1, g: 0.11, b: 0.13 } : { r: 0.4, g: 0.42, b: 0.46 } }];
+    return t;
+}
+
+function hugFrame(name, direction, gap) {
+    const f = figma.createFrame();
+    f.name = name;
+    f.fills = [];
+    f.clipsContent = false;
+    f.layoutMode = direction;
+    f.itemSpacing = gap;
+    f.primaryAxisSizingMode = 'AUTO';
+    f.counterAxisSizingMode = 'AUTO';
+    return f;
+}
+
+// "JobControl › Button": the layer under its nearest named component, as
+// bare tags ("div") don't say where it is.
+function placeOf(layer) {
+    const own = layer.name.split(' ')[0];
+    for (let p = layer.parent; p && p.type !== 'PAGE' && p.type !== 'SECTION'; p = p.parent) {
+        const name = p.name.split(' ')[0];
+        if (/^[A-Z]/.test(name) && name !== own && !p.getPluginData('sourceUrl'))
+            return `${name} › ${own}`;
+    }
+    return own;
+}
+
+// One component's states: a title, where it is in the screen, and an
+// instance of every variant with its name above it.
+async function stateGroup(set, layers) {
+    const group = hugFrame(set.name, 'VERTICAL', 16);
+    const title = caption(set.name, 20, true);
+    if (title) group.appendChild(title);
+    const where = layers
+        .slice(0, 3)
+        .map(placeOf)
+        .filter((p, i, all) => all.indexOf(p) === i)
+        .join('; ');
+    const sub = caption(
+        `${set.children.length} state(s) · in this screen ${layers.length === 1 ? 'at' : `${layers.length}×, e.g.`} ${where}`,
+        12,
+        false,
+    );
+    if (sub) group.appendChild(sub);
+
+    const cells = [];
+    for (const variant of set.children) {
+        if (variant.type !== 'COMPONENT') continue;
+        const cell = hugFrame(variant.name, 'VERTICAL', 8);
+        const label = caption(variant.name, 11, false);
+        if (label) cell.appendChild(label);
+        cell.appendChild(variant.createInstance());
+        cells.push(cell);
+    }
+    const row = figma.createFrame();
+    row.name = 'States';
+    row.fills = [];
+    row.clipsContent = false;
+    const gap = 32;
+    const widest = cells.reduce((w, c) => Math.max(w, c.width), 0);
+    const total = cells.reduce((w, c) => w + c.width, 0) + gap * Math.max(0, cells.length - 1);
+    try {
+        row.layoutMode = 'HORIZONTAL';
+        row.layoutWrap = 'WRAP';
+        row.itemSpacing = gap;
+        row.counterAxisSpacing = gap;
+        row.primaryAxisSizingMode = 'FIXED';
+        row.counterAxisSizingMode = 'AUTO';
+        row.resize(Math.max(1, Math.min(total, Math.max(widest, STORY_ROW_WIDTH))), 1);
+    } catch (e) {
+        row.layoutMode = 'VERTICAL';
+        row.itemSpacing = gap;
+        row.primaryAxisSizingMode = 'AUTO';
+        row.counterAxisSizingMode = 'AUTO';
+    }
+    for (const c of cells) row.appendChild(c);
+    group.appendChild(row);
+
+    // Show the states in the colour mode they were captured in.
+    for (let p = set.parent; p && p.type !== 'PAGE'; p = p.parent) {
+        const modes = p.explicitVariableModes || {};
+        for (const id of Object.keys(modes)) {
+            try {
+                const collection = await figma.variables.getVariableCollectionByIdAsync(id);
+                if (collection) group.setExplicitVariableModeForCollection(collection, modes[id]);
+            } catch (e) {
+                console.warn('variable mode not copied', e);
+            }
+        }
+        if (Object.keys(modes).length) break;
+    }
+    return group;
+}
+
+// Below `box`, clear of everything else on the page.
+function freeSpotBelow(box, w, h, ignore) {
+    const page = figma.currentPage;
+    const x = box.x;
+    let y = box.y + box.height + 200;
+    const others = page.children.filter((c) => !ignore.includes(c));
+    for (let moved = true, guard = 0; moved && guard < 500; guard++) {
+        moved = false;
+        for (const c of others) {
+            if (c.x < x + w && c.x + c.width > x && c.y < y + h && c.y + c.height > y) {
+                y = c.y + c.height + 200;
+                moved = true;
+            }
+        }
+    }
+    return { x, y };
+}
+
+// Lays out, beneath each screen, the Storybook states of the components it
+// shows. A screen's earlier states section is replaced in place.
+async function attachStoryStates(targets) {
+    const { index, count } = await storySetIndex();
+    const result = { screens: targets.length, withStates: 0, sets: 0, places: 0, sections: [], inFile: count };
+    if (!count) return result;
+    await storyFonts();
+    const page = figma.currentPage;
+    const previous = {};
+    for (const s of page.findAllWithCriteria({ types: ['SECTION'] })) {
+        const id = s.getPluginData(STORY_FOR);
+        if (id) previous[id] = s;
+    }
+    const used = new Set();
+    for (const screen of targets) {
+        const found = componentsIn(screen, index);
+        const old = previous[screen.id];
+        const spot = old ? { x: old.x, y: old.y } : null;
+        if (old) old.remove();
+        if (!found.length) continue;
+        progress(`Placing Storybook states for ${screen.name} (${found.length} component(s))…`);
+        const section = figma.createSection();
+        section.name = `${screen.name} — Storybook states`;
+        section.setPluginData(STORY_FOR, screen.id);
+        let y = SECTION_PADDING;
+        let width = 0;
+        for (const { set, layers } of found) {
+            const group = await stateGroup(set, layers);
+            section.appendChild(group);
+            group.x = SECTION_PADDING;
+            group.y = y;
+            y += group.height + STATE_GAP;
+            width = Math.max(width, group.width);
+            used.add(set.id);
+            result.places += layers.length;
+        }
+        section.resizeWithoutConstraints(width + SECTION_PADDING * 2, y - STATE_GAP + SECTION_PADDING);
+        const at =
+            spot ||
+            freeSpotBelow(
+                screen.absoluteBoundingBox || screen,
+                section.width,
+                section.height,
+                [section],
+            );
+        section.x = at.x;
+        section.y = at.y;
+        result.withStates++;
+        result.sections.push(section);
+    }
+    result.sets = used.size;
+    return result;
+}
+
+function storySummary(r) {
+    if (!r.inFile)
+        return 'No Storybook capture in this file yet. Capture one (Storybook in the launcher) and import it; its states then show up beside the screens that use those components.';
+    if (!r.withStates)
+        return `None of the ${r.screens} screen(s) show a component that has Storybook states.`;
+    return `Placed the states of ${r.sets} Storybook component(s) beneath ${r.withStates} of ${r.screens} screen(s).`;
+}
+
+/* -------------------------------------------------------------------- */
 /* Tabs & popovers                                                      */
 /* -------------------------------------------------------------------- */
 
@@ -999,6 +1395,11 @@ function simplify(n, isRoot) {
             )
                 c.name = n.name;
             if (n.absolute) c.absolute = true;
+            // The wrapper's components still render what's left.
+            if (n.react)
+                c.react = (c.react || []).concat(
+                    n.react.filter((r) => !(c.react || []).includes(r)),
+                );
             return c;
         }
     }
@@ -1026,6 +1427,7 @@ async function build(data, state) {
         node.clipsContent = !!data.clip || data.type === 'IMAGE';
         applyBox(node, data, state);
         if (data.classes) node.setPluginData('classes', data.classes);
+        if (data.react) node.setPluginData('react', data.react.join(','));
     }
     if (data.stateKey) state.stateNodes[data.stateKey] = node;
 

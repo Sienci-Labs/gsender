@@ -244,7 +244,13 @@ const IN_PAGE = `(() => {
                 });
             }
             const docs = (story.parameters && story.parameters.docs) || {};
+            const c = story.component;
             return {
+                // The React component the story shows, which the plugin
+                // looks for in captured screens.
+                component:
+                    (c && (c.displayName || c.name ||
+                        (c.render && (c.render.displayName || c.render.name)))) || null,
                 args: plain(story.initialArgs),
                 controls: list,
                 description:
@@ -475,6 +481,8 @@ async function captureComponent(cdp, doc, group, index, theme) {
         }
         const info = await call(cdp, 'describe', entry.id);
         if (!component.description) component.description = info.description;
+        if (!component.componentName && info.component)
+            component.componentName = info.component;
         for (const c of info.controls) {
             if (!controlNames.includes(c.name)) controlNames.push(c.name);
             if (c.values.every((v) => typeof v === 'boolean'))

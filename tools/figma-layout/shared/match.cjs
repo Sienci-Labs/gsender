@@ -184,7 +184,58 @@ var L2FMatch = (function () {
         return (m ? m[1] : String(url)).replace(/\/+$/, '') || '/';
     }
 
+    /*
+     * Storybook states beside screens: a screen layer shows a Storybook
+     * component when one of the React components it was rendered by has
+     * that component's name. Keys ignore case, punctuation, a "Widget"
+     * suffix and a plural, so "MacroWidget", "Macros" and "macro" agree.
+     */
+    function componentKey(name) {
+        var k = String(name || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '')
+            .replace(/widget$/, '');
+        if (k.length > 3) k = k.replace(/s$/, '');
+        return k;
+    }
+
+    // Keys for a Storybook component set: the story's component and the
+    // last part of its title ("Features/Jogging" → "jogging").
+    function setKeys(title, componentName) {
+        var out = [];
+        var last = String(title || '').split('/').pop();
+        [componentName, last].forEach(function (n) {
+            var k = componentKey(n);
+            if (k && out.indexOf(k) < 0) out.push(k);
+        });
+        return out;
+    }
+
+    // Keys for a screen layer: every React component it was rendered by
+    // (`react`, a list or comma-separated), or else the component name the
+    // capture put first in its layer name. Bare tags ("div #root") aren't.
+    function layerKeys(name, react) {
+        var names = Array.isArray(react)
+            ? react
+            : react
+              ? String(react).split(',')
+              : [];
+        if (!names.length) {
+            var first = String(name || '').split(' ')[0];
+            if (/^[A-Z]/.test(first)) names = [first];
+        }
+        var out = [];
+        names.forEach(function (n) {
+            var k = componentKey(n);
+            if (k && out.indexOf(k) < 0) out.push(k);
+        });
+        return out;
+    }
+
     return {
+        componentKey: componentKey,
+        setKeys: setKeys,
+        layerKeys: layerKeys,
         tokens: tokens,
         nameSimilarity: nameSimilarity,
         pathSimilarity: pathSimilarity,

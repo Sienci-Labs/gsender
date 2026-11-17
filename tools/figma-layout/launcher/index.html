@@ -114,7 +114,7 @@
         white-space: pre-wrap;
         word-break: break-word;
     }
-    .right { display: grid; gap: 16px; min-width: 0; }
+    .right { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; min-width: 0; }
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -123,6 +123,31 @@
     .tag { display: inline-block; padding: 0 6px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); font-size: 11px; margin-left: 4px; }
     .error { color: var(--danger); }
     [hidden] { display: none !important; }
+    .cards { display: grid; gap: 8px; }
+    .card { display: block; cursor: pointer; }
+    .card input { position: absolute; opacity: 0; pointer-events: none; }
+    .card > span {
+        display: block;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+    .card b { display: block; }
+    .card small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .card input:checked + span { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .card input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .callout {
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 14px;
+    }
+    .callout .check { margin: 0; }
+    button.big { width: 100%; padding: 10px 12px; font-size: 15px; }
+    ol.steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+    ol.steps code { font-size: 12px; word-break: break-all; }
+    .next.done { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+    .next h2 { display: flex; gap: 8px; align-items: center; }
 </style>
 </head>
 <body>
@@ -134,17 +159,26 @@
 <main>
     <form class="panel" id="form">
         <fieldset>
-            <legend>What to capture</legend>
-            <div class="seg" role="radiogroup" aria-label="What to capture">
-                <label><input type="radio" name="mode" value="capture" checked /><span>Screens</span></label>
-                <label><input type="radio" name="mode" value="live" /><span>Live</span></label>
-                <label><input type="radio" name="mode" value="storybook" /><span>Storybook</span></label>
+            <legend>1. What to capture</legend>
+            <div class="cards" role="radiogroup" aria-label="What to capture">
+                <label class="card"><input type="radio" name="mode" value="capture" checked /><span>
+                    <b>Screens</b>
+                    <small>Each screen as a frame, with its tabs and menus broken out beside it, and (below) the Storybook states of the components on it.</small>
+                </span></label>
+                <label class="card"><input type="radio" name="mode" value="live" /><span>
+                    <b>Live</b>
+                    <small>Opens gSender in its own window. Click around to any state, then capture exactly what you see.</small>
+                </span></label>
+                <label class="card"><input type="radio" name="mode" value="storybook" /><span>
+                    <b>Storybook only</b>
+                    <small>Every component's stories and control states as Figma component sets, without screens.</small>
+                </span></label>
             </div>
             <p class="hint" id="modeHint"></p>
         </fieldset>
 
         <fieldset>
-            <legend>Layout</legend>
+            <legend>2. Layout</legend>
             <div class="seg" role="radiogroup" aria-label="Layout">
                 <label><input type="radio" name="layout" value="desktop" checked /><span>Desktop</span></label>
                 <label><input type="radio" name="layout" value="pendant" /><span>Pendant</span></label>
@@ -178,6 +212,13 @@
             </label>
         </fieldset>
 
+        <div class="callout" id="withStoriesField">
+            <label class="check">
+                <input type="checkbox" name="withStories" checked />
+                <span><b>Include component states from Storybook</b><small>Also captures Storybook, so in Figma each screen gets the states (hover, disabled, active…) of the buttons and widgets on it, laid out beneath it. Adds a few minutes.</small></span>
+            </label>
+        </div>
+
         <fieldset id="screenFields">
             <label class="field">
                 <span>Tabs and menus to break out</span>
@@ -207,6 +248,7 @@
         </fieldset>
 
         <fieldset id="storyFields" hidden>
+            <legend>Storybook</legend>
             <label class="field">
                 <span>Control states</span>
                 <select name="controls">
@@ -219,7 +261,7 @@
                 <input type="checkbox" name="interaction" />
                 <span>Hover, focus and pressed<small>For stories that show a single button or input</small></span>
             </label>
-            <label class="field">
+            <label class="field" id="storyFilterField">
                 <span>Only these components (one per line; blank for all)</span>
                 <textarea name="stories" placeholder="components/Button&#10;features/Jogging"></textarea>
             </label>
@@ -237,7 +279,7 @@
         </fieldset>
 
         <div class="actions">
-            <button class="primary" type="submit" id="run">Start</button>
+            <button class="primary big" type="submit" id="run">Start</button>
             <button type="button" id="captureNow" hidden>Capture now</button>
             <button type="button" class="danger" id="stop" disabled>Stop</button>
         </div>
@@ -245,6 +287,16 @@
     </form>
 
     <div class="right">
+        <section class="panel next" id="next">
+            <h2><span class="dot" id="nextDot"></span>3. Then, in Figma</h2>
+            <ol class="steps">
+                <li>Open a design file in the Figma <b>desktop</b> app.</li>
+                <li>First time only: press <b>⌘/</b> (Ctrl+/), choose <b>Import plugin from manifest…</b> and pick <code id="manifestPath">tools/figma-layout/figma-plugin/manifest.json</code>.</li>
+                <li>Press <b>⌘/</b> and run <b>Layout Importer</b>. While this page is open its <b>Live capture</b> list shows each capture and, with <i>Import new captures automatically</i> on, brings them in as they finish.</li>
+                <li id="nextStories">Storybook states land beneath the screens that use those components. Already imported screens? Click <b>Place states for this page</b> in the plugin.</li>
+            </ol>
+        </section>
+
         <section class="panel">
             <div class="status">
                 <span class="dot" id="dot"></span>
@@ -280,9 +332,15 @@
     const field = (name) => form.elements[name];
 
     const MODE_HINTS = {
-        capture: 'Starts the dev servers if needed, captures each screen with its tabs and menus, then stops.',
-        live: 'Opens gSender in its own window and keeps it open. Get the UI into any state, then capture it with Capture now, ⌥⇧F in the window, or its ◧ button.',
-        storybook: 'Captures every story and the states its controls reach. Each component becomes a component set with a variant per state. Takes a few minutes for everything.',
+        capture: 'Starts the dev servers it needs, captures, then stops them.',
+        live: 'Capture with Capture now here, ⌥⇧F in the window, or its ◧ button. Runs until you press Stop.',
+        storybook: 'Takes a few minutes for everything. To see states beside screens, import a Screens capture too, or use Screens with Storybook states included.',
+    };
+    const RUN_LABELS = {
+        capture: 'Capture screens',
+        captureStories: 'Capture screens + Storybook states',
+        live: 'Open live window',
+        storybook: 'Capture Storybook',
     };
     const LAYOUT_HINTS = {
         desktop: '1440×900, the desktop app.',
@@ -301,8 +359,13 @@
         $('layoutHint').textContent = story && layout !== 'all'
             ? (layout === 'desktop' ? "The app's stories at 1440×900." : `The pendant's stories at ${layout === 'android' ? '1280×800' : '800×1280'}.`)
             : LAYOUT_HINTS[layout];
+        const withStories = mode === 'capture' && field('withStories').checked;
+        $('withStoriesField').hidden = mode !== 'capture';
         $('screenFields').hidden = story;
-        $('storyFields').hidden = !story;
+        $('storyFields').hidden = !story && !withStories;
+        $('storyFilterField').hidden = !story;
+        $('nextStories').hidden = !story && !withStories;
+        $('run').textContent = RUN_LABELS[withStories ? 'captureStories' : mode];
         $('urlField').hidden = mode !== 'capture';
         $('themeField').hidden = mode === 'live';
         $('stampField').hidden = mode === 'live';
@@ -326,6 +389,7 @@
             states: field('states').value,
             machine: choice === 'custom' ? field('machine').value : choice,
             urls: lines(field('urls').value),
+            withStories: field('withStories').checked,
             controls: field('controls').value,
             interaction: field('interaction').checked,
             stories: lines(field('stories').value),
@@ -482,6 +546,10 @@
                     ? `Finished: ${s.job.label}`
                     : `Stopped: ${s.job.label}`;
             $('run').disabled = running;
+            if (s.manifest) $('manifestPath').textContent = s.manifest;
+            const finished = !!(s.job && !running && s.job.exit === 0);
+            $('next').classList.toggle('done', finished);
+            $('nextDot').className = 'dot' + (finished ? ' on' : '');
             $('stop').disabled = !running;
             $('captureNow').hidden = !(running && s.job.mode === 'live');
             $('captureHint').textContent = s.livePort

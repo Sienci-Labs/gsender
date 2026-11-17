@@ -106,6 +106,19 @@
 </section>
 
 <section>
+    <h2>Storybook states</h2>
+    <small class="hint">Import a Storybook capture into this file, and each screen gets the states of the components it shows (buttons, widgets, panels) laid out beneath it, found by component name.</small>
+    <label style="margin-top: 6px">
+        <input type="checkbox" id="storyStates" />
+        <span>Show states beside screens<small>When screens or a Storybook capture are imported</small></span>
+    </label>
+    <div class="row" style="margin-top: 6px">
+        <button class="secondary" id="attachStates">Place states for this page</button>
+    </div>
+    <small class="hint">Uses the selected screens, or every captured screen on this page.</small>
+</section>
+
+<section>
     <h2>Only import differences</h2>
     <small class="hint" id="baselineHint">Pick a capture to compare with, and imports bring in only what differs from it: changed parts of a screen, or changed Storybook states.</small>
     <ul id="baselineList"></ul>
@@ -174,7 +187,7 @@
 
     /* Options, remembered between runs via figma.clientStorage ---------- */
 
-    const DEFAULTS = { autoLayout: true, variables: true, states: true, backdrops: true, simplify: true, font: 'Inter', autoImport: true, linkProto: true };
+    const DEFAULTS = { autoLayout: true, variables: true, states: true, backdrops: true, simplify: true, font: 'Inter', autoImport: true, linkProto: true, storyStates: true };
     const OPTION_IDS = Object.keys(DEFAULTS);
 
     function readOptions() {
@@ -199,6 +212,7 @@
     /* Import queue: one import at a time --------------------------------- */
 
     const queue = [];
+    const ATTACH = 'attach-states';
     let importing = false;
 
     function enqueue(docsToImport) {
@@ -212,6 +226,11 @@
         status.className = '';
         status.textContent = 'Starting…';
         let batch = queue.shift();
+        if (batch === ATTACH) {
+            status.textContent = 'Placing Storybook states…';
+            parent.postMessage({ pluginMessage: { type: 'attach-states', options: readOptions() } }, '*');
+            return;
+        }
         let note = '';
         try {
             if (baselines.length) ({ docs: batch, note } = onlyDifferences(batch));
@@ -734,6 +753,8 @@
     });
 
     /* Prototype ------------------------------------------------------------ */
+
+    $('attachStates').addEventListener('click', () => enqueue(ATTACH));
 
     const send = (type) => parent.postMessage({ pluginMessage: { type } }, '*');
     $('markMaster').addEventListener('click', () => send('mark-master'));
