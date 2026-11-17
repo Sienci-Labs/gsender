@@ -29,7 +29,7 @@ const log = {
     info: debug(pkg + ':info'),
     warn: debug(pkg + ':warn'),
     error: debug(pkg + ':error'),
-    fatal: debug(pkg + ':fatal')
+    fatal: debug(pkg + ':fatal'),
 };
 
 export default log;

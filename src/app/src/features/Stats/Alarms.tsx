@@ -54,11 +54,13 @@ export function Alarms() {
                                 <CardHeader>Clear Alarms & Errors</CardHeader>
                             </div>
                             <p className="text-gray-600 text-sm dark:text-white max-xl:hidden">
-                            Clear all prior alarms and errors. This action
-                            cannot be undone.
+                                Clear all prior alarms and errors. This action
+                                cannot be undone.
                             </p>
                             <Button
-                                icon={<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />}
+                                icon={
+                                    <FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+                                }
                                 onClick={deleteAlarms}
                                 text="Clear Alarms & Errors"
                                 size="lg"

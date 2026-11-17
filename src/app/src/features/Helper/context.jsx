@@ -21,7 +21,14 @@
  *
  */
 
-import React, { createContext, useContext, useState, useMemo, useEffect, useRef } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    useMemo,
+    useEffect,
+    useRef,
+} from 'react';
 import { useSelector } from 'react-redux';
 import get from 'lodash/get';
 import _ from 'lodash';
@@ -57,7 +64,8 @@ export const WizardProvider = ({ children }) => {
     const [minimized, setMinimized] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [overlay, setOverlay] = useState(false);
-    const [pendingToolchangeNotice, setPendingToolchangeNotice] = useState(false);
+    const [pendingToolchangeNotice, setPendingToolchangeNotice] =
+        useState(false);
     const [resumingJob, setResumingJob] = useState(false);
     const resumeTimerRef = useRef(null);
 
@@ -344,7 +352,8 @@ export const WizardProvider = ({ children }) => {
             },
             resumeJobAfterDelay: (delayMs) => {
                 setResumingJob(true);
-                if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+                if (resumeTimerRef.current)
+                    clearTimeout(resumeTimerRef.current);
                 resumeTimerRef.current = setTimeout(() => {
                     resetWizard();
                 }, delayMs);

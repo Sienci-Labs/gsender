@@ -1,8 +1,5 @@
 {
-  "watch": [
-    "output/server-cli.js",
-    "output/server/**/*"
-  ],
+  "watch": ["output/server-cli.js", "output/server/**/*"],
   "ignore": [
     "output/app/**/*",
     "node_modules/**/*",
@@ -18,4 +15,3 @@
     "NODE_ENV": "development"
   }
 }
-

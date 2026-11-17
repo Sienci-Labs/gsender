@@ -134,7 +134,8 @@ export class MPGJogManager {
         }
 
         // In this angle system, positive deltas are CCW. Map CW to positive jog.
-        const rotationDirectionSign = rotationState.accumulatedDegrees > 0 ? -1 : 1;
+        const rotationDirectionSign =
+            rotationState.accumulatedDegrees > 0 ? -1 : 1;
         const signedDirection = mpgIsReversed
             ? -rotationDirectionSign
             : rotationDirectionSign;

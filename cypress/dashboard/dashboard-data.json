@@ -55,9 +55,7 @@
         "Reset Defaults Firmware and gSender",
         "Update Change and Apply Settings"
       ],
-      "pending": [
-        "Flash"
-      ]
+      "pending": ["Flash"]
     },
 
     {
@@ -69,23 +67,13 @@
         "Keyboard Shortcuts",
         "XY Squaring"
       ],
-      "pending": [
-        "Game Pad",
-        "SD Card Manager",
-        "Accessory Installation"
-      ]
+      "pending": ["Game Pad", "SD Card Manager", "Accessory Installation"]
     },
 
     {
       "name": "Stats",
       "color": "orange",
-      "pending": [
-        "Overview",
-        "Jobs",
-        "Maintenance",
-        "Alarms",
-        "About"
-      ]
+      "pending": ["Overview", "Jobs", "Maintenance", "Alarms", "About"]
     }
   ]
 }

@@ -119,7 +119,9 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
             (selectedTool.isManual ?? selectedTool.id > effectiveRackSize));
     const EmptyIcon = state.icon;
     const isRackTool =
-        !isEmptyTool && !isRackDisabledNoSlots && selectedTool.id <= effectiveRackSize;
+        !isEmptyTool &&
+        !isRackDisabledNoSlots &&
+        selectedTool.id <= effectiveRackSize;
     const wrapperClassName = cn(
         state.backgroundColor,
         state.borderColor,
@@ -158,11 +160,13 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                                     Rack
                                 </span>
                             )}
-                            {!isEmptyTool && !isRackTool && allowManualBadge && (
-                                <span className="text-gray-600 text-xs dark:text-gray-300">
-                                    Manual
-                                </span>
-                            )}
+                            {!isEmptyTool &&
+                                !isRackTool &&
+                                allowManualBadge && (
+                                    <span className="text-gray-600 text-xs dark:text-gray-300">
+                                        Manual
+                                    </span>
+                                )}
                         </div>
                     </div>
 
@@ -183,7 +187,7 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                 </div>
 
                 <div className="text-left text-sm font-bold text-gray-700 dark:text-gray-200">
-                    {isEmptyTool ? '' : selectedTool.nickname ?? ''}
+                    {isEmptyTool ? '' : (selectedTool.nickname ?? '')}
                 </div>
 
                 <div className="grid grid-cols-[1fr_auto] items-center gap-3">

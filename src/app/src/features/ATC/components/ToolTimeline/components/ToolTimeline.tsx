@@ -129,10 +129,14 @@ export function ToolTimeline({
                             <>
                                 <div
                                     className="h-6 w-6 rounded-md border-2 border-white shadow-sm"
-                                    style={{ backgroundColor: activeTool.color }}
+                                    style={{
+                                        backgroundColor: activeTool.color,
+                                    }}
                                 />
                                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                    T{mappings.get(activeTool.toolNumber) ?? activeTool.toolNumber}
+                                    T
+                                    {mappings.get(activeTool.toolNumber) ??
+                                        activeTool.toolNumber}
                                 </span>
                             </>
                         )}
@@ -184,10 +188,10 @@ export function ToolTimeline({
                                 const probeState: ToolProbeState =
                                     toolInfo?.status ?? 'unprobed';
                                 const isManual = allowManualBadge
-                                    ? toolInfo?.isManual ??
+                                    ? (toolInfo?.isManual ??
                                       (rackSize > 0
                                           ? toolLookupNumber > rackSize
-                                          : false)
+                                          : false))
                                     : false;
                                 const itemKey = `${tool.index}-${tool.toolNumber}-${tool.startLine ?? index}`;
                                 return (
@@ -207,7 +211,9 @@ export function ToolTimeline({
                                                     : 0
                                             }
                                             handleRemap={() =>
-                                                handleRemapClick(tool.toolNumber)
+                                                handleRemapClick(
+                                                    tool.toolNumber,
+                                                )
                                             }
                                             isRemapped={isRemapped}
                                             remapValue={remapValue}

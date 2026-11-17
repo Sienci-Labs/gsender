@@ -1,7 +1,7 @@
-import { toast } from "app/lib/toaster";
-import prefStore from "app/store";
-import reduxStore from "app/store/redux";
-import get from "lodash/get";
+import { toast } from 'app/lib/toaster';
+import prefStore from 'app/store';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 
 export const FRONT_RIGHT = 'FR';
 export const FRONT_LEFT = 'FL';
@@ -63,7 +63,7 @@ const getPositionMovements = (
     if (!xLimit || !yLimit) {
         toast.error(
             "Unable to find machine limits - make sure they're set in preferences",
-            { position: 'bottom-right' }
+            { position: 'bottom-right' },
         );
         return [null, null];
     }
@@ -125,16 +125,16 @@ export const getMovementGCode = (
 ) => {
     const gcode = [];
 
-	const settings = get(
-		reduxStore.getState(),
-		"controller.settings.settings",
-		{},
-	);
-	// if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
-	const setMachineOrigin = isBitSetInNumber(get(settings, "$22", "0"), 3);
-	const zMove = setMachineOrigin ? -OFFSET_DISTANCE : -pullOff;
-	gcode.push(`G53 G21 G0 Z${zMove}`); // Move up to the limit of Z travel minus offset
-	const homingPosition = getHomingLocation(homingPositionSetting);
+    const settings = get(
+        reduxStore.getState(),
+        'controller.settings.settings',
+        {},
+    );
+    // if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
+    const setMachineOrigin = isBitSetInNumber(get(settings, '$22', '0'), 3);
+    const zMove = setMachineOrigin ? -OFFSET_DISTANCE : -pullOff;
+    gcode.push(`G53 G21 G0 Z${zMove}`); // Move up to the limit of Z travel minus offset
+    const homingPosition = getHomingLocation(homingPositionSetting);
 
     // Change homing flag for grblHal specifically
     const controllerType = prefStore.get(
@@ -142,9 +142,9 @@ export const getMovementGCode = (
         'grbl',
     );
 
-	if (controllerType === "grblHAL") {
-		homingFlag = setMachineOrigin;
-	}
+    if (controllerType === 'grblHAL') {
+        homingFlag = setMachineOrigin;
+    }
 
     const [xMovement, yMovement] = getPositionMovements(
         requestedPosition,
@@ -156,7 +156,7 @@ export const getMovementGCode = (
     if (xMovement === null || yMovement === null) {
         toast.error(
             'Unable to calculate position movements based on inputs - check arguments passed',
-            { position: 'bottom-right' }
+            { position: 'bottom-right' },
         );
         return [];
     }

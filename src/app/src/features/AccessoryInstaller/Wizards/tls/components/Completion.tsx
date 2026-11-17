@@ -46,10 +46,10 @@ export function TLSCompletion() {
                     className="shrink-0 mr-3 text-yellow-600"
                 />
                 <span className="text-left">
-                    If you change your spindle or router's physical
-                    position (e.g. reinstalling it or a mounting bracket),
-                    you may need to update these settings in{' '}
-                    <b>Config</b> or run this installation wizard again.
+                    If you change your spindle or router's physical position
+                    (e.g. reinstalling it or a mounting bracket), you may need
+                    to update these settings in <b>Config</b> or run this
+                    installation wizard again.
                 </span>
             </div>
         </div>

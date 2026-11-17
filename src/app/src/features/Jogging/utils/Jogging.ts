@@ -106,7 +106,10 @@ export interface JoggerProps {
     threshold?: number;
 }
 
-export function cancelJog(state: GRBL_ACTIVE_STATES_T, firmwareType: FIRMWARE_TYPES_T) {
+export function cancelJog(
+    state: GRBL_ACTIVE_STATES_T,
+    firmwareType: FIRMWARE_TYPES_T,
+) {
     if (state) {
         if (state === GRBL_ACTIVE_STATE_JOG) {
             return controller.command('jog:cancel');

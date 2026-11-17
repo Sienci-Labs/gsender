@@ -40,7 +40,7 @@ export function EEPROMSettingRow({
     link = null,
     linkLabel = null,
     min,
-    max
+    max,
 }: EEPROMSettingRowProps) {
     const { EEPROM, eepromMap, machineProfile, firmwareType, eepromIsDefault } =
         useSettings();

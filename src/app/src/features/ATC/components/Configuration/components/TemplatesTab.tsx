@@ -17,7 +17,10 @@ import {
     CircleHelp,
 } from 'lucide-react';
 import cn from 'classnames';
-import { useConfigContext, mapDefaultsToValues } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import {
+    useConfigContext,
+    mapDefaultsToValues,
+} from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import {
     ATCIMacroConfig,
     Macro,
@@ -72,7 +75,9 @@ export function TemplateManagerProvider({
         if (!templates?.macros) {
             return [];
         }
-        return [...templates.macros].sort((a, b) => a.name.localeCompare(b.name));
+        return [...templates.macros].sort((a, b) =>
+            a.name.localeCompare(b.name),
+        );
     }, [templates]);
 
     useEffect(() => {
@@ -261,7 +266,10 @@ function TemplateManagerVersionInfo() {
                     <span className="text-sm font-semibold dark:text-white">
                         Local Templates:
                     </span>
-                    <Badge variant="secondary" className={localVersionBadgeClass}>
+                    <Badge
+                        variant="secondary"
+                        className={localVersionBadgeClass}
+                    >
                         v{localTemplateVersion}
                     </Badge>
                 </div>
@@ -314,11 +322,7 @@ function TemplateManagerUploadSection() {
     );
 }
 
-function TemplateViewer({
-    className = '',
-}: {
-    className?: string;
-}) {
+function TemplateViewer({ className = '' }: { className?: string }) {
     const { selectedTemplate } = useTemplateManagerContext();
 
     return (
@@ -362,12 +366,7 @@ export function TemplateManagerListContent({
         useTemplateManagerContext();
 
     return (
-        <div
-            className={cn(
-                'flex flex-col min-h-0 h-full gap-3',
-                className,
-            )}
-        >
+        <div className={cn('flex flex-col min-h-0 h-full gap-3', className)}>
             {showUploadButton && <TemplateManagerUploadSection />}
 
             <div className="border border-border bg-white dark:border-slate-700 dark:bg-dark-darker flex flex-col min-h-0 flex-1 overflow-hidden">

@@ -40,7 +40,7 @@ const parseMountPoint = (val, acc) => {
 
     const mount = {
         route: '/',
-        target: val
+        target: val,
     };
 
     if (val.indexOf(':') >= 0) {
@@ -76,52 +76,95 @@ const defaultPort = isElectron() ? 0 : 8000;
 program
     .version(pkg.version, '--version', 'Output the current program version')
     .usage('[options]')
-    .option('-p, --port <port>', `Set listen port (default: ${defaultPort})`, defaultPort)
-    .option('-H, --host <host>', `Set listen address or hostname (default: ${defaultHost})`, defaultHost)
+    .option(
+        '-p, --port <port>',
+        `Set listen port (default: ${defaultPort})`,
+        defaultPort,
+    )
+    .option(
+        '-H, --host <host>',
+        `Set listen address or hostname (default: ${defaultHost})`,
+        defaultHost,
+    )
     .option('-b, --backlog <backlog>', 'Set listen backlog (default: 511)', 511)
     .option('-c, --config <filename>', 'Set config file (default: ~/.cncrc)')
-    .option('-v, --verbose', 'Increase the verbosity level (-v, -vv, -vvv)', increaseVerbosityLevel, 0)
-    .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
+    .option(
+        '-v, --verbose',
+        'Increase the verbosity level (-v, -vv, -vvv)',
+        increaseVerbosityLevel,
+        0,
+    )
+    .option(
+        '-m, --mount <route-path>:<target>',
+        'Add a mount point for serving static files',
+        parseMountPoint,
+        [],
+    )
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
-    .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
-    .option('--remote', 'Enable Headless mode, exposing the internal server on your local network', false)
-    .option('--controller <type>', 'Specify CNC controller: Grbl, grblHAL (default: \'\')', parseController, '')
-    .option('--kiosk', 'Enable Kiosk mode, only allowing this application to be run', false);
+    .option(
+        '--access-token-lifetime <lifetime>',
+        'Access token lifetime in seconds or a time span string (default: 30d)',
+    )
+    .option(
+        '--allow-remote-access',
+        'Allow remote access to the server (default: false)',
+        false,
+    )
+    .option(
+        '--remote',
+        'Enable Headless mode, exposing the internal server on your local network',
+        false,
+    )
+    .option(
+        '--controller <type>',
+        "Specify CNC controller: Grbl, grblHAL (default: '')",
+        parseController,
+        '',
+    )
+    .option(
+        '--kiosk',
+        'Enable Kiosk mode, only allowing this application to be run',
+        false,
+    );
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
-const normalizedArgv = ('' + process.argv[0]).indexOf(pkg.name) >= 0
-    ? ['node', pkg.name, ...process.argv.slice(1)]
-    : process.argv;
+const normalizedArgv =
+    ('' + process.argv[0]).indexOf(pkg.name) >= 0
+        ? ['node', pkg.name, ...process.argv.slice(1)]
+        : process.argv;
 if (normalizedArgv.length > 1) {
     program.parse(normalizedArgv);
 }
 
 const options = program.opts();
 
-module.exports = () => new Promise((resolve, reject) => {
-    let kiosk = !!options.kiosk;
+module.exports = () =>
+    new Promise((resolve, reject) => {
+        let kiosk = !!options.kiosk;
 
-    require('./server').createServer({
-        port: options.port,
-        host: options.host,
-        backlog: options.backlog,
-        configFile: options.config,
-        verbosity: options.verbose,
-        mountPoints: options.mount,
-        watchDirectory: options.watchDirectory,
-        accessTokenLifetime: options.accessTokenLifetime,
-        allowRemoteAccess: !!options.allowRemoteAccess,
-        controller: options.controller,
-        kiosk
-    }, (err, data = {}) => {
-        if (err) {
-            err.errData = data; // preserve bindingErr flag
-            reject(err);
-            return;
-        }
+        require('./server').createServer(
+            {
+                port: options.port,
+                host: options.host,
+                backlog: options.backlog,
+                configFile: options.config,
+                verbosity: options.verbose,
+                mountPoints: options.mount,
+                watchDirectory: options.watchDirectory,
+                accessTokenLifetime: options.accessTokenLifetime,
+                allowRemoteAccess: !!options.allowRemoteAccess,
+                controller: options.controller,
+                kiosk,
+            },
+            (err, data = {}) => {
+                if (err) {
+                    err.errData = data; // preserve bindingErr flag
+                    reject(err);
+                    return;
+                }
 
-        resolve({ ...data, headless: false, kiosk });
+                resolve({ ...data, headless: false, kiosk });
+            },
+        );
     });
-});

@@ -455,9 +455,7 @@ export class JoystickLoop {
             const absY = Math.abs(yAxis);
 
             // Treat tiny XY stick movement as idle to avoid micro-jog spam.
-            if (
-                Math.max(absX, absY) < HORIZONTAL_EFFECTIVE_IDLE_THRESHOLD
-            ) {
+            if (Math.max(absX, absY) < HORIZONTAL_EFFECTIVE_IDLE_THRESHOLD) {
                 this.horizontalDominantAxis = null;
                 return;
             }

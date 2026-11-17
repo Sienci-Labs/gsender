@@ -10,7 +10,7 @@ export interface JobStatus {
 
 export interface RecentFile {
     fileSize: number;
-    filePath: string,
-    fileName: string,
-    timeUploaded: number
+    filePath: string;
+    fileName: string;
+    timeUploaded: number;
 }

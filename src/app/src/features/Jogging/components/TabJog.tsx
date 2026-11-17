@@ -22,10 +22,13 @@ const TabJog = (props: TabJogProps) => {
             viewBox="0 0 50 187"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className={cn('w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]', {
-                'cursor-pointer': props.canClick,
-                'cursor-not-allowed': !props.canClick,
-            })}
+            className={cn(
+                'w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]',
+                {
+                    'cursor-pointer': props.canClick,
+                    'cursor-not-allowed': !props.canClick,
+                },
+            )}
         >
             <path
                 role="button"

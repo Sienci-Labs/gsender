@@ -9,7 +9,15 @@ import {
 import Button from 'app/components/Button';
 
 export function ActionButtons() {
-    const { isMounted, isConnected, isLoading, setIsLoading, firmwareType, hasFTP, hasYM } = useSDCard();
+    const {
+        isMounted,
+        isConnected,
+        isLoading,
+        setIsLoading,
+        firmwareType,
+        hasFTP,
+        hasYM,
+    } = useSDCard();
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     const isGrblHAL = firmwareType === 'grblHAL';

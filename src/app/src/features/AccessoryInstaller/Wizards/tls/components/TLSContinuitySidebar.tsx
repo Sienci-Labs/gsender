@@ -24,7 +24,9 @@ export function TLSContinuitySidebar() {
     );
     // Selected for reactivity: firmwarePastVersion reads redux directly, but
     // this ensures the component re-renders once version info arrives/changes.
-    useSelector((state: RootState) => state.controller.settings.version?.semver);
+    useSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
 
     const invertProbePin = get(eepromSettings, '$6', undefined);
     const legacyToolSensor = get(eepromSettings, '$668', undefined);

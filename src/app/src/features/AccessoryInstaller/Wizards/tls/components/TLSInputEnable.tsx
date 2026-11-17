@@ -18,8 +18,7 @@ export function TLSInputEnable() {
         (state: RootState) => state.controller.state.status?.probe?.type,
     );
 
-    const tlsInputEnabled =
-        (Number(get(eepromSettings, '$65', 0)) || 0) & 8;
+    const tlsInputEnabled = (Number(get(eepromSettings, '$65', 0)) || 0) & 8;
 
     if (boardId !== 'SLB Lite' || !tlsInputEnabled) {
         return null;

@@ -380,6 +380,12 @@ class GrblController {
 					this.updateSpindleModal(spindleCommand);
 				}
 
+				// Optimistically update units modal so toolchange/macros see the latest value before the next $G report
+				const unitsCommand = _.intersection(words, ["G20", "G21"])[0];
+				if (unitsCommand) {
+					this.updateUnitsModal(unitsCommand);
+				}
+
 				// // M6 Tool Change
 				//const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
 				const passthroughM6 = _.get(
@@ -545,6 +551,12 @@ class GrblController {
 				const spindleCommand = _.intersection(words, ["M3", "M4"])[0];
 				if (spindleCommand) {
 					this.updateSpindleModal(spindleCommand);
+				}
+
+				// Optimistically update units modal so toolchange/macros see the latest value before the next $G report
+				const unitsCommand = _.intersection(words, ["G20", "G21"])[0];
+				if (unitsCommand) {
+					this.updateUnitsModal(unitsCommand);
 				}
 
 				/* Emit event to UI for toolchange handler */
@@ -2369,6 +2381,14 @@ class GrblController {
 	updateSpindleModal(modal) {
 		this.state.parserstate.modal.spindle = modal;
 		this.emit("controller:state", GRBL, this.state);
+	}
+
+	updateUnitsModal(units) {
+		if (this.runner.getModalGroup().units === units) {
+			return;
+		}
+		this.runner.setUnits(units);
+		this.emit("controller:state", GRBL, this.runner.state);
 	}
 
 	/* Runs specified code segment on M6 command before alerting the UI as to what's happened */

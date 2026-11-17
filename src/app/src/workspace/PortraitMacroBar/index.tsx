@@ -87,7 +87,11 @@ function SortableMacroButton({
             style={style}
             className={cx('relative w-full', isDragging && 'invisible')}
         >
-            <MacroButtonInner macro={macro} canRun={canRun} onClick={() => onRun(macro)} />
+            <MacroButtonInner
+                macro={macro}
+                canRun={canRun}
+                onClick={() => onRun(macro)}
+            />
             <div
                 {...attributes}
                 {...listeners}
@@ -110,9 +114,7 @@ export const PortraitMacroBar = () => {
     const isConnected = useTypedSelector(
         (state) => state.connection.isConnected,
     );
-    const workflow = useTypedSelector(
-        (state) => state.controller.workflow,
-    );
+    const workflow = useTypedSelector((state) => state.controller.workflow);
     const [macros, setMacros] = useState<MacroItem[]>([]);
     const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -139,18 +141,30 @@ export const PortraitMacroBar = () => {
         return () => clearInterval(interval);
     }, [isPortrait, enabled]);
 
-    const canRun = isConnected && (workflow.state === WORKFLOW_STATE_IDLE || workflow.state === WORKFLOW_STATE_PAUSED);
+    const canRun =
+        isConnected &&
+        (workflow.state === WORKFLOW_STATE_IDLE ||
+            workflow.state === WORKFLOW_STATE_PAUSED);
 
     const handleRun = useCallback(
         (macro: MacroItem) => {
             if (!canRun) return;
-            controller.command('macro:run', macro.id, controller.context, (err: Error | null) => {
-                if (err) {
-                    toast.error(`Failed to run macro "${macro.name}"`, { position: 'bottom-right' });
-                    return;
-                }
-                toast.info(`Started running macro "${macro.name}"!`, { position: 'bottom-right' });
-            });
+            controller.command(
+                'macro:run',
+                macro.id,
+                controller.context,
+                (err: Error | null) => {
+                    if (err) {
+                        toast.error(`Failed to run macro "${macro.name}"`, {
+                            position: 'bottom-right',
+                        });
+                        return;
+                    }
+                    toast.info(`Started running macro "${macro.name}"!`, {
+                        position: 'bottom-right',
+                    });
+                },
+            );
         },
         [canRun],
     );
@@ -159,27 +173,24 @@ export const PortraitMacroBar = () => {
         setActiveId(event.active.id);
     }, []);
 
-    const handleDragEnd = useCallback(
-        (event: DragEndEvent) => {
-            setActiveId(null);
-            const { active, over } = event;
-            if (!over || active.id === over.id) return;
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+        setActiveId(null);
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
 
-            setMacros((items) => {
-                const oldIndex = items.findIndex((m) => m.id === active.id);
-                const newIndex = items.findIndex((m) => m.id === over.id);
-                const reordered = arrayMove(items, oldIndex, newIndex);
+        setMacros((items) => {
+            const oldIndex = items.findIndex((m) => m.id === active.id);
+            const newIndex = items.findIndex((m) => m.id === over.id);
+            const reordered = arrayMove(items, oldIndex, newIndex);
 
-                // persist new order to server
-                reordered.forEach((macro, index) => {
-                    api.macros.update(macro.id, { rowIndex: index });
-                });
-
-                return reordered;
+            // persist new order to server
+            reordered.forEach((macro, index) => {
+                api.macros.update(macro.id, { rowIndex: index });
             });
-        },
-        [],
-    );
+
+            return reordered;
+        });
+    }, []);
 
     const handleDragCancel = useCallback(() => {
         setActiveId(null);
@@ -198,7 +209,10 @@ export const PortraitMacroBar = () => {
                 onDragEnd={handleDragEnd}
                 onDragCancel={handleDragCancel}
             >
-                <SortableContext items={macros.map((m) => m.id)} strategy={rectSortingStrategy}>
+                <SortableContext
+                    items={macros.map((m) => m.id)}
+                    strategy={rectSortingStrategy}
+                >
                     <div className="grid grid-cols-5 gap-2">
                         {macros.map((macro) => (
                             <SortableMacroButton

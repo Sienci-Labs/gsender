@@ -86,7 +86,11 @@ export function ToolStatusBadges({
 
     return (
         <div
-            className={cn('inline-flex items-center', sizeConfig.container, className)}
+            className={cn(
+                'inline-flex items-center',
+                sizeConfig.container,
+                className,
+            )}
         >
             {manualPosition === 'before' ? manualBadge : null}
             {statusBadge}

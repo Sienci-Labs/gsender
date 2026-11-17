@@ -1,11 +1,10 @@
 describe('gSender Configuration and Firmware Test Suite', () => {
-
     beforeEach(() => {
         cy.viewport(2844, 1450);
         cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
             maxRetries: 8,
             waitTime: 8000,
-            timeout: 5000
+            timeout: 5000,
         });
     });
 
@@ -22,15 +21,21 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.goToConfig();
 
         // Reset Settings
-        cy.get('[data-testid="gsender-settings-reset-button"] > span.text-sm').click();
+        cy.get(
+            '[data-testid="gsender-settings-reset-button"] > span.text-sm',
+        ).click();
         // FIX: use cy.contains on button.bg-blue-500 — avoids hardcoded radix ID
-        cy.contains('button.bg-blue-500', 'Restore Settings', { timeout: 10000 })
+        cy.contains('button.bg-blue-500', 'Restore Settings', {
+            timeout: 10000,
+        })
             .should('be.visible')
             .click();
         cy.get('section line:nth-of-type(1)').click({ force: true });
 
         // Export Settings
-        cy.get('[data-testid="gsender-settings-export-button"] > span.text-sm').click();
+        cy.get(
+            '[data-testid="gsender-settings-export-button"] > span.text-sm',
+        ).click();
         cy.wait(3000);
         cy.get('#section-0 > div.flex-row').click({ force: true });
 
@@ -39,9 +44,13 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.applySettings();
 
         // Import Settings
-        cy.get('[data-testid="gsender-settings-import-button"] > span.text-sm').click();
-        cy.get('div.min-h-1\\/5 > fieldset input')
-            .selectFile('cypress/fixtures/gSender-settings.json', { force: true });
+        cy.get(
+            '[data-testid="gsender-settings-import-button"] > span.text-sm',
+        ).click();
+        cy.get('div.min-h-1\\/5 > fieldset input').selectFile(
+            'cypress/fixtures/gSender-settings.json',
+            { force: true },
+        );
         // FIX: same — use cy.contains instead of hardcoded radix ID
         cy.contains('button.bg-blue-500', 'Import Settings', { timeout: 10000 })
             .should('be.visible')
@@ -50,16 +59,21 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
         // Verify units reverted to mm
         cy.get('#section-0').within(() => {
-            cy.get('fieldset').first().within(() => {
-                cy.get('button[role="switch"]', { timeout: 10000 })
-                    .first()
-                    .then(($toggle) => {
-                        const isMMSelected =
-              $toggle.attr('data-state') === 'unchecked' ||
-              $toggle.attr('aria-checked') === 'false';
-                        expect(isMMSelected, 'Units should be set to MM after import').to.be.true;
-                    });
-            });
+            cy.get('fieldset')
+                .first()
+                .within(() => {
+                    cy.get('button[role="switch"]', { timeout: 10000 })
+                        .first()
+                        .then(($toggle) => {
+                            const isMMSelected =
+                                $toggle.attr('data-state') === 'unchecked' ||
+                                $toggle.attr('aria-checked') === 'false';
+                            expect(
+                                isMMSelected,
+                                'Units should be set to MM after import',
+                            ).to.be.true;
+                        });
+                });
         });
 
         // Part 2: Firmware Settings
@@ -68,13 +82,17 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
         // Restore defaults
         cy.get('div.fixed div.grid > button:nth-of-type(1)').click();
-        cy.contains('button.bg-blue-500', 'Restore Defaults', { timeout: 10000 })
+        cy.contains('button.bg-blue-500', 'Restore Defaults', {
+            timeout: 10000,
+        })
             .should('be.visible')
             .should('not.be.disabled')
             .click();
 
         // Skip waiting — force click past the notification
-        cy.get('[data-testid="firmware-settings-export-button"]', { timeout: 10000 })
+        cy.get('[data-testid="firmware-settings-export-button"]', {
+            timeout: 10000,
+        })
             .should('be.visible')
             .click({ force: true });
 
@@ -82,20 +100,25 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.get('div[data-title]', { timeout: 10000 }).should('not.exist');
 
         // Export firmware settings
-        cy.get('[data-testid="firmware-settings-export-button"]', { timeout: 10000 })
+        cy.get('[data-testid="firmware-settings-export-button"]', {
+            timeout: 10000,
+        })
             .should('be.visible')
             .should('not.be.disabled')
             .click();
-
 
         // Import firmware settings
-        cy.get('[data-testid="firmware-settings-import-button"]', { timeout: 10000 })
+        cy.get('[data-testid="firmware-settings-import-button"]', {
+            timeout: 10000,
+        })
             .should('be.visible')
             .should('not.be.disabled')
             .click();
 
-        cy.get('div.fixed input')
-            .selectFile('cypress/fixtures/gSender-firmware-settings.json', { force: true });
+        cy.get('div.fixed input').selectFile(
+            'cypress/fixtures/gSender-firmware-settings.json',
+            { force: true },
+        );
 
         // Wait for import to process — no confirm button needed, file auto-imports
         cy.wait(2000);
@@ -109,7 +132,10 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
         // Close import notification if present
         cy.get('body').then(($body) => {
-            if ($body.find('section:contains("EPROM settings imported")').length > 0) {
+            if (
+                $body.find('section:contains("EPROM settings imported")')
+                    .length > 0
+            ) {
                 cy.get('section button > svg').first().click({ force: true });
             }
         });

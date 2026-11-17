@@ -30,11 +30,11 @@ export interface Spindle {
     capabilities: string;
     laser: boolean;
     raw: string;
-    order: number
+    order: number;
 }
 
 export interface LaserState {
-    laserOnOutline: boolean,
+    laserOnOutline: boolean;
     power: number;
     duration: number;
     xOffset: number;

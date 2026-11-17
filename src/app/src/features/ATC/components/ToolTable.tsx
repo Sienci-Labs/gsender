@@ -26,7 +26,7 @@ import { ToolProbeState } from 'app/features/ATC/types.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import get from 'lodash/get';
-import store from "app/store";
+import store from 'app/store';
 
 export type ToolStatus = ToolProbeState;
 
@@ -185,7 +185,7 @@ export function ToolTable({ tools = [], disabled }: ToolTableProps) {
     const { rackSize, connected, atcAvailable } = useToolChange();
     const allowManualBadge = connected && atcAvailable;
     const reportedRackEnable = Number(
-        store.get('widgets.atc.templates.variables._tc_rack_enable.value', 1)
+        store.get('widgets.atc.templates.variables._tc_rack_enable.value', 1),
     );
     const rackEnabled = reportedRackEnable !== 0;
 

@@ -5,11 +5,8 @@ const crypto = require('crypto');
 const dotenv = require('dotenv');
 const pkg = require('./package.json');
 
-
 function loadEnv(target) {
-    const envFile = target === 'production'
-        ? '.env.prod'
-        : '.env.dev';
+    const envFile = target === 'production' ? '.env.prod' : '.env.dev';
 
     dotenv.config({ path: path.resolve(__dirname, envFile) });
 }
@@ -77,7 +74,7 @@ function createHexFilePlugin(target) {
 
                 const transformed = source.replace(
                     /(['"])!file-loader!([^'"]+\.hex)\1/g,
-                    (match, quote, hexPath) => `${quote}${hexPath}${quote}`
+                    (match, quote, hexPath) => `${quote}${hexPath}${quote}`,
                 );
 
                 return {
@@ -91,15 +88,22 @@ function createHexFilePlugin(target) {
 
                 const serverDir = path.join(__dirname, 'src/server');
                 const relativePath = path.relative(serverDir, args.path);
-                const outputPath = path.join(__dirname, baseOutDir, 'server', relativePath);
+                const outputPath = path.join(
+                    __dirname,
+                    baseOutDir,
+                    'server',
+                    relativePath,
+                );
 
                 // Ensure output directory exists
-                await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
+                await fs.promises.mkdir(path.dirname(outputPath), {
+                    recursive: true,
+                });
                 await fs.promises.writeFile(outputPath, contents);
 
                 const relativeToOutput = path.relative(
                     path.join(__dirname, baseOutDir, 'server'),
-                    outputPath
+                    outputPath,
                 );
 
                 return {
@@ -174,8 +178,10 @@ function prebuild(target) {
         : path.join(__dirname, 'dist/gsender');
 
     // Clean
-    fs.rmSync(isDev ? path.join(__dirname, 'output') : path.join(__dirname, 'dist'),
-              { recursive: true, force: true });
+    fs.rmSync(
+        isDev ? path.join(__dirname, 'output') : path.join(__dirname, 'dist'),
+        { recursive: true, force: true },
+    );
 
     // Create output dirs
     fs.mkdirSync(baseDir, { recursive: true });
@@ -183,7 +189,7 @@ function prebuild(target) {
     // Copy package.json
     fs.copyFileSync(
         path.join(__dirname, 'src/package.json'),
-        path.join(baseDir, 'package.json')
+        path.join(baseDir, 'package.json'),
     );
 
     // Dev: copy app assets (favicon, images, assets)
@@ -193,7 +199,9 @@ function prebuild(target) {
         for (const asset of ['favicon.ico', 'images', 'assets']) {
             const src = path.join(__dirname, 'src/app', asset);
             if (fs.existsSync(src)) {
-                fs.cpSync(src, path.join(baseDir, 'app', asset), { recursive: true });
+                fs.cpSync(src, path.join(baseDir, 'app', asset), {
+                    recursive: true,
+                });
             }
         }
     }
@@ -204,7 +212,9 @@ function prebuild(target) {
             path.join(__dirname, 'src/yarn.lock'),
             path.join(__dirname, 'yarn.lock'),
         ];
-        const targetYarnLock = yarnLockCandidates.find((candidate) => fs.existsSync(candidate));
+        const targetYarnLock = yarnLockCandidates.find((candidate) =>
+            fs.existsSync(candidate),
+        );
         if (targetYarnLock) {
             fs.copyFileSync(targetYarnLock, path.join(baseDir, 'yarn.lock'));
         }
@@ -220,7 +230,11 @@ const buildVersion = pkg.version;
 
 // Sentry plugin for esbuild (optional - only in production)
 function getSentryPlugin() {
-    if (process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT) {
+    if (
+        process.env.SENTRY_AUTH_TOKEN &&
+        process.env.SENTRY_ORG &&
+        process.env.SENTRY_PROJECT
+    ) {
         try {
             const { sentryEsbuildPlugin } = require('@sentry/esbuild-plugin');
             return sentryEsbuildPlugin({
@@ -229,7 +243,9 @@ function getSentryPlugin() {
                 project: process.env.SENTRY_PROJECT,
             });
         } catch (error) {
-            console.warn('⚠️  Sentry plugin not available, skipping source map upload');
+            console.warn(
+                '⚠️  Sentry plugin not available, skipping source map upload',
+            );
             return null;
         }
     }
@@ -260,7 +276,9 @@ const createConfig = (target, entry, outdir, additionalOptions = {}) => {
             'global.NODE_ENV': JSON.stringify(target),
             'global.PUBLIC_PATH': JSON.stringify(publicPath),
             'global.BUILD_VERSION': JSON.stringify(buildVersion),
-            'global.METRICS_ENDPOINT': JSON.stringify(process.env.METRICS_ENDPOINT || ''),
+            'global.METRICS_ENDPOINT': JSON.stringify(
+                process.env.METRICS_ENDPOINT || '',
+            ),
         },
         loader: {
             '.txt': 'copy',
@@ -287,7 +305,7 @@ async function buildServer(target) {
         {
             packages: 'external', // Don't bundle any node_modules
             plugins: [srcResolverPlugin, createHexFilePlugin(target)],
-        }
+        },
     );
 
     try {
@@ -317,7 +335,7 @@ async function buildElectron(target) {
             packages: 'external', // Don't bundle any node_modules
             outExtension: { '.js': '.js' },
             plugins: [srcResolverPlugin, createHexFilePlugin(target)],
-        }
+        },
     );
 
     try {
@@ -347,7 +365,7 @@ async function buildServerCli(target) {
             packages: 'external',
             outExtension: { '.js': '.js' },
             plugins: [srcResolverPlugin, createHexFilePlugin(target)],
-        }
+        },
     );
 
     try {
@@ -372,7 +390,7 @@ async function watchAll() {
         {
             packages: 'external',
             plugins: [srcResolverPlugin, createHexFilePlugin('development')],
-        }
+        },
     );
 
     const electronConfig = createConfig(
@@ -383,7 +401,7 @@ async function watchAll() {
             packages: 'external',
             outExtension: { '.js': '.js' },
             plugins: [srcResolverPlugin, createHexFilePlugin('development')],
-        }
+        },
     );
 
     const cliConfig = createConfig(
@@ -394,7 +412,7 @@ async function watchAll() {
             packages: 'external',
             outExtension: { '.js': '.js' },
             plugins: [srcResolverPlugin, createHexFilePlugin('development')],
-        }
+        },
     );
 
     copyStaticFiles('development');
@@ -404,17 +422,15 @@ async function watchAll() {
     const electronCtx = await esbuild.context(electronConfig);
     const cliCtx = await esbuild.context(cliConfig);
 
-    await Promise.all([
-        serverCtx.watch(),
-        electronCtx.watch(),
-        cliCtx.watch(),
-    ]);
+    await Promise.all([serverCtx.watch(), electronCtx.watch(), cliCtx.watch()]);
 
     console.log('👀 Watching:');
     console.log('   - Server files (output/server/index.js)');
     console.log('   - Electron main (output/main.js)');
     console.log('   - Server CLI (output/server-cli.js)');
-    console.log('\n✨ Hot reload enabled! Edit files and see changes instantly.\n');
+    console.log(
+        '\n✨ Hot reload enabled! Edit files and see changes instantly.\n',
+    );
 }
 
 async function watchServer() {
@@ -426,7 +442,8 @@ async function build() {
     const args = process.argv.slice(2);
     const target = args.includes('--production') ? 'production' : 'development';
     const watch = args.includes('--watch');
-    const buildTarget = args.find(arg => arg.startsWith('--target='))?.split('=')[1] || 'all';
+    const buildTarget =
+        args.find((arg) => arg.startsWith('--target='))?.split('=')[1] || 'all';
 
     console.log(`🔨 Building for ${target}...`);
 

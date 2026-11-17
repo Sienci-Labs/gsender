@@ -54,7 +54,10 @@ const ProbeImage: React.FC<Props> = ({
 }) => {
     const getProbeImage = () => {
         const { id } = probeCommand;
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO || touchplateType === TOUCHPLATE_TYPE_BITZERO) {
+        if (
+            touchplateType === TOUCHPLATE_TYPE_AUTOZERO ||
+            touchplateType === TOUCHPLATE_TYPE_BITZERO
+        ) {
             if (id === 'Z Touch') {
                 return AutoZProbe;
             }

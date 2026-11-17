@@ -18,7 +18,9 @@ exports.default = async (config) => {
 
     // Skip silently on non-signing builds (branch builds, dev machines without SM vars)
     if (!keypairAlias || !clientCert) {
-        console.log('WindowsSigner: SM_KEYPAIR_ALIAS or SM_CLIENT_CERT_FILE not set — skipping signing');
+        console.log(
+            'WindowsSigner: SM_KEYPAIR_ALIAS or SM_CLIENT_CERT_FILE not set — skipping signing',
+        );
         return;
     }
 
@@ -29,7 +31,7 @@ exports.default = async (config) => {
     try {
         execSync(
             `smctl sign --keypair-alias="${keypairAlias}" --input="${filePath}" --verbose`,
-            { stdio: 'inherit' }
+            { stdio: 'inherit' },
         );
     } catch (err) {
         throw new Error(`Failed to sign executable: ${err.message}`);

@@ -2109,7 +2109,9 @@ class Visualizer extends Component {
                     obj.geometry.dispose();
                 }
                 if (obj.material) {
-                    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+                    const mats = Array.isArray(obj.material)
+                        ? obj.material
+                        : [obj.material];
                     mats.forEach((m) => {
                         if (m.map) m.map.dispose();
                         m.dispose();
@@ -2177,16 +2179,19 @@ class Visualizer extends Component {
         {
             // Imperial Coordinate System
             const visible = objects.coordinateSystem.visible;
-            const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
+            const imperialCoordinateSystem =
+                this.createCoordinateSystem(IMPERIAL_UNITS);
             imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
-            imperialCoordinateSystem.visible = visible && units === IMPERIAL_UNITS;
+            imperialCoordinateSystem.visible =
+                visible && units === IMPERIAL_UNITS;
             this.group.add(imperialCoordinateSystem);
         }
 
         {
             // Metric Coordinate System
             const visible = objects.coordinateSystem.visible;
-            const metricCoordinateSystem = this.createCoordinateSystem(METRIC_UNITS);
+            const metricCoordinateSystem =
+                this.createCoordinateSystem(METRIC_UNITS);
             metricCoordinateSystem.name = 'MetricCoordinateSystem';
             metricCoordinateSystem.visible = visible && units === METRIC_UNITS;
             this.group.add(metricCoordinateSystem);
@@ -2195,16 +2200,19 @@ class Visualizer extends Component {
         {
             // Imperial Grid Line Numbers
             const visible = objects.gridLineNumbers.visible;
-            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            const imperialGridLineNumbers =
+                this.createGridLineNumbers(IMPERIAL_UNITS);
             imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
-            imperialGridLineNumbers.visible = visible && units === IMPERIAL_UNITS;
+            imperialGridLineNumbers.visible =
+                visible && units === IMPERIAL_UNITS;
             this.group.add(imperialGridLineNumbers);
         }
 
         {
             // Metric Grid Line Numbers
             const visible = objects.gridLineNumbers.visible;
-            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            const metricGridLineNumbers =
+                this.createGridLineNumbers(METRIC_UNITS);
             metricGridLineNumbers.name = 'MetricGridLineNumbers';
             metricGridLineNumbers.visible = visible && units === METRIC_UNITS;
             this.group.add(metricGridLineNumbers);
@@ -2213,8 +2221,12 @@ class Visualizer extends Component {
         {
             // Cutting Tool (async STL load)
             Promise.all([
-                loadSTL('assets/models/stl/bit.stl').then((geometry) => geometry),
-                loadTexture('assets/textures/brushed-steel-texture.jpg').then((texture) => texture),
+                loadSTL('assets/models/stl/bit.stl').then(
+                    (geometry) => geometry,
+                ),
+                loadTexture('assets/textures/brushed-steel-texture.jpg').then(
+                    (texture) => texture,
+                ),
             ])
                 .then((result) => {
                     const [geometry, texture] = result;
@@ -2263,7 +2275,10 @@ class Visualizer extends Component {
                     this.updateScene();
                 })
                 .catch((error) => {
-                    console.error('Visualizer: Failed to load cutting tool assets during rebuild:', error);
+                    console.error(
+                        'Visualizer: Failed to load cutting tool assets during rebuild:',
+                        error,
+                    );
                 });
         }
 

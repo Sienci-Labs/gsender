@@ -4,11 +4,13 @@ import Button from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { GRBL_ACTIVE_STATE_RUN, GRBL_HAL_ACTIVE_STATE_RUN } from 'app/constants';
+import {
+    GRBL_ACTIVE_STATE_RUN,
+    GRBL_HAL_ACTIVE_STATE_RUN,
+} from 'app/constants';
 
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
-
 
 const MarkingStep = () => {
     const {
@@ -22,7 +24,9 @@ const MarkingStep = () => {
     const { units } = useWorkspaceState();
     const status = useTypedSelector((state) => state.controller.state.status);
 
-    const machineIsMoving = status?.activeState === GRBL_ACTIVE_STATE_RUN || status?.activeState === GRBL_HAL_ACTIVE_STATE_RUN;
+    const machineIsMoving =
+        status?.activeState === GRBL_ACTIVE_STATE_RUN ||
+        status?.activeState === GRBL_HAL_ACTIVE_STATE_RUN;
     const currentMainStepData = mainSteps[currentMainStep];
     const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
 
@@ -82,7 +86,9 @@ const MarkingStep = () => {
                                     <div className="flex items-center gap-4">
                                         <Button
                                             disabled={
-                                                !isCurrentStep || step.completed || machineIsMoving
+                                                !isCurrentStep ||
+                                                step.completed ||
+                                                machineIsMoving
                                             }
                                             onClick={() => {
                                                 if (

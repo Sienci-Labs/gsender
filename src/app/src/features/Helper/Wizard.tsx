@@ -73,8 +73,13 @@ const Wizard = () => {
     if (minimized) {
         const pill = (
             <div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-[#18181f]/90 backdrop-blur-sm border border-gray-200 dark:border-[#2a2a35] shadow-md">
-                <Wrench size={12} className="text-gray-500 dark:text-gray-400 shrink-0" />
-                <span className="font-medium text-gray-700 dark:text-[#e5e5ea] text-xs whitespace-nowrap">{title}</span>
+                <Wrench
+                    size={12}
+                    className="text-gray-500 dark:text-gray-400 shrink-0"
+                />
+                <span className="font-medium text-gray-700 dark:text-[#e5e5ea] text-xs whitespace-nowrap">
+                    {title}
+                </span>
                 <MinMaxButton />
                 <CancelButton />
             </div>
@@ -100,11 +105,13 @@ const Wizard = () => {
 
             <div className="fixed inset-y-0 left-0 right-[33%] flex items-center justify-center z-[200] pointer-events-none">
                 <div className="pointer-events-auto w-[860px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
-
                     {/* Titlebar */}
                     <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-[#2a2a35] bg-gray-100 dark:bg-[#111116]">
                         <div className="flex items-center gap-2">
-                            <Wrench size={14} className="text-gray-500 dark:text-gray-400" />
+                            <Wrench
+                                size={14}
+                                className="text-gray-500 dark:text-gray-400"
+                            />
                             <span className="font-semibold text-base text-gray-900 dark:text-[#e5e5ea]">
                                 {title}
                             </span>

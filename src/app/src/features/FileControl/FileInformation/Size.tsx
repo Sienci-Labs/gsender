@@ -45,9 +45,7 @@ const Size = () => {
             </thead>
             <tbody>
                 <tr>
-                    <td className="border border-gray-300 px-1 font-bold">
-                        X
-                    </td>
+                    <td className="border border-gray-300 px-1 font-bold">X</td>
                     <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.delta.x}
                     </td>
@@ -59,9 +57,7 @@ const Size = () => {
                     </td>
                 </tr>
                 <tr>
-                    <td className="border border-gray-300 px-1 font-bold">
-                        Y
-                    </td>
+                    <td className="border border-gray-300 px-1 font-bold">Y</td>
                     <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.delta.y}
                     </td>
@@ -73,9 +69,7 @@ const Size = () => {
                     </td>
                 </tr>
                 <tr>
-                    <td className="border border-gray-300 px-1 font-bold">
-                        Z
-                    </td>
+                    <td className="border border-gray-300 px-1 font-bold">Z</td>
                     <td className="border border-gray-300 px-1 text-center">
                         {formattedBBox.delta.z}
                     </td>

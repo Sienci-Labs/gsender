@@ -29,7 +29,8 @@ function JoggingSpacer() {
 }
 
 export function useSienciTLSWizard(): Wizard {
-    const { connectionValidation, homingValidation, grblHAlValidator } = useValidations();
+    const { connectionValidation, homingValidation, grblHAlValidator } =
+        useValidations();
 
     const validations = useMemo(
         () => [connectionValidation, grblHAlValidator, homingValidation],
@@ -60,7 +61,7 @@ export function useSienciTLSWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content: TLS_STEP_ONE
+                                    content: TLS_STEP_ONE,
                                 },
                                 {
                                     type: 'component',
@@ -81,7 +82,7 @@ export function useSienciTLSWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content: TLS_STEP_TWO
+                                    content: TLS_STEP_TWO,
                                 },
                                 {
                                     type: 'component',
@@ -110,7 +111,7 @@ export function useSienciTLSWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content: TLS_STEP_THREE
+                                    content: TLS_STEP_THREE,
                                 },
                                 {
                                     type: 'component',

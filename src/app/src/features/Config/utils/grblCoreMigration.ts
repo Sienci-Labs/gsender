@@ -86,7 +86,10 @@ export function translateGrblCoreOrderedSettings(
     boardId?: string,
     migration: GrblCoreMigration = GRBLCORE_MIGRATION,
 ): Map<EEPROM, string> | undefined {
-    if (!ordered || !usesGrblCoreMigration(firmwareSemver, boardId, migration)) {
+    if (
+        !ordered ||
+        !usesGrblCoreMigration(firmwareSemver, boardId, migration)
+    ) {
         return ordered;
     }
 

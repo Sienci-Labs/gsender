@@ -8,7 +8,9 @@ interface ValidationBannerProps {
 }
 
 export function ValidationBanner({ validations }: ValidationBannerProps) {
-    const [validationError, setValidationError] = useState<ReactNode | null>(null);
+    const [validationError, setValidationError] = useState<ReactNode | null>(
+        null,
+    );
 
     useEffect(() => {
         if (validations && validations.length > 0) {
