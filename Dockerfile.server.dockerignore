@@ -1,0 +1,15 @@
+# Build context exclusions for Dockerfile.server only
+.git
+.github
+**/node_modules
+dist
+output
+releases
+coverage
+cypress
+__tests__
+examples
+Dockerfile*
+gsender_server_log.txt
+.env.sentry-build-plugin
+cypress.env.json

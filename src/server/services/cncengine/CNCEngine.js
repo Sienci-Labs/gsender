@@ -26,7 +26,6 @@ import noop from 'lodash/noop';
 import partition from 'lodash/partition';
 import { SerialPort } from 'serialport';
 import socketIO from 'socket.io';
-import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import EventTrigger from '../../lib/EventTrigger';
@@ -47,6 +46,15 @@ import UF2Flasher from '../../lib/Firmware/Flashing/UF2Flasher';
 import delay from '../../lib/delay';
 import Connection from '../../lib/Connection';
 import { VISUALIZER_SECONDARY } from '../../../app/src/constants';
+
+// Electron is only present when running inside the desktop app. The headless
+// server runs under plain Node.js, where the module may not be installed.
+let app = null;
+try {
+    ({ app } = require('electron'));
+} catch (err) {
+    // Running outside of Electron
+}
 
 const log = logger('service:cncengine');
 
