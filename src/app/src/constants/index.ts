@@ -256,6 +256,9 @@ export const SPINDLE_MODES = ['M3', 'M4', 'M5'];
 
 export const SURFACING_DWELL_DURATION = 4;
 
+// Fraction of the cutting feedrate used for the straight Z plunge into uncut material
+export const SURFACING_PLUNGE_FEED_RATIO = 0.25;
+
 // Event Triggers
 export const PROGRAM_START = 'gcode:start';
 export const PROGRAM_END = 'gcode:stop';
