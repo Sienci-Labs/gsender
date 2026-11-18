@@ -432,6 +432,23 @@ The host shows a floating toggle button (using your `label`/`icon`) on the main
 visualizer; clicking it opens the plugin panel docked over the canvas, where your
 UI can call the `gsender.viewer.*` API against the visualizer behind it.
 
+Optional contribution fields:
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `width` | number (px) | `320` | Width of the drawer docked over the visualizer. Minimum `200`. |
+| `height` | number (px) | full visualizer height | Height of the drawer, anchored to the top-right. Minimum `120`. |
+| `requiresIdle` | boolean | `false` | Grey out the toggle unless the machine is connected and idle (for plugins that drive motion). |
+
+```json
+{ "slot": "visualizer-overlay", "label": "Corner Finder", "icon": "🎯", "width": 420, "height": 360 }
+```
+
+`width` and `height` are always capped to the visualizer bounds (minus a 1rem
+margin each side), so the drawer shrinks on small windows — design your UI to
+flex or scroll. Values that aren't positive numbers are ignored and the default
+is used.
+
 #### API
 
 | Method | Description |

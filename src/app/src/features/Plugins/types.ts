@@ -42,6 +42,11 @@ export type PluginContribution = {
     // true, the host greys out and blocks the overlay toggle unless the machine
     // is connected and idle (i.e. actually able to accept the command).
     requiresIdle?: boolean;
+    // For "visualizer-overlay" contributions: the drawer size in CSS px. Omitted
+    // → default (320px wide, full visualizer height). Always capped to the
+    // visualizer bounds; non-positive/non-numeric values fall back to default.
+    width?: number;
+    height?: number;
 };
 
 export type PluginRecord = {
