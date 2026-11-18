@@ -12,7 +12,7 @@ import {
     nameVariants,
     planVariations,
 } from '../capture/variants.mjs';
-import { buildArgs } from '../launcher/server.mjs';
+import { buildArgs, newProgress, track } from '../launcher/server.mjs';
 import { syncPlugin } from '../sync-plugin.mjs';
 
 const require = createRequire(import.meta.url);
@@ -313,6 +313,29 @@ test('the launcher builds start.mjs arguments from its options', () => {
     assert.deepEqual(both.args, ['--pendant', '--stamp']);
     assert.deepEqual(both.next, ['--storybook', '--pendant', '--stamp', '--controls', 'primary']);
     assert.equal(buildArgs({ mode: 'live', withStories: true }).next, undefined);
+});
+
+test('the launcher reads progress from the capture output', () => {
+    const p = newProgress();
+    for (const line of [
+        '$ yarn figma --storybook',
+        '▶ Starting storybook (yarn storybook --ci --no-open), log: /tmp/x.log',
+    ])
+        track(p, line);
+    assert.equal(p.phase, 'Starting storybook');
+    for (const line of [
+        '✔ storybook ready at http://localhost:6006/',
+        '• Desktop: 4 component(s)',
+        '  Components/Button … 20 state(s) from 5 stories',
+        '    ! Hidden: renders nothing visible',
+        '  Features/Coolant … 13 state(s) from 7 stories',
+        '• Pendant: 2 component(s)',
+    ])
+        track(p, line);
+    assert.deepEqual(p, { phase: 'Capturing Storybook · Pendant', done: 2, total: 6 });
+    const screens = newProgress();
+    track(screens, '• http://localhost:5173/ … figma-captures/index.json (1838 KB)');
+    assert.equal(screens.done, 1);
 });
 
 test('the launcher rejects what it cannot pass on safely', () => {

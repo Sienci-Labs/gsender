@@ -65,8 +65,26 @@ function addLog(text, flush = false) {
     for (const line of parts) {
         if (!line && (!log.length || !log[log.length - 1].text)) continue;
         log.push({ n: ++logCount, text: line });
+        if (job) track(job.progress, line);
     }
     if (log.length > MAX_LOG) log.splice(0, log.length - MAX_LOG);
+}
+
+// What a running job is doing, read from its output: the last step it
+// announced ("Starting backend", "Capturing…") and, for Storybook, how many
+// components are done out of how many.
+export function newProgress() {
+    return { phase: 'Starting…', done: 0, total: 0 };
+}
+export function track(p, line) {
+    let m;
+    if ((m = line.match(/^▶ (.+?)(?: \(.*\))?(?:,\s*log:.*)?$/))) p.phase = m[1];
+    else if ((m = line.match(/^✔ (\S+) (?:ready|already running)/))) p.phase = `${m[1]} ready`;
+    else if ((m = line.match(/^• (.+?): (\d+) component\(s\)/))) {
+        p.total += Number(m[2]);
+        p.phase = `Capturing Storybook · ${m[1]}`;
+    } else if (/^ {2}\S.* … /.test(line)) p.done++;
+    else if (/^• \S+.* … /.test(line)) p.done++;
 }
 
 const oneOf = (v, list, fallback) => (list.includes(v) ? v : fallback);
@@ -196,7 +214,19 @@ function runStep(steps, i) {
         detached: !isWindows,
         env: childEnv(),
     });
-    job = { child, mode, label, args, startedAt: Date.now(), exit: null, step: i + 1, steps: steps.length };
+    job = {
+        child,
+        mode,
+        label,
+        args,
+        startedAt: Date.now(),
+        // When the first step started, for the elapsed time of the whole run
+        runStartedAt: (steps.startedAt ??= Date.now()),
+        exit: null,
+        step: i + 1,
+        steps: steps.length,
+        progress: newProgress(),
+    };
     const mine = job;
     child.stdout.on('data', (d) => addLog(d));
     child.stderr.on('data', (d) => addLog(d));
@@ -212,6 +242,7 @@ function runStep(steps, i) {
             return;
         }
         mine.exit = exit;
+        mine.endedAt = Date.now();
         addLog(
             `\n${
                 mine.exit === 0
@@ -297,7 +328,16 @@ function state(since) {
             running: job.exit === null,
             exit: job.exit,
             startedAt: job.startedAt,
+            runStartedAt: job.runStartedAt,
+            endedAt: job.endedAt || null,
+            step: job.step,
+            steps: job.steps,
+            progress: job.progress,
+            // The item being captured right now ("  Features/Jogging … "),
+            // printed before its result arrives.
+            current: job.exit === null ? partial.trim().replace(/\s*…$/, '') : '',
         },
+        now: Date.now(),
         log: log.filter((l) => l.n > since),
         captures: listCaptures(OUT),
         outDir: OUT,

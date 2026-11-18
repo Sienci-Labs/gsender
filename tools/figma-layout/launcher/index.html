@@ -102,6 +102,24 @@
     .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; }
     .dot.on { background: var(--ok); }
     .dot.bad { background: var(--danger); }
+    .status .elapsed { margin: 0 0 0 auto; font-variant-numeric: tabular-nums; }
+    .spinner {
+        width: 14px; height: 14px; flex: none;
+        border: 2px solid var(--border); border-top-color: var(--accent);
+        border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .progress { margin-bottom: 12px; }
+    .bar { height: 8px; border-radius: 999px; background: var(--border); overflow: hidden; position: relative; }
+    .bar span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: inherit; transition: width 0.4s; }
+    .bar.indeterminate span { width: 30%; position: absolute; animation: slide 1.4s ease-in-out infinite; }
+    @keyframes slide { from { left: -30%; } to { left: 100%; } }
+    .now { margin: 6px 0 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now b { color: var(--text); font-weight: 600; }
+    @media (prefers-reduced-motion: reduce) {
+        .spinner, .bar.indeterminate span { animation-duration: 3s; }
+    }
+    form.busy fieldset, form.busy .callout { opacity: 0.55; pointer-events: none; }
     pre {
         margin: 0;
         height: 260px;
@@ -300,8 +318,13 @@
         <section class="panel">
             <div class="status">
                 <span class="dot" id="dot"></span>
+                <span class="spinner" id="spinner" hidden aria-hidden="true"></span>
                 <b id="jobLabel">Idle</b>
-                <span class="hint" id="jobHint" style="margin: 0"></span>
+                <span class="hint elapsed" id="elapsed"></span>
+            </div>
+            <div class="progress" id="progress" hidden>
+                <div class="bar" id="bar" role="progressbar" aria-labelledby="jobLabel"><span id="barFill"></span></div>
+                <p class="now" id="now" aria-live="polite"></p>
             </div>
             <pre id="log" aria-live="polite" aria-label="Output"></pre>
         </section>
@@ -349,6 +372,61 @@
         all: 'Desktop stories, and pendant stories at both the pendant and Android sizes.',
     };
 
+    function clock(ms) {
+        const t = Math.max(0, Math.round(ms / 1000));
+        const h = Math.floor(t / 3600);
+        const m = Math.floor((t % 3600) / 60);
+        const sec = String(t % 60).padStart(2, '0');
+        return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`;
+    }
+
+    const PAGE_TITLE = document.title;
+
+    // Spinner, elapsed time, a bar (filled by components done in Storybook,
+    // sliding otherwise) and what is being captured right now.
+    function showProgress(s, running) {
+        const job = s.job;
+        const live = running && job.mode === 'live';
+        $('progress').hidden = !running;
+        const start = job && (job.runStartedAt || job.startedAt);
+        $('elapsed').textContent = start
+            ? `${running ? '' : 'took '}${clock((running ? s.now || Date.now() : job.endedAt || s.now || Date.now()) - start)}`
+            : '';
+        if (!running) {
+            document.title = PAGE_TITLE;
+            return;
+        }
+        const p = job.progress || { phase: '', done: 0, total: 0 };
+        const bar = $('bar');
+        const known = p.total > 0 && !live;
+        bar.classList.toggle('indeterminate', !known);
+        const pct = known ? Math.min(100, Math.round((p.done / p.total) * 100)) : 0;
+        $('barFill').style.width = known ? `${pct}%` : '';
+        if (known) {
+            bar.setAttribute('aria-valuenow', String(pct));
+            bar.setAttribute('aria-valuemin', '0');
+            bar.setAttribute('aria-valuemax', '100');
+        } else {
+            bar.removeAttribute('aria-valuenow');
+        }
+        const step = job.steps > 1 ? `Step ${job.step} of ${job.steps} · ` : '';
+        const count = known ? ` · ${p.done} of ${p.total} components` : '';
+        const now = $('now');
+        now.textContent = '';
+        now.append(`${step}${live ? 'Waiting for you to capture' : p.phase}${count}`);
+        if (job.current && !live) {
+            const b = document.createElement('b');
+            b.textContent = job.current;
+            now.append(' · ', b);
+        }
+        document.title = `${known ? `${pct}% ` : ''}Capturing… · ${PAGE_TITLE}`;
+    }
+
+    function runLabel() {
+        const mode = field('mode').value;
+        return RUN_LABELS[mode === 'capture' && field('withStories').checked ? 'captureStories' : mode];
+    }
+
     function syncForm() {
         const mode = field('mode').value;
         const story = mode === 'storybook';
@@ -365,7 +443,7 @@
         $('storyFields').hidden = !story && !withStories;
         $('storyFilterField').hidden = !story;
         $('nextStories').hidden = !story && !withStories;
-        $('run').textContent = RUN_LABELS[withStories ? 'captureStories' : mode];
+        if (!form.classList.contains('busy')) $('run').textContent = runLabel();
         $('urlField').hidden = mode !== 'capture';
         $('themeField').hidden = mode === 'live';
         $('stampField').hidden = mode === 'live';
@@ -538,14 +616,19 @@
             }
             const running = !!(s.job && s.job.running);
             $('dot').className = 'dot' + (running ? ' on' : s.job && s.job.exit ? ' bad' : '');
+            $('dot').hidden = running;
+            $('spinner').hidden = !running;
             $('jobLabel').textContent = !s.job
                 ? 'Idle'
                 : running
-                  ? `Running: ${s.job.label}`
+                  ? `Capturing: ${s.job.label}`
                   : s.job.exit === 0
                     ? `Finished: ${s.job.label}`
                     : `Stopped: ${s.job.label}`;
+            showProgress(s, running);
             $('run').disabled = running;
+            $('run').textContent = running ? 'Capturing…' : runLabel();
+            form.classList.toggle('busy', running);
             if (s.manifest) $('manifestPath').textContent = s.manifest;
             const finished = !!(s.job && !running && s.job.exit === 0);
             $('next').classList.toggle('done', finished);

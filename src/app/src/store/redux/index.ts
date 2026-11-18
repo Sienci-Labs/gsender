@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { sagaMiddleware } from './sagas';
+import { sagaMiddleware } from './sagas/middleware';
 import connection from './slices/connection.slice';
 import console from './slices/console.slice';
 import controller from './slices/controller.slice';

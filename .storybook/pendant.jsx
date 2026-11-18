@@ -7,6 +7,7 @@ import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/ibm-plex-mono/600.css';
 import '@fontsource/ibm-plex-mono/700.css';
 import { useLayoutEffect } from 'react';
+import { UNSAFE_LocationContext } from 'react-router';
 import { spyOn } from 'storybook/test';
 import appStore from 'app/store';
 import controller from 'app/lib/controller';
@@ -22,6 +23,15 @@ export const TABLET = { width: 810, height: 1080 };
 // Widths of the carve screen's two columns on that tablet (44% / 56%)
 export const CARVE_LEFT = Math.round(TABLET.width * 0.44);
 export const CARVE_RIGHT = TABLET.width - CARVE_LEFT;
+
+// The legacy carve screen (PendantShell with pendant.legacyCarve) targets the
+// 800x1280 pendant. CarveView lays its cards out in a 2-column grid (p-3, gap-3);
+// LEGACY_CARD is one column's width.
+export const LEGACY = { width: 800, height: 1280 };
+export const LEGACY_CARD = Math.floor((LEGACY.width - 24 - 12) / 2);
+// BottomDrawer's panel heights below its 3.5rem header: minimal and expanded (60vh)
+export const DRAWER_MINIMAL = 168;
+export const DRAWER_EXPANDED = Math.round(LEGACY.height * 0.6);
 
 const px = (value) => (typeof value === 'number' ? `${value}px` : value);
 
@@ -85,6 +95,16 @@ export const withPendant = (Story, { parameters }) => {
         </PendantFrame>
     );
 };
+
+// The pendant mounts no top-level router (entry-pendant.tsx); Config and the
+// tools it opens bring their own MemoryRouter. The preview wraps every story in
+// a HashRouter, so stories of those components hide it with this decorator
+// (listed before withPendant) to keep react-router from refusing to nest.
+export const withoutRouter = (Story) => (
+    <UNSAFE_LocationContext.Provider value={null}>
+        <Story />
+    </UNSAFE_LocationContext.Provider>
+);
 
 // Spread into a pendant story file's meta parameters: own iframe per story on
 // Docs pages (the pendant stylesheet and <html> theme are page-wide), and no

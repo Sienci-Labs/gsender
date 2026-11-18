@@ -311,7 +311,7 @@ const call = (cdp, method, ...args) =>
 // cause, so capturing that component again works. After a reload the
 // helpers this script put in the page are gone too, hence the last few.
 const RELOADED =
-    /navigated or closed|Timed out waiting for Page|context was destroyed|Cannot find context|Execution context|stopped responding|__l2fSb|__layoutToFigma|Cannot read properties of undefined \(reading '(ready|show|setArgs|resetArgs|describe|markInteractive|captureContent)'\)/i;
+    /net::ERR_ABORTED|navigated or closed|Timed out waiting for Page|context was destroyed|Cannot find context|Execution context|stopped responding|__l2fSb|__layoutToFigma|Cannot read properties of undefined \(reading '(ready|show|setArgs|resetArgs|describe|markInteractive|captureContent)'\)/i;
 
 /* -------------------------------------------------------------------- */
 /* Planning                                                             */

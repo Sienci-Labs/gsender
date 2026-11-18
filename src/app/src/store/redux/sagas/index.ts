@@ -21,14 +21,13 @@
  *
  */
 
-import createSagaMiddleware from 'redux-saga';
 import { all, call } from 'redux-saga/effects';
 
 import * as controller from './controllerSagas';
 
 const sagas = [controller];
 
-export const sagaMiddleware = createSagaMiddleware();
+export { sagaMiddleware } from './middleware';
 
 export default function* root() {
     yield all(sagas.map((saga) => call(saga.initialize)));

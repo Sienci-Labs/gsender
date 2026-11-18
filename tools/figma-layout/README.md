@@ -42,8 +42,11 @@ the machine to connect to, then **Start**. Screens mode includes
 Storybook for the same layout, and the plugin lays each component's states
 out beneath the screens that use it (see
 [Storybook states beside screens](#storybook-states-beside-screens)). The
-page's **Then, in Figma** box has the steps for getting captures into Figma. The page shows the tool's output
-as it runs, has **Stop**, and in live mode a **Capture now** button.
+page's **Then, in Figma** box has the steps for getting captures into Figma. While a capture runs the page
+shows a spinner, the elapsed time, what it is doing ("Starting backend",
+"Step 2 of 2 · Capturing Storybook · Desktop · 12 of 56 components ·
+Features/Jogging") with a progress bar for Storybook, and the tool's output.
+It has **Stop**, and in live mode a **Capture now** button.
 
 Below that it lists the captures in `./figma-captures/`. Pick one as
 **Baseline** and one to **Compare**, and **Save differences only** writes a

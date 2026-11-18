@@ -1003,10 +1003,11 @@ function pickSet(entries, layout) {
 
 // The Storybook components a screen shows: walks its layers and records,
 // for each component set, the outermost layers rendered by its component.
-function componentsIn(screen, index) {
+async function componentsIn(screen, index) {
     const layout = screen.getPluginData('layout') || 'desktop';
     const found = new Map(); // set id → { set, layers }
-    const walk = (node, active) => {
+    const seenMains = new Set();
+    const walk = async (node, active) => {
         let inside = active;
         if (node.type === 'FRAME' || node.type === 'INSTANCE' || node.type === 'COMPONENT') {
             for (const k of L2FMatch.layerKeys(node.name, node.getPluginData('react'))) {
@@ -1018,9 +1019,19 @@ function componentsIn(screen, index) {
                 inside.add(set.id);
             }
         }
-        if ('children' in node) for (const c of node.children) walk(c, inside);
+        // Tab panels are instances of the tab group's variants; what they
+        // show is in the main component, where the capture's names are.
+        if (node.type === 'INSTANCE') {
+            const main = await node.getMainComponentAsync();
+            if (main && !seenMains.has(main.id)) {
+                seenMains.add(main.id);
+                for (const c of main.children) await walk(c, inside);
+            }
+            return;
+        }
+        if ('children' in node) for (const c of node.children) await walk(c, inside);
     };
-    walk(screen, new Set());
+    await walk(screen, new Set());
     // In reading order of where each first appears.
     const box = (n) => n.absoluteBoundingBox || { x: 0, y: 0 };
     return [...found.values()].sort((a, b) => {
@@ -1179,7 +1190,7 @@ async function attachStoryStates(targets) {
     }
     const used = new Set();
     for (const screen of targets) {
-        const found = componentsIn(screen, index);
+        const found = await componentsIn(screen, index);
         const old = previous[screen.id];
         const spot = old ? { x: old.x, y: old.y } : null;
         if (old) old.remove();
