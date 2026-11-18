@@ -60,6 +60,7 @@ import { PluginParserChain } from "../../lib/plugin-parsers";
 import Sender, { SP_TYPE_CHAR_COUNTING } from "../../lib/Sender";
 import ToolChanger from "../../lib/ToolChanger";
 import translateExpression from "../../lib/translate-expression";
+import getMacroSettings from "../../lib/get-macro-settings";
 import Workflow, {
 	WORKFLOW_STATE_IDLE,
 	WORKFLOW_STATE_PAUSED,
@@ -1715,6 +1716,9 @@ class GrblHalController {
 		const programFeedrate = this.runner.getCurrentFeedrate();
 		const spindleRate = this.runner.getCurrentSpindleRate();
 
+		// EEPROM settings
+		const eepromSettings = getMacroSettings(this.settings.settings);
+
 		return Object.assign(context || {}, {
 			// User-defined global variables
 			global: this.sharedContext,
@@ -1768,6 +1772,9 @@ class GrblHalController {
 
 			// Current Spindle RPM
 			spindleRate: spindleRate,
+
+			// EEPROM settings - settings.$xxx
+			settings: eepromSettings,
 
 			// Global objects
 			...globalObjects,
