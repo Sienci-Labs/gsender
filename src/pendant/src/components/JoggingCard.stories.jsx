@@ -13,7 +13,7 @@ import JoggingCard from './JoggingCard';
 // Z and A. Whether it is enabled comes from the machine state; step sizes and
 // feeds from app/store (widgets.axes.jog.<preset>) in the workspace units
 const meta = {
-    title: 'Pendant/JoggingCard',
+    title: 'Pendant/Legacy/JoggingCard',
     component: JoggingCard,
     tags: ['ai-generated'],
     decorators: [withPendant],

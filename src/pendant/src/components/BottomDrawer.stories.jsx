@@ -49,7 +49,7 @@ const MACROS = [
 // firmware's ATC=1). Which tab is open is internal state, so each tab story
 // opens it in its play function.
 const meta = {
-    title: 'Pendant/BottomDrawer',
+    title: 'Pendant/Legacy/BottomDrawer',
     component: BottomDrawer,
     tags: ['ai-generated'],
     decorators: [

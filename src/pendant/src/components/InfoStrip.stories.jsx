@@ -21,7 +21,7 @@ const MODAL = {
 // parser modal state, input pins and the clock. All from the machine state
 // (modal, status.pinState, status.currentTool, $32 for laser mode)
 const meta = {
-    title: 'Pendant/InfoStrip',
+    title: 'Pendant/Legacy/InfoStrip',
     component: InfoStrip,
     tags: ['ai-generated'],
     decorators: [withPendant],

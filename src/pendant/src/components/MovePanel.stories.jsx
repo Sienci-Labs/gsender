@@ -20,7 +20,7 @@ const POSITION = { x: 120.5, y: 45.25, z: -3.175 };
 // pad (absolute, incremental or machine coordinates). Gating comes from the
 // machine state: homing ($22), whether the machine has homed, alarms
 const meta = {
-    title: 'Pendant/MovePanel',
+    title: 'Pendant/Legacy/MovePanel',
     component: MovePanel,
     tags: ['ai-generated'],
     decorators: [withPendant],

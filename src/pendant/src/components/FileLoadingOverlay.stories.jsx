@@ -10,7 +10,7 @@ import FileLoadingOverlay from './FileLoadingOverlay';
 // Shown over the visualizer while a loaded file's toolpath is built
 // (legacy visualizer card and the carve screen's visualizer stage)
 const meta = {
-    title: 'Pendant/FileLoadingOverlay',
+    title: 'Pendant/Legacy/FileLoadingOverlay',
     component: FileLoadingOverlay,
     tags: ['ai-generated'],
     decorators: [withPendant],

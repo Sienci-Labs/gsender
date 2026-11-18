@@ -38,7 +38,7 @@ const SENDER = {
 // workspace selector, job controls, progress and override sliders. What it
 // shows comes from the machine state (connection, loaded file, job progress)
 const meta = {
-    title: 'Pendant/VisualizerCard',
+    title: 'Pendant/Legacy/VisualizerCard',
     component: VisualizerCard,
     tags: ['ai-generated'],
     decorators: [withPendant],

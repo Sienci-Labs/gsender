@@ -12,7 +12,7 @@ import FeedOverrideWrapper from './FeedOverrideWrapper';
 // machine state (status.ov, status.feedrate, status.spindle); the spindle
 // slider only shows with workspace.spindleFunctions on
 const meta = {
-    title: 'Pendant/FeedOverrideWrapper',
+    title: 'Pendant/Legacy/FeedOverrideWrapper',
     component: FeedOverrideWrapper,
     tags: ['ai-generated'],
     decorators: [withPendant],

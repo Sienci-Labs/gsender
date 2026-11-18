@@ -24,7 +24,7 @@ const SENDER = {
 // Stop under the legacy carve screen's visualizer card, built from the
 // desktop's ControlButton; which are enabled comes from the machine state
 const meta = {
-    title: 'Pendant/JobControls',
+    title: 'Pendant/Legacy/JobControls',
     component: JobControls,
     tags: ['ai-generated'],
     decorators: [withPendant],

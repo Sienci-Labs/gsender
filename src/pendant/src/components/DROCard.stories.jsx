@@ -17,7 +17,7 @@ const POSITIONED = {
 // card (right column): work/machine position, per-axis Go To and Zero, and
 // Home / Go to XY / Zero All. Positions and gating come from the machine state
 const meta = {
-    title: 'Pendant/DROCard',
+    title: 'Pendant/Legacy/DROCard',
     component: DROCard,
     tags: ['ai-generated'],
     decorators: [withPendant],

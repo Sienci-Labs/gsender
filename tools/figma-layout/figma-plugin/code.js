@@ -440,12 +440,13 @@ function layoutVariants(set, variants) {
         set.layoutMode = 'HORIZONTAL';
         set.layoutWrap = 'WRAP';
         set.counterAxisSpacing = gap;
-        set.primaryAxisSizingMode = 'FIXED';
-        set.counterAxisSizingMode = 'AUTO';
+        // resize() fixes both axes; set the height to hug afterwards.
         set.resize(
             Math.min(total, Math.max(widest, SET_MAX_WIDTH)) + pad * 2,
             set.height,
         );
+        set.primaryAxisSizingMode = 'FIXED';
+        set.counterAxisSizingMode = 'AUTO';
     } catch (e) {
         // Wrapping auto layout isn't available everywhere.
         set.layoutMode = 'VERTICAL';
@@ -1129,9 +1130,12 @@ async function stateGroup(set, layers) {
         row.layoutWrap = 'WRAP';
         row.itemSpacing = gap;
         row.counterAxisSpacing = gap;
+        // resize() fixes both axes, so it goes before the height is set to
+        // hug the wrapped rows; the other way round the rows overflow a 1px
+        // frame and pile onto whatever is below.
+        row.resize(Math.max(1, Math.min(total, Math.max(widest, STORY_ROW_WIDTH))), 1);
         row.primaryAxisSizingMode = 'FIXED';
         row.counterAxisSizingMode = 'AUTO';
-        row.resize(Math.max(1, Math.min(total, Math.max(widest, STORY_ROW_WIDTH))), 1);
     } catch (e) {
         row.layoutMode = 'VERTICAL';
         row.itemSpacing = gap;
@@ -1199,19 +1203,20 @@ async function attachStoryStates(targets) {
         const section = figma.createSection();
         section.name = `${screen.name} — Storybook states`;
         section.setPluginData(STORY_FOR, screen.id);
-        let y = SECTION_PADDING;
-        let width = 0;
+        // One auto layout column, so Figma stacks the components itself.
+        const column = hugFrame('Storybook states', 'VERTICAL', STATE_GAP);
+        section.appendChild(column);
+        column.x = SECTION_PADDING;
+        column.y = SECTION_PADDING;
         for (const { set, layers } of found) {
-            const group = await stateGroup(set, layers);
-            section.appendChild(group);
-            group.x = SECTION_PADDING;
-            group.y = y;
-            y += group.height + STATE_GAP;
-            width = Math.max(width, group.width);
+            column.appendChild(await stateGroup(set, layers));
             used.add(set.id);
             result.places += layers.length;
         }
-        section.resizeWithoutConstraints(width + SECTION_PADDING * 2, y - STATE_GAP + SECTION_PADDING);
+        section.resizeWithoutConstraints(
+            column.width + SECTION_PADDING * 2,
+            column.height + SECTION_PADDING * 2,
+        );
         const at =
             spot ||
             freeSpotBelow(

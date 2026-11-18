@@ -15,7 +15,7 @@ const HOMING = { $22: '1' };
 // Everything comes from the machine state; the connection widget follows it
 // through stubPendantConnection (it reconnects about half a second after mount)
 const meta = {
-    title: 'Pendant/PendantTopBar',
+    title: 'Pendant/Legacy/PendantTopBar',
     component: PendantTopBar,
     tags: ['ai-generated'],
     decorators: [withPendant],

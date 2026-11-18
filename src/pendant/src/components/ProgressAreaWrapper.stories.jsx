@@ -22,7 +22,7 @@ const sender = (received) => ({
 // while idle that grows into a labelled bar while a job runs or is paused.
 // Progress comes from the machine state's `file` and `sender`
 const meta = {
-    title: 'Pendant/ProgressAreaWrapper',
+    title: 'Pendant/Legacy/ProgressAreaWrapper',
     component: ProgressAreaWrapper,
     tags: ['ai-generated'],
     decorators: [withPendant],

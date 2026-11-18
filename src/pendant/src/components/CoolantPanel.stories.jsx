@@ -13,7 +13,7 @@ import CoolantPanel from './CoolantPanel';
 // tab in the legacy carve screen's bottom drawer; which button glows and
 // whether they are clickable comes from the machine state (modal.coolant)
 const meta = {
-    title: 'Pendant/CoolantPanel',
+    title: 'Pendant/Legacy/CoolantPanel',
     component: CoolantPanel,
     tags: ['ai-generated'],
     decorators: [withPendant],

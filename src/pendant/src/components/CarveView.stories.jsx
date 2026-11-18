@@ -36,7 +36,7 @@ const SENDER = {
 // Sized to what is left of the 800x1280 pendant under the top bar (56px),
 // info strip (~42px) and bottom nav (~64px)
 const meta = {
-    title: 'Pendant/CarveView',
+    title: 'Pendant/Legacy/CarveView',
     component: CarveView,
     tags: ['ai-generated'],
     decorators: [withPendant],
