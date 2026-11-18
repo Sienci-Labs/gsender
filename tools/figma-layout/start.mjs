@@ -160,6 +160,9 @@ try {
         console.log(
             `\nLeaving ${started.map((s) => s.name).join(' and ')} running (logs in ${logDir}).`,
         );
+        // Let this script exit while they run on: otherwise it waits on
+        // them, and the launcher never starts the next step (Storybook).
+        for (const s of started) s.child.unref();
     } else {
         stopAll();
     }
