@@ -16,6 +16,19 @@ import PluginPanel from './PluginPanel';
 const BUTTON_SIZE_PX = 44; // h-11 / w-11
 const CONTROL_GAP_PX = 12;
 
+// Overlay drawer sizing. Plugins may override width/height via their
+// contribution; the minimums keep the header and close button usable.
+const DEFAULT_PANEL_WIDTH_PX = 320; // previous w-80
+const MIN_PANEL_WIDTH_PX = 200;
+const MIN_PANEL_HEIGHT_PX = 120;
+
+// Manifest values are unvalidated JSON, so ignore anything that isn't a
+// finite positive number and clamp the rest to the minimum.
+const sanitizeDimension = (value: unknown, min: number): number | undefined =>
+    typeof value === 'number' && Number.isFinite(value) && value > 0
+        ? Math.max(min, value)
+        : undefined;
+
 type Props = {
     // Bottom offset (px) of the lightweight toggle — overlay buttons stack above it.
     baseBottomPx: number;
@@ -34,10 +47,14 @@ const getOverlayContribution = (
 const OverlayPanel = ({
     plugin,
     title,
+    width,
+    height,
     onClose,
 }: {
     plugin: PluginRecord;
     title: string;
+    width?: number;
+    height?: number;
     onClose: () => void;
 }) => {
     useEffect(() => {
@@ -49,7 +66,16 @@ const OverlayPanel = ({
     }, []);
 
     return (
-        <div className="absolute right-4 top-4 bottom-4 z-10 flex w-80 max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-[0_10px_30px_rgba(0,_0,_0,_0.35)] dark:border-dark-lighter dark:bg-dark">
+        <div
+            // Inline width/height still respect the max-w/max-h caps below, so an
+            // oversized request never overflows a small visualizer.
+            style={{ width: width ?? DEFAULT_PANEL_WIDTH_PX, height }}
+            className={cx(
+                'absolute right-4 top-4 z-10 flex max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-[0_10px_30px_rgba(0,_0,_0,_0.35)] dark:border-dark-lighter dark:bg-dark',
+                // No explicit height → stretch to full visualizer height (default).
+                { 'bottom-4': height === undefined },
+            )}
+        >
             <div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-dark-lighter">
                 <span className="truncate text-sm font-medium text-gray-700 dark:text-gray-200">
                     {title}
@@ -182,6 +208,14 @@ const PluginVisualizerOverlayHost = ({ baseBottomPx, leftPx }: Props) => {
                             <OverlayPanel
                                 plugin={plugin}
                                 title={label}
+                                width={sanitizeDimension(
+                                    contribution?.width,
+                                    MIN_PANEL_WIDTH_PX,
+                                )}
+                                height={sanitizeDimension(
+                                    contribution?.height,
+                                    MIN_PANEL_HEIGHT_PX,
+                                )}
                                 onClose={() => toggle(plugin.id)}
                             />
                         )}
