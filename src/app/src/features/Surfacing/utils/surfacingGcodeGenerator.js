@@ -9,6 +9,7 @@ import {
     START_POSITION_FRONT_LEFT,
     START_POSITION_FRONT_RIGHT,
     SURFACING_DWELL_DURATION,
+    SURFACING_PLUNGE_FEED_RATIO,
     ZIG_ZAG_MOVEMENT,
 } from 'app/constants';
 import controller from 'app/lib/controller';
@@ -70,8 +71,8 @@ export default class Generator {
             ...toolChange,
             `${spindle} S${spindleRPM}`,
             ...dwell,
+            `G0 Z${z}`, // z move up before moving XY for safety reasons
             'G0 X0 Y0',
-            `G0 Z${z}`,
             ...m7,
             ...m8,
             `G1 F${feedrate}`,
@@ -204,11 +205,14 @@ export default class Generator {
         const MAX_ZIGZAG_LENGTH_MM = 150;
 
         const { axis, factor } = direction;
-        const { skimDepth, bitDiameter, width, length } = this.surfacing;
+        const { skimDepth, maxDepth, bitDiameter, width, length } =
+            this.surfacing;
         const units = store.get('workspace.units');
         const safeHeight = this.getSafeZValue();
+        // if cut depth > max depth, it must not ramp past max depth
+        const depth = Math.min(skimDepth, maxDepth);
 
-        const totalZDrop = safeHeight + Math.abs(skimDepth);
+        const totalZDrop = safeHeight + Math.abs(depth);
 
         // Zigzag length: min surface dimension minus one full bit diameter (to stay within bounds),
         // capped at `MAX_ZIGZAG_LENGTH_MM` so the ramp doesn't span the entire workpiece on large jobs.
@@ -554,15 +558,31 @@ export default class Generator {
 
         const safeHeight = this.getSafeZValue();
         const zValue = toFixedValue(
-            safeHeight - (depth - this.surfacing.skimDepth),
+            // if cut depth > max depth, this could be a positive number
+            // moving up is pretty useless, so choose the min to avoid this
+            Math.min(
+                safeHeight,
+                safeHeight - (depth - this.surfacing.skimDepth),
+            ),
         );
+        const defaultSurfacingState = get(
+            defaultState,
+            'workspace.widgets.surfacing',
+        );
+        const { feedrate } = {
+            ...defaultSurfacingState,
+            ...this.surfacing,
+        };
+        const plungeFeed = toFixedValue(feedrate * SURFACING_PLUNGE_FEED_RATIO);
+
         const startFromCenterStartPosition = [
             '(Entering Start Position)',
+            `G0 Z${safeHeight}`, // retract fully before any XY move
             `G0 X${position.x} Y${position.y}`,
-            `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`,
-            'G91',
-            `G0 Z${Math.abs(depth) * -1 - safeHeight}`,
-            'G90',
+            `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`, // this height varies per layer, so -
+            // - don't try to guess where to move relatively. go straight to the depth we need to cut at
+            `G1 Z${toFixedValue(Math.abs(depth) * -1)} F${plungeFeed}`, // don't G0 down, go slower into the material
+            `G1 F${feedrate}`,
             '(End of Entering Start Position)',
             '',
         ];
