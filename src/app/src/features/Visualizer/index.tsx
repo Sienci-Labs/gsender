@@ -1033,10 +1033,6 @@ class Visualizer extends Component {
             isPortrait:
                 typeof window !== 'undefined' &&
                 window.matchMedia('(orientation: portrait)').matches,
-            showSoftLimitsWarning: this.config.get(
-                'showSoftLimitsWarning',
-                false,
-            ),
             workflow: {
                 state: controller.workflow.state,
             },

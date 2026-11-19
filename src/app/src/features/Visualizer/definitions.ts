@@ -92,7 +92,6 @@ export interface State {
     units: UNITS_EN;
     theme: THEMES_T;
     isPortrait: boolean;
-    showSoftLimitsWarning: boolean;
     workflow: {
         state: WORKFLOW_STATES_T;
     };
