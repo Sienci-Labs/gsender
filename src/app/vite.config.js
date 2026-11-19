@@ -6,6 +6,21 @@ import { defineConfig } from 'vite';
 import { patchCssModules } from 'vite-css-modules';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { createRequire } from 'module';
+
+// The renderer's deps live in the repo-root node_modules, but bare imports
+// resolve by walking up from the importing file, so src/node_modules (the
+// server's production install, created by CI's `yarn --cwd src install`) is
+// checked first. webappengine pulls in i18next@8 there, which shadowed the
+// root i18next for src/app/src/i18n while react-i18next still used the root
+// copy, crashing production builds with "hasLoadedNamespace is not a
+// function". Pin these to the root copies so the two always match.
+const requireFromRoot = createRequire(
+    path.resolve(__dirname, '../../package.json'),
+);
+const rootPackageDir = (name) =>
+    path.dirname(requireFromRoot.resolve(`${name}/package.json`));
+const PINNED_TO_ROOT = ['i18next', 'react-i18next'];
 
 export default defineConfig({
     root: path.resolve(__dirname, './'), // Set root to the directory containing index.html
@@ -39,10 +54,15 @@ export default defineConfig({
         }),
     ],
     resolve: {
-        alias: {
-            app: path.resolve(__dirname, './src'),
-            '@': path.resolve(__dirname, './src'),
-        },
+        alias: [
+            { find: 'app', replacement: path.resolve(__dirname, './src') },
+            { find: '@', replacement: path.resolve(__dirname, './src') },
+            ...PINNED_TO_ROOT.map((name) => ({
+                // Exact match only, so e.g. `i18next-http-backend` is untouched.
+                find: new RegExp(`^${name}$`),
+                replacement: rootPackageDir(name),
+            })),
+        ],
         dedupe: ['react', 'react-dom'],
     },
     define: {},
