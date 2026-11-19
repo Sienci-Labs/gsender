@@ -17,9 +17,11 @@ RUN command -v yarn >/dev/null 2>&1 || npm install -g yarn
 # the build cache until package.json changes (the repo has no committed
 # lockfile). The yarn cache mount keeps downloaded tarballs around even when
 # the layer itself isn't reused.
+# --ignore-engines: dev-only tooling (i18next-cli -> inquirer/@inquirer/*) declares
+# node ^24.15, newer than the builder image's node; it isn't used by the build.
 COPY package.json ./
 RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
-    yarn install --prefer-offline --non-interactive
+    yarn install --prefer-offline --non-interactive --ignore-engines
 
 COPY . .
 
