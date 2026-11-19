@@ -1,5 +1,13 @@
-import { IMPERIAL_UNITS, METRIC_UNITS } from 'app/constants';
+import {
+    IMPERIAL_UNITS,
+    METRIC_UNITS,
+    SPIRAL_MOVEMENT,
+    START_POSITION_BACK_LEFT,
+    START_POSITION_CENTER,
+    ZIG_ZAG_MOVEMENT,
+} from 'app/constants';
 import defaultState from 'app/store/defaultState';
+import Toolpath from '../utils/gcode-toolpath';
 import Generator from '../utils/surfacingGcodeGenerator';
 
 describe('Surfacing Output', () => {
@@ -146,5 +154,132 @@ describe('Surfacing Output', () => {
         expect(toolChangeIndex).toBeGreaterThan(-1);
         expect(spindleStartIndex).toBeGreaterThan(-1);
         expect(toolChangeIndex).toBe(spindleStartIndex - 1);
+    });
+
+    describe('center start spiral', () => {
+        type Move = {
+            motion: string;
+            start: { x: number; y: number; z: number };
+            end: { x: number; y: number; z: number };
+        };
+
+        const generate = (overrides = {}) =>
+            new Generator({
+                surfacing: {
+                    ...defaultState.widgets.surfacing,
+                    length: 100,
+                    width: 100,
+                    skimDepth: 1,
+                    maxDepth: 2,
+                    bitDiameter: 22,
+                    stepover: 40,
+                    type: SPIRAL_MOVEMENT,
+                    startPosition: START_POSITION_CENTER,
+                    ...overrides,
+                },
+                units: METRIC_UNITS,
+            }).generate({ returnArray: true }) as string[];
+
+        // Simulates the program and records every move
+        const simulate = (gcode: string[]): Move[] => {
+            const moves: Move[] = [];
+            const toolpath = new Toolpath({
+                addLine: (
+                    modal: { motion: string },
+                    start: Move['start'],
+                    end: Move['end'],
+                ) =>
+                    moves.push({
+                        motion: modal.motion,
+                        start: { ...start },
+                        end: { ...end },
+                    }),
+            });
+            toolpath.loadFromStringSync(gcode.join('\n'));
+            return moves;
+        };
+
+        const cases = [
+            { name: 'two layers', overrides: {} },
+            { name: 'three layers', overrides: { maxDepth: 3 } },
+            {
+                name: 'cut direction flipped',
+                overrides: { cutDirectionFlipped: true },
+            },
+            {
+                name: 'cut depth greater than max depth',
+                overrides: { skimDepth: 3, maxDepth: 2 },
+            },
+            {
+                name: 'cut depth greater than max depth, flipped',
+                overrides: {
+                    skimDepth: 3,
+                    maxDepth: 2,
+                    cutDirectionFlipped: true,
+                },
+            },
+            {
+                name: 'cut depth greater than max depth, corner start',
+                overrides: {
+                    skimDepth: 3,
+                    maxDepth: 2,
+                    startPosition: START_POSITION_BACK_LEFT,
+                },
+            },
+            {
+                name: 'cut depth greater than max depth, zig-zag',
+                overrides: {
+                    skimDepth: 3,
+                    maxDepth: 2,
+                    type: ZIG_ZAG_MOVEMENT,
+                    startPosition: START_POSITION_BACK_LEFT,
+                },
+            },
+        ];
+
+        it.each(cases)(
+            'never cuts below max depth ($name)',
+            ({ overrides }) => {
+                const maxDepth =
+                    (overrides as { maxDepth?: number }).maxDepth ?? 2;
+                const moves = simulate(generate(overrides));
+                expect(Math.min(...moves.map((m) => m.end.z))).toBeCloseTo(
+                    -maxDepth,
+                );
+            },
+        );
+
+        it.each(cases)(
+            'never rapids below the stock surface ($name)',
+            ({ overrides }) => {
+                const moves = simulate(generate(overrides));
+                const rapidsBelowZero = moves.filter(
+                    (m) => m.motion === 'G0' && m.end.z < 0,
+                );
+                expect(rapidsBelowZero).toEqual([]);
+            },
+        );
+
+        it.each(cases)(
+            'never rapids in XY while below the stock surface ($name)',
+            ({ overrides }) => {
+                const moves = simulate(generate(overrides));
+                const xyRapidsInMaterial = moves.filter(
+                    (m) =>
+                        m.motion === 'G0' &&
+                        m.start.z < 0 &&
+                        (m.start.x !== m.end.x || m.start.y !== m.end.y),
+                );
+                expect(xyRapidsInMaterial).toEqual([]);
+            },
+        );
+
+        it('moves Z before XY in the header', () => {
+            const gcode = generate();
+            expect(gcode.indexOf('G0 Z3')).toBeGreaterThan(-1);
+            expect(gcode.indexOf('G0 Z3')).toBeLessThan(
+                gcode.indexOf('G0 X0 Y0'),
+            );
+        });
     });
 });
