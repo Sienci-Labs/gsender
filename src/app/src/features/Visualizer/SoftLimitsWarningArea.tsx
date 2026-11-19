@@ -21,79 +21,63 @@
  *
  */
 
-import { i18n } from 'app/i18n';
-import get from 'lodash/get';
-import pubsub from 'pubsub-js';
-import { Component } from 'react';
-import { connect } from 'react-redux';
-
-interface Props {
-    softLimitsEnabled?: boolean;
-}
-
-interface ControlAreaState {
-    showWarning: boolean;
-    $20: number;
-}
+import { IMPERIAL_UNITS } from 'app/constants';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
+import { selectSoftLimitViolations } from 'app/lib/softLimitState';
+import isEqual from 'lodash/isEqual';
 
 /**
- * Control Area component displaying Soft Limits Warning.
+ * Overlay warning shown when the loaded file, placed at the current work zero,
+ * would travel past the machine's soft limits. Lists each offending axis and
+ * direction with how far past the limit it goes.
  */
-class ControlArea extends Component<Props, ControlAreaState> {
-    pubsubTokens: string[] = [];
+const SoftLimitsWarningArea = () => {
+    const { t } = useAppTranslation();
+    const visualizer = useWidgetState('visualizer');
+    const enabled = !!visualizer?.showSoftLimitWarning;
+    const { units } = useWorkspaceState();
 
-    state: ControlAreaState = {
-        showWarning: false,
-        $20: 0,
-    };
+    // Deep-compare so live position ticks don't re-render unless the
+    // violation list actually changes.
+    const violations = useTypedSelector(
+        (state) => selectSoftLimitViolations(state, enabled),
+        isEqual,
+    );
 
-    componentDidMount() {
-        this.subscribe();
+    if (violations.length === 0) {
+        return null;
     }
 
-    componentWillUnmount() {
-        this.unsubscribe();
-    }
+    const isImperial = units === IMPERIAL_UNITS;
+    const unitLabel = isImperial ? 'in' : 'mm';
+    const formatDistance = (mm: number) =>
+        (isImperial ? mm / 25.4 : mm).toFixed(isImperial ? 3 : 2);
 
-    subscribe() {
-        const tokens = [
-            pubsub.subscribe('softlimits:warning', () => {
-                this.setState({ showWarning: true });
-            }),
-            pubsub.subscribe('softlimits:ok', () => {
-                this.setState({ showWarning: false });
-            }),
-        ];
-        this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
-    }
-
-    render() {
-        const { softLimitsEnabled } = this.props;
-        return (
-            <div>
-                {this.state.showWarning && softLimitsEnabled ? (
-                    <div>
-                        {i18n.t('workspace:visualizer.softLimitsWarning')}
-                    </div>
-                ) : (
-                    <div />
-                )}
+    return (
+        <div
+            role="alert"
+            className="pointer-events-none absolute left-1/2 top-2 z-[8997] -translate-x-1/2 rounded-md border border-red-500 bg-red-600/90 px-3 py-1.5 text-sm text-white shadow-lg"
+        >
+            <div className="font-semibold">
+                {t('workspace:visualizer.softLimitsWarning')}
             </div>
-        );
-    }
-}
+            <ul className="mt-0.5">
+                {violations.map((v) => (
+                    <li key={`${v.axis}${v.direction}`}>
+                        {t('workspace:visualizer.softLimitsAxisExceeded', {
+                            axis: v.axis,
+                            direction: v.direction === '+' ? '+' : '−',
+                            distance: formatDistance(v.overBy),
+                            units: unitLabel,
+                        })}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
 
-export default connect((store) => {
-    const softLimitsEnabled =
-        get(store, 'controller.settings.settings.$20') === '1';
-    return {
-        softLimitsEnabled,
-    };
-})(ControlArea);
+export default SoftLimitsWarningArea;
