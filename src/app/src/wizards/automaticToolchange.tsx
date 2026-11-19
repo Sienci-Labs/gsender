@@ -203,7 +203,7 @@ const createWizard = (count: number): WizardInstructions => {
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    '(Set Z to Tool offset apl wait)',
+                                    '(Set Z to Tool offset and wait)',
                                     'G4 P0.3',
                                     `G10 L20 P0 Z[global.toolchange.TOOL_OFFSET]`,
                                     'G0 Z[global.toolchange.RETRACT]',
