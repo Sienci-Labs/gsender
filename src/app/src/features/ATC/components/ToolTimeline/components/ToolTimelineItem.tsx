@@ -154,6 +154,11 @@ export function ToolTimelineItem({
                                 </span>
                             </>
                         )}
+                        {nicknameBelow && (
+                            <span className="ml-auto whitespace-nowrap font-mono text-xs text-gray-600 dark:text-content-muted">
+                                {lineRange}
+                            </span>
+                        )}
                     </div>
 
                     {showProbeStatus && (
@@ -186,9 +191,11 @@ export function ToolTimelineItem({
                 </div>
 
                 <div className="flex flex-shrink-0 items-center gap-3 self-stretch">
-                    <span className="whitespace-nowrap font-mono text-xs text-gray-600 dark:text-content-muted">
-                        {lineRange}
-                    </span>
+                    {!nicknameBelow && (
+                        <span className="whitespace-nowrap font-mono text-xs text-gray-600 dark:text-content-muted">
+                            {lineRange}
+                        </span>
+                    )}
                     {canRemap && (
                         <Button
                             className="relative z-10 !h-full !w-11 self-stretch rounded-lg border border-gray-300/80 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-outline/70 dark:bg-surface-elevated dark:text-content-secondary dark:hover:bg-surface-hover"
