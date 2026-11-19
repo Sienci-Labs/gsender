@@ -21,7 +21,7 @@ import type { EEPROM } from 'app/definitions/firmware';
 import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { i18n } from 'app/i18n';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { getThemeCssColor } from 'app/lib/getThemeCssColor';
 import { toFixedIfNecessary } from 'app/lib/rounding';
@@ -72,6 +72,7 @@ const axisSelectStyles = {
 };
 
 const Steps = () => {
+    const { t } = useAppTranslation();
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
     const [selectedAxis, setSelectedAxis] = useState<'x' | 'y' | 'z'>('x');
     const [currentStep, setCurrentStep] = useState(0);
@@ -154,43 +155,51 @@ const Steps = () => {
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
                     <div className="space-y-1 text-sm xl:text-base font-normal">
                         <p className="text-gray-600 dark:text-content-secondary">
-                            If you're looking to use your CNC for more accurate
-                            work and notice a specific axis is always off by a
-                            small amount - say 102mm instead of 100 - then use
-                            this tool.
+                            {t('tools:movementTuning.intro.accurateWork')}
                         </p>
 
                         <p className="text-gray-600 dark:text-content-secondary">
-                            Since CNC firmware needs to understand its hardware
-                            to make exact movements, small manufacturing
-                            variations in the motors, lead screws, pulleys, or
-                            incorrect firmware will create inaccuracies over
-                            longer distances.
+                            {t('tools:movementTuning.intro.variations')}
                         </p>
 
                         <p className="text-gray-600 dark:text-content-secondary">
-                            By testing for this difference using a marker or
-                            tape and a measuring tape, this tool will better
-                            tune the firmware to your machine.
+                            {t('tools:movementTuning.intro.testing')}
                         </p>
 
                         <div className="flex gap-2 items-center">
                             <label className="min-w-24 font-bold dark:text-content-primary">
-                                Axis to Tune
+                                {t(
+                                    'tools:movementTuning.axisSelection.axisToTune',
+                                )}
                             </label>
                             <Select
                                 styles={axisSelectStyles}
                                 options={[
                                     {
-                                        label: 'X-Axis',
+                                        label: t(
+                                            'tools:movementTuning.axisOption',
+                                            {
+                                                axis: 'X',
+                                            },
+                                        ),
                                         value: 'x',
                                     },
                                     {
-                                        label: 'Y-Axis',
+                                        label: t(
+                                            'tools:movementTuning.axisOption',
+                                            {
+                                                axis: 'Y',
+                                            },
+                                        ),
                                         value: 'y',
                                     },
                                     {
-                                        label: 'Z-Axis',
+                                        label: t(
+                                            'tools:movementTuning.axisOption',
+                                            {
+                                                axis: 'Z',
+                                            },
+                                        ),
                                         value: 'z',
                                     },
                                 ]}
@@ -216,10 +225,17 @@ const Steps = () => {
                                     }
                                 }}
                                 value={{
-                                    label: `${selectedAxis.toUpperCase()}-Axis`,
+                                    label: t(
+                                        'tools:movementTuning.axisOption',
+                                        {
+                                            axis: selectedAxis.toUpperCase(),
+                                        },
+                                    ),
                                     value: selectedAxis,
                                 }}
-                                placeholder="Select Axis"
+                                placeholder={t(
+                                    'tools:movementTuning.axisSelection.selectAxis',
+                                )}
                                 className="w-full"
                             />
                         </div>
@@ -233,8 +249,9 @@ const Steps = () => {
                         {!isConnected && (
                             <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                                 <p>
-                                    Please connect to a device before starting
-                                    the movement tuning wizard.
+                                    {t(
+                                        'tools:movementTuning.axisSelection.connectFirst',
+                                    )}
                                 </p>
                             </div>
                         )}
@@ -242,15 +259,12 @@ const Steps = () => {
                     <div className="flex flex-col gap-4 items-center">
                         <img
                             src={starterImage}
-                            alt="Movement Tuning Example"
+                            alt={t('tools:movementTuning.legacy.exampleAlt')}
                             className="w-[440px] h-auto border border-gray-200 rounded-lg"
                         />
 
                         <p className="text-gray-600 font-bold dark:text-content-primary">
-                            Whichever axis you'll be tuning, please place it in
-                            an initial location so that it'll have space to move
-                            to the right (for X), backwards (for Y), and
-                            downwards (for Z).
+                            {t('tools:movementTuning.axisSelection.placement')}
                         </p>
                     </div>
                 </div>
@@ -261,7 +275,7 @@ const Steps = () => {
                         variant="outline"
                         disabled={isDisabled}
                     >
-                        Start Movement Tuning
+                        {t('tools:movementTuning.legacy.start')}
                     </Button>
                 </div>
             </div>
@@ -274,17 +288,18 @@ const Steps = () => {
                 <div className="flex flex-col gap-4">
                     <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-content-primary dark:border-yellow-950">
                         <span>
-                            Your {selectedAxis.toUpperCase()}-axis movement was
-                            off by{' '}
-                            <strong>
-                                {toFixedIfNecessary(
-                                    moveDistance - measuredDistance,
-                                    4,
-                                )}{' '}
-                                {units}.
-                            </strong>{' '}
-                            Consider updating your {selectedAxis.toUpperCase()}
-                            -axis step/mm value in your CNC firmware.
+                            <TransKey
+                                i18nKey="tools:movementTuning.completion.offBy"
+                                values={{
+                                    axis: selectedAxis.toUpperCase(),
+                                    distance: toFixedIfNecessary(
+                                        moveDistance - measuredDistance,
+                                        4,
+                                    ),
+                                    units,
+                                }}
+                                components={{ bold: <strong /> }}
+                            />
                         </span>
 
                         <AlertDialog>
@@ -293,57 +308,78 @@ const Steps = () => {
                                     className="bg-white text-black"
                                     variant="outline"
                                 >
-                                    Update step/mm
+                                    {t(
+                                        'tools:movementTuning.completion.updateStepsButton',
+                                    )}
                                 </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-white">
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                        Update Firmware
+                                        {t(
+                                            'tools:movementTuning.completion.updateFirmware',
+                                        )}
                                     </AlertDialogTitle>
                                     <div className="space-y-4">
                                         <p>
-                                            This will update the{' '}
-                                            <strong>
-                                                {selectedAxis.toUpperCase()}
-                                                -axis
-                                            </strong>{' '}
-                                            step/mm value in your CNC firmware ({' '}
-                                            <strong>
-                                                {getEEPROMSettingKey(
-                                                    selectedAxis,
-                                                )}
-                                            </strong>{' '}
-                                            )
+                                            <TransKey
+                                                i18nKey="tools:movementTuning.completion.updateDescription"
+                                                values={{
+                                                    axis: selectedAxis.toUpperCase(),
+                                                    setting:
+                                                        getEEPROMSettingKey(
+                                                            selectedAxis,
+                                                        ),
+                                                }}
+                                                components={{
+                                                    bold: <strong />,
+                                                }}
+                                            />
                                         </p>
                                         <p>
-                                            From:{' '}
-                                            <strong>{currentStepsPerMM}</strong>
+                                            <TransKey
+                                                i18nKey="tools:movementTuning.completion.from"
+                                                values={{
+                                                    value: currentStepsPerMM,
+                                                }}
+                                                components={{
+                                                    bold: <strong />,
+                                                }}
+                                            />
                                         </p>
                                         <p>
-                                            To:{' '}
-                                            <strong>
-                                                {calculateNewStepsPerMM({
-                                                    originalStepsPerMM:
-                                                        currentStepsPerMM,
-                                                    givenDistanceMoved:
-                                                        moveDistance,
-                                                    actualDistanceMoved:
-                                                        measuredDistance,
-                                                })}
-                                            </strong>
+                                            <TransKey
+                                                i18nKey="tools:movementTuning.completion.to"
+                                                values={{
+                                                    value: calculateNewStepsPerMM(
+                                                        {
+                                                            originalStepsPerMM:
+                                                                currentStepsPerMM,
+                                                            givenDistanceMoved:
+                                                                moveDistance,
+                                                            actualDistanceMoved:
+                                                                measuredDistance,
+                                                        },
+                                                    ),
+                                                }}
+                                                components={{
+                                                    bold: <strong />,
+                                                }}
+                                            />
                                         </p>
                                     </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>
-                                        Cancel
+                                        {t('common:actions.cancel')}
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                         className="border border-blue-500"
                                         onClick={handleUpdateEEPROM}
                                     >
-                                        Update Firmware
+                                        {t(
+                                            'tools:movementTuning.completion.updateFirmware',
+                                        )}
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -354,14 +390,16 @@ const Steps = () => {
                             onClick={reset}
                             variant="outline"
                             icon={<LuRefreshCw className="w-4 h-4" />}
-                            text="Restart Wizard"
+                            text={t('common:wizard.restartWizard')}
                         />
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
                                     icon={<LuMove className="w-4 h-4" />}
-                                    text="Jog Controls"
+                                    text={t(
+                                        'tools:movementTuning.legacy.jogControls',
+                                    )}
                                 />
                             </PopoverTrigger>
 
@@ -378,8 +416,9 @@ const Steps = () => {
             <div className="flex flex-col gap-4">
                 <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-content-primary dark:border-green-950">
                     <p>
-                        Your {selectedAxis.toUpperCase()}-axis looks accurate,
-                        so you should be good to go!
+                        {t('tools:movementTuning.completion.accurate', {
+                            axis: selectedAxis.toUpperCase(),
+                        })}
                     </p>
                 </div>
 
@@ -388,14 +427,16 @@ const Steps = () => {
                         onClick={reset}
                         variant="outline"
                         icon={<LuRefreshCw className="w-4 h-4" />}
-                        text="Restart Wizard"
+                        text={t('common:wizard.restartWizard')}
                     />
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
                                 icon={<LuMove className="w-4 h-4" />}
-                                text="Jog Controls"
+                                text={t(
+                                    'tools:movementTuning.legacy.jogControls',
+                                )}
                             />
                         </PopoverTrigger>
 
@@ -415,15 +456,21 @@ const Steps = () => {
                     <div className="flex flex-col gap-4">
                         <div className="space-y-1">
                             <h3 className="text-lg font-semibold dark:text-content-primary">
-                                Instructions
+                                {t('tools:movementTuning.legacy.instructions')}
                             </h3>
                             <p className="h-20 text-gray-600 dark:text-content-primary">
                                 {currentStep === 0 &&
-                                    'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'}
+                                    t(
+                                        'tools:movementTuning.markFirstLocation.instructions',
+                                    )}
                                 {currentStep === 1 &&
-                                    "Now move any distance you wish. A larger value will better tune your movement, just make sure you don't hit your machine limits. Once you are ready, clicked the Move Axis Button."}
+                                    t(
+                                        'tools:movementTuning.moveAxis.instructions',
+                                    )}
                                 {currentStep === 2 &&
-                                    'Lastly, measure the distance travelled between the original mark and the current gantry location. Take your time when entering this value, a more accurate measurement will give you better tuning results'}
+                                    t(
+                                        'tools:movementTuning.distanceTravelled.instructions',
+                                    )}
                             </p>
                         </div>
 
@@ -462,7 +509,9 @@ const Steps = () => {
                                             }}
                                             variant="secondary"
                                         >
-                                            Mark First Location
+                                            {t(
+                                                'tools:movementTuning.steps.markFirstLocation',
+                                            )}
                                         </Button>
                                     </div>
                                 </div>
@@ -509,8 +558,12 @@ const Steps = () => {
                                             }}
                                             variant="alt"
                                         >
-                                            Move {selectedAxis.toUpperCase()}
-                                            -axis
+                                            {t(
+                                                'tools:movementTuning.moveAxis.button',
+                                                {
+                                                    axis: selectedAxis.toUpperCase(),
+                                                },
+                                            )}
                                         </Button>
 
                                         <div className="flex items-center gap-2">
@@ -564,7 +617,9 @@ const Steps = () => {
                                                 setCurrentStep(3);
                                             }}
                                         >
-                                            Set Distance Travelled
+                                            {t(
+                                                'tools:movementTuning.steps.distanceTravelled',
+                                            )}
                                         </Button>
 
                                         <div className="flex items-center gap-2">
@@ -589,11 +644,11 @@ const Steps = () => {
 
                     <div className="flex flex-col items-center gap-4">
                         <h3 className="text-lg font-semibold dark:text-content-primary">
-                            Diagram
+                            {t('tools:movementTuning.legacy.diagram')}
                         </h3>
                         <img
                             src={stepImage}
-                            alt="Movement Tuning Step"
+                            alt={t('tools:movementTuning.legacy.stepAlt')}
                             className="w-[450px] h-auto border border-gray-200 rounded-lg"
                         />
                     </div>
@@ -605,14 +660,14 @@ const Steps = () => {
                     onClick={reset}
                     variant="outline"
                     icon={<LuRefreshCw className="w-4 h-4" />}
-                    text="Restart Wizard"
+                    text={t('common:wizard.restartWizard')}
                 />
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
                             variant="outline"
                             icon={<LuMove className="w-4 h-4" />}
-                            text="Jog Controls"
+                            text={t('tools:movementTuning.legacy.jogControls')}
                         />
                     </PopoverTrigger>
 

@@ -7,6 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { Loader2, Monitor, QrCode, X } from 'lucide-react';
@@ -27,6 +28,7 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
     const [desktops, setDesktops] = useState<PairedDesktop[]>([]);
     const [scanning, setScanning] = useState(false);
     const [pendingName, setPendingName] = useState<string | null>(null);
+    const { t } = useAppTranslation();
 
     const refresh = useCallback(async () => {
         try {
@@ -44,7 +46,11 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
     const beginPair = useCallback(
         async (request: PairRequest) => {
             if (!running) {
-                toast.error('Turn on Remote File Receive before pairing');
+                toast.error(
+                    i18n.t(
+                        'notifications:remoteFileReceive.turnOnBeforePairing',
+                    ),
+                );
                 return;
             }
             try {
@@ -53,7 +59,9 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
                 // Matches the server-side pending pair lifetime.
                 setTimeout(() => setPendingName(null), PENDING_PAIR_TTL_MS);
             } catch {
-                toast.error('Could not start pairing');
+                toast.error(
+                    i18n.t('notifications:remoteFileReceive.pairingFailed'),
+                );
             }
         },
         [running],
@@ -64,7 +72,9 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
             setScanning(false);
             const request = parsePairPayload(text);
             if (!request) {
-                toast.error("That QR code isn't a gSender pairing code");
+                toast.error(
+                    i18n.t('notifications:remoteFileReceive.invalidQrCode'),
+                );
                 return;
             }
             beginPair(request);
@@ -89,7 +99,11 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
             await api.remoteFileReceive.forgetDesktop(desktop.id);
             refresh();
         } catch {
-            toast.error(`Could not forget ${desktop.name}`);
+            toast.error(
+                i18n.t('notifications:remoteFileReceive.forgetFailed', {
+                    name: desktop.name,
+                }),
+            );
         }
     }
 
@@ -97,7 +111,7 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
         <div className="flex flex-col gap-2 rounded-md border border-gray-200 dark:border-outline p-3">
             <div className="flex items-center justify-between">
                 <span className="text-sm font-bold dark:text-content-primary">
-                    Paired desktops
+                    {t('tools:remoteFileReceive.desktops.heading')}
                 </span>
                 <Button
                     variant="secondary"
@@ -105,21 +119,22 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
                     onClick={() => setScanning(true)}
                 >
                     <QrCode className="w-4 h-4 mr-1" />
-                    Pair with desktop
+                    {t('tools:remoteFileReceive.desktops.pair')}
                 </Button>
             </div>
 
             {pendingName && (
                 <p className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Pairing with {pendingName}…
+                    {t('tools:remoteFileReceive.desktops.pairing', {
+                        name: pendingName,
+                    })}
                 </p>
             )}
 
             {desktops.length === 0 ? (
                 <p className="text-sm text-gray-500">
-                    On the desktop, open Send to Pendant and choose "Pair a new
-                    tablet", then scan the code it shows.
+                    {t('tools:remoteFileReceive.desktops.empty')}
                 </p>
             ) : (
                 desktops.map((desktop) => (
@@ -137,7 +152,7 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
                             className="flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-outline dark:text-content-primary"
                         >
                             <X className="w-3.5 h-3.5" />
-                            Forget
+                            {t('tools:remoteFileReceive.desktops.forget')}
                         </button>
                     </div>
                 ))
@@ -146,10 +161,13 @@ export default function PairedDesktops({ running }: PairedDesktopsProps) {
             <Dialog open={scanning} onOpenChange={setScanning}>
                 <DialogContent className="sm:max-w-md bg-white dark:bg-surface-raised">
                     <DialogHeader>
-                        <DialogTitle>Scan pairing code</DialogTitle>
+                        <DialogTitle>
+                            {t('tools:remoteFileReceive.scanDialog.title')}
+                        </DialogTitle>
                         <DialogDescription>
-                            Point the camera at the QR code shown in the
-                            desktop's Send to Pendant dialog.
+                            {t(
+                                'tools:remoteFileReceive.scanDialog.description',
+                            )}
                         </DialogDescription>
                     </DialogHeader>
                     {scanning && <QrScanner onScan={handleScan} />}

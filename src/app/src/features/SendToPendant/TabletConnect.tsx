@@ -1,6 +1,7 @@
 import { Switch } from 'app/components/shadcn/Switch';
 import { WORKFLOW_STATE_RUNNING } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { TransKey, useAppTranslation } from 'app/i18n';
 import {
     CheckCircle2,
     File as FileIcon,
@@ -51,6 +52,7 @@ export const TabletConnect: React.FC = () => {
     const s = useSendToTablet();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { t } = useAppTranslation();
 
     const loadedFile = useTypedSelector((state) => state.file);
     const jobRunning = useTypedSelector(
@@ -75,12 +77,10 @@ export const TabletConnect: React.FC = () => {
             >
                 <div className={cardHeaderClass}>
                     <h2 id="tablet-connect-tablets" className={headingClass}>
-                        Tablets
+                        {t('tools:sendToPendant.tablets.heading')}
                     </h2>
                     <p className={mutedClass}>
-                        On the tablet, open Tools → Remote File Receive and turn
-                        it on. Then scan this computer's QR code, or enter the
-                        IP and code it shows.
+                        {t('tools:sendToPendant.tablets.instructions')}
                     </p>
                 </div>
 
@@ -103,7 +103,7 @@ export const TabletConnect: React.FC = () => {
                         >
                             <div className="flex items-center justify-between">
                                 <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-content-muted">
-                                    Pair with code
+                                    {t('tools:sendToPendant.manual.heading')}
                                 </p>
                             </div>
                             <div className="flex gap-2">
@@ -112,7 +112,9 @@ export const TabletConnect: React.FC = () => {
                                         htmlFor="pendant-ip"
                                         className={labelClass}
                                     >
-                                        Tablet IP
+                                        {t(
+                                            'tools:sendToPendant.manual.tabletIp',
+                                        )}
                                     </label>
                                     <input
                                         id="pendant-ip"
@@ -129,7 +131,7 @@ export const TabletConnect: React.FC = () => {
                                         htmlFor="pendant-port"
                                         className={labelClass}
                                     >
-                                        Port
+                                        {t('tools:sendToPendant.manual.port')}
                                     </label>
                                     <input
                                         id="pendant-port"
@@ -147,7 +149,7 @@ export const TabletConnect: React.FC = () => {
                                     htmlFor="pendant-code"
                                     className={labelClass}
                                 >
-                                    Pairing code (shown on the tablet)
+                                    {t('tools:sendToPendant.manual.code')}
                                 </label>
                                 <input
                                     id="pendant-code"
@@ -166,14 +168,14 @@ export const TabletConnect: React.FC = () => {
                                     className={secondaryButtonClass}
                                     onClick={() => s.setView('pick')}
                                 >
-                                    Cancel
+                                    {t('common:actions.cancel')}
                                 </button>
                                 <button
                                     type="submit"
                                     className={primaryButtonClass}
                                     disabled={!s.ip || !s.port || !s.code}
                                 >
-                                    Pair
+                                    {t('tools:sendToPendant.manual.pair')}
                                 </button>
                             </div>
                         </form>
@@ -201,12 +203,14 @@ export const TabletConnect: React.FC = () => {
             >
                 <div className={cardHeaderClass}>
                     <h2 id="tablet-connect-send" className={headingClass}>
-                        Send files
+                        {t('tools:sendToPendant.send.heading')}
                     </h2>
                     <p className={mutedClass}>
                         {hasTablet
-                            ? `Files go to ${s.selected?.name}'s file library.`
-                            : 'Pair a tablet to send files to it.'}
+                            ? t('tools:sendToPendant.send.destination', {
+                                  name: s.selected?.name,
+                              })
+                            : t('tools:sendToPendant.send.pairFirst')}
                     </p>
                 </div>
 
@@ -229,8 +233,12 @@ export const TabletConnect: React.FC = () => {
                             <span className="flex-1 min-w-0">
                                 <span className="block font-medium text-gray-900 dark:text-content-primary">
                                     {loadedAlreadyAdded
-                                        ? 'Loaded file added'
-                                        : 'Send loaded file'}
+                                        ? t(
+                                              'tools:sendToPendant.send.loadedAdded',
+                                          )
+                                        : t(
+                                              'tools:sendToPendant.send.sendLoaded',
+                                          )}
                                 </span>
                                 <span className="block truncate text-xs text-gray-500 dark:text-content-muted">
                                     {loadedName}
@@ -277,8 +285,13 @@ export const TabletConnect: React.FC = () => {
                                             </span>
                                             <button
                                                 type="button"
-                                                title="Remove"
-                                                aria-label={`Remove ${f.name}`}
+                                                title={t(
+                                                    'tools:sendToPendant.send.remove',
+                                                )}
+                                                aria-label={t(
+                                                    'tools:sendToPendant.send.removeFile',
+                                                    { name: f.name },
+                                                )}
                                                 onClick={() => s.removeFile(i)}
                                                 disabled={s.sending}
                                                 className="p-0.5 rounded shrink-0 text-gray-400 hover:text-gray-700 dark:hover:text-content-primary"
@@ -296,24 +309,28 @@ export const TabletConnect: React.FC = () => {
                                     disabled={s.sending}
                                     className="w-full py-1.5 text-xs font-medium text-robin-700 dark:text-robin-400 hover:underline"
                                 >
-                                    + Add more files
+                                    {t('tools:sendToPendant.send.addMore')}
                                 </button>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center text-center">
                                 <Upload className="w-6 h-6 mb-2 text-gray-400" />
                                 <p className="text-gray-600 dark:text-content-muted">
-                                    Drop g-code files here, or{' '}
-                                    <button
-                                        type="button"
-                                        disabled={!hasTablet}
-                                        onClick={() =>
-                                            fileInputRef.current?.click()
-                                        }
-                                        className="font-medium text-robin-700 dark:text-robin-400 hover:underline"
-                                    >
-                                        browse
-                                    </button>
+                                    <TransKey
+                                        i18nKey="tools:sendToPendant.send.dropzone"
+                                        components={{
+                                            browse: (
+                                                <button
+                                                    type="button"
+                                                    disabled={!hasTablet}
+                                                    onClick={() =>
+                                                        fileInputRef.current?.click()
+                                                    }
+                                                    className="font-medium text-robin-700 dark:text-robin-400 hover:underline"
+                                                />
+                                            ),
+                                        }}
+                                    />
                                 </p>
                             </div>
                         )}
@@ -337,12 +354,16 @@ export const TabletConnect: React.FC = () => {
                             className={`min-w-0 ${s.multipleFiles ? 'opacity-60' : 'cursor-pointer'}`}
                         >
                             <span className="block font-medium text-gray-900 dark:text-content-primary">
-                                Load as active job
+                                {t('tools:sendToPendant.send.loadActive')}
                             </span>
                             <span className={`block ${mutedClass}`}>
                                 {s.multipleFiles
-                                    ? 'Only one file can be the active job, so multiple files go to the library.'
-                                    : "Always added to the pendant's file library too."}
+                                    ? t(
+                                          'tools:sendToPendant.send.loadActiveMultiple',
+                                      )
+                                    : t(
+                                          'tools:sendToPendant.send.loadActiveHint',
+                                      )}
                             </span>
                         </label>
                         <Switch
@@ -362,15 +383,33 @@ export const TabletConnect: React.FC = () => {
                             {s.sendComplete ? (
                                 <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
                                     <CheckCircle2 className="w-5 h-5" />
-                                    <span className="font-medium">Sent!</span>
+                                    <span className="font-medium">
+                                        {t(
+                                            'tools:sendToPendant.send.sentBanner',
+                                        )}
+                                    </span>
                                 </div>
                             ) : (
                                 <>
                                     <div className="flex justify-between items-center text-xs text-gray-600 dark:text-content-muted">
                                         <span className="font-medium truncate">
                                             {s.files.length > 1
-                                                ? `Sending ${s.currentIndex + 1} of ${s.files.length}: ${currentFile?.name}…`
-                                                : `Sending ${currentFile?.name}…`}
+                                                ? t(
+                                                      'tools:sendToPendant.send.sendingOf',
+                                                      {
+                                                          current:
+                                                              s.currentIndex +
+                                                              1,
+                                                          total: s.files.length,
+                                                          name: currentFile?.name,
+                                                      },
+                                                  )
+                                                : t(
+                                                      'tools:sendToPendant.send.sendingFile',
+                                                      {
+                                                          name: currentFile?.name,
+                                                      },
+                                                  )}
                                         </span>
                                         <span className="tabular-nums">
                                             {s.uploadProgress}%
@@ -391,7 +430,7 @@ export const TabletConnect: React.FC = () => {
 
                     {jobRunning && (
                         <p className={mutedClass}>
-                            Sending is paused while a job is running.
+                            {t('tools:sendToPendant.send.pausedWhileRunning')}
                         </p>
                     )}
 
@@ -403,12 +442,19 @@ export const TabletConnect: React.FC = () => {
                             className={primaryButtonClass}
                         >
                             {s.sendComplete
-                                ? 'Sent'
+                                ? t('tools:sendToPendant.send.sentButton')
                                 : s.sending
-                                  ? `Sending… ${s.uploadProgress}%`
+                                  ? t(
+                                        'tools:sendToPendant.send.sendingButton',
+                                        {
+                                            percent: s.uploadProgress,
+                                        },
+                                    )
                                   : s.files.length > 1
-                                    ? `Send ${s.files.length} files`
-                                    : 'Send'}
+                                    ? t('tools:sendToPendant.send.sendFiles', {
+                                          count: s.files.length,
+                                      })
+                                    : t('tools:sendToPendant.send.sendButton')}
                         </button>
                     </div>
                 </div>

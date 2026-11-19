@@ -7,6 +7,7 @@ import {
 } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { useEffect } from 'react';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { useSquaring } from '../context/SquaringContext';
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const MarkingStep = ({ onComplete }: Props) => {
+    const { t } = useAppTranslation();
     const {
         mainSteps,
         currentMainStep,
@@ -57,10 +59,10 @@ const MarkingStep = ({ onComplete }: Props) => {
             <div className="flex flex-col gap-4">
                 <div className="space-y-1">
                     <h3 className="text-lg font-semibold dark:text-content-primary">
-                        Instructions
+                        {t('tools:squaring.instructions')}
                     </h3>
                     <p className="text-gray-600 dark:text-content-primary h-20">
-                        {currentSubStepData.description}
+                        {translateKey(currentSubStepData.description)}
                     </p>
                 </div>
 
@@ -128,7 +130,7 @@ const MarkingStep = ({ onComplete }: Props) => {
                                             variant={step.buttonVariant}
                                             testId={`sq-mark-location-${step}-${index}`}
                                         >
-                                            {step.buttonLabel}
+                                            {translateKey(step.label)}
                                         </Button>
 
                                         <div className="flex items-center gap-2">

@@ -22,7 +22,7 @@ import {
     AddressSummary,
 } from 'app/features/RemoteMode/components/AddressOption.tsx';
 import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
-import { i18n } from 'app/i18n';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { isIPv4 } from 'app/lib/utils';
@@ -54,6 +54,7 @@ export function RemoteModeDialog({
     const [ip, setIp] = useState('127.0.0.1');
     const [remoteEnabled, setRemoteEnabled] = useState(false);
     const [dirty, setDirty] = useState(false);
+    const { t } = useAppTranslation();
 
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
 
@@ -162,13 +163,15 @@ export function RemoteModeDialog({
             <DialogContent className="bg-white w-[750px] text-sm">
                 <form>
                     <DialogHeader>
-                        <DialogTitle>Wireless CNC Control</DialogTitle>
+                        <DialogTitle>
+                            {t('tools:remoteMode.dialog.title')}
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="grid grid-cols-2 text-gray-600 grid-">
                         <div className="flex flex-col gap-8 px-4">
                             <div className="flex flex-row gap-4 items-center">
                                 <span className="font-bold dark:text-content-primary">
-                                    Enable Wireless Control
+                                    {t('tools:remoteMode.dialog.enable')}
                                 </span>
                                 <Switch
                                     onChange={toggleRemoteMode}
@@ -176,8 +179,7 @@ export function RemoteModeDialog({
                                 />
                             </div>
                             <p className="dark:text-content-primary">
-                                In most cases you'll want the recommended
-                                address and the default port:
+                                {t('tools:remoteMode.dialog.recommendedHint')}
                             </p>
                             {/* Addr and Port are one group, so they sit closer together than
 							    the column's gap-8 would otherwise put them. */}
@@ -185,7 +187,9 @@ export function RemoteModeDialog({
                                 <div className="flex flex-col w-full gap-1">
                                     <div className="flex flex-row w-full items-center gap-4">
                                         <span className="w-12 shrink-0 dark:text-content-primary">
-                                            Addr:
+                                            {t(
+                                                'tools:remoteMode.dialog.addressLabel',
+                                            )}
                                         </span>
                                         <Select
                                             onValueChange={onIPSelect}
@@ -226,7 +230,9 @@ export function RemoteModeDialog({
                                                 {otherAddresses.length > 0 && (
                                                     <SelectGroup>
                                                         <SelectLabel className="pl-2 pt-2 text-xs font-normal text-gray-400 dark:text-content-muted border-t border-gray-100 dark:border-outline-subtle mt-1">
-                                                            Other / advanced
+                                                            {t(
+                                                                'tools:remoteMode.dialog.otherAddresses',
+                                                            )}
                                                         </SelectLabel>
                                                         {otherAddresses.map(
                                                             (o) => (
@@ -259,12 +265,15 @@ export function RemoteModeDialog({
                                                 <TriangleAlert className="w-4 h-4 shrink-0" />
                                                 <div className="flex flex-col items-start min-w-0">
                                                     <span>
-                                                        This computer no longer
-                                                        has{' '}
-                                                        <b className="font-mono">
-                                                            {ip}
-                                                        </b>
-                                                        .
+                                                        <TransKey
+                                                            i18nKey="tools:remoteMode.dialog.addressMissing"
+                                                            values={{ ip }}
+                                                            components={{
+                                                                bold: (
+                                                                    <b className="font-mono" />
+                                                                ),
+                                                            }}
+                                                        />
                                                     </span>
                                                     {recommended && (
                                                         <button
@@ -274,38 +283,43 @@ export function RemoteModeDialog({
                                                                 applyRecommendedIp
                                                             }
                                                         >
-                                                            Use{' '}
-                                                            {
-                                                                recommended.address
-                                                            }{' '}
-                                                            ({recommended.label}
-                                                            ) instead
+                                                            {t(
+                                                                'tools:remoteMode.dialog.useRecommended',
+                                                                {
+                                                                    address:
+                                                                        recommended.address,
+                                                                    label: recommended.label,
+                                                                },
+                                                            )}
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
                                         ) : selectedEntry?.usable === false ? (
                                             <span className="text-amber-700 dark:text-amber-400">
-                                                Other devices can't reach
-                                                gSender at this address — pick
-                                                the recommended one to use
-                                                wireless control.
+                                                {t(
+                                                    'tools:remoteMode.dialog.unreachable',
+                                                )}
                                             </span>
                                         ) : (
                                             <span className="text-gray-600 dark:text-content-muted">
                                                 {selectedEntry
-                                                    ? `${selectedEntry.label} — `
-                                                    : ''}
-                                                other devices on your network
-                                                use this address to reach
-                                                gSender.
+                                                    ? t(
+                                                          'tools:remoteMode.dialog.addressHintWithLabel',
+                                                          {
+                                                              label: selectedEntry.label,
+                                                          },
+                                                      )
+                                                    : t(
+                                                          'tools:remoteMode.dialog.addressHint',
+                                                      )}
                                             </span>
                                         )}
                                     </div>
                                 </div>
                                 <div className="flex flex-row w-full items-center gap-4">
                                     <span className="w-12 shrink-0 dark:text-content-primary">
-                                        Port:
+                                        {t('tools:remoteMode.dialog.portLabel')}
                                     </span>
                                     <input
                                         className="border border-gray-200 rounded p-2 focus:outline-none w-full min-w-0 dark:bg-surface-raised dark:text-content-primary"
@@ -316,9 +330,10 @@ export function RemoteModeDialog({
                                 </div>
                             </div>
                             <p className="dark:text-content-primary text-sm">
-                                <b>Note:</b> Clicking "Save" will ask you to
-                                restart gSender so that the settings can be
-                                updated.
+                                <TransKey
+                                    i18nKey="tools:remoteMode.dialog.restartNote"
+                                    components={{ bold: <b /> }}
+                                />
                             </p>
                             <hr />
                             <Button
@@ -326,7 +341,7 @@ export function RemoteModeDialog({
                                 disabled={!dirty}
                                 onClick={saveRemotePreferences}
                             >
-                                Save
+                                {t('common:actions.save')}
                             </Button>
                         </div>
 

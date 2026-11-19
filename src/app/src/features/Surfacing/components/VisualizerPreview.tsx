@@ -4,6 +4,7 @@ import {
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import Visualizer from 'app/features/Visualizer';
+import { TransKey } from 'app/i18n';
 import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
 import { useEffect, type ComponentType } from 'react';
 import { useDispatch } from 'react-redux';
@@ -16,7 +17,10 @@ type VisualizerPreviewProps = {
     PreviewComponent?: ComponentType<{ gcode?: string }>;
 };
 
-const VisualizerPreview = ({ gcode, PreviewComponent }: VisualizerPreviewProps) => {
+const VisualizerPreview = ({
+    gcode,
+    PreviewComponent,
+}: VisualizerPreviewProps) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -42,8 +46,7 @@ const VisualizerPreview = ({ gcode, PreviewComponent }: VisualizerPreviewProps) 
         return (
             <div className="flex flex-col h-full items-center justify-center">
                 <p className="text-gray-600 text-center text-sm">
-                    No g-code generated yet. <br /> Please generate g-code
-                    first.
+                    <TransKey i18nKey="tools:common.noGcode" />
                 </p>
             </div>
         );

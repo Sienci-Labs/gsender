@@ -1,3 +1,4 @@
+import { i18n, useAppTranslation } from 'app/i18n';
 import type { NetworkAddress, NetworkAddressKind } from 'app/store/definitions';
 import cx from 'classnames';
 import {
@@ -32,13 +33,13 @@ export const kindIcon = (kind?: NetworkAddressKind) =>
 // beside the address without crowding it.
 export function addressDescription(entry: NetworkAddress): string {
     if (entry.kind === 'loopback') {
-        return 'This computer only';
+        return i18n.t('tools:remoteMode.address.thisComputerOnly');
     }
     if (entry.kind === 'virtual') {
-        return 'Virtual';
+        return i18n.t('tools:remoteMode.address.virtual');
     }
     if (!entry.usable) {
-        return 'No network';
+        return i18n.t('tools:remoteMode.address.noNetwork');
     }
     return entry.label;
 }
@@ -46,6 +47,7 @@ export function addressDescription(entry: NetworkAddress): string {
 // A single row in the open dropdown list.
 export function AddressOption({ entry }: { entry: NetworkAddress }) {
     const Icon = kindIcon(entry.kind);
+    const { t } = useAppTranslation();
 
     return (
         <>
@@ -75,7 +77,7 @@ export function AddressOption({ entry }: { entry: NetworkAddress }) {
             </span>
             {entry.recommended ? (
                 <span className="ml-3 shrink-0 rounded-full px-2 py-px text-[10px] font-semibold uppercase tracking-wide bg-green-600/10 text-green-700 dark:bg-green-400/15 dark:text-green-300">
-                    Recommended
+                    {t('tools:remoteMode.address.recommended')}
                 </span>
             ) : (
                 <span

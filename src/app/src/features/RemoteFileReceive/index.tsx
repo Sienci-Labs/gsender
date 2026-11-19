@@ -1,6 +1,7 @@
 import Button from 'app/components/Button';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { Switch } from 'app/components/shadcn/Switch';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import type { RootState } from 'app/store/redux';
@@ -81,6 +82,7 @@ export default function RemoteFileReceive({
     const [openingFile, setOpeningFile] = useState<string | null>(null);
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [deleting, setDeleting] = useState(false);
+    const { t } = useAppTranslation();
 
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
     const usableAddresses = ipList.filter((entry) => entry.usable);
@@ -126,14 +128,16 @@ export default function RemoteFileReceive({
                 refresh();
                 toast.success(
                     data.enabled
-                        ? 'Remote file receive turned on'
-                        : 'Remote file receive turned off',
+                        ? i18n.t('notifications:remoteFileReceive.turnedOn')
+                        : i18n.t('notifications:remoteFileReceive.turnedOff'),
                     { position: 'bottom-right' },
                 );
             },
             () => {
                 setBusy(false);
-                toast.error('Failed to update remote file receive settings');
+                toast.error(
+                    i18n.t('notifications:remoteFileReceive.updateFailed'),
+                );
             },
         );
     }
@@ -142,11 +146,17 @@ export default function RemoteFileReceive({
         actions.regenerateToken(
             () => {
                 refresh();
-                toast.success('Pairing code regenerated', {
-                    position: 'bottom-right',
-                });
+                toast.success(
+                    i18n.t('notifications:remoteFileReceive.codeRegenerated'),
+                    {
+                        position: 'bottom-right',
+                    },
+                );
             },
-            () => toast.error('Failed to regenerate the pairing code'),
+            () =>
+                toast.error(
+                    i18n.t('notifications:remoteFileReceive.regenerateFailed'),
+                ),
         );
     }
 
@@ -156,7 +166,11 @@ export default function RemoteFileReceive({
         const result = await actions.readFile(file.savedName);
         setOpeningFile(null);
         if (!result) {
-            toast.error(`Could not open ${file.name}`);
+            toast.error(
+                i18n.t('notifications:remoteFileReceive.openFailed', {
+                    name: file.name,
+                }),
+            );
             return;
         }
         onOpenFile({
@@ -193,10 +207,13 @@ export default function RemoteFileReceive({
         if (names.length === 0) return;
 
         Confirm({
-            title: 'Delete files?',
-            content: `Delete ${names.length} file${names.length > 1 ? 's' : ''} from this tablet? This can't be undone.`,
-            confirmLabel: 'Delete',
-            cancelLabel: 'Cancel',
+            title: i18n.t('notifications:remoteFileReceive.deleteFiles.title'),
+            content: i18n.t(
+                'notifications:remoteFileReceive.deleteFiles.content',
+                { count: names.length },
+            ),
+            confirmLabel: i18n.t('common:actions.delete'),
+            cancelLabel: i18n.t('common:actions.cancel'),
             onConfirm: () => {
                 setDeleting(true);
                 actions.deleteFiles(
@@ -206,13 +223,19 @@ export default function RemoteFileReceive({
                         setSelected(new Set());
                         refresh();
                         toast.success(
-                            `Deleted ${names.length} file${names.length > 1 ? 's' : ''}`,
+                            i18n.t('notifications:remoteFileReceive.deleted', {
+                                count: names.length,
+                            }),
                             { position: 'bottom-right' },
                         );
                     },
                     () => {
                         setDeleting(false);
-                        toast.error('Failed to delete the selected files');
+                        toast.error(
+                            i18n.t(
+                                'notifications:remoteFileReceive.deleteFailed',
+                            ),
+                        );
                     },
                 );
             },
@@ -226,13 +249,12 @@ export default function RemoteFileReceive({
     return (
         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto gap-4">
             <p className="text-sm text-gray-600 dark:text-content-muted">
-                Let a desktop gSender send a g-code file to this tablet over
-                Wi-Fi, without copying it over first.
+                {t('tools:remoteFileReceive.description')}
             </p>
 
             <div className="flex flex-row items-center gap-4">
                 <span className="font-bold dark:text-content-primary">
-                    Enabled
+                    {t('tools:remoteFileReceive.enabled')}
                 </span>
                 <Switch onChange={toggle} checked={running} disabled={busy} />
             </div>
@@ -242,21 +264,21 @@ export default function RemoteFileReceive({
             {running && (
                 <div className="flex flex-col gap-3 rounded-md border border-gray-200 dark:border-outline p-3">
                     <span className="text-sm font-bold dark:text-content-primary">
-                        Manual pairing
+                        {t('tools:remoteFileReceive.manual.heading')}
                     </span>
                     <p className="text-xs text-gray-500">
-                        If the desktop can't find this tablet automatically,
-                        enter one of these addresses and the code below in its
-                        Send to Pendant dialog.
+                        {t('tools:remoteFileReceive.manual.instructions')}
                     </p>
                     <div>
                         <span className="text-xs text-gray-600 dark:text-content-muted">
-                            Address(es) a desktop can send to:
+                            {t('tools:remoteFileReceive.manual.addresses')}
                         </span>
                         <div className="flex flex-col gap-1 mt-1">
                             {usableAddresses.length === 0 && (
                                 <span className="text-sm text-gray-500">
-                                    No network connection detected.
+                                    {t(
+                                        'tools:remoteFileReceive.manual.noNetwork',
+                                    )}
                                 </span>
                             )}
                             {usableAddresses.map((entry) => (
@@ -276,7 +298,9 @@ export default function RemoteFileReceive({
                     <div className="flex flex-row items-center justify-between">
                         <div>
                             <span className="text-xs text-gray-600 dark:text-content-muted">
-                                Pairing code
+                                {t(
+                                    'tools:remoteFileReceive.manual.pairingCode',
+                                )}
                             </span>
                             <div className="font-mono text-2xl tracking-widest dark:text-content-primary">
                                 {token}
@@ -284,7 +308,7 @@ export default function RemoteFileReceive({
                         </div>
                         <Button variant="secondary" onClick={regenerateToken}>
                             <RefreshCw className="w-4 h-4 mr-1" />
-                            New code
+                            {t('tools:remoteFileReceive.manual.newCode')}
                         </Button>
                     </div>
                 </div>
@@ -297,7 +321,7 @@ export default function RemoteFileReceive({
             <div className="flex-1 min-h-0 flex flex-col">
                 <div className="flex items-center justify-between mb-2">
                     <h2 className="text-sm font-bold dark:text-content-primary">
-                        Received files
+                        {t('tools:remoteFileReceive.files.heading')}
                     </h2>
                     {selected.size > 0 && (
                         <button
@@ -307,14 +331,15 @@ export default function RemoteFileReceive({
                             className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border border-red-300 text-red-600 dark:border-red-500/40 dark:text-red-400 disabled:opacity-50"
                         >
                             <Trash2 className="w-4 h-4" />
-                            Delete ({selected.size})
+                            {t('tools:remoteFileReceive.files.deleteSelected', {
+                                count: selected.size,
+                            })}
                         </button>
                     )}
                 </div>
                 {files.length === 0 ? (
                     <p className="text-sm text-gray-500">
-                        Files sent here with "Add to library" will show up in
-                        this list.
+                        {t('tools:remoteFileReceive.files.empty')}
                     </p>
                 ) : (
                     <div className="flex flex-col gap-2 overflow-y-auto">
@@ -327,7 +352,7 @@ export default function RemoteFileReceive({
                                 }
                                 onChange={toggleSelectAll}
                             />
-                            Select all
+                            {t('tools:remoteFileReceive.files.selectAll')}
                         </label>
                         {files.map((file) => (
                             <div
@@ -357,13 +382,22 @@ export default function RemoteFileReceive({
                                         !onOpenFile ||
                                         openingFile === file.savedName
                                     }
-                                    aria-label={`Load ${file.name}`}
+                                    aria-label={t(
+                                        'tools:remoteFileReceive.files.loadFile',
+                                        {
+                                            name: file.name,
+                                        },
+                                    )}
                                     className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border border-gray-300 dark:border-outline dark:text-content-primary disabled:opacity-50"
                                 >
                                     <Download className="w-4 h-4" />
                                     {openingFile === file.savedName
-                                        ? 'Loading...'
-                                        : 'Load'}
+                                        ? t(
+                                              'tools:remoteFileReceive.files.loading',
+                                          )
+                                        : t(
+                                              'tools:remoteFileReceive.files.load',
+                                          )}
                                 </OpenButton>
                             </div>
                         ))}

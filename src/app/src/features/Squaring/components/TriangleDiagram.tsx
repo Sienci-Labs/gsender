@@ -1,9 +1,11 @@
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import React from 'react';
 import { useSquaring } from '../context/SquaringContext';
 
 const TriangleDiagram = () => {
+    const { t } = useAppTranslation();
     const { currentMainStep, currentSubStep, mainSteps, triangle } =
         useSquaring();
     const { units } = useWorkspaceState();
@@ -126,7 +128,9 @@ const TriangleDiagram = () => {
         ];
         return distances[lineIndex].value
             ? `${distances[lineIndex].value}${units}`
-            : `Measure ${distances[lineIndex].points}`;
+            : t('tools:squaring.diagram.measure', {
+                  points: distances[lineIndex].points,
+              });
     };
 
     return (

@@ -6,11 +6,12 @@ import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 import { Diagnostic } from 'app/features/Stats/components/Diagnostic.tsx';
 import { StatCard } from 'app/features/Stats/components/StatCard';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { useContext } from 'react';
 import { FaTrash } from 'react-icons/fa';
 
 export function Alarms() {
+    const { t } = useAppTranslation();
     const { setAlarms } = useContext(StatContext);
     function deleteAlarms() {
         Confirm({
@@ -30,7 +31,7 @@ export function Alarms() {
             <div className="col-span-4 max-xl:col-span-6 row-span-6 min-h-0">
                 <StatCard>
                     <div className="h-full flex flex-col min-h-0">
-                        <CardHeader>Alarms & Errors</CardHeader>
+                        <CardHeader>{t('stats:alarms.title')}</CardHeader>
                         <div className="flex-1 min-h-0 overflow-y-auto">
                             <AlarmListing />
                         </div>
@@ -42,7 +43,9 @@ export function Alarms() {
                     <StatCard>
                         <div className="h-full flex flex-col gap-4 max-xl:justify-center">
                             <div className="max-xl:hidden">
-                                <CardHeader>Diagnostic File</CardHeader>
+                                <CardHeader>
+                                    {t('stats:diagnostic.title')}
+                                </CardHeader>
                             </div>
                             <Diagnostic compactOnSmall />
                         </div>
@@ -52,18 +55,19 @@ export function Alarms() {
                     <StatCard>
                         <div className="h-full flex flex-col gap-4 justify-center">
                             <div className="max-xl:hidden">
-                                <CardHeader>Clear Alarms & Errors</CardHeader>
+                                <CardHeader>
+                                    {t('stats:alarms.clear.title')}
+                                </CardHeader>
                             </div>
                             <p className="text-gray-600 text-sm dark:text-content-primary max-xl:hidden">
-                                Clear all prior alarms and errors. This action
-                                cannot be undone.
+                                {t('stats:alarms.clear.description')}
                             </p>
                             <Button
                                 icon={
                                     <FaTrash className="text-gray-600 w-4 h-4 dark:text-content-secondary" />
                                 }
                                 onClick={deleteAlarms}
-                                text="Clear Alarms & Errors"
+                                text={t('stats:alarms.clear.title')}
                                 size="lg"
                                 className="text-gray-600"
                             />

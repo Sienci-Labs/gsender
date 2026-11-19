@@ -1,0 +1,179 @@
+{
+  "dataCollection": {
+    "title": "",
+    "subtitle": "",
+    "badges": {
+      "anonymous": "",
+      "optional": "",
+      "changeAnytime": ""
+    },
+    "description": "",
+    "decline": "",
+    "accept": ""
+  },
+  "about": {
+    "team": {
+      "leadDev": "",
+      "devManager": "",
+      "dev": "",
+      "qa": "",
+      "docs": "",
+      "iconDesign": "",
+      "uxUiDev": "",
+      "title": ""
+    },
+    "releaseNotes": {
+      "loadError": "",
+      "retry": "",
+      "empty": "",
+      "title": "",
+      "seeAll": ""
+    },
+    "logoAlt": "",
+    "byline": "",
+    "version": "",
+    "copyright": "",
+    "madeInCanada": "",
+    "canadaFlagAlt": "",
+    "description": ""
+  },
+  "alarms": {
+    "title": "",
+    "clear": {
+      "title": "",
+      "description": ""
+    },
+    "heading": "",
+    "eventType": {
+      "alarm": "",
+      "error": ""
+    },
+    "at": "",
+    "noMessage": "",
+    "viewAll": "",
+    "preview": "",
+    "on": "",
+    "empty": ""
+  },
+  "diagnostic": {
+    "title": "",
+    "description": ""
+  },
+  "chart": {
+    "noData": "",
+    "complete": "",
+    "incomplete": "",
+    "jobs": "",
+    "hoursPerPort": "",
+    "hoursTooltip": ""
+  },
+  "jobs": {
+    "columns": {
+      "fileName": "",
+      "duration": "",
+      "lines": "",
+      "startTime": "",
+      "status": ""
+    },
+    "history": "",
+    "clear": "",
+    "searchPlaceholder": "",
+    "jobsPerCnc": "",
+    "runTimePerCnc": "",
+    "status": {
+      "finished": "",
+      "stopped": ""
+    },
+    "empty": ""
+  },
+  "maintenance": {
+    "title": "",
+    "upcoming": "",
+    "add": "",
+    "editTask": "",
+    "status": {
+      "urgent": "",
+      "due": "",
+      "soon": "",
+      "low": ""
+    },
+    "hours": "",
+    "resetTimerLabel": "",
+    "editTaskLabel": "",
+    "searchPlaceholder": "",
+    "hoursShort": "",
+    "form": {
+      "errors": {
+        "nameRequired": "",
+        "startInvalid": "",
+        "endInvalid": "",
+        "endBeforeStart": ""
+      },
+      "taskName": "",
+      "taskNamePlaceholder": "",
+      "taskNameHint": "",
+      "startRange": "",
+      "endRange": "",
+      "description": "",
+      "descriptionPlaceholder": ""
+    }
+  },
+  "configuration": {
+    "enabled": "",
+    "disabled": "",
+    "connection": "",
+    "axes": "",
+    "softLimits": "",
+    "homing": "",
+    "homeLocation": "",
+    "reportInches": ""
+  },
+  "update": {
+    "info": "",
+    "available": "",
+    "willUpdate": "",
+    "backupRecommended": "",
+    "readDocs": "",
+    "updateNow": "",
+    "downloading": "",
+    "whatsNew": "",
+    "seeAllReleases": ""
+  },
+  "menu": {
+    "overview": "",
+    "jobs": "",
+    "maintenance": "",
+    "alarms": "",
+    "about": ""
+  },
+  "overview": {
+    "totals": {
+      "jobsRun": "",
+      "cuttingTime": "",
+      "averageJobTime": "",
+      "longestJob": ""
+    },
+    "yourMachine": "",
+    "stats": "",
+    "more": "",
+    "recentJobs": "",
+    "manage": "",
+    "change": "",
+    "configuration": "",
+    "getHelp": "",
+    "links": {
+      "resources": {
+        "title": "",
+        "description": ""
+      },
+      "community": {
+        "title": "",
+        "description": ""
+      },
+      "github": {
+        "title": "",
+        "description": ""
+      }
+    }
+  }
+}

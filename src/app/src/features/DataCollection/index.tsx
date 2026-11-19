@@ -8,6 +8,7 @@ import {
     SheetDescription,
     SheetTitle,
 } from 'app/components/shadcn/Sheet';
+import { TransKey, useAppTranslation } from 'app/i18n';
 import store from 'app/store';
 import { BarChart3, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -24,6 +25,7 @@ const DataCollection = () => {
     if (isDev) return null;
 
     const posthog = usePostHog();
+    const { t } = useAppTranslation();
     const [open, setOpen] = useState(false);
 
     const collectUsageDataStatus = store.get(
@@ -71,15 +73,17 @@ const DataCollection = () => {
                 <div className="pointer-events-auto relative w-full max-w-2xl rounded-2xl border border-slate-200/90 bg-white pl-6 pr-12 pb-8 pt-6 shadow-[0_25px_50px_-12px_rgba(15,23,42,0.2),0_0_0_1px_rgba(15,23,42,0.03)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.04)]">
                     <SheetClose className="absolute right-3 top-3 rounded-sm p-1 text-slate-500 opacity-80 ring-offset-background transition-opacity hover:bg-slate-100 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 dark:hover:bg-slate-800">
                         <X className="h-4 w-4" />
-                        <span className="sr-only">Close</span>
+                        <span className="sr-only">
+                            {t('common:actions.close')}
+                        </span>
                     </SheetClose>
                     <div className="flex flex-col gap-6">
                         <div className="flex flex-col space-y-1 text-center">
                             <SheetTitle className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                                Anonymous usage information
+                                {t('stats:dataCollection.title')}
                             </SheetTitle>
                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                                Help us make gSender better
+                                {t('stats:dataCollection.subtitle')}
                             </p>
                         </div>
 
@@ -89,17 +93,17 @@ const DataCollection = () => {
                                     className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400"
                                     strokeWidth={2}
                                 />
-                                Anonymous
+                                {t('stats:dataCollection.badges.anonymous')}
                             </span>
                             <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-300">
-                                Optional
+                                {t('stats:dataCollection.badges.optional')}
                             </span>
                             <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-300">
                                 <SlidersHorizontal
                                     className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400"
                                     strokeWidth={2}
                                 />
-                                Change anytime in Settings
+                                {t('stats:dataCollection.badges.changeAnytime')}
                             </span>
                         </div>
 
@@ -116,14 +120,7 @@ const DataCollection = () => {
 
                             <div className="min-w-0 max-w-prose flex-1 space-y-4">
                                 <SheetDescription className="space-y-3 text-sm leading-relaxed">
-                                    We&apos;d like a clearer picture of how many
-                                    people use gSender, which CNCs and computers
-                                    it runs on, and general app usage, so we can
-                                    focus improvements where they matter most.
-                                    <br /> <br />
-                                    Nothing is collected without your
-                                    permission, and you can opt in or out
-                                    whenever you like from the settings screen.
+                                    <TransKey i18nKey="stats:dataCollection.description" />
                                 </SheetDescription>
                             </div>
                         </div>
@@ -135,14 +132,14 @@ const DataCollection = () => {
                             className="w-full sm:w-auto"
                             onClick={handleDecline}
                         >
-                            Decline
+                            {t('stats:dataCollection.decline')}
                         </Button>
                         <Button
                             variant="alt"
                             className="w-full sm:w-auto"
                             onClick={handleAccept}
                         >
-                            Accept
+                            {t('stats:dataCollection.accept')}
                         </Button>
                     </div>
                 </div>

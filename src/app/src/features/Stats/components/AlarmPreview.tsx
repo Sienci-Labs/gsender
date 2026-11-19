@@ -1,6 +1,7 @@
 import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useAppTranslation } from 'app/i18n';
 import { useContext } from 'react';
 import { tv } from 'tailwind-variants';
 import { CardHeader } from './CardHeader.tsx';
@@ -16,13 +17,17 @@ const eventRow = tv({
 });
 
 export function AlarmPreview() {
+    const { t } = useAppTranslation();
     const { alarms = [] } = useContext(StatContext);
     const shortlist = alarms.slice(0, 4);
 
     return (
         <StatCard>
-            <CardHeader link={'/stats/alarms'} linkLabel={'View all'}>
-                Alarms & Errors
+            <CardHeader
+                link={'/stats/alarms'}
+                linkLabel={t('stats:alarms.viewAll')}
+            >
+                {t('stats:alarms.title')}
             </CardHeader>
             <div className="flex flex-col gap-2 justify-around">
                 {shortlist.length == 0 && <EmptyAlarmList />}
@@ -32,9 +37,17 @@ export function AlarmPreview() {
                         key={index}
                     >
                         <span className="font-2xl">
-                            {event.type} {event.CODE}
+                            {t('stats:alarms.preview', {
+                                type:
+                                    event.type === 'ALARM'
+                                        ? t('stats:alarms.eventType.alarm')
+                                        : t('stats:alarms.eventType.error'),
+                                code: event.CODE,
+                            })}
                         </span>
-                        <span>on {event.time}</span>
+                        <span>
+                            {t('stats:alarms.on', { time: event.time })}
+                        </span>
                     </div>
                 ))}
             </div>

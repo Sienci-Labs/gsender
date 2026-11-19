@@ -1,5 +1,6 @@
 import { useValidations } from 'app/components/Wizard/hooks/UseValidations.tsx';
 import type { Wizard } from 'app/components/Wizard/types';
+import { tk } from 'app/i18n';
 import { Jogging } from 'app/features/Jogging';
 import { useMemo } from 'react';
 import XYSquaringExample from '../assets/X-Y_Squaring_01.png';
@@ -21,24 +22,22 @@ export function useXYSquaringWizard(): Wizard {
     return useMemo<Wizard>(
         () => ({
             id: 'xy-squaring',
-            title: 'XY Squaring',
+            title: tk('tools:registry.squaring.title'),
             image: XYSquaringExample,
             validations: [...validations],
             helpUrl: 'https://resources.sienci.com/view/gs-calibration-tools/',
             subWizards: [
                 {
                     id: 'initial-setup',
-                    title: 'XY Squaring',
-                    description: `If your CNC is making skewed cuts (pictured), it's because
-								the X and Y axes aren't squared to each other. This can be
-								fixed.`,
-                    estimatedTime: '5 - 10 minutes',
+                    title: tk('tools:registry.squaring.title'),
+                    description: tk('tools:squaring.landing.skewedCuts'),
+                    estimatedTime: tk('tools:squaring.wizard.estimatedTime'),
                     completionPage: ResultsStep,
                     context: useSquaring,
                     steps: [
                         {
                             id: 'landing',
-                            title: 'Initial Setup',
+                            title: tk('tools:squaring.wizard.initialSetup'),
                             component: Landing,
                             secondaryContent: [
                                 {
@@ -50,15 +49,17 @@ export function useXYSquaringWizard(): Wizard {
                                 },
                                 {
                                     type: 'link',
-                                    title: 'Need help?',
-                                    content: 'Follow along in our',
+                                    title: tk('common:wizard.needHelp'),
+                                    content: tk(
+                                        'tools:squaring.wizard.followAlong',
+                                    ),
                                     url: 'https://resources.sienci.com/view/gs-calibration-tools/',
                                 },
                             ],
                         },
                         {
                             id: 'mark-locations',
-                            title: 'Mark Locations',
+                            title: tk('tools:squaring.wizard.markLocations'),
                             component: MarkingStep,
                             secondaryContent: [
                                 {
@@ -68,15 +69,17 @@ export function useXYSquaringWizard(): Wizard {
                                 },
                                 {
                                     type: 'link',
-                                    title: 'Need help?',
-                                    content: 'Follow along in our',
+                                    title: tk('common:wizard.needHelp'),
+                                    content: tk(
+                                        'tools:squaring.wizard.followAlong',
+                                    ),
                                     url: 'https://resources.sienci.com/view/gs-calibration-tools/',
                                 },
                             ],
                         },
                         {
                             id: 'first-location',
-                            title: 'Measure Distances',
+                            title: tk('tools:squaring.wizard.measureDistances'),
                             component: MeasurementStep,
                             secondaryContent: [
                                 {
@@ -86,8 +89,10 @@ export function useXYSquaringWizard(): Wizard {
                                 },
                                 {
                                     type: 'link',
-                                    title: 'Need help?',
-                                    content: 'Follow along in our',
+                                    title: tk('common:wizard.needHelp'),
+                                    content: tk(
+                                        'tools:squaring.wizard.followAlong',
+                                    ),
                                     url: 'https://resources.sienci.com/view/gs-calibration-tools/',
                                 },
                             ],

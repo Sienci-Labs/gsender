@@ -4,7 +4,7 @@ import {
     type UploadState,
     useSDCard,
 } from 'app/features/SDCard/hooks/useSDCard.ts';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import cn from 'classnames';
@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 
 export function StatusIndicator({ isMounted }) {
     const { isConnected } = useSDCard();
+    const { t } = useAppTranslation();
     const [uploadState, setUploadState] = useState<UploadState>('idle');
     const [uploadProgress, setUploadProgress] = useState<number>(0);
     let status: string;
@@ -54,13 +55,13 @@ export function StatusIndicator({ isMounted }) {
     }, []);
 
     if (!isConnected) {
-        status = 'Disconnected';
+        status = t('common:machineState.disconnected');
         colourClasses = 'bg-gray-50 dark:text- text-gray-700 border-gray-200';
     } else if (isMounted) {
-        status = 'Mounted';
+        status = t('tools:sdCard.status.mounted');
         colourClasses = 'bg-green-50 text-green-700 border-green-200';
     } else {
-        status = 'Unmounted';
+        status = t('tools:sdCard.status.unmounted');
         colourClasses = 'bg-red-50 text-red-700 border-red-200';
     }
 
@@ -71,7 +72,7 @@ export function StatusIndicator({ isMounted }) {
                     <div className="flex items-center space-x-4">
                         <HardDrive className="w-6 h-6 text-gray-600 dark:text-content-secondary" />
                         <span className="text-sm font-medium text-gray-700 dark:text-content-secondary">
-                            SD Card Status:
+                            {t('tools:sdCard.status.label')}
                         </span>
                     </div>
                     <div

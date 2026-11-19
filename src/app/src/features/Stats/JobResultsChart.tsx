@@ -1,4 +1,5 @@
 import { Job, StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useAppTranslation } from 'app/i18n';
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import { useContext } from 'react';
 import { Pie } from 'react-chartjs-2';
@@ -7,26 +8,28 @@ import { FaChartPie } from 'react-icons/fa';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function EmptyDataPlaceholder() {
+    const { t } = useAppTranslation();
     return (
         <div className="flex flex-col gap-2 items-center justify-center text-gray-700 dark:text-content-primary">
             <span className="text-6xl">
                 <FaChartPie />
             </span>
-            <span>No data to display</span>
+            <span>{t('stats:chart.noData')}</span>
         </div>
     );
 }
 
 export function JobResultsChart() {
+    const { t } = useAppTranslation();
     const { jobStats, filteredJobs, isConnected } = useContext(StatContext);
 
-    const labels = ['Complete', 'Incomplete'];
+    const labels = [t('stats:chart.complete'), t('stats:chart.incomplete')];
 
     const data = {
         labels,
         datasets: [
             {
-                label: 'Jobs',
+                label: t('stats:chart.jobs'),
                 data: [jobStats.completeJobs, jobStats.incompleteJobs],
                 backgroundColor: ['#659dd2', '#C7813F'],
             },

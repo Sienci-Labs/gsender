@@ -20,6 +20,7 @@ import {
     type MaintenanceTask,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
+import { useAppTranslation } from 'app/i18n';
 import { useContext, useEffect, useState } from 'react';
 
 // import Button from 'app/components/Button';
@@ -37,6 +38,7 @@ export function MaintenanceEditTaskDialog({
 }: MaintenanceEditTaskDialogProps) {
     const { maintenanceTasks, maintenanceActions, setMaintenanceTasks } =
         useContext(StatContext);
+    const { t } = useAppTranslation();
     const [task, setTask] = useState<MaintenanceTask>(currentTask);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
@@ -102,7 +104,9 @@ export function MaintenanceEditTaskDialog({
             <Dialog open={show} onOpenChange={toggleShow}>
                 <DialogContent className="bg-white w-1/2">
                     <DialogHeader>
-                        <DialogTitle>Edit Task</DialogTitle>
+                        <DialogTitle>
+                            {t('stats:maintenance.editTask')}
+                        </DialogTitle>
                     </DialogHeader>
                     <form className="w-full" onSubmit={handleSubmit}>
                         <MaintenanceTaskForm task={task} />
@@ -111,7 +115,7 @@ export function MaintenanceEditTaskDialog({
                                 type="submit"
                                 className={buttonStyle({ colors: 'primary' })}
                             >
-                                Save
+                                {t('common:actions.save')}
                             </button>
                             <button
                                 className={buttonStyle({ colors: 'secondary' })}
@@ -121,14 +125,14 @@ export function MaintenanceEditTaskDialog({
                                     toggleShow(false);
                                 }}
                             >
-                                Cancel
+                                {t('common:actions.cancel')}
                             </button>
                             <button
                                 type="button"
                                 className={buttonStyle({ colors: 'danger' })}
                                 onClick={(_e) => onDelete()}
                             >
-                                Delete
+                                {t('common:actions.delete')}
                             </button>
                         </div>
                     </form>
@@ -141,17 +145,21 @@ export function MaintenanceEditTaskDialog({
                 >
                     <AlertDialogContent className="bg-white">
                         <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Task</AlertDialogTitle>
+                            <AlertDialogTitle>
+                                {t('notifications:stats.deleteTask.title')}
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                                {'Are you sure you want to delete ' +
-                                    task.name +
-                                    '?'}
+                                {t('notifications:stats.deleteTask.content', {
+                                    name: task.name,
+                                })}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel>No</AlertDialogCancel>
+                            <AlertDialogCancel>
+                                {t('common:actions.no')}
+                            </AlertDialogCancel>
                             <AlertDialogAction onClick={deleteTask}>
-                                Yes
+                                {t('common:actions.yes')}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

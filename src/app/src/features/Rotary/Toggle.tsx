@@ -4,9 +4,11 @@ import Tooltip from 'app/components/Tooltip';
 import { WORKSPACE_MODE } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 
 const Toggle = () => {
+    const { t } = useAppTranslation();
     const { mode } = useWorkspaceState();
     const { type: controllerType } = useTypedSelector(
         (state) => state.controller,
@@ -26,23 +28,25 @@ const Toggle = () => {
 
     const tooltipContent =
         controllerType === 'grblHAL'
-            ? 'Enable 4-axis or Rotary mode'
-            : 'Toggle Rotary mode';
+            ? t('tools:rotary.toggle.enableTooltip')
+            : t('tools:rotary.toggle.toggleTooltip');
 
     return (
         <div className="flex items-center gap-2 dark:text-content-primary">
-            {controllerType === 'grblHAL' && <span>4-Axis</span>}
+            {controllerType === 'grblHAL' && (
+                <span>{t('tools:rotary.toggle.fourAxis')}</span>
+            )}
             <Tooltip content={tooltipContent}>
                 <div>
                     <Switch
                         checked={mode === WORKSPACE_MODE.ROTARY}
                         onChange={handleToggle}
                         disabled={!connected}
-                        aria-label="Toggle Rotary mode"
+                        aria-label={t('tools:rotary.toggle.toggleTooltip')}
                     />
                 </div>
             </Tooltip>
-            <span>Rotary</span>
+            <span>{t('tools:rotary.toggle.rotary')}</span>
         </div>
     );
 };

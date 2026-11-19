@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import generateSupportFile from 'app/lib/diagnostics.tsx';
 
 interface DiagnosticProps {
@@ -5,6 +6,7 @@ interface DiagnosticProps {
 }
 
 export function Diagnostic({ compactOnSmall = false }: DiagnosticProps) {
+    const { t } = useAppTranslation();
     return (
         <div
             className={`flex flex-col gap-4 ${
@@ -16,9 +18,7 @@ export function Diagnostic({ compactOnSmall = false }: DiagnosticProps) {
                     compactOnSmall ? 'max-xl:hidden' : ''
                 }`}
             >
-                Share this file with our customer support or community so others
-                can help you better. It contains your machine errors, profile,
-                settings, and more.
+                {t('stats:diagnostic.description')}
             </p>
             {generateSupportFile()}
         </div>

@@ -188,7 +188,21 @@
       "title": "Quitter gSender ?",
       "content": "Voulez-vous vraiment quitter gSender ?",
       "confirm": "Quitter"
-    }
+    },
+    "paired": "",
+    "unsupportedFileType": "",
+    "couldNotReachAddress": "",
+    "pairingFieldsRequired": "",
+    "noFiles": "",
+    "chooseTablet": "",
+    "noLongerPaired": "",
+    "timedOut": "",
+    "couldNotReachTablet": "",
+    "partialSend": "",
+    "sentAndLoaded": "",
+    "sentToLibrary_many": "",
+    "sentToLibrary_one": "",
+    "sentToLibrary_other": ""
   },
   "plugins": {
     "removed": "{{name}} a été supprimé.",
@@ -243,7 +257,8 @@
     "deleteFile": {
       "title": "Supprimer le fichier",
       "content": "Voulez-vous vraiment supprimer {{fileName}} ?"
-    }
+    },
+    "fileError": ""
   },
   "settings": {
     "restored": "Paramètres restaurés",
@@ -264,6 +279,14 @@
     "resetAllTasks": {
       "title": "Réinitialiser toutes les tâches",
       "content": "Voulez-vous vraiment réinitialiser les durées de toutes les tâches de maintenance ?"
+    },
+    "deleteTask": {
+      "title": "",
+      "content": ""
+    },
+    "resetTaskTimer": {
+      "title": "",
+      "content": ""
     }
   },
   "toolchange": {
@@ -303,5 +326,27 @@
   "workspace": {
     "modeSetDefault": "Mode d'espace de travail défini sur Par défaut",
     "modeSetRotary": "Mode d'espace de travail défini sur Rotatif"
+  },
+  "remoteFileReceive": {
+    "turnOnBeforePairing": "",
+    "pairingFailed": "",
+    "invalidQrCode": "",
+    "forgetFailed": "",
+    "turnedOn": "",
+    "turnedOff": "",
+    "updateFailed": "",
+    "codeRegenerated": "",
+    "regenerateFailed": "",
+    "openFailed": "",
+    "deleteFiles": {
+      "title": "",
+      "content_many": "",
+      "content_one": "",
+      "content_other": ""
+    },
+    "deleted_many": "",
+    "deleted_one": "",
+    "deleted_other": "",
+    "deleteFailed": ""
   }
 }

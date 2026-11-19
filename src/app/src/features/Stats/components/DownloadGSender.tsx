@@ -1,9 +1,11 @@
 import { Button } from 'app/components/Button';
+import { useAppTranslation } from 'app/i18n';
 import isElectron from 'is-electron';
 import { useState } from 'react';
 import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 
 export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
+    const { t } = useAppTranslation();
     const [canClick, setCanClick] = useState(true);
     function updateGSender() {
         setCanClick(false);
@@ -27,20 +29,14 @@ export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
                 >
                     <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
                 </svg>
-                <span className="sr-only">Info</span>
+                <span className="sr-only">{t('stats:update.info')}</span>
                 <h3 className="text-lg font-medium">
-                    gSender v{version} available to download!
+                    {t('stats:update.available', { version })}
                 </h3>
             </div>
             <div className="mt-2 mb-4 text-sm flex flex-col gap-2">
-                <p>
-                    Clicking the below button will update gSender to version{' '}
-                    {version}.
-                </p>{' '}
-                <p>
-                    It is recommended you backup your EEPROM values and settings
-                    before updating.
-                </p>
+                <p>{t('stats:update.willUpdate', { version })}</p>{' '}
+                <p>{t('stats:update.backupRecommended')}</p>
                 <p>
                     <a
                         className="text-sm text-blue-600 dark:text-blue-400 underline text-center"
@@ -49,10 +45,7 @@ export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
                         rel="noreferrer"
                     >
                         <div className="flex items-center gap-1 text-center justify-center">
-                            <span>
-                                Read our documentation on updating to learn
-                                more.
-                            </span>
+                            <span>{t('stats:update.readDocs')}</span>
                             <FaExternalLinkAlt />
                         </div>
                     </a>
@@ -66,8 +59,16 @@ export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
                     onClick={updateGSender}
                 >
                     <FaDownload />
-                    {canClick && <span>Update to v{version} now!</span>}
-                    {!canClick && <span>Downloading ({downloadPercent}%)</span>}
+                    {canClick && (
+                        <span>{t('stats:update.updateNow', { version })}</span>
+                    )}
+                    {!canClick && (
+                        <span>
+                            {t('stats:update.downloading', {
+                                percent: downloadPercent,
+                            })}
+                        </span>
+                    )}
                 </Button>
             </div>
         </div>

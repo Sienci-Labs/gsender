@@ -194,7 +194,22 @@
       "title": "Выйти из gSender?",
       "content": "Вы уверены, что хотите выйти из gSender?",
       "confirm": "Выйти"
-    }
+    },
+    "paired": "",
+    "unsupportedFileType": "",
+    "couldNotReachAddress": "",
+    "pairingFieldsRequired": "",
+    "noFiles": "",
+    "chooseTablet": "",
+    "noLongerPaired": "",
+    "timedOut": "",
+    "couldNotReachTablet": "",
+    "partialSend": "",
+    "sentAndLoaded": "",
+    "sentToLibrary_few": "",
+    "sentToLibrary_many": "",
+    "sentToLibrary_one": "",
+    "sentToLibrary_other": ""
   },
   "plugins": {
     "removed": "{{name}} удалён.",
@@ -249,7 +264,8 @@
     "deleteFile": {
       "title": "Удалить файл",
       "content": "Вы уверены, что хотите удалить {{fileName}}?"
-    }
+    },
+    "fileError": ""
   },
   "settings": {
     "restored": "Настройки восстановлены",
@@ -270,6 +286,14 @@
     "resetAllTasks": {
       "title": "Сбросить все задачи",
       "content": "Вы уверены, что хотите сбросить время для всех задач обслуживания?"
+    },
+    "deleteTask": {
+      "title": "",
+      "content": ""
+    },
+    "resetTaskTimer": {
+      "title": "",
+      "content": ""
     }
   },
   "toolchange": {
@@ -311,5 +335,29 @@
   "workspace": {
     "modeSetDefault": "Режим рабочей области: стандартный",
     "modeSetRotary": "Режим рабочей области: поворотный"
+  },
+  "remoteFileReceive": {
+    "turnOnBeforePairing": "",
+    "pairingFailed": "",
+    "invalidQrCode": "",
+    "forgetFailed": "",
+    "turnedOn": "",
+    "turnedOff": "",
+    "updateFailed": "",
+    "codeRegenerated": "",
+    "regenerateFailed": "",
+    "openFailed": "",
+    "deleteFiles": {
+      "title": "",
+      "content_few": "",
+      "content_many": "",
+      "content_one": "",
+      "content_other": ""
+    },
+    "deleted_few": "",
+    "deleted_many": "",
+    "deleted_one": "",
+    "deleted_other": "",
+    "deleteFailed": ""
   }
 }

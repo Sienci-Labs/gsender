@@ -3,6 +3,7 @@ import { ControlledInput } from 'app/components/ControlledInput';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import { FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { useMovementTuning } from '../utils/MovementTuningContext';
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const DistanceTravelled = ({ onComplete }: Props) => {
+    const { t } = useAppTranslation();
     const {
         setTravelCompleted,
         setSetTravelCompleted,
@@ -25,10 +27,7 @@ const DistanceTravelled = ({ onComplete }: Props) => {
         <div className="flex flex-col gap-4">
             <div className="space-y-1">
                 <p className="h-20 dark:text-content-primary">
-                    Lastly, measure the distance travelled between the original
-                    mark and the current gantry location. Take your time when
-                    entering this value, a more accurate measurement will give
-                    you better tuning results.
+                    {t('tools:movementTuning.distanceTravelled.instructions')}
                 </p>
             </div>
 
@@ -57,7 +56,9 @@ const DistanceTravelled = ({ onComplete }: Props) => {
                                 }}
                                 testId="mt-set-distance"
                             >
-                                Set Distance Travelled
+                                {t(
+                                    'tools:movementTuning.steps.distanceTravelled',
+                                )}
                             </Button>
 
                             <div className="flex items-center gap-2">

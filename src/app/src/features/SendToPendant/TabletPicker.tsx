@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { ChevronDown, QrCode, Tablet, X } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -15,22 +16,30 @@ interface TabletPickerProps {
     onForget: (id: string) => void;
 }
 
-const StatusLine: React.FC<{ tablet: PendantTablet }> = ({ tablet }) => (
-    <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-content-muted">
-        <span
-            className={`inline-block w-1.5 h-1.5 rounded-full ${
-                tablet.online ? 'bg-green-500' : 'bg-gray-400'
-            }`}
-        />
-        {tablet.online ? 'Online' : 'Offline'}
-        {tablet.host && (
-            <span className="text-gray-400 dark:text-content-muted">
-                · {tablet.online ? '' : 'last seen '}
-                {tablet.host}
-            </span>
-        )}
-    </span>
-);
+const StatusLine: React.FC<{ tablet: PendantTablet }> = ({ tablet }) => {
+    const { t } = useAppTranslation();
+    return (
+        <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-content-muted">
+            <span
+                className={`inline-block w-1.5 h-1.5 rounded-full ${
+                    tablet.online ? 'bg-green-500' : 'bg-gray-400'
+                }`}
+            />
+            {tablet.online
+                ? t('tools:sendToPendant.picker.online')
+                : t('tools:sendToPendant.picker.offline')}
+            {tablet.host && (
+                <span className="text-gray-400 dark:text-content-muted">
+                    {tablet.online
+                        ? `· ${tablet.host}`
+                        : t('tools:sendToPendant.picker.lastSeen', {
+                              host: tablet.host,
+                          })}
+                </span>
+            )}
+        </span>
+    );
+};
 
 export const TabletPicker: React.FC<TabletPickerProps> = ({
     tablets,
@@ -42,7 +51,8 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
     onForget,
 }) => {
     const [expanded, setExpanded] = useState(false);
-    const selected = tablets.find((t) => t.id === selectedId);
+    const { t } = useAppTranslation();
+    const selected = tablets.find((tablet) => tablet.id === selectedId);
 
     if (tablets.length === 0) {
         return (
@@ -51,10 +61,10 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                     <Tablet className="w-6 h-6" />
                 </div>
                 <p className="font-medium text-gray-900 dark:text-content-primary">
-                    No pendant paired yet
+                    {t('tools:sendToPendant.picker.noneTitle')}
                 </p>
                 <p className="mt-1 mb-4 text-xs text-gray-500 dark:text-content-muted">
-                    Pair once and it's remembered for future sends.
+                    {t('tools:sendToPendant.picker.noneHint')}
                 </p>
                 <button
                     type="button"
@@ -63,7 +73,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-robin-700 hover:bg-robin-800 disabled:opacity-50"
                 >
                     <QrCode className="w-4 h-4" />
-                    Pair with QR code
+                    {t('tools:sendToPendant.picker.pairWithQr')}
                 </button>
                 <button
                     type="button"
@@ -71,7 +81,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                     onClick={onPairManual}
                     className="mt-3 text-xs text-gray-500 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-primary"
                 >
-                    Enter IP & code instead
+                    {t('tools:sendToPendant.picker.enterIpInstead')}
                 </button>
             </div>
         );
@@ -82,7 +92,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
     return (
         <div className="space-y-2">
             <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-content-muted">
-                Sending to
+                {t('tools:sendToPendant.picker.sendingTo')}
             </p>
             <div className="rounded-lg border border-robin-500/60 bg-robin-500/5 dark:bg-robin-500/10">
                 <div className="flex items-center gap-3 px-3 py-3">
@@ -99,7 +109,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                             </>
                         ) : (
                             <p className="text-gray-500 dark:text-content-muted">
-                                Choose a tablet
+                                {t('tools:sendToPendant.picker.chooseTablet')}
                             </p>
                         )}
                     </div>
@@ -110,7 +120,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                             onClick={() => setExpanded((v) => !v)}
                             className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-robin-700 dark:text-robin-400 hover:bg-robin-500/10 disabled:opacity-50"
                         >
-                            Change
+                            {t('tools:sendToPendant.picker.change')}
                             <ChevronDown
                                 className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`}
                             />
@@ -119,7 +129,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                         selected && (
                             <button
                                 type="button"
-                                title="Forget this tablet"
+                                title={t('tools:sendToPendant.picker.forget')}
                                 disabled={disabled}
                                 onClick={() => onForget(selected.id)}
                                 className="p-1 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-200/60 dark:hover:bg-surface-base dark:hover:text-content-primary"
@@ -132,45 +142,47 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
 
                 {canChange && expanded && (
                     <div className="border-t border-robin-500/20 py-1">
-                        {tablets.map((t) => (
+                        {tablets.map((tablet) => (
                             <div
-                                key={t.id}
+                                key={tablet.id}
                                 className="group flex items-center gap-2 px-3 hover:bg-robin-500/10"
                             >
                                 <button
                                     type="button"
                                     disabled={disabled}
                                     onClick={() => {
-                                        onSelect(t.id);
+                                        onSelect(tablet.id);
                                         setExpanded(false);
                                     }}
                                     className="flex flex-1 min-w-0 items-center gap-2 py-2 text-left"
                                 >
                                     <span
                                         className={`inline-block w-1.5 h-1.5 shrink-0 rounded-full ${
-                                            t.online
+                                            tablet.online
                                                 ? 'bg-green-500'
                                                 : 'bg-gray-400'
                                         }`}
                                     />
                                     <span
                                         className={`truncate ${
-                                            t.id === selectedId
+                                            tablet.id === selectedId
                                                 ? 'font-medium text-gray-900 dark:text-content-primary'
                                                 : 'text-gray-700 dark:text-content-primary'
                                         }`}
                                     >
-                                        {t.name}
+                                        {tablet.name}
                                     </span>
                                     <span className="ml-auto text-xs text-gray-400 shrink-0">
-                                        {t.host}
+                                        {tablet.host}
                                     </span>
                                 </button>
                                 <button
                                     type="button"
-                                    title="Forget this tablet"
+                                    title={t(
+                                        'tools:sendToPendant.picker.forget',
+                                    )}
                                     disabled={disabled}
-                                    onClick={() => onForget(t.id)}
+                                    onClick={() => onForget(tablet.id)}
                                     className="p-0.5 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 text-gray-400 hover:text-gray-700 dark:hover:text-content-primary"
                                 >
                                     <X className="w-3.5 h-3.5" />
@@ -188,7 +200,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                     className="flex items-center gap-1 font-medium text-robin-700 dark:text-robin-400 hover:underline"
                 >
                     <QrCode className="w-3.5 h-3.5" />
-                    Pair another tablet
+                    {t('tools:sendToPendant.picker.pairAnother')}
                 </button>
                 <span className="text-gray-300 dark:text-outline">·</span>
                 <button
@@ -197,7 +209,7 @@ export const TabletPicker: React.FC<TabletPickerProps> = ({
                     onClick={onPairManual}
                     className="text-gray-500 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-primary"
                 >
-                    Enter IP manually
+                    {t('tools:sendToPendant.picker.enterIpManually')}
                 </button>
             </div>
         </div>

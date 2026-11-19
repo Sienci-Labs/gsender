@@ -1,5 +1,6 @@
 import { ConfigRow } from 'app/features/Stats/components/Configuration.tsx';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useAppTranslation } from 'app/i18n';
 import { useContext } from 'react';
 
 export function StatRow({
@@ -30,27 +31,28 @@ function getTimeString(seconds: number): string {
 }
 
 export function StatTable() {
+    const { t } = useAppTranslation();
     const { isConnected, jobStats } = useContext(StatContext);
     return (
         <div className="flex flex-col px-10">
             <StatRow
                 connected={isConnected}
-                label="Total jobs run"
+                label={t('stats:overview.totals.jobsRun')}
                 value={jobStats.completeJobs + jobStats.incompleteJobs}
             />
             <StatRow
                 connected={isConnected}
-                label="Total cutting time"
+                label={t('stats:overview.totals.cuttingTime')}
                 value={getTimeString(jobStats.totalCutTime)}
             />
             <StatRow
                 connected={isConnected}
-                label="Average job time"
+                label={t('stats:overview.totals.averageJobTime')}
                 value={getTimeString(jobStats.averageCutTime)}
             />
             <StatRow
                 connected={isConnected}
-                label="Longest job"
+                label={t('stats:overview.totals.longestJob')}
                 value={getTimeString(jobStats.longestCutTime)}
             />
         </div>

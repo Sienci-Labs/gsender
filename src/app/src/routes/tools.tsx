@@ -1,19 +1,19 @@
 import PluginToolCard from 'app/components/PluginToolCard';
 import ToolCard from 'app/components/ToolCard';
 import { usePinnedTools } from 'app/features/ToolsPage/usePinnedTools';
+import { useAppTranslation } from 'app/i18n';
 
 const ToolsPage = () => {
+    const { t } = useAppTranslation();
     const { tools, pinnedIds, togglePin } = usePinnedTools({ pendant: false });
 
     return (
         <div className="py-4 px-16 max-xl:px-8 pb-12 fixed-content-area w-full flex flex-col overflow-y-auto">
             <h1 className="text-3xl font-bold dark:text-content-primary mb-2">
-                Tools
+                {t('common:nav.tools')}
             </h1>
             <p className="text-sm text-gray-600 dark:text-content-muted mb-4">
-                Tools are plugins that can be installed and used to extend the
-                functionality of gSender. Some are built in to gSender, some are
-                third party plugins. Star a tool to pin it to the top.
+                {t('tools:page.description')}
             </p>
 
             <div className="flex-1 grid lg:grid-cols-3 grid-cols-2 gap-4 overflow-y-auto overflow-x-hidden">

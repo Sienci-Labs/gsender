@@ -1,0 +1,470 @@
+{
+  "movementTuning": {
+    "axisSelection": {
+      "placement": "",
+      "axisToTune": "",
+      "selectAxis": "",
+      "connectFirst": ""
+    },
+    "axisOption": "",
+    "completion": {
+      "updateStepsButton": "",
+      "updateFirmware": "",
+      "accurate": ""
+    },
+    "distanceTravelled": {
+      "instructions": ""
+    },
+    "steps": {
+      "distanceTravelled": "",
+      "markFirstLocation": "",
+      "axisSelection": "",
+      "moveAxis": ""
+    },
+    "markFirstLocation": {
+      "instructions": ""
+    },
+    "moveAxis": {
+      "instructions": "",
+      "button": ""
+    },
+    "title": "",
+    "intro": {
+      "accurateWork": "",
+      "variations": "",
+      "testing": ""
+    },
+    "estimatedTime": "",
+    "followAlongIn": "",
+    "legacy": {
+      "exampleAlt": "",
+      "start": "",
+      "jogControls": "",
+      "instructions": "",
+      "diagram": "",
+      "stepAlt": ""
+    }
+  },
+  "remoteFileReceive": {
+    "transfer": {
+      "fileFailed": "",
+      "failed": "",
+      "receiving": "",
+      "received": ""
+    },
+    "desktops": {
+      "heading": "",
+      "pair": "",
+      "pairing": "",
+      "empty": "",
+      "forget": ""
+    },
+    "scanDialog": {
+      "title": "",
+      "description": ""
+    },
+    "scanner": {
+      "cameraFailed": "",
+      "unsupported": ""
+    },
+    "description": "",
+    "enabled": "",
+    "manual": {
+      "heading": "",
+      "instructions": "",
+      "addresses": "",
+      "noNetwork": "",
+      "pairingCode": "",
+      "newCode": ""
+    },
+    "files": {
+      "heading": "",
+      "deleteSelected_one": "",
+      "deleteSelected_other": "",
+      "empty": "",
+      "selectAll": "",
+      "loadFile": "",
+      "loading": "",
+      "load": ""
+    }
+  },
+  "remoteMode": {
+    "address": {
+      "thisComputerOnly": "",
+      "virtual": "",
+      "noNetwork": "",
+      "recommended": ""
+    },
+    "nav": {
+      "control": "",
+      "workflow": "",
+      "info": "",
+      "menu": "",
+      "home": ""
+    },
+    "qrCode": {
+      "scanHint": "",
+      "typeAddress": "",
+      "copy": ""
+    },
+    "dialog": {
+      "title": "",
+      "enable": "",
+      "recommendedHint": "",
+      "addressLabel": "",
+      "otherAddresses": "",
+      "useRecommended": "",
+      "unreachable": "",
+      "addressHintWithLabel": "",
+      "addressHint": "",
+      "portLabel": ""
+    }
+  },
+  "rotary": {
+    "actions": {
+      "surfacingTooltip": "",
+      "surfacing": "",
+      "zAxisProbeName": "",
+      "probeZTooltip": "",
+      "probeZ": "",
+      "yAxisAlignment": "",
+      "yAxisAlignmentTooltip": ""
+    },
+    "mounting": {
+      "linesUpQuestion": "",
+      "linesUp": "",
+      "doesNotLineUp": "",
+      "endMillDiameter": "",
+      "numberOfHoles": "",
+      "extensionTrackLength": "",
+      "openTooltip": "",
+      "button": "",
+      "title": "",
+      "description": "",
+      "loadToVisualizer": ""
+    },
+    "surfacing": {
+      "intro": "",
+      "length": "",
+      "startFinalDiameter": "",
+      "stepdown": "",
+      "bitDiameterAndTool": "",
+      "enableRehoming": "",
+      "rehomingHint": ""
+    },
+    "toggle": {
+      "enableTooltip": "",
+      "toggleTooltip": "",
+      "fourAxis": "",
+      "rotary": ""
+    }
+  },
+  "common": {
+    "defaultValueUnits": "",
+    "defaultValue": "",
+    "stepover": "",
+    "feedRate": "",
+    "spindleRpm": "",
+    "defaultOn": "",
+    "defaultOff": "",
+    "delay": "",
+    "visualizerPreview": "",
+    "gcodeTab": "",
+    "lineCount_one": "",
+    "lineCount_other": "",
+    "generateGcode": "",
+    "loadToMainVisualizer": "",
+    "noGcode": ""
+  },
+  "sdCard": {
+    "actions": {
+      "refreshFiles": "",
+      "upload": ""
+    },
+    "validation": {
+      "unusableByFirmware": "",
+      "tooLong": "",
+      "invalidCharacter": ""
+    },
+    "unavailable": {
+      "notConnected": "",
+      "requiresGrblHal": "",
+      "noTransfer": ""
+    },
+    "files": {
+      "empty": "",
+      "emptyHint": "",
+      "heading_one": "",
+      "heading_other": "",
+      "columns": {
+        "name": "",
+        "size": "",
+        "actions": ""
+      },
+      "atcMacro": "",
+      "unusable": "",
+      "run": ""
+    },
+    "status": {
+      "mounted": "",
+      "unmounted": "",
+      "label": ""
+    },
+    "uploadModal": {
+      "title": "",
+      "description": "",
+      "accepts": "",
+      "selectedFiles_one": "",
+      "selectedFiles_other": "",
+      "removeFile": "",
+      "uploadCount_one": "",
+      "uploadCount_other": ""
+    },
+    "upload": {
+      "uploading": "",
+      "complete": ""
+    }
+  },
+  "sendToPendant": {
+    "pairWithQr": {
+      "createFailed": "",
+      "waiting": "",
+      "useCode": ""
+    },
+    "tablets": {
+      "heading": "",
+      "instructions": ""
+    },
+    "manual": {
+      "heading": "",
+      "tabletIp": "",
+      "port": "",
+      "code": "",
+      "pair": ""
+    },
+    "send": {
+      "heading": "",
+      "destination": "",
+      "pairFirst": "",
+      "loadedAdded": "",
+      "sendLoaded": "",
+      "remove": "",
+      "removeFile": "",
+      "addMore": "",
+      "loadActive": "",
+      "loadActiveMultiple": "",
+      "loadActiveHint": "",
+      "sentBanner": "",
+      "sendingOf": "",
+      "sendingFile": "",
+      "pausedWhileRunning": "",
+      "sentButton": "",
+      "sendingButton": "",
+      "sendFiles_one": "",
+      "sendFiles_other": "",
+      "sendButton": ""
+    },
+    "picker": {
+      "online": "",
+      "offline": "",
+      "lastSeen": "",
+      "noneTitle": "",
+      "noneHint": "",
+      "pairWithQr": "",
+      "enterIpInstead": "",
+      "sendingTo": "",
+      "chooseTablet": "",
+      "change": "",
+      "forget": "",
+      "pairAnother": "",
+      "enterIpManually": ""
+    }
+  },
+  "squaring": {
+    "landing": {
+      "prepare": "",
+      "tape": "",
+      "ruler": "",
+      "pointer": "",
+      "position": "",
+      "skewedCuts": "",
+      "connectFirst": "",
+      "exampleAlt": "",
+      "skewedCutsCaption": "",
+      "start": ""
+    },
+    "instructions": "",
+    "enterMeasurement": "",
+    "update": "",
+    "results": {
+      "square": {
+        "title": "",
+        "body": ""
+      },
+      "minor": {
+        "title": "",
+        "deviation": "",
+        "adjust": ""
+      },
+      "major": {
+        "title": ""
+      },
+      "title": ""
+    },
+    "measured": {
+      "title": "",
+      "bottomEdge": "",
+      "rightEdge": "",
+      "diagonal": "",
+      "angleDeviation": ""
+    },
+    "eeprom": {
+      "title": "",
+      "intro": "",
+      "xStepsPerMm": "",
+      "current": "",
+      "recommended": "",
+      "yStepsPerMm": "",
+      "updating": "",
+      "update": "",
+      "updateFirmware": "",
+      "dialogBody": "",
+      "warningTitle": "",
+      "warningBody": ""
+    },
+    "wizard": {
+      "estimatedTime": "",
+      "initialSetup": "",
+      "followAlong": "",
+      "markLocations": "",
+      "measureDistances": ""
+    },
+    "jogControls": "",
+    "nextStep": "",
+    "showJogControls": "",
+    "diagram": {
+      "measure": ""
+    },
+    "subSteps": {
+      "markPoint1": {
+        "label": "",
+        "description": ""
+      },
+      "moveXAxis": {
+        "label": "",
+        "description": ""
+      },
+      "markPoint2": {
+        "label": "",
+        "description": ""
+      },
+      "moveYAxis": {
+        "label": "",
+        "description": ""
+      },
+      "markPoint3": {
+        "label": "",
+        "description": ""
+      },
+      "measure12": {
+        "label": "",
+        "description": ""
+      },
+      "measure23": {
+        "label": "",
+        "description": ""
+      },
+      "measure13": {
+        "label": "",
+        "description": ""
+      }
+    }
+  },
+  "registry": {
+    "squaring": {
+      "title": "",
+      "description": ""
+    },
+    "surfacing": {
+      "title": "",
+      "description": ""
+    },
+    "rotarySurfacing": {
+      "title": "",
+      "description": ""
+    },
+    "movementTuning": {
+      "title": "",
+      "description": ""
+    },
+    "keyboardShortcuts": {
+      "title": "",
+      "description": ""
+    },
+    "gamepad": {
+      "title": "",
+      "description": ""
+    },
+    "tabletConnect": {
+      "title": "",
+      "description": ""
+    },
+    "sd": {
+      "title": "",
+      "description": ""
+    },
+    "accessoryInstall": {
+      "title": "",
+      "description": ""
+    },
+    "plugins": {
+      "title": "",
+      "description": ""
+    },
+    "remoteFileReceive": {
+      "title": "",
+      "description": ""
+    }
+  },
+  "surfacing": {
+    "gcodeViewer": {
+      "title": "",
+      "copy": ""
+    },
+    "position": {
+      "backLeft": "",
+      "backRight": "",
+      "frontLeft": "",
+      "frontRight": "",
+      "center": ""
+    },
+    "pattern": {
+      "spiral": "",
+      "zigZag": ""
+    },
+    "flipCutDirection": "",
+    "startPosition": "",
+    "xAndY": "",
+    "cutDepthAndMax": "",
+    "cutDepthWarning": "",
+    "bitDiameterAndTool": "",
+    "toggleDelay": "",
+    "coolantControl": "",
+    "mist": "",
+    "toggleMist": "",
+    "flood": "",
+    "toggleFlood": ""
+  },
+  "tabs": {
+    "probe": "",
+    "macros": "",
+    "spindleLaser": "",
+    "atc": "",
+    "coolant": "",
+    "rotary": "",
+    "console": ""
+  },
+  "page": {
+    "description": ""
+  }
+}

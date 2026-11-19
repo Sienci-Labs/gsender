@@ -11,7 +11,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { METRIC_UNITS } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { i18n } from 'app/i18n';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -28,6 +28,7 @@ const FM_LOWER_OFFSET_THRESHOLD =
     store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 2 : 0.079;
 
 const ResultsStep = () => {
+    const { t } = useAppTranslation();
     const { triangle, jogValues } = useSquaring();
     const [isUpdating, setIsUpdating] = useState(false);
     const { units } = useWorkspaceState();
@@ -73,9 +74,11 @@ const ResultsStep = () => {
             return (
                 <div className="text-green-950 bg-green-100 p-4 rounded-lg space-y-2">
                     <p className="font-bold text-lg">
-                        Your machine is properly squared!
+                        {t('tools:squaring.results.square.title')}
                     </p>
-                    <p className="text-sm">No adjustments are needed.</p>
+                    <p className="text-sm">
+                        {t('tools:squaring.results.square.body')}
+                    </p>
                 </div>
             );
         }
@@ -85,20 +88,20 @@ const ResultsStep = () => {
             return (
                 <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg space-y-2 dark:bg-yellow-900 dark:text-content-primary">
                     <p className="font-bold text-lg">
-                        Your machine is slightly out of square
+                        {t('tools:squaring.results.minor.title')}
                     </p>
                     <p>
-                        The deviation is minor ({hypotenuseDiff}
-                        {units}) but you may want to adjust the right Y-axis
-                        rail to achieve better squareness.
+                        {t('tools:squaring.results.minor.deviation', {
+                            diff: hypotenuseDiff,
+                            units,
+                        })}
                     </p>
 
                     <p>
-                        You can move your either the right y-axis rail forward
-                        by {hypotenuseDiff}
-                        {units} or the left y-axis rail backward by{' '}
-                        {hypotenuseDiff}
-                        {units}.
+                        {t('tools:squaring.results.minor.adjust', {
+                            diff: hypotenuseDiff,
+                            units,
+                        })}
                     </p>
                 </div>
             );
@@ -108,28 +111,25 @@ const ResultsStep = () => {
         return (
             <div className="text-red-950 bg-red-100 p-4 rounded-lg space-y-2 dark:bg-red-950 dark:text-content-primary">
                 <p className="font-bold text-lg">
-                    Your machine needs adjustment
+                    {t('tools:squaring.results.major.title')}
                 </p>
                 <p>
-                    The machine is off by {angle.toFixed(2)}° or{' '}
-                    <strong>
-                        {hypotenuseDiff}
-                        {units}
-                    </strong>{' '}
-                    on the diagonal.
+                    <TransKey
+                        i18nKey="tools:squaring.results.major.offBy"
+                        values={{
+                            angle: angle.toFixed(2),
+                            diff: hypotenuseDiff,
+                            units,
+                        }}
+                        components={{ bold: <strong /> }}
+                    />
                 </p>
                 <p>
-                    You can move your either the right y-axis rail forward by{' '}
-                    <strong>
-                        {hypotenuseDiff}
-                        {units}
-                    </strong>{' '}
-                    or the left y-axis rail backward by{' '}
-                    <strong>
-                        {hypotenuseDiff}
-                        {units}
-                    </strong>
-                    .
+                    <TransKey
+                        i18nKey="tools:squaring.results.major.adjust"
+                        values={{ diff: hypotenuseDiff, units }}
+                        components={{ bold: <strong /> }}
+                    />
                 </p>
             </div>
         );
@@ -141,19 +141,19 @@ const ResultsStep = () => {
                 <div className="flex flex-row items-start gap-4">
                     <div className="space-y-1">
                         <h3 className="text-lg font-semibold dark:text-content-primary">
-                            Results
+                            {t('tools:squaring.results.title')}
                         </h3>
                         {renderResult()}
                     </div>
 
                     <div className="space-y-1">
                         <h3 className="text-lg font-semibold dark:text-content-primary">
-                            Measured Dimensions
+                            {t('tools:squaring.measured.title')}
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
                                 <div className="text-sm text-gray-600 dark:text-content-primary">
-                                    Bottom Edge (1-2)
+                                    {t('tools:squaring.measured.bottomEdge')}
                                 </div>
                                 <div className="text-xl font-bold">
                                     {triangle.a}
@@ -162,7 +162,7 @@ const ResultsStep = () => {
                             </div>
                             <div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
                                 <div className="text-sm text-gray-600 dark:text-content-primary">
-                                    Right Edge (2-3)
+                                    {t('tools:squaring.measured.rightEdge')}
                                 </div>
                                 <div className="text-xl font-bold">
                                     {triangle.b}
@@ -171,7 +171,7 @@ const ResultsStep = () => {
                             </div>
                             <div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
                                 <div className="text-sm text-gray-600 dark:text-content-primary">
-                                    Diagonal (1-3)
+                                    {t('tools:squaring.measured.diagonal')}
                                 </div>
                                 <div className="text-xl font-bold">
                                     {triangle.c}
@@ -180,7 +180,9 @@ const ResultsStep = () => {
                             </div>
                             <div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
                                 <div className="text-sm text-gray-600 dark:text-content-primary">
-                                    Angle Deviation
+                                    {t(
+                                        'tools:squaring.measured.angleDeviation',
+                                    )}
                                 </div>
                                 <div className="text-xl font-bold">
                                     {angle.toFixed(2)}°
@@ -193,38 +195,50 @@ const ResultsStep = () => {
                 {needsEEPROMAdjustment && (
                     <div className="flex flex-col justify-center items-start space-y-1">
                         <h3 className="text-lg font-semibold dark:text-content-primary">
-                            Other Recommendations
+                            {t('tools:squaring.eeprom.title')}
                         </h3>
                         <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col justify-center items-start space-y-1 dark:bg-yellow-950 dark:text-content-primary dark:border-yellow-950">
-                            <p>
-                                We also noticed from the results that your motor
-                                movement settings could be updated to improve
-                                your machines accuracy.
-                            </p>
+                            <p>{t('tools:squaring.eeprom.intro')}</p>
                             {/* <div className="grid grid-cols-2 gap-4"> */}
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 <div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised">
                                     <div className="text-sm text-gray-600 dark:text-content-primary">
-                                        X-axis step/mm
+                                        {t('tools:squaring.eeprom.xStepsPerMm')}
                                     </div>
                                     <div className="text-xl font-bold">
-                                        Current: {currentXSteps}
+                                        {t('tools:squaring.eeprom.current', {
+                                            value: currentXSteps,
+                                        })}
                                     </div>
                                     <div className="text-xl font-bold text-blue-600">
-                                        Recommended:{' '}
-                                        {eepromAdjustment.x.amount.toFixed(3)}
+                                        {t(
+                                            'tools:squaring.eeprom.recommended',
+                                            {
+                                                value: eepromAdjustment.x.amount.toFixed(
+                                                    3,
+                                                ),
+                                            },
+                                        )}
                                     </div>
                                 </div>
                                 <div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised">
                                     <div className="text-sm text-gray-600 dark:text-content-primary">
-                                        Y-axis step/mm
+                                        {t('tools:squaring.eeprom.yStepsPerMm')}
                                     </div>
                                     <div className="text-xl font-bold">
-                                        Current: {currentYSteps}
+                                        {t('tools:squaring.eeprom.current', {
+                                            value: currentYSteps,
+                                        })}
                                     </div>
                                     <div className="text-xl font-bold text-blue-600">
-                                        Recommended:{' '}
-                                        {eepromAdjustment.y.amount.toFixed(3)}
+                                        {t(
+                                            'tools:squaring.eeprom.recommended',
+                                            {
+                                                value: eepromAdjustment.y.amount.toFixed(
+                                                    3,
+                                                ),
+                                            },
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -234,51 +248,71 @@ const ResultsStep = () => {
                                         <AlertDialogTrigger asChild>
                                             <Button disabled={isUpdating}>
                                                 {isUpdating
-                                                    ? 'Updating...'
-                                                    : 'Update step/mm'}
+                                                    ? t(
+                                                          'tools:squaring.eeprom.updating',
+                                                      )
+                                                    : t(
+                                                          'tools:squaring.eeprom.update',
+                                                      )}
                                             </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent className="bg-white">
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>
-                                                    Update Firmware
+                                                    {t(
+                                                        'tools:squaring.eeprom.updateFirmware',
+                                                    )}
                                                 </AlertDialogTitle>
                                                 <div className="space-y-4">
                                                     <p>
-                                                        This will update the
-                                                        X-axis ($100) and Y-axis
-                                                        ($101) step/mm values in
-                                                        your CNC firmware to the
-                                                        new ones below:
+                                                        {t(
+                                                            'tools:squaring.eeprom.dialogBody',
+                                                        )}
                                                     </p>
                                                     <p>
-                                                        X-axis:{' '}
-                                                        <strong>
-                                                            {eepromAdjustment.x.amount.toFixed(
-                                                                3,
-                                                            )}
-                                                        </strong>
+                                                        <TransKey
+                                                            i18nKey="tools:squaring.eeprom.xAxisValue"
+                                                            values={{
+                                                                value: eepromAdjustment.x.amount.toFixed(
+                                                                    3,
+                                                                ),
+                                                            }}
+                                                            components={{
+                                                                bold: (
+                                                                    <strong />
+                                                                ),
+                                                            }}
+                                                        />
                                                     </p>
                                                     <p>
-                                                        Y-axis:{' '}
-                                                        <strong>
-                                                            {eepromAdjustment.y.amount.toFixed(
-                                                                3,
-                                                            )}
-                                                        </strong>
+                                                        <TransKey
+                                                            i18nKey="tools:squaring.eeprom.yAxisValue"
+                                                            values={{
+                                                                value: eepromAdjustment.y.amount.toFixed(
+                                                                    3,
+                                                                ),
+                                                            }}
+                                                            components={{
+                                                                bold: (
+                                                                    <strong />
+                                                                ),
+                                                            }}
+                                                        />
                                                     </p>
                                                 </div>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>
-                                                    Cancel
+                                                    {t('common:actions.cancel')}
                                                 </AlertDialogCancel>
                                                 <AlertDialogAction
                                                     className="border border-blue-500"
                                                     onClick={handleUpdateEEPROM}
                                                     data-testid="sq-update-step-per-mm"
                                                 >
-                                                    Update Firmware
+                                                    {t(
+                                                        'tools:squaring.eeprom.updateFirmware',
+                                                    )}
                                                 </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
@@ -286,11 +320,13 @@ const ResultsStep = () => {
                                 </div>
 
                                 <div className="mt-1 xl:mt-4 text-sm text-yellow-600 dark:text-yellow-400">
-                                    <p className="font-bold">Warning</p>
+                                    <p className="font-bold">
+                                        {t(
+                                            'tools:squaring.eeprom.warningTitle',
+                                        )}
+                                    </p>
                                     <p>
-                                        Updating Firmware values can affect your
-                                        machine's accuracy. Make sure to verify
-                                        the new settings after applying them.
+                                        {t('tools:squaring.eeprom.warningBody')}
                                     </p>
                                 </div>
                             </div>

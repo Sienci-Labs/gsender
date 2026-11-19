@@ -12,7 +12,7 @@ import {
 import type { EEPROM } from 'app/definitions/firmware';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { i18n } from 'app/i18n';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { toFixedIfNecessary } from 'app/lib/rounding';
 import { toast } from 'sonner';
@@ -24,6 +24,7 @@ const Completion = () => {
         useMovementTuning();
     const { units } = useWorkspaceState();
     const { settings } = useTypedSelector((state) => state.controller.settings);
+    const { t } = useAppTranslation();
 
     const handleUpdateEEPROM = () => {
         const currentStepsPerMM = Number(settings[eepromKey as EEPROM]);
@@ -49,17 +50,18 @@ const Completion = () => {
             <div className="flex flex-col gap-4">
                 <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
                     <span>
-                        Your {selectedAxis.toUpperCase()}-axis movement was off
-                        by{' '}
-                        <strong>
-                            {toFixedIfNecessary(
-                                moveDistance - measuredDistance,
-                                4,
-                            )}{' '}
-                            {units}.
-                        </strong>{' '}
-                        Consider updating your {selectedAxis.toUpperCase()}
-                        -axis step/mm value in your CNC firmware.
+                        <TransKey
+                            i18nKey="tools:movementTuning.completion.offBy"
+                            values={{
+                                axis: selectedAxis.toUpperCase(),
+                                distance: toFixedIfNecessary(
+                                    moveDistance - measuredDistance,
+                                    4,
+                                ),
+                                units,
+                            }}
+                            components={{ bold: <strong /> }}
+                        />
                     </span>
 
                     <AlertDialog>
@@ -69,53 +71,70 @@ const Completion = () => {
                                 variant="outline"
                                 testId="mt-update-step-per-mm"
                             >
-                                Update step/mm
+                                {t(
+                                    'tools:movementTuning.completion.updateStepsButton',
+                                )}
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-white">
                             <AlertDialogHeader>
                                 <AlertDialogTitle>
-                                    Update Firmware
+                                    {t(
+                                        'tools:movementTuning.completion.updateFirmware',
+                                    )}
                                 </AlertDialogTitle>
                                 <div className="space-y-4">
                                     <p>
-                                        This will update the{' '}
-                                        <strong>
-                                            {selectedAxis.toUpperCase()}
-                                            -axis
-                                        </strong>{' '}
-                                        step/mm value in your CNC firmware ({' '}
-                                        <strong>
-                                            {getEEPROMSettingKey(selectedAxis)}
-                                        </strong>{' '}
-                                        )
+                                        <TransKey
+                                            i18nKey="tools:movementTuning.completion.updateDescription"
+                                            values={{
+                                                axis: selectedAxis.toUpperCase(),
+                                                setting:
+                                                    getEEPROMSettingKey(
+                                                        selectedAxis,
+                                                    ),
+                                            }}
+                                            components={{ bold: <strong /> }}
+                                        />
                                     </p>
                                     <p>
-                                        From:{' '}
-                                        <strong>{currentStepsPerMM}</strong>
+                                        <TransKey
+                                            i18nKey="tools:movementTuning.completion.from"
+                                            values={{
+                                                value: currentStepsPerMM,
+                                            }}
+                                            components={{ bold: <strong /> }}
+                                        />
                                     </p>
                                     <p>
-                                        To:{' '}
-                                        <strong>
-                                            {calculateNewStepsPerMM({
-                                                originalStepsPerMM:
-                                                    currentStepsPerMM,
-                                                givenDistanceMoved:
-                                                    moveDistance,
-                                                actualDistanceMoved:
-                                                    measuredDistance,
-                                            })}
-                                        </strong>
+                                        <TransKey
+                                            i18nKey="tools:movementTuning.completion.to"
+                                            values={{
+                                                value: calculateNewStepsPerMM({
+                                                    originalStepsPerMM:
+                                                        currentStepsPerMM,
+                                                    givenDistanceMoved:
+                                                        moveDistance,
+                                                    actualDistanceMoved:
+                                                        measuredDistance,
+                                                }),
+                                            }}
+                                            components={{ bold: <strong /> }}
+                                        />
                                     </p>
                                 </div>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>
+                                    {t('common:actions.cancel')}
+                                </AlertDialogCancel>
                                 <AlertDialogAction
                                     className="border border-blue-500"
                                     onClick={handleUpdateEEPROM}
                                 >
-                                    Update Firmware
+                                    {t(
+                                        'tools:movementTuning.completion.updateFirmware',
+                                    )}
                                 </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
@@ -129,8 +148,9 @@ const Completion = () => {
         <div className="flex flex-col gap-4">
             <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-white dark:border-green-950">
                 <p>
-                    Your {selectedAxis.toUpperCase()}-axis looks accurate, so
-                    you should be good to go!
+                    {t('tools:movementTuning.completion.accurate', {
+                        axis: selectedAxis.toUpperCase(),
+                    })}
                 </p>
             </div>
         </div>

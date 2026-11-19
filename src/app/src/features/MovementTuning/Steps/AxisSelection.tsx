@@ -3,6 +3,7 @@
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import { useEffect } from 'react';
 import Select from 'react-select';
 import { useMovementTuning } from '../utils/MovementTuningContext';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const AxisSelection = ({ onComplete }: Props) => {
+    const { t } = useAppTranslation();
     const {
         selectedAxis,
         setSelectedAxis,
@@ -42,27 +44,31 @@ const AxisSelection = ({ onComplete }: Props) => {
             {/* <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]"> */}
             <div className="space-y-12 text-sm xl:text-base font-normal">
                 <p className="font-bold dark:text-content-primary">
-                    Whichever axis you'll be tuning, please place it in an
-                    initial location so that it'll have space to move to the
-                    right (for X), backwards (for Y), and downwards (for Z).
+                    {t('tools:movementTuning.axisSelection.placement')}
                 </p>
 
                 <div className="flex gap-2 items-center">
                     <label className="min-w-24 font-bold dark:text-content-primary">
-                        Axis to Tune
+                        {t('tools:movementTuning.axisSelection.axisToTune')}
                     </label>
                     <Select
                         options={[
                             {
-                                label: 'X-Axis',
+                                label: t('tools:movementTuning.axisOption', {
+                                    axis: 'X',
+                                }),
                                 value: 'x',
                             },
                             {
-                                label: 'Y-Axis',
+                                label: t('tools:movementTuning.axisOption', {
+                                    axis: 'Y',
+                                }),
                                 value: 'y',
                             },
                             {
-                                label: 'Z-Axis',
+                                label: t('tools:movementTuning.axisOption', {
+                                    axis: 'Z',
+                                }),
                                 value: 'z',
                             },
                         ]}
@@ -80,10 +86,14 @@ const AxisSelection = ({ onComplete }: Props) => {
                             }
                         }}
                         value={{
-                            label: `${selectedAxis.toUpperCase()}-Axis`,
+                            label: t('tools:movementTuning.axisOption', {
+                                axis: selectedAxis.toUpperCase(),
+                            }),
                             value: selectedAxis,
                         }}
-                        placeholder="Select Axis"
+                        placeholder={t(
+                            'tools:movementTuning.axisSelection.selectAxis',
+                        )}
                         className="w-full"
                         testId="mt-axis-selection"
                     />
@@ -98,8 +108,9 @@ const AxisSelection = ({ onComplete }: Props) => {
                 {!isConnected && (
                     <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                         <p>
-                            Please connect to a device before starting the
-                            movement tuning wizard.
+                            {t(
+                                'tools:movementTuning.axisSelection.connectFirst',
+                            )}
                         </p>
                     </div>
                 )}

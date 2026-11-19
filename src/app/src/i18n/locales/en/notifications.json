@@ -184,7 +184,20 @@
       "title": "Quit gSender?",
       "content": "Are you sure you want to quit gSender?",
       "confirm": "Quit"
-    }
+    },
+    "paired": "Paired with {{name}}",
+    "unsupportedFileType": "{{fileName}}: Unsupported file type",
+    "couldNotReachAddress": "Could not reach the tablet at {{ip}}:{{port}}",
+    "pairingFieldsRequired": "Tablet IP, port and pairing code are required",
+    "noFiles": "Add at least one file to send",
+    "chooseTablet": "Choose a paired tablet to send to",
+    "noLongerPaired": "{{name}} is no longer paired with this computer. Pair it again to send.",
+    "timedOut": "Timed out reaching the tablet",
+    "couldNotReachTablet": "Could not reach {{name}} at {{host}}:{{port}}. Make sure Remote File Receive is turned on.",
+    "partialSend": "Sent {{sent}} of {{total}} files before the error",
+    "sentAndLoaded": "Added to the library and loaded on {{name}}",
+    "sentToLibrary_one": "Sent to {{name}}'s file library",
+    "sentToLibrary_other": "Sent {{count}} files to {{name}}'s file library"
   },
   "plugins": {
     "removed": "{{name}} was removed.",
@@ -239,7 +252,8 @@
     "deleteFile": {
       "title": "Delete File",
       "content": "Are you sure you want to delete {{fileName}}?"
-    }
+    },
+    "fileError": "{{fileName}}: {{error}}"
   },
   "settings": {
     "restored": "Settings restored",
@@ -260,6 +274,14 @@
     "resetAllTasks": {
       "title": "Reset All Tasks",
       "content": "Are you sure you want to reset the times for every Maintenance Task?"
+    },
+    "deleteTask": {
+      "title": "Delete Task",
+      "content": "Are you sure you want to delete {{name}}?"
+    },
+    "resetTaskTimer": {
+      "title": "Reset Maintenance Timer",
+      "content": "Are you sure you want to reset the maintenance timer for {{name}}? Only do this if you have just performed this maintenance task."
     }
   },
   "toolchange": {
@@ -297,5 +319,25 @@
   "workspace": {
     "modeSetDefault": "Workspace Mode set to Default",
     "modeSetRotary": "Workspace Mode set to Rotary"
+  },
+  "remoteFileReceive": {
+    "turnedOn": "Remote file receive turned on",
+    "turnedOff": "Remote file receive turned off",
+    "updateFailed": "Failed to update remote file receive settings",
+    "codeRegenerated": "Pairing code regenerated",
+    "regenerateFailed": "Failed to regenerate the pairing code",
+    "openFailed": "Could not open {{name}}",
+    "deleteFiles": {
+      "title": "Delete files?",
+      "content_one": "Delete {{count}} file from this tablet? This can't be undone.",
+      "content_other": "Delete {{count}} files from this tablet? This can't be undone."
+    },
+    "deleted_one": "Deleted {{count}} file",
+    "deleted_other": "Deleted {{count}} files",
+    "deleteFailed": "Failed to delete the selected files",
+    "turnOnBeforePairing": "Turn on Remote File Receive before pairing",
+    "pairingFailed": "Could not start pairing",
+    "invalidQrCode": "That QR code isn't a gSender pairing code",
+    "forgetFailed": "Could not forget {{name}}"
   }
 }

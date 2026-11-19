@@ -2,6 +2,7 @@ import { Button } from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import { FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { useMovementTuning } from '../utils/MovementTuningContext';
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const MoveAxis = ({ onComplete }: Props) => {
+    const { t } = useAppTranslation();
     const {
         moveAxisCompleted,
         setMoveAxisCompleted,
@@ -23,10 +25,7 @@ const MoveAxis = ({ onComplete }: Props) => {
         <div className="flex flex-col gap-4">
             <div className="space-y-1">
                 <p className="h-20 dark:text-content-primary">
-                    Now move any distance you wish. A larger value will better
-                    tune your movement, just make sure you don't hit your
-                    machine limits. Once you are ready, clicked the Move Axis
-                    Button.
+                    {t('tools:movementTuning.moveAxis.instructions')}
                 </p>
             </div>
 
@@ -63,8 +62,9 @@ const MoveAxis = ({ onComplete }: Props) => {
                                 variant="alt"
                                 testId="mt-move-axis"
                             >
-                                Move {selectedAxis.toUpperCase()}
-                                -axis
+                                {t('tools:movementTuning.moveAxis.button', {
+                                    axis: selectedAxis.toUpperCase(),
+                                })}
                             </Button>
 
                             <div className="flex items-center gap-2">

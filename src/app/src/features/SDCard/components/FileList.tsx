@@ -11,7 +11,7 @@ import {
     ACCEPTED_EXTENSIONS,
     validateSDFilename,
 } from 'app/features/SDCard/components/UploadModal.tsx';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
@@ -38,7 +38,8 @@ const formatFileSize = (bytes: number): string => {
 
 function getUnusableReason(filename: string): string {
     return (
-        validateSDFilename(filename) ?? 'File flagged as unusable by firmware'
+        validateSDFilename(filename) ??
+        i18n.t('tools:sdCard.validation.unusableByFirmware')
     );
 }
 
@@ -67,6 +68,7 @@ export const FileList: React.FC = () => {
     } = useSDCard();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { t } = useAppTranslation();
 
     const ATCIFiles = store.get('widgets.atc.templates.macros', {});
 
@@ -103,7 +105,12 @@ export const FileList: React.FC = () => {
 
             const validationError = validateSDFilename(file.name);
             if (validationError) {
-                errors.push(`${file.name}: ${validationError}`);
+                errors.push(
+                    i18n.t('notifications:sdCard.fileError', {
+                        fileName: file.name,
+                        error: validationError,
+                    }),
+                );
                 return;
             }
 
@@ -159,7 +166,7 @@ export const FileList: React.FC = () => {
     if (!isConnected) {
         return (
             <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-600 rounded-lg shadow-sm border">
-                Must be connected to use SD card functionality.
+                {t('tools:sdCard.unavailable.notConnected')}
             </div>
         );
     }
@@ -167,7 +174,7 @@ export const FileList: React.FC = () => {
     if (firmwareType !== 'grblHAL') {
         return (
             <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-600 rounded-lg shadow-sm border">
-                SD card tools are only available for grblHAL devices.
+                {t('tools:sdCard.unavailable.requiresGrblHal')}
             </div>
         );
     }
@@ -175,7 +182,7 @@ export const FileList: React.FC = () => {
     if (!hasFTP && !hasYM) {
         return (
             <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-600 rounded-lg shadow-sm border">
-                Enable FTP or YMODEM in firmware to use SD card tools.
+                {t('tools:sdCard.unavailable.noTransfer')}
             </div>
         );
     }
@@ -204,10 +211,10 @@ export const FileList: React.FC = () => {
                 }}
             >
                 <File className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <p className="text-lg font-medium">No files found</p>
-                <p className="text-sm">
-                    Upload files or refresh to see SD card contents
+                <p className="text-lg font-medium">
+                    {t('tools:sdCard.files.empty')}
                 </p>
+                <p className="text-sm">{t('tools:sdCard.files.emptyHint')}</p>
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -252,18 +259,24 @@ export const FileList: React.FC = () => {
                 />
                 <div className="px-6 py-4 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900">
-                        Files ({files.length})
+                        {t('tools:sdCard.files.heading', {
+                            count: files.length,
+                        })}
                     </h2>
                 </div>
 
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>File Name</TableHead>
-                            <TableHead>Size</TableHead>
+                            <TableHead>
+                                {t('tools:sdCard.files.columns.name')}
+                            </TableHead>
+                            <TableHead>
+                                {t('tools:sdCard.files.columns.size')}
+                            </TableHead>
                             <TableHead></TableHead>
                             <TableHead className="text-right">
-                                Actions
+                                {t('tools:sdCard.files.columns.actions')}
                             </TableHead>
                         </TableRow>
                     </TableHeader>
@@ -298,7 +311,9 @@ export const FileList: React.FC = () => {
                                     <TableCell>
                                         {isATCI && (
                                             <span className="italic">
-                                                ATC Macro
+                                                {t(
+                                                    'tools:sdCard.files.atcMacro',
+                                                )}
                                             </span>
                                         )}
                                         {file.unusable && (
@@ -308,7 +323,9 @@ export const FileList: React.FC = () => {
                                                     file.name,
                                                 )}
                                             >
-                                                Unusable
+                                                {t(
+                                                    'tools:sdCard.files.unusable',
+                                                )}
                                             </span>
                                         )}
                                     </TableCell>
@@ -328,7 +345,11 @@ export const FileList: React.FC = () => {
                                                 className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Play className="w-3.5 h-3.5" />
-                                                <span>Run</span>
+                                                <span>
+                                                    {t(
+                                                        'tools:sdCard.files.run',
+                                                    )}
+                                                </span>
                                             </button>
 
                                             <button
@@ -343,7 +364,9 @@ export const FileList: React.FC = () => {
                                                 className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
-                                                <span>Delete</span>
+                                                <span>
+                                                    {t('common:actions.delete')}
+                                                </span>
                                             </button>
                                         </div>
                                     </TableCell>

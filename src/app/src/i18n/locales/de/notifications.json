@@ -182,7 +182,20 @@
       "title": "gSender beenden?",
       "content": "Möchten Sie gSender wirklich beenden?",
       "confirm": "Beenden"
-    }
+    },
+    "paired": "",
+    "unsupportedFileType": "",
+    "couldNotReachAddress": "",
+    "pairingFieldsRequired": "",
+    "noFiles": "",
+    "chooseTablet": "",
+    "noLongerPaired": "",
+    "timedOut": "",
+    "couldNotReachTablet": "",
+    "partialSend": "",
+    "sentAndLoaded": "",
+    "sentToLibrary_one": "",
+    "sentToLibrary_other": ""
   },
   "plugins": {
     "removed": "{{name}} wurde entfernt.",
@@ -237,7 +250,8 @@
     "deleteFile": {
       "title": "Datei löschen",
       "content": "Möchten Sie {{fileName}} wirklich löschen?"
-    }
+    },
+    "fileError": ""
   },
   "settings": {
     "restored": "Einstellungen wiederhergestellt",
@@ -258,6 +272,14 @@
     "resetAllTasks": {
       "title": "Alle Aufgaben zurücksetzen",
       "content": "Möchten Sie die Zeiten aller Wartungsaufgaben wirklich zurücksetzen?"
+    },
+    "deleteTask": {
+      "title": "",
+      "content": ""
+    },
+    "resetTaskTimer": {
+      "title": "",
+      "content": ""
     }
   },
   "toolchange": {
@@ -295,5 +317,25 @@
   "workspace": {
     "modeSetDefault": "Arbeitsbereichsmodus auf Standard gesetzt",
     "modeSetRotary": "Arbeitsbereichsmodus auf Rotation gesetzt"
+  },
+  "remoteFileReceive": {
+    "turnOnBeforePairing": "",
+    "pairingFailed": "",
+    "invalidQrCode": "",
+    "forgetFailed": "",
+    "turnedOn": "",
+    "turnedOff": "",
+    "updateFailed": "",
+    "codeRegenerated": "",
+    "regenerateFailed": "",
+    "openFailed": "",
+    "deleteFiles": {
+      "title": "",
+      "content_one": "",
+      "content_other": ""
+    },
+    "deleted_one": "",
+    "deleted_other": "",
+    "deleteFailed": ""
   }
 }

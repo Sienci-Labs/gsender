@@ -1,4 +1,5 @@
 import api from 'app/api';
+import { i18n } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import axios from 'axios';
 import type React from 'react';
@@ -88,9 +89,12 @@ export function useSendToTablet() {
 
     const handlePaired = useCallback(
         (tablet: PendantTablet) => {
-            toast.success(`Paired with ${tablet.name}`, {
-                position: 'bottom-right',
-            });
+            toast.success(
+                i18n.t('notifications:pendant.paired', { name: tablet.name }),
+                {
+                    position: 'bottom-right',
+                },
+            );
             selectTablet(tablet.id);
             setView('pick');
             refresh();
@@ -116,7 +120,11 @@ export function useSendToTablet() {
         const valid = picked.filter((f) => {
             const extension = `.${f.name.split('.').pop()?.toLowerCase()}`;
             if (!GCODE_ACCEPT.split(',').includes(extension)) {
-                toast.error(`${f.name}: Unsupported file type`);
+                toast.error(
+                    i18n.t('notifications:pendant.unsupportedFileType', {
+                        fileName: f.name,
+                    }),
+                );
                 return false;
             }
             return true;
@@ -186,7 +194,10 @@ export function useSendToTablet() {
         } catch (error: any) {
             toast.error(
                 error?.response?.data?.msg ||
-                    `Could not reach the tablet at ${ip}:${port}`,
+                    i18n.t('notifications:pendant.couldNotReachAddress', {
+                        ip,
+                        port,
+                    }),
             );
             return null;
         }
@@ -195,7 +206,7 @@ export function useSendToTablet() {
     /** Manual pairing without sending anything. */
     const submitManualPairing = async (): Promise<void> => {
         if (!ip || !port || !code) {
-            toast.error('Tablet IP, port and pairing code are required');
+            toast.error(i18n.t('notifications:pendant.pairingFieldsRequired'));
             return;
         }
         const tablet = await pairWithCode();
@@ -204,13 +215,13 @@ export function useSendToTablet() {
 
     const handleSend = async () => {
         if (files.length === 0) {
-            toast.error('Add at least one file to send');
+            toast.error(i18n.t('notifications:pendant.noFiles'));
             return;
         }
 
         const target = selected;
         if (!target?.host || !target.port || !target.key) {
-            toast.error('Choose a paired tablet to send to');
+            toast.error(i18n.t('notifications:pendant.chooseTablet'));
             setSending(false);
             return;
         }
@@ -254,20 +265,29 @@ export function useSendToTablet() {
                 if (error?.response?.status === 401) {
                     // The tablet forgot us - drop the stale key and re-pair.
                     toast.error(
-                        `${name} is no longer paired with this computer. Pair it again to send.`,
+                        i18n.t('notifications:pendant.noLongerPaired', {
+                            name,
+                        }),
                     );
                     await forget(target.id);
                     setView('qr');
                 } else if (error?.code === 'ECONNABORTED') {
-                    toast.error('Timed out reaching the tablet');
+                    toast.error(i18n.t('notifications:pendant.timedOut'));
                 } else {
                     toast.error(
-                        `Could not reach ${name} at ${host}:${targetPort}. Make sure Remote File Receive is turned on.`,
+                        i18n.t('notifications:pendant.couldNotReachTablet', {
+                            name,
+                            host,
+                            port: targetPort,
+                        }),
                     );
                 }
                 if (i > 0) {
                     toast.error(
-                        `Sent ${i} of ${files.length} files before the error`,
+                        i18n.t('notifications:pendant.partialSend', {
+                            sent: i,
+                            total: files.length,
+                        }),
                         {
                             position: 'bottom-right',
                         },
@@ -284,10 +304,11 @@ export function useSendToTablet() {
         setSendComplete(true);
         toast.success(
             willLoadActive
-                ? `Added to the library and loaded on ${name}`
-                : files.length === 1
-                  ? `Sent to ${name}'s file library`
-                  : `Sent ${files.length} files to ${name}'s file library`,
+                ? i18n.t('notifications:pendant.sentAndLoaded', { name })
+                : i18n.t('notifications:pendant.sentToLibrary', {
+                      name,
+                      count: files.length,
+                  }),
             { position: 'bottom-right' },
         );
         resetTimer.current = setTimeout(resetSend, SENT_RESET_MS);

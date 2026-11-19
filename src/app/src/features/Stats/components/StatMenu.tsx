@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { NavLink } from 'react-router';
 import { tv } from 'tailwind-variants';
 
@@ -30,14 +31,31 @@ function StatMenuLink({ label, href, end = false }: StatMenuProps) {
 }
 
 export function StatMenu() {
+    const { t } = useAppTranslation();
     return (
         <div className="w-fit mx-auto">
             <ul className="fixed bottom-4 left-[55%] -translate-x-[55%] rounded-md flex text-sm font-medium text-center bg-white text-gray-600 items-center justify-center border-gray-200 ring-1 ring-gray-200 dark:ring-outline p-1 dark:bg-surface-elevated dark:border-outline dark:text-content-primary">
-                <StatMenuLink label="Overview" href={'/stats'} end />
-                <StatMenuLink label="Jobs" href={'/stats/jobs'} />
-                <StatMenuLink label="Maintenance" href={'/stats/maintenance'} />
-                <StatMenuLink label="Alarms" href={'/stats/alarms'} />
-                <StatMenuLink label="About" href={'/stats/about'} />
+                <StatMenuLink
+                    label={t('stats:menu.overview')}
+                    href={'/stats'}
+                    end
+                />
+                <StatMenuLink
+                    label={t('stats:menu.jobs')}
+                    href={'/stats/jobs'}
+                />
+                <StatMenuLink
+                    label={t('stats:menu.maintenance')}
+                    href={'/stats/maintenance'}
+                />
+                <StatMenuLink
+                    label={t('stats:menu.alarms')}
+                    href={'/stats/alarms'}
+                />
+                <StatMenuLink
+                    label={t('stats:menu.about')}
+                    href={'/stats/about'}
+                />
             </ul>
         </div>
     );

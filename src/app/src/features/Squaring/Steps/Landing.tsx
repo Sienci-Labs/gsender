@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+import { useAppTranslation } from 'app/i18n';
 import { useEffect } from 'react';
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
 }
 
 const Landing = ({ onComplete }: Props) => {
+    const { t } = useAppTranslation();
     useEffect(() => {
         onComplete();
     }, []);
@@ -14,22 +16,16 @@ const Landing = ({ onComplete }: Props) => {
         <div className="flex flex-col gap-4 xl:gap-0">
             <div className="space-y-12 text-sm xl:text-base font-normal">
                 <div className="mb-2 dark:text-content-primary">
-                    To know how much adjustment is needed, follow the steps
-                    below. Prepare:
+                    {t('tools:squaring.landing.prepare')}
                     <ul className="list-disc list-inside">
-                        <li>3 squares of tape marked with an &apos;X&apos;</li>
-                        <li>A long ruler or measuring tape</li>
-                        <li>
-                            Put something pointed in the spindle like an old
-                            v-bit, tapered bit, pencil, or a pointed dowel
-                        </li>
+                        <li>{t('tools:squaring.landing.tape')}</li>
+                        <li>{t('tools:squaring.landing.ruler')}</li>
+                        <li>{t('tools:squaring.landing.pointer')}</li>
                     </ul>
                 </div>
 
                 <p className="mb-2 dark:text-content-primary">
-                    Use the jog buttons to position your CNC near its front,
-                    left corner with the pointed tip almost touching the
-                    wasteboard, then continue below.
+                    {t('tools:squaring.landing.position')}
                 </p>
             </div>
         </div>

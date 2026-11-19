@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import cn from 'classnames';
 import { FaCheckCircle } from 'react-icons/fa';
 import { FaCircleXmark } from 'react-icons/fa6';
@@ -27,6 +28,7 @@ export function JobPreview({
     jobStatus: JOB_STATUS_T;
     duration: number;
 }) {
+    const { t } = useAppTranslation();
     const jobComplete = jobStatus === 'COMPLETE';
     const statusMessage = jobComplete ? 'Finished' : 'Stopped';
     return (
@@ -53,7 +55,9 @@ export function JobPreview({
                         color: statusMessage,
                     })}
                 >
-                    {statusMessage}
+                    {jobComplete
+                        ? t('stats:jobs.status.finished')
+                        : t('stats:jobs.status.stopped')}
                 </div>
             </span>
         </div>

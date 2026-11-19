@@ -2,6 +2,7 @@
 import { useValidations } from 'app/components/Wizard/hooks/UseValidations.tsx';
 import type { SecondaryContent, Wizard } from 'app/components/Wizard/types';
 import { Jogging } from 'app/features/Jogging';
+import { tk, useAppTranslation } from 'app/i18n';
 import { useMemo } from 'react';
 import xAxisCalibrationImage1 from '../assets/X-Axis_Mark_01.png';
 import xAxisCalibrationImage2 from '../assets/X-Axis_Mark_02.png';
@@ -27,6 +28,7 @@ const imageDict: Record<string, string> = {
 
 export function useMovementTuningWizard(): Wizard {
     const { connectionValidation, activeStateCheck } = useValidations();
+    const { t } = useAppTranslation();
     // const { selectedAxis } = useMovementTuning();
 
     const validations = useMemo(
@@ -41,45 +43,38 @@ export function useMovementTuningWizard(): Wizard {
     return useMemo<Wizard>(
         () => ({
             id: 'movement-tuning',
-            title: 'Movement Tuning',
+            title: tk('tools:movementTuning.title'),
             image: xAxisCalibrationImage1,
             validations: [...validations],
             helpUrl: 'https://resources.sienci.com/view/gs-calibration-tools/',
             subWizards: [
                 {
                     id: 'initial-setup',
-                    title: 'Movement Tuning',
+                    title: tk('tools:movementTuning.title'),
                     description: (
                         <>
                             <p className="mb-2">
-                                If you're looking to use your CNC for more
-                                accurate work and notice a specific axis is
-                                always off by a small amount - say 102mm instead
-                                of 100 - then use this tool.
+                                {t('tools:movementTuning.intro.accurateWork')}
                             </p>
 
                             <p className="mb-2">
-                                Since CNC firmware needs to understand its
-                                hardware to make exact movements, small
-                                manufacturing variations in the motors, lead
-                                screws, pulleys, or incorrect firmware will
-                                create inaccuracies over longer distances.
+                                {t('tools:movementTuning.intro.variations')}
                             </p>
 
                             <p className="mb-2">
-                                By testing for this difference using a marker or
-                                tape and a measuring tape, this tool will better
-                                tune the firmware to your machine.
+                                {t('tools:movementTuning.intro.testing')}
                             </p>
                         </>
                     ),
-                    estimatedTime: '5 - 10 minutes',
+                    estimatedTime: tk('tools:movementTuning.estimatedTime'),
                     completionPage: Completion,
                     context: useMovementTuning,
                     steps: [
                         {
                             id: 'landing',
-                            title: 'Axis Selection',
+                            title: tk(
+                                'tools:movementTuning.steps.axisSelection',
+                            ),
                             component: AxisSelection,
                             secondaryContent: [
                                 {
@@ -96,15 +91,19 @@ export function useMovementTuningWizard(): Wizard {
                                 },
                                 {
                                     type: 'link',
-                                    title: 'Need help?',
-                                    content: 'Follow along in our',
+                                    title: tk('common:wizard.needHelp'),
+                                    content: tk(
+                                        'tools:movementTuning.followAlongIn',
+                                    ),
                                     url: 'https://resources.sienci.com/view/gs-calibration-tools/',
                                 },
                             ],
                         },
                         {
                             id: 'first-location',
-                            title: 'Mark First Location',
+                            title: tk(
+                                'tools:movementTuning.steps.markFirstLocation',
+                            ),
                             component: MarkFirstLocation,
                             secondaryContent: [
                                 {
@@ -114,15 +113,17 @@ export function useMovementTuningWizard(): Wizard {
                                 },
                                 {
                                     type: 'link',
-                                    title: 'Need help?',
-                                    content: 'Follow along in our',
+                                    title: tk('common:wizard.needHelp'),
+                                    content: tk(
+                                        'tools:movementTuning.followAlongIn',
+                                    ),
                                     url: 'https://resources.sienci.com/view/gs-calibration-tools/',
                                 },
                             ],
                         },
                         {
                             id: 'move-axis',
-                            title: 'Move Axis',
+                            title: tk('tools:movementTuning.steps.moveAxis'),
                             component: MoveAxis,
                             secondaryContent: [
                                 {
@@ -132,15 +133,19 @@ export function useMovementTuningWizard(): Wizard {
                                 },
                                 {
                                     type: 'link',
-                                    title: 'Need help?',
-                                    content: 'Follow along in our',
+                                    title: tk('common:wizard.needHelp'),
+                                    content: tk(
+                                        'tools:movementTuning.followAlongIn',
+                                    ),
                                     url: 'https://resources.sienci.com/view/gs-calibration-tools/',
                                 },
                             ],
                         },
                         {
                             id: 'distance-travelled',
-                            title: 'Set Distance Travelled',
+                            title: tk(
+                                'tools:movementTuning.steps.distanceTravelled',
+                            ),
                             component: DistanceTravelled,
                             secondaryContent: [
                                 {
@@ -150,8 +155,10 @@ export function useMovementTuningWizard(): Wizard {
                                 },
                                 {
                                     type: 'link',
-                                    title: 'Need help?',
-                                    content: 'Follow along in our',
+                                    title: tk('common:wizard.needHelp'),
+                                    content: tk(
+                                        'tools:movementTuning.followAlongIn',
+                                    ),
                                     url: 'https://resources.sienci.com/view/atc-software/',
                                 },
                             ],
@@ -160,6 +167,6 @@ export function useMovementTuningWizard(): Wizard {
                 },
             ],
         }),
-        [validations],
+        [validations, t],
     );
 }

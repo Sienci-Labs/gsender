@@ -1,5 +1,6 @@
 import { Button } from 'app/components/Button';
 import { UpdateGSender } from 'app/features/Stats/components/UpdateGSender.tsx';
+import { TransKey, useAppTranslation } from 'app/i18n';
 import { cn } from 'app/lib/utils';
 import type { RootState } from 'app/store/redux';
 import { version } from 'app-root/package.json';
@@ -10,6 +11,7 @@ import { useSelector } from 'react-redux';
 import useGetReleaseNotes from './utils/useGetReleaseNotes';
 
 const About = () => {
+    const { t } = useAppTranslation();
     const { releaseNotes, status, fetchReleaseNotes } = useGetReleaseNotes();
 
     const updateReleaseNotes = useSelector(
@@ -20,13 +22,13 @@ const About = () => {
     );
 
     const team = [
-        { name: 'Kevin G.', title: 'Lead Dev' },
-        { name: 'Walid K.', title: 'Dev Manager' },
-        { name: 'Sophia B.', title: 'Dev' },
-        { name: 'Shilpa G', title: 'QA' },
-        { name: 'Stephen C.', title: 'Docs' },
-        { name: 'Kelly Z.', title: 'Icon Design' },
-        { name: 'Brady B.', title: 'UX/UI Dev' },
+        { name: 'Kevin G.', title: t('stats:about.team.leadDev') },
+        { name: 'Walid K.', title: t('stats:about.team.devManager') },
+        { name: 'Sophia B.', title: t('stats:about.team.dev') },
+        { name: 'Shilpa G', title: t('stats:about.team.qa') },
+        { name: 'Stephen C.', title: t('stats:about.team.docs') },
+        { name: 'Kelly Z.', title: t('stats:about.team.iconDesign') },
+        { name: 'Brady B.', title: t('stats:about.team.uxUiDev') },
     ];
 
     const gSenderLogo = new URL(
@@ -50,24 +52,24 @@ const About = () => {
         if (status === 'error') {
             return (
                 <div className="flex flex-col gap-2 items-center justify-center h-full">
+                    <p>{t('stats:about.releaseNotes.loadError')}</p>
                     <p>
-                        There was a problem loading the release notes. Please
-                        try again.
-                    </p>
-                    <p>
-                        If this issue persists, please checkout the release
-                        notes on{' '}
-                        <a
-                            href="https://github.com/Sienci-Labs/gsender/releases"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 dark:text-blue-400 underline"
-                        >
-                            GitHub.
-                        </a>
+                        <TransKey
+                            i18nKey="stats:about.releaseNotes.persistentError"
+                            components={{
+                                link: (
+                                    <a
+                                        href="https://github.com/Sienci-Labs/gsender/releases"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 dark:text-blue-400 underline"
+                                    />
+                                ),
+                            }}
+                        />
                     </p>
                     <Button onClick={fetchReleaseNotes} variant="outline">
-                        Retry
+                        {t('stats:about.releaseNotes.retry')}
                     </Button>
                 </div>
             );
@@ -76,10 +78,10 @@ const About = () => {
         if (releaseNotes.length === 0) {
             return (
                 <div className="flex flex-col items-center justify-center h-full gap-2">
-                    <p>No release notes found</p>
+                    <p>{t('stats:about.releaseNotes.empty')}</p>
 
                     <Button onClick={fetchReleaseNotes} variant="outline">
-                        Retry
+                        {t('stats:about.releaseNotes.retry')}
                     </Button>
                 </div>
             );
@@ -130,29 +132,34 @@ const About = () => {
                 <div className="flex items-center gap-2">
                     <img
                         src={gSenderLogo.href}
-                        alt="gSender Logo"
+                        alt={t('stats:about.logoAlt')}
                         width={125}
                         height={125}
                     />
                     <div className="dark:text-content-primary">
                         <h1 className="text-3xl font-bold">gSender</h1>
                         <p className="text-sm text-gray-600 dark:text-content-primary">
-                            By Sienci Labs
+                            {t('stats:about.byline')}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-content-primary">
-                            Version {version}
+                            {t('stats:about.version', { version })}
                         </p>
                     </div>
                 </div>
                 <div className="flex flex-col items-end gap-2 text-sm">
                     <p className=" text-gray-600 dark:text-content-primary">
-                        Copyright © {new Date().getFullYear()} Sienci Labs Inc.
+                        {t('stats:about.copyright', {
+                            year: new Date().getFullYear(),
+                        })}
                     </p>
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-600 dark:text-content-primary">
-                            Made in Canada
+                            {t('stats:about.madeInCanada')}
                         </span>
-                        <img src={canadaFlag.href} alt="Canada Flag" />
+                        <img
+                            src={canadaFlag.href}
+                            alt={t('stats:about.canadaFlagAlt')}
+                        />
                     </div>
                     <p>
                         <a
@@ -168,17 +175,12 @@ const About = () => {
             </div>
 
             <p className="text-md md:text-lg dark:text-content-primary">
-                gSender is a free and feature-packed CNC control software,
-                designed to be clean and easy to learn while retaining a depth
-                of capabilities for advanced users. Many thousands of people
-                trust gSender to control their grbl and grblHAL-based CNCs every
-                day, and they keep coming back for its ease of use, engaged
-                community, and reliability.
+                {t('stats:about.description')}
             </p>
 
             <div>
                 <h2 className="text-2xl text-blue-600 dark:text-blue-400 mb-2">
-                    gSender Team
+                    {t('stats:about.team.title')}
                 </h2>
                 <div className="text-md md:text-lg dark:text-content-primary">
                     {team.map((member, index) => (
@@ -194,7 +196,7 @@ const About = () => {
                 <div className="h-full flex flex-col gap-2">
                     <div className="flex gap-2 items-center justify-between">
                         <h2 className="text-2xl text-blue-600 dark:text-blue-400">
-                            Release Notes
+                            {t('stats:about.releaseNotes.title')}
                         </h2>
 
                         <a
@@ -204,7 +206,9 @@ const About = () => {
                             rel="noreferrer"
                         >
                             <div className="flex items-center gap-1">
-                                <span>See all latest updates made</span>
+                                <span>
+                                    {t('stats:about.releaseNotes.seeAll')}
+                                </span>
                                 <FaExternalLinkAlt />
                             </div>
                         </a>

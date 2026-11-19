@@ -1,4 +1,5 @@
 import type { PluginRecord } from 'app/features/Plugins/types';
+import { tk } from 'app/i18n';
 import type { IconType } from 'react-icons';
 import { BiSolidCylinder } from 'react-icons/bi';
 import {
@@ -32,86 +33,81 @@ export type ToolEntry = {
 export const BUILT_IN_TOOLS: ToolEntry[] = [
     {
         id: 'surfacing',
-        title: 'Surfacing',
-        description: 'Flatten your wasteboard or other non-flat stock',
+        title: tk('tools:registry.surfacing.title'),
+        description: tk('tools:registry.surfacing.description'),
         icon: GiFlatPlatform,
         link: '/tools/surfacing',
     },
     {
         id: 'rotary-surfacing',
-        title: 'Rotary Surfacing',
-        description: 'Turn square material into round stock for rotary cutting',
+        title: tk('tools:registry.rotarySurfacing.title'),
+        description: tk('tools:registry.rotarySurfacing.description'),
         icon: BiSolidCylinder,
         link: '/tools/rotary-surfacing',
     },
     {
         id: 'movement-tuning',
-        title: 'Movement Tuning',
-        description:
-            'Ensure that each axis of your machine is moving accurately',
+        title: tk('tools:registry.movementTuning.title'),
+        description: tk('tools:registry.movementTuning.description'),
         icon: TbRulerMeasure,
         link: '/tools/movement-tuning',
     },
     {
         id: 'squaring',
-        title: 'XY Squaring',
-        description: 'Get your CNC accurately aligned to make square cuts',
+        title: tk('tools:registry.squaring.title'),
+        description: tk('tools:registry.squaring.description'),
         icon: MdSquareFoot,
         link: '/tools/squaring',
     },
     {
         id: 'keyboard-shortcuts',
-        title: 'Keyboard Shortcuts',
-        description:
-            'Set up keyboard shortcuts for easy navigation and control',
+        title: tk('tools:registry.keyboardShortcuts.title'),
+        description: tk('tools:registry.keyboardShortcuts.description'),
         icon: FaKeyboard,
         link: '/tools/keyboard-shortcuts',
         hideOnPendant: true,
     },
     {
         id: 'gamepad',
-        title: 'Gamepad',
-        description:
-            'Easy hand-held CNC control using pre-made or custom profiles',
+        title: tk('tools:registry.gamepad.title'),
+        description: tk('tools:registry.gamepad.description'),
         icon: FaGamepad,
         link: '/tools/gamepad',
         hideOnPendant: true,
     },
     {
         id: 'tablet-connect',
-        title: 'Tablet Connect',
-        description:
-            'Pair tablets running the gSender pendant and send them g-code files over Wi-Fi',
+        title: tk('tools:registry.tabletConnect.title'),
+        description: tk('tools:registry.tabletConnect.description'),
         icon: FaTabletAlt,
         link: '/tools/tablet-connect',
         hideOnPendant: true,
     },
     {
         id: 'sd',
-        title: 'SD Card Manager',
-        description: 'Manage and view files on your SD card',
+        title: tk('tools:registry.sd.title'),
+        description: tk('tools:registry.sd.description'),
         icon: FaSdCard,
         link: '/tools/sd',
     },
     {
         id: 'accessoryInstall',
-        title: 'Accessory Installation',
-        description: 'Install various CNC Accessories',
+        title: tk('tools:registry.accessoryInstall.title'),
+        description: tk('tools:registry.accessoryInstall.description'),
         icon: LuDrill,
         link: '/tools/accessoryInstall',
     },
     {
         id: 'plugins',
-        title: 'Plugins',
-        description: 'Manage installed UI plugins',
+        title: tk('tools:registry.plugins.title'),
+        description: tk('tools:registry.plugins.description'),
         icon: PiPuzzlePiece,
         link: '/tools/plugins',
     },
     {
         id: 'remote-file-receive',
-        title: 'Remote File Receive',
-        description:
-            'Receive g-code files sent from a desktop gSender over Wi-Fi',
+        title: tk('tools:registry.remoteFileReceive.title'),
+        description: tk('tools:registry.remoteFileReceive.description'),
         icon: FaWifi,
         link: '',
         pendantOnly: true,

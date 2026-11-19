@@ -7,6 +7,7 @@ import {
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import { Jogging } from 'app/features/Jogging';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useAppTranslation } from 'app/i18n';
 import { cx } from 'class-variance-authority';
 import { useEffect, useState } from 'react';
 import { LuMove, LuRefreshCw } from 'react-icons/lu';
@@ -17,6 +18,7 @@ import MeasurementStep from './MeasurementStep';
 import ResultsStep from './ResultsStep';
 
 const Steps = () => {
+    const { t } = useAppTranslation();
     const [started, setStarted] = useState(false);
     const { currentMainStep, mainSteps, goToNextMainStep, resetSquaring } =
         useSquaring();
@@ -56,32 +58,20 @@ const Steps = () => {
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
                     <div className="space-y-1 text-sm xl:text-base font-normal">
                         <p className="text-gray-600 dark:text-content-secondary">
-                            If your CNC is making skewed cuts (pictured),
-                            it&apos;s because the X and Y axes aren&apos;t
-                            squared to each other. This can be fixed.
+                            {t('tools:squaring.landing.skewedCuts')}
                         </p>
 
                         <div className="text-gray-600 dark:text-content-secondary">
-                            To know how much adjustment is needed, follow the
-                            steps below. Prepare:
+                            {t('tools:squaring.landing.prepare')}
                             <ul className="list-disc list-inside">
-                                <li>
-                                    3 squares of tape marked with an
-                                    &apos;X&apos;
-                                </li>
-                                <li>A long ruler or measuring tape</li>
-                                <li>
-                                    Put something pointed in the spindle like an
-                                    old v-bit, tapered bit, pencil, or a pointed
-                                    dowel
-                                </li>
+                                <li>{t('tools:squaring.landing.tape')}</li>
+                                <li>{t('tools:squaring.landing.ruler')}</li>
+                                <li>{t('tools:squaring.landing.pointer')}</li>
                             </ul>
                         </div>
 
                         <p className="text-gray-600 dark:text-content-secondary">
-                            Use the jog buttons to position your CNC near its
-                            front, left corner with the pointed tip almost
-                            touching the wasteboard, then continue below.
+                            {t('tools:squaring.landing.position')}
                         </p>
 
                         <div className="flex justify-center items-center">
@@ -92,8 +82,7 @@ const Steps = () => {
                         {!isConnected && (
                             <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                                 <p>
-                                    Please connect to a device before starting
-                                    the squaring wizard.
+                                    {t('tools:squaring.landing.connectFirst')}
                                 </p>
                             </div>
                         )}
@@ -101,14 +90,12 @@ const Steps = () => {
                     <div className="flex flex-col gap-4 items-center">
                         <img
                             src={xySquaringImage}
-                            alt="XY Squaring Example"
+                            alt={t('tools:squaring.landing.exampleAlt')}
                             className="w-[450px] h-auto border border-gray-200 rounded-lg"
                         />
 
                         <p className="text-gray-600 font-bold dark:text-content-primary">
-                            If the X and Y axes aren't squared to each other on
-                            your CNC then it will cause your cuts to end up
-                            skewed.
+                            {t('tools:squaring.landing.skewedCutsCaption')}
                         </p>
                     </div>
                 </div>
@@ -118,7 +105,7 @@ const Steps = () => {
                         onClick={() => setStarted(true)}
                         disabled={isDisabled}
                     >
-                        Start XY Squaring
+                        {t('tools:squaring.landing.start')}
                     </Button>
                 </div>
             </div>
@@ -137,7 +124,7 @@ const Steps = () => {
                             setStarted(false);
                         }}
                         icon={<LuRefreshCw className="w-4 h-4" />}
-                        text="Restart Wizard"
+                        text={t('common:wizard.restartWizard')}
                     />
 
                     <Popover>
@@ -145,7 +132,7 @@ const Steps = () => {
                             <Button
                                 variant="outline"
                                 icon={<LuMove className="w-4 h-4" />}
-                                text="Jog Controls"
+                                text={t('tools:squaring.jogControls')}
                             />
                         </PopoverTrigger>
 
@@ -163,7 +150,7 @@ const Steps = () => {
                         onClick={goToNextMainStep}
                         disabled={!isCurrentStepComplete()}
                     >
-                        Next Step
+                        {t('tools:squaring.nextStep')}
                     </Button>
                 </div>
             </div>

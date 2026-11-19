@@ -6,7 +6,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import { i18n } from 'app/i18n';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import { File, Upload, X } from 'lucide-react';
 import type React from 'react';
@@ -21,10 +21,16 @@ interface UploadModalProps {
 // Mirrors the firmware's filename_valid() check from the SD card plugin.
 // Returns null if valid, or an error string describing the problem.
 export function validateSDFilename(filename: string): string | null {
-    if (filename.length > 40) return 'Filename too long (max 40 characters)';
-    if (filename.includes('?')) return 'Filename contains invalid character: ?';
-    if (filename.includes('~')) return 'Filename contains invalid character: ~';
-    if (filename.includes('!')) return 'Filename contains invalid character: !';
+    if (filename.length > 40) {
+        return i18n.t('tools:sdCard.validation.tooLong', { max: 40 });
+    }
+    for (const character of ['?', '~', '!']) {
+        if (filename.includes(character)) {
+            return i18n.t('tools:sdCard.validation.invalidCharacter', {
+                character,
+            });
+        }
+    }
     return null;
 }
 
@@ -50,6 +56,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     const [dragOver, setDragOver] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { t } = useAppTranslation();
 
     const handleFileSelect = (files: FileList | null) => {
         if (!files || files.length === 0) return;
@@ -71,7 +78,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
             const validationError = validateSDFilename(file.name);
             if (validationError) {
-                errors.push(`${file.name}: ${validationError}`);
+                errors.push(
+                    i18n.t('notifications:sdCard.fileError', {
+                        fileName: file.name,
+                        error: validationError,
+                    }),
+                );
                 return;
             }
 
@@ -146,9 +158,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Upload Files</DialogTitle>
+                    <DialogTitle>
+                        {t('tools:sdCard.uploadModal.title')}
+                    </DialogTitle>
                     <DialogDescription>
-                        Upload one or more valid gcode files to your SD card
+                        {t('tools:sdCard.uploadModal.description')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -168,17 +182,22 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     >
                         <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                         <p className="text-sm text-gray-600 mb-2">
-                            Drag & drop files here, or{' '}
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="text-blue-600 dark:text-blue-400 hover:text-blue-600 font-medium"
-                            >
-                                browse
-                            </button>
+                            <TransKey
+                                i18nKey="tools:sdCard.uploadModal.dropzone"
+                                components={{
+                                    browse: (
+                                        <button
+                                            onClick={() =>
+                                                fileInputRef.current?.click()
+                                            }
+                                            className="text-blue-600 dark:text-blue-400 hover:text-blue-600 font-medium"
+                                        />
+                                    ),
+                                }}
+                            />
                         </p>
                         <p className="text-xs text-gray-600">
-                            Accepts: .gcode, .nc, .macro and other supported
-                            files
+                            {t('tools:sdCard.uploadModal.accepts')}
                         </p>
                     </div>
 
@@ -194,7 +213,9 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     {selectedFiles.length > 0 && (
                         <div>
                             <h3 className="text-sm font-medium text-gray-700 mb-2">
-                                Selected Files ({selectedFiles.length}):
+                                {t('tools:sdCard.uploadModal.selectedFiles', {
+                                    count: selectedFiles.length,
+                                })}
                             </h3>
                             <div className="space-y-2 max-h-60 overflow-y-auto">
                                 {selectedFiles.map((file, index) => (
@@ -212,7 +233,9 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                                         <button
                                             onClick={() => removeFile(index)}
                                             className="p-1 hover:bg-gray-200 rounded transition-colors"
-                                            title="Remove file"
+                                            title={t(
+                                                'tools:sdCard.uploadModal.removeFile',
+                                            )}
                                         >
                                             <X className="w-4 h-4 text-gray-600" />
                                         </button>
@@ -228,7 +251,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                         onClick={() => handleOpenChange(false)}
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200"
                     >
-                        Cancel
+                        {t('common:actions.cancel')}
                     </button>
                     <button
                         onClick={handleUpload}
@@ -236,8 +259,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                     >
                         {isLoading
-                            ? 'Uploading...'
-                            : `Upload ${selectedFiles.length > 0 ? `(${selectedFiles.length})` : ''}`}
+                            ? t('tools:sdCard.upload.uploading')
+                            : selectedFiles.length > 0
+                              ? t('tools:sdCard.uploadModal.uploadCount', {
+                                    count: selectedFiles.length,
+                                })
+                              : t('tools:sdCard.actions.upload')}
                     </button>
                 </DialogFooter>
             </DialogContent>

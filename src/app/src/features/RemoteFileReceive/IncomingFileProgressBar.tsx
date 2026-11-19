@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { CheckCircle2 } from 'lucide-react';
 import type { IncomingFileTransfer } from './useIncomingFileTransfer';
 
@@ -30,6 +31,7 @@ export default function IncomingFileProgressBar({
 }: {
     transfer: IncomingFileTransfer;
 }) {
+    const { t } = useAppTranslation();
     if (transfer.state === 'idle') {
         return null;
     }
@@ -44,8 +46,14 @@ export default function IncomingFileProgressBar({
             <div className="flex justify-between text-xs text-gray-600 dark:text-content-muted">
                 <span className="truncate">
                     {isError
-                        ? `${transfer.name || 'Transfer'} failed`
-                        : `Receiving ${transfer.name}…`}
+                        ? transfer.name
+                            ? t('tools:remoteFileReceive.transfer.fileFailed', {
+                                  name: transfer.name,
+                              })
+                            : t('tools:remoteFileReceive.transfer.failed')
+                        : t('tools:remoteFileReceive.transfer.receiving', {
+                              name: transfer.name,
+                          })}
                 </span>
                 {!isError && (
                     <span className="tabular-nums shrink-0 ml-2">
@@ -69,12 +77,15 @@ export default function IncomingFileProgressBar({
                         {isComplete && (
                             <span className="absolute inset-0 flex items-center justify-center gap-1.5 text-white text-xs font-semibold">
                                 <CheckCircle2 className="w-4 h-4" />
-                                Received
+                                {t('tools:remoteFileReceive.transfer.received')}
                             </span>
                         )}
                         {isError && (
                             <span className="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold px-2 truncate">
-                                {transfer.message || 'Transfer failed'}
+                                {transfer.message ||
+                                    t(
+                                        'tools:remoteFileReceive.transfer.failed',
+                                    )}
                             </span>
                         )}
                     </div>

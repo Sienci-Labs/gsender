@@ -1,15 +1,17 @@
 import { JobPreview } from 'app/features/Stats/components/JobPreview.tsx';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useAppTranslation } from 'app/i18n';
 import { useContext } from 'react';
 import { FaRegListAlt } from 'react-icons/fa';
 
 export function EmptyJobList() {
+    const { t } = useAppTranslation();
     return (
         <div className="flex flex-col gap-2 items-center justify-center text-gray-700 dark:text-content-primary h-full">
             <span className="text-6xl">
                 <FaRegListAlt />
             </span>
-            <span>No Jobs recorded. Get carving!</span>
+            <span>{t('stats:jobs.empty')}</span>
         </div>
     );
 }

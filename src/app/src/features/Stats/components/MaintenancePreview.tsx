@@ -2,6 +2,7 @@ import {
     StatContext,
     type MaintenanceTask as Task,
 } from 'app/features/Stats/utils/StatContext.tsx';
+import { type TranslationKey, useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import { useContext } from 'react';
 import { FaCircle } from 'react-icons/fa';
@@ -40,6 +41,14 @@ const reminderBGStyles = tv({
     },
 });
 
+// Display text for each reminder level (the levels are also style variants).
+const reminderLabels: Record<string, TranslationKey> = {
+    'Urgent!': 'stats:maintenance.status.urgent',
+    Due: 'stats:maintenance.status.due',
+    Soon: 'stats:maintenance.status.soon',
+    Low: 'stats:maintenance.status.low',
+};
+
 function remainingTime(task: Task) {
     const { rangeStart, currentTime } = task;
     return rangeStart - Math.floor(currentTime);
@@ -58,6 +67,7 @@ function remainingTimeString(task: Task) {
 }
 
 function MaintenanceTask({ task }: { task: Task }) {
+    const { t } = useAppTranslation();
     const time = remainingTime(task);
     const reminderString = remainingTimeString(task);
 
@@ -70,14 +80,14 @@ function MaintenanceTask({ task }: { task: Task }) {
         >
             <div className={'flex flex-col'}>
                 <span className={reminderStyles({ color: reminderString })}>
-                    {time} hrs
+                    {t('stats:maintenance.hoursShort', { time })}
                 </span>
                 <span className="text-gray-700 max-xl:text-sm dark:text-content-muted">
                     {task.name}
                 </span>
             </div>
             <div className={reminderStyles({ color: reminderString })}>
-                {reminderString}
+                {t(reminderLabels[reminderString])}
                 <span className="">
                     <FaCircle />
                 </span>

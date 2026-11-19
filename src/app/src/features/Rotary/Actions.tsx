@@ -7,6 +7,7 @@ import {
 } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useAppTranslation } from 'app/i18n';
 import { useNavigate } from 'react-router';
 import MountingSetup from './MountingSetup';
 import {
@@ -16,6 +17,7 @@ import {
 } from './utils/probeCommands';
 
 const Actions = () => {
+    const { t } = useAppTranslation();
     const navigate = useNavigate();
     const isConnected = useTypedSelector(
         (state) => state.connection.isConnected,
@@ -36,10 +38,10 @@ const Actions = () => {
                 onClick={() => navigate('/tools/rotary-surfacing')}
                 disabled={firmwareType === GRBL && !isInRotaryMode}
                 tooltip={{
-                    content: 'Open rotary surfacing tool',
+                    content: t('tools:rotary.actions.surfacingTooltip'),
                 }}
             >
-                Rotary Surfacing
+                {t('tools:rotary.actions.surfacing')}
             </Button>
             <MountingSetup
                 isDisabled={
@@ -51,7 +53,12 @@ const Actions = () => {
             <Button
                 size="sm"
                 variant="primary"
-                onClick={() => runProbing('Rotary Z-Axis', getZAxisProbing())}
+                onClick={() =>
+                    runProbing(
+                        t('tools:rotary.actions.zAxisProbeName'),
+                        getZAxisProbing(),
+                    )
+                }
                 disabled={
                     !isConnected ||
                     (firmwareType === GRBL && !isInRotaryMode) ||
@@ -59,17 +66,20 @@ const Actions = () => {
                     activeState !== GRBL_ACTIVE_STATE_IDLE
                 }
                 tooltip={{
-                    content: 'Run rotary Z-axis probing',
+                    content: t('tools:rotary.actions.probeZTooltip'),
                     side: 'left',
                 }}
             >
-                Probe Rotary Z-Axis
+                {t('tools:rotary.actions.probeZ')}
             </Button>
             <Button
                 size="sm"
                 variant="primary"
                 onClick={() =>
-                    runProbing('Y-Axis Alignment', getYAxisAlignmentProbing())
+                    runProbing(
+                        t('tools:rotary.actions.yAxisAlignment'),
+                        getYAxisAlignmentProbing(),
+                    )
                 }
                 disabled={
                     !isConnected ||
@@ -78,11 +88,11 @@ const Actions = () => {
                     activeState !== GRBL_ACTIVE_STATE_IDLE
                 }
                 tooltip={{
-                    content: 'Run rotary Y-axis alignment',
+                    content: t('tools:rotary.actions.yAxisAlignmentTooltip'),
                     side: 'left',
                 }}
             >
-                Y-Axis Alignment
+                {t('tools:rotary.actions.yAxisAlignment')}
             </Button>
         </div>
     );

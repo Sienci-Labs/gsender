@@ -1,4 +1,5 @@
 import type { ButtonVariants } from 'app/components/Button';
+import { tk } from 'app/i18n';
 import controller from 'app/lib/controller';
 import store from 'app/store';
 import { createContext, type ReactNode, useContext, useState } from 'react';
@@ -39,8 +40,12 @@ type JogValues = {
 };
 
 type SubStep = {
+    // Identifies the step (matched by the step components and the diagram); not shown
     buttonLabel: string;
+    // tk() key for the button text
+    label: string;
     buttonVariant?: ButtonVariants['variant'];
+    // tk() key
     description: string;
     completed: boolean;
     value?: number;
@@ -134,9 +139,11 @@ const initialMainSteps = (): MainStep[] => {
             subSteps: [
                 {
                     buttonLabel: 'Mark Point 1',
+                    label: tk('tools:squaring.subSteps.markPoint1.label'),
                     buttonVariant: 'secondary',
-                    description:
-                        "First, we'll mark three points on your machine in a triangle. Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X.",
+                    description: tk(
+                        'tools:squaring.subSteps.markPoint1.description',
+                    ),
                     completed: false,
                     output: null,
                     shapeActions: [
@@ -152,9 +159,11 @@ const initialMainSteps = (): MainStep[] => {
                 },
                 {
                     buttonLabel: 'Move X-axis',
+                    label: tk('tools:squaring.subSteps.moveXAxis.label'),
                     buttonVariant: 'primary',
-                    description:
-                        'Input the farthest your CNC can move in the X-axis to create a horizontal line.',
+                    description: tk(
+                        'tools:squaring.subSteps.moveXAxis.description',
+                    ),
                     value: units === 'mm' ? 300 : 12,
                     completed: false,
                     output: null,
@@ -179,9 +188,11 @@ const initialMainSteps = (): MainStep[] => {
                 },
                 {
                     buttonLabel: 'Mark Point 2',
+                    label: tk('tools:squaring.subSteps.markPoint2.label'),
                     buttonVariant: 'secondary',
-                    description:
-                        'Now mark the second location with the second piece of tape.',
+                    description: tk(
+                        'tools:squaring.subSteps.markPoint2.description',
+                    ),
                     completed: false,
                     output: null,
                     shapeActions: [
@@ -205,9 +216,11 @@ const initialMainSteps = (): MainStep[] => {
                 },
                 {
                     buttonLabel: 'Move Y-axis',
+                    label: tk('tools:squaring.subSteps.moveYAxis.label'),
                     buttonVariant: 'primary',
-                    description:
-                        'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
+                    description: tk(
+                        'tools:squaring.subSteps.moveYAxis.description',
+                    ),
                     value: units === 'mm' ? 300 : 12,
                     completed: false,
                     output: null,
@@ -240,9 +253,11 @@ const initialMainSteps = (): MainStep[] => {
                 },
                 {
                     buttonLabel: 'Mark Point 3',
+                    label: tk('tools:squaring.subSteps.markPoint3.label'),
                     buttonVariant: 'secondary',
-                    description:
-                        'Place the last piece of tape with an X mark at the current position.',
+                    description: tk(
+                        'tools:squaring.subSteps.markPoint3.description',
+                    ),
                     completed: false,
                     output: null,
                     shapeActions: [
@@ -281,20 +296,28 @@ const initialMainSteps = (): MainStep[] => {
             subSteps: [
                 {
                     buttonLabel: 'Measure Distance 1-2',
-                    description:
-                        "Now, measure the distances between the points you've marked and enter them below. Measure the distance between points 1 and 2.",
+                    label: tk('tools:squaring.subSteps.measure12.label'),
+                    description: tk(
+                        'tools:squaring.subSteps.measure12.description',
+                    ),
                     completed: false,
                     output: null,
                 },
                 {
                     buttonLabel: 'Measure Distance 2-3',
-                    description: 'Measure the distance between points 2 and 3.',
+                    label: tk('tools:squaring.subSteps.measure23.label'),
+                    description: tk(
+                        'tools:squaring.subSteps.measure23.description',
+                    ),
                     completed: false,
                     output: null,
                 },
                 {
                     buttonLabel: 'Measure Distance 1-3',
-                    description: 'Measure the distance between points 1 and 3.',
+                    label: tk('tools:squaring.subSteps.measure13.label'),
+                    description: tk(
+                        'tools:squaring.subSteps.measure13.description',
+                    ),
                     completed: false,
                     output: null,
                 },

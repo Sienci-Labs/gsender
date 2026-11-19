@@ -6,6 +6,8 @@ import config from './config.json';
 import helper from './helper.json';
 import notifications from './notifications.json';
 import probe from './probe.json';
+import stats from './stats.json';
+import tools from './tools.json';
 import wizards from './wizards.json';
 import workspace from './workspace.json';
 
@@ -16,6 +18,8 @@ export const resources = {
     helper,
     notifications,
     probe,
+    stats,
+    tools,
     wizards,
     workspace,
 } as const;

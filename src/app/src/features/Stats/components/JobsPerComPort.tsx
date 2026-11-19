@@ -4,6 +4,7 @@ import {
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
 import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
+import { useAppTranslation } from 'app/i18n';
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import { useContext } from 'react';
 import { Pie } from 'react-chartjs-2';
@@ -24,6 +25,7 @@ function aggregatePortInfo(jobs: Job[]): [string[], number[]] {
 }
 
 export function JobsPerComPort() {
+    const { t } = useAppTranslation();
     const { jobs } = useContext(StatContext);
     const [ports, jobData] = aggregatePortInfo(jobs);
 
@@ -33,7 +35,7 @@ export function JobsPerComPort() {
         labels,
         datasets: [
             {
-                label: 'Jobs',
+                label: t('stats:chart.jobs'),
                 data: jobData,
                 backgroundColor: [
                     '#7ca7d0',

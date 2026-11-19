@@ -1,4 +1,5 @@
 import { DownloadGSender } from 'app/features/Stats/components/DownloadGSender.tsx';
+import { useAppTranslation } from 'app/i18n';
 import ReactParse from 'html-react-parser';
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ export function UpdateGSender({
         releaseNotes: '',
     },
 }) {
+    const { t } = useAppTranslation();
     const [version, setVersion] = useState<string>('');
     const [releaseNotes, setReleaseNotes] = useState('');
     const [releaseDate, setReleaseDate] = useState<string>('');
@@ -42,7 +44,7 @@ export function UpdateGSender({
             <div className="col-span-2 flex flex-col">
                 <div className="flex gap-2 items-center justify-between">
                     <h2 className="text-2xl font-bold dark:text-content-primary">
-                        What's new in v{version}
+                        {t('stats:update.whatsNew', { version })}
                     </h2>
                     <a
                         className="text-sm text-blue-600 dark:text-blue-400 underline"
@@ -52,7 +54,7 @@ export function UpdateGSender({
                     >
                         <div className="flex items-center gap-1">
                             <FaExternalLinkAlt />
-                            See all recent releases
+                            {t('stats:update.seeAllReleases')}
                         </div>
                     </a>
                 </div>

@@ -3,6 +3,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import { useState } from 'react';
 import { Link } from 'react-router';
@@ -26,6 +27,7 @@ export function NavFlyoutLink({
 
 export function RemoteMenuFlyout() {
     const [open, setOpen] = useState(false);
+    const { t } = useAppTranslation();
     const genericHamburgerLine = `h-1 w-6 my-1 rounded-full bg-gray-800 transition ease transform duration-300`;
 
     return (
@@ -35,7 +37,7 @@ export function RemoteMenuFlyout() {
                     <button
                         className="flex flex-col h-full w-12 border-2 border-gray-400 rounded justify-center items-center group"
                         type="button"
-                        aria-label="Menu"
+                        aria-label={t('tools:remoteMode.nav.menu')}
                         aria-expanded={open}
                     >
                         <div
@@ -70,9 +72,17 @@ export function RemoteMenuFlyout() {
                     side="bottom"
                     sideOffset={8}
                 >
-                    <p className="text-gray-800 text-md font-medium">Menu</p>
-                    <NavFlyoutLink href="/remote" label="Home" />
-                    <NavFlyoutLink href="/remote/config" label="Config" />
+                    <p className="text-gray-800 text-md font-medium">
+                        {t('tools:remoteMode.nav.menu')}
+                    </p>
+                    <NavFlyoutLink
+                        href="/remote"
+                        label={t('tools:remoteMode.nav.home')}
+                    />
+                    <NavFlyoutLink
+                        href="/remote/config"
+                        label={t('common:nav.config')}
+                    />
                 </PopoverContent>
             </Popover>
         </div>

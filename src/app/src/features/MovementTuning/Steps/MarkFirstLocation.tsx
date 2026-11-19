@@ -1,4 +1,5 @@
 import { Button } from 'app/components/Button';
+import { useAppTranslation } from 'app/i18n';
 import { FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { useMovementTuning } from '../utils/MovementTuningContext';
 
@@ -7,14 +8,14 @@ interface Props {
 }
 
 const MarkFirstLocation = ({ onComplete }: Props) => {
+    const { t } = useAppTranslation();
     const { markLocationCompleted, setMarkLocationCompleted } =
         useMovementTuning();
     return (
         <div className="flex flex-col gap-4">
             <div className="space-y-1">
                 <p className="h-20 dark:text-content-primary">
-                    First, mark next to the gantry in the location shown with
-                    your marker, pencil, or using a strip of tape.
+                    {t('tools:movementTuning.markFirstLocation.instructions')}
                 </p>
             </div>
 
@@ -44,7 +45,9 @@ const MarkFirstLocation = ({ onComplete }: Props) => {
                                 variant="secondary"
                                 testId="mt-mark-first-location"
                             >
-                                Mark First Location
+                                {t(
+                                    'tools:movementTuning.steps.markFirstLocation',
+                                )}
                             </Button>
                         </div>
                     </div>

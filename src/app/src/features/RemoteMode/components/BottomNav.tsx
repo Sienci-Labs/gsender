@@ -1,3 +1,4 @@
+import { useAppTranslation } from 'app/i18n';
 import { FaTasks } from 'react-icons/fa';
 import { IoSpeedometerOutline } from 'react-icons/io5';
 import { RiToolsFill } from 'react-icons/ri';
@@ -21,6 +22,7 @@ export function BottomNavLink({ label, icon, href }) {
 
 export function BottomNav() {
     const { pathname } = useLocation();
+    const { t } = useAppTranslation();
     if (pathname.includes('/remote/config')) return null;
 
     return (
@@ -28,22 +30,22 @@ export function BottomNav() {
             <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
                 <BottomNavLink
                     href="/remote/"
-                    label="Control"
+                    label={t('tools:remoteMode.nav.control')}
                     icon={<RxDashboard />}
                 />
                 <BottomNavLink
                     href="/remote/workflow"
-                    label="Workflow"
+                    label={t('tools:remoteMode.nav.workflow')}
                     icon={<IoSpeedometerOutline />}
                 />
                 <BottomNavLink
                     href="/remote/tools"
-                    label="Tools"
+                    label={t('common:nav.tools')}
                     icon={<RiToolsFill />}
                 />
                 <BottomNavLink
                     href="/remote/info"
-                    label="Info"
+                    label={t('tools:remoteMode.nav.info')}
                     icon={<FaTasks />}
                 />
             </div>

@@ -1,0 +1,484 @@
+{
+  "registry": {
+    "surfacing": {
+      "title": "Surfacing",
+      "description": "Flatten your wasteboard or other non-flat stock"
+    },
+    "rotarySurfacing": {
+      "title": "Rotary Surfacing",
+      "description": "Turn square material into round stock for rotary cutting"
+    },
+    "movementTuning": {
+      "title": "Movement Tuning",
+      "description": "Ensure that each axis of your machine is moving accurately"
+    },
+    "squaring": {
+      "title": "XY Squaring",
+      "description": "Get your CNC accurately aligned to make square cuts"
+    },
+    "keyboardShortcuts": {
+      "title": "Keyboard Shortcuts",
+      "description": "Set up keyboard shortcuts for easy navigation and control"
+    },
+    "gamepad": {
+      "title": "Gamepad",
+      "description": "Easy hand-held CNC control using pre-made or custom profiles"
+    },
+    "tabletConnect": {
+      "title": "Tablet Connect",
+      "description": "Pair tablets running the gSender pendant and send them g-code files over Wi-Fi"
+    },
+    "sd": {
+      "title": "SD Card Manager",
+      "description": "Manage and view files on your SD card"
+    },
+    "accessoryInstall": {
+      "title": "Accessory Installation",
+      "description": "Install various CNC Accessories"
+    },
+    "plugins": {
+      "title": "Plugins",
+      "description": "Manage installed UI plugins"
+    },
+    "remoteFileReceive": {
+      "title": "Remote File Receive",
+      "description": "Receive g-code files sent from a desktop gSender over Wi-Fi"
+    }
+  },
+  "tabs": {
+    "probe": "Probe",
+    "macros": "Macros",
+    "spindleLaser": "Spindle/Laser",
+    "atc": "ATC",
+    "coolant": "Coolant",
+    "rotary": "Rotary",
+    "console": "Console"
+  },
+  "common": {
+    "defaultValue": "Default is {{value}}",
+    "defaultValueUnits": "Default is {{value}} {{units}}",
+    "defaultOn": "Default is on",
+    "defaultOff": "Default is off",
+    "stepover": "Stepover",
+    "feedRate": "Feed Rate",
+    "spindleRpm": "Spindle RPM",
+    "delay": "Delay",
+    "visualizerPreview": "Visualizer Preview",
+    "gcodeTab": "G-Code",
+    "lineCount_one": "({{count}} line)",
+    "lineCount_other": "({{count}} lines)",
+    "generateGcode": "Generate G-code",
+    "loadToMainVisualizer": "Load to Main Visualizer",
+    "noGcode": "No g-code generated yet.<br/>Please generate g-code first."
+  },
+  "surfacing": {
+    "intro": "<bold>For ideal wasteboard surfacing:</bold> know your CNCs exact movement limits accounting for limit switches and other add-ons, get nicer and faster cuts using your widest diameter bit, and consider turning off hard and soft limits so you don't encounter alarms or errors.",
+    "startPosition": "Start Position",
+    "xAndY": "X & Y",
+    "cutDepthAndMax": "Cut Depth & Max",
+    "cutDepthWarning": "Warning: Cut depth ({{cutDepth}} {{units}}) exceeds max depth ({{maxDepth}} {{units}})",
+    "bitDiameterAndTool": "Bit Diameter & Tool Number (optional)",
+    "coolantControl": "Coolant Control",
+    "toggleDelay": "Toggle spindle delay",
+    "mist": "Mist (M7)",
+    "flood": "Flood (M8)",
+    "toggleMist": "Toggle Mist coolant",
+    "toggleFlood": "Toggle Flood coolant",
+    "position": {
+      "backLeft": "Start at the Back Left",
+      "backRight": "Start at the Back Right",
+      "frontLeft": "Start at the Front Left",
+      "frontRight": "Start at the Front Right",
+      "center": "Start at the Center"
+    },
+    "pattern": {
+      "spiral": "Spiral surfacing pattern",
+      "zigZag": "Zig-Zag surfacing pattern"
+    },
+    "flipCutDirection": "Flip Cut Direction",
+    "gcodeViewer": {
+      "title": "G-code Output",
+      "copy": "Copy G-code"
+    }
+  },
+  "rotary": {
+    "actions": {
+      "surfacing": "Rotary Surfacing",
+      "surfacingTooltip": "Open rotary surfacing tool",
+      "zAxisProbeName": "Rotary Z-Axis",
+      "probeZ": "Probe Rotary Z-Axis",
+      "probeZTooltip": "Run rotary Z-axis probing",
+      "yAxisAlignment": "Y-Axis Alignment",
+      "yAxisAlignmentTooltip": "Run rotary Y-axis alignment"
+    },
+    "toggle": {
+      "enableTooltip": "Enable 4-axis or Rotary mode",
+      "toggleTooltip": "Toggle Rotary mode",
+      "fourAxis": "4-Axis",
+      "rotary": "Rotary"
+    },
+    "mounting": {
+      "linesUpQuestion": "Does the mounting track line up without interference?",
+      "linesUp": "Lines up",
+      "doesNotLineUp": "Does not line up",
+      "endMillDiameter": "End Mill Diameter",
+      "numberOfHoles": "Number of Holes",
+      "extensionTrackLength": "Extension Track Length",
+      "openTooltip": "Open mounting setup tool",
+      "button": "Mounting Setup",
+      "title": "Rotary Mounting Setup",
+      "description": "Make sure your router is mounted as far down as possible with the bit inserted not too far into the collet to prevent bottoming out.",
+      "loadToVisualizer": "Load G-Code to Visualizer"
+    },
+    "surfacing": {
+      "intro": "Make sure that your tool clears the surface of your material without running into the limits of your Z-axis. You should also use the probing feature to zero your Z-axis to the centerline before surfacing.",
+      "length": "Length",
+      "startFinalDiameter": "Start & Final Diameter",
+      "stepdown": "Stepdown",
+      "bitDiameterAndTool": "Bit Diameter & Tool",
+      "enableRehoming": "Enable Rehoming",
+      "rehomingHint": "Cut faster and cleaner by only rotating one direction, but you will need to rehome your A-axis at the end."
+    }
+  },
+  "squaring": {
+    "subSteps": {
+      "markPoint1": {
+        "label": "Mark Point 1",
+        "description": "First, we'll mark three points on your machine in a triangle. Stick the first tape to the wasteboard at the CNCs current position. The pointed tip should almost be touching the center of the X."
+      },
+      "moveXAxis": {
+        "label": "Move X-axis",
+        "description": "Input the farthest your CNC can move in the X-axis to create a horizontal line."
+      },
+      "markPoint2": {
+        "label": "Mark Point 2",
+        "description": "Now mark the second location with the second piece of tape."
+      },
+      "moveYAxis": {
+        "label": "Move Y-axis",
+        "description": "Input the farthest your CNC can move in the Y-axis to create a vertical line."
+      },
+      "markPoint3": {
+        "label": "Mark Point 3",
+        "description": "Place the last piece of tape with an X mark at the current position."
+      },
+      "measure12": {
+        "label": "Measure Distance 1-2",
+        "description": "Now, measure the distances between the points you've marked and enter them below. Measure the distance between points 1 and 2."
+      },
+      "measure23": {
+        "label": "Measure Distance 2-3",
+        "description": "Measure the distance between points 2 and 3."
+      },
+      "measure13": {
+        "label": "Measure Distance 1-3",
+        "description": "Measure the distance between points 1 and 3."
+      }
+    },
+    "instructions": "Instructions",
+    "enterMeasurement": "Enter measurement",
+    "update": "Update",
+    "diagram": {
+      "measure": "Measure {{points}}"
+    },
+    "showJogControls": "Show Jog Controls",
+    "jogControls": "Jog Controls",
+    "nextStep": "Next Step",
+    "landing": {
+      "skewedCuts": "If your CNC is making skewed cuts (pictured), it's because the X and Y axes aren't squared to each other. This can be fixed.",
+      "prepare": "To know how much adjustment is needed, follow the steps below. Prepare:",
+      "tape": "3 squares of tape marked with an 'X'",
+      "ruler": "A long ruler or measuring tape",
+      "pointer": "Put something pointed in the spindle like an old v-bit, tapered bit, pencil, or a pointed dowel",
+      "position": "Use the jog buttons to position your CNC near its front, left corner with the pointed tip almost touching the wasteboard, then continue below.",
+      "connectFirst": "Please connect to a device before starting the squaring wizard.",
+      "exampleAlt": "XY Squaring Example",
+      "skewedCutsCaption": "If the X and Y axes aren't squared to each other on your CNC then it will cause your cuts to end up skewed.",
+      "start": "Start XY Squaring"
+    },
+    "wizard": {
+      "estimatedTime": "5 - 10 minutes",
+      "initialSetup": "Initial Setup",
+      "markLocations": "Mark Locations",
+      "measureDistances": "Measure Distances",
+      "followAlong": "Follow along in our"
+    },
+    "results": {
+      "title": "Results",
+      "square": {
+        "title": "Your machine is properly squared!",
+        "body": "No adjustments are needed."
+      },
+      "minor": {
+        "title": "Your machine is slightly out of square",
+        "deviation": "The deviation is minor ({{diff}}{{units}}) but you may want to adjust the right Y-axis rail to achieve better squareness.",
+        "adjust": "You can move your either the right y-axis rail forward by {{diff}}{{units}} or the left y-axis rail backward by {{diff}}{{units}}."
+      },
+      "major": {
+        "title": "Your machine needs adjustment",
+        "offBy": "The machine is off by {{angle}}° or <bold>{{diff}}{{units}}</bold> on the diagonal.",
+        "adjust": "You can move your either the right y-axis rail forward by <bold>{{diff}}{{units}}</bold> or the left y-axis rail backward by <bold>{{diff}}{{units}}</bold>."
+      }
+    },
+    "measured": {
+      "title": "Measured Dimensions",
+      "bottomEdge": "Bottom Edge (1-2)",
+      "rightEdge": "Right Edge (2-3)",
+      "diagonal": "Diagonal (1-3)",
+      "angleDeviation": "Angle Deviation"
+    },
+    "eeprom": {
+      "title": "Other Recommendations",
+      "intro": "We also noticed from the results that your motor movement settings could be updated to improve your machines accuracy.",
+      "xStepsPerMm": "X-axis step/mm",
+      "yStepsPerMm": "Y-axis step/mm",
+      "current": "Current: {{value}}",
+      "recommended": "Recommended: {{value}}",
+      "updating": "Updating...",
+      "update": "Update step/mm",
+      "updateFirmware": "Update Firmware",
+      "dialogBody": "This will update the X-axis ($100) and Y-axis ($101) step/mm values in your CNC firmware to the new ones below:",
+      "xAxisValue": "X-axis: <bold>{{value}}</bold>",
+      "yAxisValue": "Y-axis: <bold>{{value}}</bold>",
+      "warningTitle": "Warning",
+      "warningBody": "Updating Firmware values can affect your machine's accuracy. Make sure to verify the new settings after applying them."
+    }
+  },
+  "movementTuning": {
+    "title": "Movement Tuning",
+    "estimatedTime": "5 - 10 minutes",
+    "followAlongIn": "Follow along in our",
+    "axisOption": "{{axis}}-Axis",
+    "intro": {
+      "accurateWork": "If you're looking to use your CNC for more accurate work and notice a specific axis is always off by a small amount - say 102mm instead of 100 - then use this tool.",
+      "variations": "Since CNC firmware needs to understand its hardware to make exact movements, small manufacturing variations in the motors, lead screws, pulleys, or incorrect firmware will create inaccuracies over longer distances.",
+      "testing": "By testing for this difference using a marker or tape and a measuring tape, this tool will better tune the firmware to your machine."
+    },
+    "steps": {
+      "axisSelection": "Axis Selection",
+      "markFirstLocation": "Mark First Location",
+      "moveAxis": "Move Axis",
+      "distanceTravelled": "Set Distance Travelled"
+    },
+    "axisSelection": {
+      "placement": "Whichever axis you'll be tuning, please place it in an initial location so that it'll have space to move to the right (for X), backwards (for Y), and downwards (for Z).",
+      "axisToTune": "Axis to Tune",
+      "selectAxis": "Select Axis",
+      "connectFirst": "Please connect to a device before starting the movement tuning wizard."
+    },
+    "markFirstLocation": {
+      "instructions": "First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape."
+    },
+    "moveAxis": {
+      "instructions": "Now move any distance you wish. A larger value will better tune your movement, just make sure you don't hit your machine limits. Once you are ready, clicked the Move Axis Button.",
+      "button": "Move {{axis}}-axis"
+    },
+    "distanceTravelled": {
+      "instructions": "Lastly, measure the distance travelled between the original mark and the current gantry location. Take your time when entering this value, a more accurate measurement will give you better tuning results."
+    },
+    "completion": {
+      "offBy": "Your {{axis}}-axis movement was off by <bold>{{distance}} {{units}}.</bold> Consider updating your {{axis}}-axis step/mm value in your CNC firmware.",
+      "updateStepsButton": "Update step/mm",
+      "updateFirmware": "Update Firmware",
+      "updateDescription": "This will update the <bold>{{axis}}-axis</bold> step/mm value in your CNC firmware ( <bold>{{setting}}</bold> )",
+      "from": "From: <bold>{{value}}</bold>",
+      "to": "To: <bold>{{value}}</bold>",
+      "accurate": "Your {{axis}}-axis looks accurate, so you should be good to go!"
+    },
+    "legacy": {
+      "exampleAlt": "Movement Tuning Example",
+      "start": "Start Movement Tuning",
+      "jogControls": "Jog Controls",
+      "instructions": "Instructions",
+      "diagram": "Diagram",
+      "stepAlt": "Movement Tuning Step"
+    }
+  },
+  "sdCard": {
+    "actions": {
+      "refreshFiles": "Refresh Files",
+      "upload": "Upload"
+    },
+    "upload": {
+      "uploading": "Uploading...",
+      "complete": "Upload complete!"
+    },
+    "status": {
+      "label": "SD Card Status:",
+      "mounted": "Mounted",
+      "unmounted": "Unmounted"
+    },
+    "validation": {
+      "tooLong": "Filename too long (max {{max}} characters)",
+      "invalidCharacter": "Filename contains invalid character: {{character}}",
+      "unusableByFirmware": "File flagged as unusable by firmware"
+    },
+    "uploadModal": {
+      "title": "Upload Files",
+      "description": "Upload one or more valid gcode files to your SD card",
+      "dropzone": "Drag & drop files here, or <browse>browse</browse>",
+      "accepts": "Accepts: .gcode, .nc, .macro and other supported files",
+      "selectedFiles_one": "Selected Files ({{count}}):",
+      "selectedFiles_other": "Selected Files ({{count}}):",
+      "removeFile": "Remove file",
+      "uploadCount_one": "Upload ({{count}})",
+      "uploadCount_other": "Upload ({{count}})"
+    },
+    "unavailable": {
+      "notConnected": "Must be connected to use SD card functionality.",
+      "requiresGrblHal": "SD card tools are only available for grblHAL devices.",
+      "noTransfer": "Enable FTP or YMODEM in firmware to use SD card tools."
+    },
+    "files": {
+      "empty": "No files found",
+      "emptyHint": "Upload files or refresh to see SD card contents",
+      "heading_one": "Files ({{count}})",
+      "heading_other": "Files ({{count}})",
+      "columns": {
+        "name": "File Name",
+        "size": "Size",
+        "actions": "Actions"
+      },
+      "atcMacro": "ATC Macro",
+      "unusable": "Unusable",
+      "run": "Run"
+    }
+  },
+  "remoteMode": {
+    "dialog": {
+      "title": "Wireless CNC Control",
+      "enable": "Enable Wireless Control",
+      "recommendedHint": "In most cases you'll want the recommended address and the default port:",
+      "addressLabel": "Addr:",
+      "otherAddresses": "Other / advanced",
+      "addressMissing": "This computer no longer has <bold>{{ip}}</bold>.",
+      "useRecommended": "Use {{address}} ({{label}}) instead",
+      "unreachable": "Other devices can't reach gSender at this address — pick the recommended one to use wireless control.",
+      "addressHint": "other devices on your network use this address to reach gSender.",
+      "addressHintWithLabel": "{{label}} — other devices on your network use this address to reach gSender.",
+      "portLabel": "Port:",
+      "restartNote": "<bold>Note:</bold> Clicking \"Save\" will ask you to restart gSender so that the settings can be updated."
+    },
+    "address": {
+      "thisComputerOnly": "This computer only",
+      "virtual": "Virtual",
+      "noNetwork": "No network",
+      "recommended": "Recommended"
+    },
+    "qrCode": {
+      "scanHint": "Scan with your phone camera to control your CNC",
+      "typeAddress": "Or type the text below into a web browser for any other device:",
+      "copy": "Copy"
+    },
+    "nav": {
+      "control": "Control",
+      "workflow": "Workflow",
+      "info": "Info",
+      "menu": "Menu",
+      "home": "Home"
+    }
+  },
+  "sendToPendant": {
+    "pairWithQr": {
+      "createFailed": "Could not create a pairing code",
+      "instructions": "On the tablet, open <bold>Remote File Receive</bold> and tap <bold>Pair with desktop</bold>, then point it at this code.",
+      "waiting": "Waiting for a tablet to scan…",
+      "useCode": "Use pairing code instead"
+    },
+    "picker": {
+      "online": "Online",
+      "offline": "Offline",
+      "lastSeen": "· last seen {{host}}",
+      "noneTitle": "No pendant paired yet",
+      "noneHint": "Pair once and it's remembered for future sends.",
+      "pairWithQr": "Pair with QR code",
+      "enterIpInstead": "Enter IP & code instead",
+      "sendingTo": "Sending to",
+      "chooseTablet": "Choose a tablet",
+      "change": "Change",
+      "forget": "Forget this tablet",
+      "pairAnother": "Pair another tablet",
+      "enterIpManually": "Enter IP manually"
+    },
+    "tablets": {
+      "heading": "Tablets",
+      "instructions": "On the tablet, open Tools → Remote File Receive and turn it on. Then scan this computer's QR code, or enter the IP and code it shows."
+    },
+    "manual": {
+      "heading": "Pair with code",
+      "tabletIp": "Tablet IP",
+      "port": "Port",
+      "code": "Pairing code (shown on the tablet)",
+      "pair": "Pair"
+    },
+    "send": {
+      "heading": "Send files",
+      "destination": "Files go to {{name}}'s file library.",
+      "pairFirst": "Pair a tablet to send files to it.",
+      "loadedAdded": "Loaded file added",
+      "sendLoaded": "Send loaded file",
+      "remove": "Remove",
+      "removeFile": "Remove {{name}}",
+      "addMore": "+ Add more files",
+      "dropzone": "Drop g-code files here, or <browse>browse</browse>",
+      "loadActive": "Load as active job",
+      "loadActiveMultiple": "Only one file can be the active job, so multiple files go to the library.",
+      "loadActiveHint": "Always added to the pendant's file library too.",
+      "sentBanner": "Sent!",
+      "sendingOf": "Sending {{current}} of {{total}}: {{name}}…",
+      "sendingFile": "Sending {{name}}…",
+      "pausedWhileRunning": "Sending is paused while a job is running.",
+      "sentButton": "Sent",
+      "sendingButton": "Sending… {{percent}}%",
+      "sendFiles_one": "Send {{count}} file",
+      "sendFiles_other": "Send {{count}} files",
+      "sendButton": "Send"
+    }
+  },
+  "remoteFileReceive": {
+    "description": "Let a desktop gSender send a g-code file to this tablet over Wi-Fi, without copying it over first.",
+    "enabled": "Enabled",
+    "manual": {
+      "heading": "Manual pairing",
+      "instructions": "If the desktop can't find this tablet automatically, enter one of these addresses and the code below in its Send to Pendant dialog.",
+      "addresses": "Address(es) a desktop can send to:",
+      "noNetwork": "No network connection detected.",
+      "pairingCode": "Pairing code",
+      "newCode": "New code"
+    },
+    "files": {
+      "heading": "Received files",
+      "deleteSelected_one": "Delete ({{count}})",
+      "deleteSelected_other": "Delete ({{count}})",
+      "empty": "Files sent here with \"Add to library\" will show up in this list.",
+      "selectAll": "Select all",
+      "loadFile": "Load {{name}}",
+      "loading": "Loading...",
+      "load": "Load"
+    },
+    "transfer": {
+      "fileFailed": "{{name}} failed",
+      "failed": "Transfer failed",
+      "receiving": "Receiving {{name}}…",
+      "received": "Received"
+    },
+    "desktops": {
+      "heading": "Paired desktops",
+      "pair": "Pair with desktop",
+      "pairing": "Pairing with {{name}}…",
+      "empty": "On the desktop, open Send to Pendant and choose \"Pair a new tablet\", then scan the code it shows.",
+      "forget": "Forget"
+    },
+    "scanDialog": {
+      "title": "Scan pairing code",
+      "description": "Point the camera at the QR code shown in the desktop's Send to Pendant dialog."
+    },
+    "scanner": {
+      "cameraFailed": "Could not open the camera. Check that gSender has camera permission.",
+      "unsupported": "This device does not support camera access."
+    }
+  },
+  "page": {
+    "description": "Tools are plugins that can be installed and used to extend the functionality of gSender. Some are built in to gSender, some are third party plugins. Star a tool to pin it to the top."
+  }
+}

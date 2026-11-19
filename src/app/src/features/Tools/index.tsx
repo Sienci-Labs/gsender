@@ -5,6 +5,7 @@ import type { PluginRecord } from 'app/features/Plugins/types';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { tk } from 'app/i18n';
 import type { RootState } from 'app/store/redux';
 import { useMemo } from 'react';
 import { Tabs } from '../../components/Tabs';
@@ -21,33 +22,44 @@ export interface TabItem {
     content: React.ComponentType<{ isActive: boolean }>;
 }
 
+// Tabs translates these keys; they also identify the tabs filtered below
+const TAB_LABELS = {
+    probe: tk('tools:tabs.probe'),
+    macros: tk('tools:tabs.macros'),
+    spindleLaser: tk('tools:tabs.spindleLaser'),
+    atc: tk('tools:tabs.atc'),
+    coolant: tk('tools:tabs.coolant'),
+    rotary: tk('tools:tabs.rotary'),
+    console: tk('tools:tabs.console'),
+};
+
 const tabs = [
     {
-        label: 'Probe',
+        label: TAB_LABELS.probe,
         content: Probe,
     },
     {
-        label: 'Macros',
+        label: TAB_LABELS.macros,
         content: Macros,
     },
     {
-        label: 'Spindle/Laser',
+        label: TAB_LABELS.spindleLaser,
         content: Spindle,
     },
     {
-        label: 'ATC',
+        label: TAB_LABELS.atc,
         content: ATCWidget,
     },
     {
-        label: 'Coolant',
+        label: TAB_LABELS.coolant,
         content: Coolant,
     },
     {
-        label: 'Rotary',
+        label: TAB_LABELS.rotary,
         content: Rotary,
     },
     {
-        label: 'Console',
+        label: TAB_LABELS.console,
         content: Console,
     },
 ];
@@ -84,18 +96,21 @@ const Tools = () => {
     const filteredTabs = useMemo(
         () =>
             [...tabs, ...pluginTabs].filter((tab) => {
-                if (tab.label === 'Rotary' && !rotary.tab.show) {
+                if (tab.label === TAB_LABELS.rotary && !rotary.tab.show) {
                     return false;
                 }
 
-                if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
+                if (
+                    tab.label === TAB_LABELS.spindleLaser &&
+                    !spindleFunctions
+                ) {
                     return false;
                 }
-                if (tab.label === 'ATC' && !atcEnabledOrCompiled) {
+                if (tab.label === TAB_LABELS.atc && !atcEnabledOrCompiled) {
                     return false;
                 }
 
-                if (tab.label === 'Coolant' && !coolantFunctions) {
+                if (tab.label === TAB_LABELS.coolant && !coolantFunctions) {
                     return false;
                 }
 

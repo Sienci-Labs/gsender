@@ -1,3 +1,4 @@
+import { i18n } from 'app/i18n';
 import jsQR from 'jsqr';
 import { useEffect, useRef, useState } from 'react';
 
@@ -69,12 +70,12 @@ export default function QrScanner({ onScan }: QrScannerProps) {
             })
             .catch(() => {
                 setError(
-                    'Could not open the camera. Check that gSender has camera permission.',
+                    i18n.t('tools:remoteFileReceive.scanner.cameraFailed'),
                 );
             });
 
         if (!navigator.mediaDevices) {
-            setError('This device does not support camera access.');
+            setError(i18n.t('tools:remoteFileReceive.scanner.unsupported'));
         }
 
         return () => {

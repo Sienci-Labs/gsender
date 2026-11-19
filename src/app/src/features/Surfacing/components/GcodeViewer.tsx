@@ -1,5 +1,5 @@
 import { Button } from 'app/components/Button';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { toast } from 'app/lib/toaster';
 import { Copy } from 'lucide-react';
 import React from 'react';
@@ -9,6 +9,7 @@ interface GcodeViewerProps {
 }
 
 export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
+    const { t } = useAppTranslation();
     const gcodeLines = gcode.split('\n');
 
     const handleCopy = async () => {
@@ -27,14 +28,16 @@ export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
     return (
         <div className="w-full h-full flex flex-col">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">G-code Output</h3>
+                <h3 className="text-lg font-semibold">
+                    {t('tools:surfacing.gcodeViewer.title')}
+                </h3>
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={handleCopy}
                     className="flex items-center gap-2 border border-gray-500"
                     icon={<Copy className="h-4 w-4" />}
-                    text="Copy G-code"
+                    text={t('tools:surfacing.gcodeViewer.copy')}
                 />
             </div>
 

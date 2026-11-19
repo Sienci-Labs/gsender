@@ -2,6 +2,7 @@
 import Button from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { translateKey, useAppTranslation } from 'app/i18n';
 import { useEffect, useState } from 'react';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { useSquaring } from '../context/SquaringContext';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const MeasurementStep = ({ onComplete }: Props) => {
+    const { t } = useAppTranslation();
     const {
         mainSteps,
         currentMainStep,
@@ -70,10 +72,10 @@ const MeasurementStep = ({ onComplete }: Props) => {
             <div className="flex flex-col gap-4">
                 <div className="space-y-1">
                     <h3 className="text-lg font-semibold dark:text-content-primary">
-                        Instructions
+                        {t('tools:squaring.instructions')}
                     </h3>
                     <p className="text-gray-600 dark:text-content-primary h-20">
-                        {currentSubStepData.description}
+                        {translateKey(currentSubStepData.description)}
                     </p>
                 </div>
 
@@ -113,12 +115,14 @@ const MeasurementStep = ({ onComplete }: Props) => {
                                     <div className="flex items-center gap-4">
                                         <div className="flex-1">
                                             <h4 className="font-medium dark:text-white">
-                                                {step.buttonLabel}
+                                                {translateKey(step.label)}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <ControlledInput
                                                     type="number"
-                                                    placeholder="Enter measurement"
+                                                    placeholder={t(
+                                                        'tools:squaring.enterMeasurement',
+                                                    )}
                                                     value={
                                                         measurementInputs[
                                                             measurementKey
@@ -160,8 +164,12 @@ const MeasurementStep = ({ onComplete }: Props) => {
                                                     testId={`sq-confirm-${measurementKey}`}
                                                 >
                                                     {step.completed
-                                                        ? 'Update'
-                                                        : 'Confirm'}
+                                                        ? t(
+                                                              'tools:squaring.update',
+                                                          )
+                                                        : t(
+                                                              'common:actions.confirm',
+                                                          )}
                                                 </Button>
                                             </div>
                                         </div>

@@ -16,7 +16,7 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { i18n } from 'app/i18n';
+import { i18n, tk, translateKey, useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
@@ -29,24 +29,25 @@ import standardTrackGraphic from './assets/Vortex_Standard_Track_01.png';
 import { HOLE_TYPES } from './utils/mountingSetupMacros';
 
 const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
+    const { t } = useAppTranslation();
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState({
         'mounting-track-lines-up': {
-            label: 'Does the mounting track line up without interference?',
+            label: tk('tools:rotary.mounting.linesUpQuestion'),
             subOptions: [
                 {
-                    label: 'Lines up',
+                    label: tk('tools:rotary.mounting.linesUp'),
                     value: 'lines-up',
                 },
                 {
-                    label: 'Does not line up',
+                    label: tk('tools:rotary.mounting.doesNotLineUp'),
                     value: 'does-not-line-up',
                 },
             ],
             value: 'does-not-line-up',
         },
         'end-mill-diameter': {
-            label: 'End Mill Diameter',
+            label: tk('tools:rotary.mounting.endMillDiameter'),
             subOptions: [
                 {
                     label: '¼"',
@@ -60,7 +61,7 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
             value: 'quarter-inch',
         },
         'number-of-holes': {
-            label: 'Number of Holes',
+            label: tk('tools:rotary.mounting.numberOfHoles'),
             subOptions: [
                 {
                     label: '6',
@@ -74,7 +75,7 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
             value: 'six',
         },
         'extension-track-length': {
-            label: 'Extension Track Length',
+            label: tk('tools:rotary.mounting.extensionTrackLength'),
             subOptions: [
                 {
                     label: '400mm',
@@ -222,26 +223,26 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
                     onClick={() => setOpen(true)}
                     disabled={isDisabled}
                     tooltip={{
-                        content: 'Open mounting setup tool',
+                        content: t('tools:rotary.mounting.openTooltip'),
                     }}
                 >
-                    Mounting Setup
+                    {t('tools:rotary.mounting.button')}
                 </Button>
             </DialogTrigger>
             <DialogContent className="bg-white w-11/12 max-w-6xl">
                 <DialogHeader>
-                    <DialogTitle>Rotary Mounting Setup</DialogTitle>
+                    <DialogTitle>
+                        {t('tools:rotary.mounting.title')}
+                    </DialogTitle>
 
                     <DialogDescription>
-                        Make sure your router is mounted as far down as possible
-                        with the bit inserted not too far into the collet to
-                        prevent bottoming out.
+                        {t('tools:rotary.mounting.description')}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col justify-between gap-8 mt-8">
                     {Object.entries(options).map(([key, option]) => (
                         <div key={key} className="grid grid-cols-2 gap-2">
-                            <p>{option.label}</p>
+                            <p>{translateKey(option.label)}</p>
                             <RadioGroup
                                 value={option.value}
                                 onValueChange={(value) =>
@@ -262,7 +263,7 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
                                             value={subOption.value}
                                             size="sm"
                                         />
-                                        <p>{subOption.label}</p>
+                                        <p>{translateKey(subOption.label)}</p>
                                     </div>
                                 ))}
                             </RadioGroup>
@@ -272,13 +273,13 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
                 <div className="flex flex-col gap-2 min-h-[400px] justify-center">
                     <img
                         src={getIllustrationImage()}
-                        alt="Mounting Setup"
+                        alt={t('tools:rotary.mounting.button')}
                         className="w-full self-center"
                     />
                 </div>
                 <DialogFooter>
                     <Button type="submit" onClick={handleSubmit}>
-                        Load G-Code to Visualizer
+                        {t('tools:rotary.mounting.loadToVisualizer')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

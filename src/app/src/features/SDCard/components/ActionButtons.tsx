@@ -5,6 +5,7 @@ import {
     mountSDCard,
     refreshSDCardFiles,
 } from 'app/features/SDCard/utils/utils.ts';
+import { useAppTranslation } from 'app/i18n';
 import { HardDrive, RefreshCw, Upload } from 'lucide-react';
 import { useState } from 'react';
 
@@ -19,6 +20,7 @@ export function ActionButtons() {
         hasYM,
     } = useSDCard();
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
+    const { t } = useAppTranslation();
 
     const isGrblHAL = firmwareType === 'grblHAL';
     const hasTransfer = hasFTP || hasYM;
@@ -35,7 +37,7 @@ export function ActionButtons() {
                     <RefreshCw
                         className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
                     />
-                    <span>Refresh Files</span>
+                    <span>{t('tools:sdCard.actions.refreshFiles')}</span>
                 </Button>
 
                 <Button
@@ -44,7 +46,7 @@ export function ActionButtons() {
                     className="flex flex-row items-center gap-2"
                 >
                     <Upload className="w-4 h-4" />
-                    <span>Upload</span>
+                    <span>{t('tools:sdCard.actions.upload')}</span>
                 </Button>
             </div>
 

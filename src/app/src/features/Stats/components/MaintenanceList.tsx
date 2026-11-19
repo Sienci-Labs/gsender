@@ -19,7 +19,7 @@ import {
     type MaintenanceTask,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
-import { i18n } from 'app/i18n';
+import { i18n, useAppTranslation } from 'app/i18n';
 import { AlertCircle, CheckCircle, Pen } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 
@@ -32,6 +32,11 @@ interface FormattedTask {
     subRow?: string;
 }
 
+function UrgentLabel() {
+    const { t } = useAppTranslation();
+    return <>{t('stats:maintenance.status.urgent')}</>;
+}
+
 function determineTime(task: MaintenanceTask) {
     const { rangeStart, rangeEnd, currentTime } = task;
     if (currentTime < rangeStart) {
@@ -42,7 +47,7 @@ function determineTime(task: MaintenanceTask) {
         return (
             <div className="flex flex-col items-center text-center justify-center">
                 <AlertCircle size={20} className="text-red-600" />
-                {'Urgent!'}
+                <UrgentLabel />
             </div>
         );
     }
@@ -64,6 +69,7 @@ function formatTasks(data: MaintenanceTask[]) {
 }
 
 export function MaintenanceList() {
+    const { t } = useAppTranslation();
     const { maintenanceTasks, maintenanceActions, setMaintenanceTasks } =
         useContext(StatContext);
     const [formattedData, setFormattedData] = useState([]);
@@ -95,7 +101,9 @@ export function MaintenanceList() {
                                 textAlign: 'center',
                             }}
                         >
-                            {info.renderValue() + ' Hrs'}
+                            {t('stats:maintenance.hours', {
+                                time: info.renderValue(),
+                            })}
                         </div>
                     );
                 } else if (info.renderValue() === 'Due') {
@@ -111,7 +119,7 @@ export function MaintenanceList() {
                                 height: '100%',
                             }}
                         >
-                            {info.renderValue()}
+                            {t('stats:maintenance.status.due')}
                         </div>
                     );
                 } else {
@@ -177,7 +185,9 @@ export function MaintenanceList() {
                             onClick={() => {
                                 onClear(info.cell.row.original.id);
                             }}
-                            aria-label={`Reset maintenance timer for ${info.cell.row.original.part}`}
+                            aria-label={t('stats:maintenance.resetTimerLabel', {
+                                name: info.cell.row.original.part,
+                            })}
                         >
                             <CheckCircle size={24} color="green" />
                         </button>
@@ -186,7 +196,9 @@ export function MaintenanceList() {
                             onClick={() => {
                                 onEdit(info.cell.row.original.id);
                             }}
-                            aria-label={`Edit maintenance task for ${info.cell.row.original.part}`}
+                            aria-label={t('stats:maintenance.editTaskLabel', {
+                                name: info.cell.row.original.part,
+                            })}
                         >
                             <Pen size={24} />
                         </button>
@@ -248,7 +260,7 @@ export function MaintenanceList() {
                 onAdd={onAdd}
                 onResetAll={onResetAll}
                 pagination={false}
-                searchPlaceholder="Search Tasks..."
+                searchPlaceholder={t('stats:maintenance.searchPlaceholder')}
                 columnVisibility={{ description: false }} // this makes it so the description column doesnt show, but it exists to search on
                 height="h-[calc(100vh-40px-220px)]"
             />
@@ -269,16 +281,21 @@ export function MaintenanceList() {
                     <AlertDialogContent className="bg-white">
                         <AlertDialogHeader>
                             <AlertDialogTitle>
-                                Reset Maintenance Timer
+                                {t('notifications:stats.resetTaskTimer.title')}
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                                {'Are you sure you want to reset the maintenance timer for ' +
-                                    currentTask.name +
-                                    '? Only do this if you have just performed this maintenance task.'}
+                                {t(
+                                    'notifications:stats.resetTaskTimer.content',
+                                    {
+                                        name: currentTask.name,
+                                    },
+                                )}
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel>No</AlertDialogCancel>
+                            <AlertDialogCancel>
+                                {t('common:actions.no')}
+                            </AlertDialogCancel>
                             <AlertDialogAction
                                 onClick={() => {
                                     const updatedTasks = maintenanceTasks.map(
@@ -299,7 +316,7 @@ export function MaintenanceList() {
                                     maintenanceActions.update(updatedTasks);
                                 }}
                             >
-                                Yes
+                                {t('common:actions.yes')}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

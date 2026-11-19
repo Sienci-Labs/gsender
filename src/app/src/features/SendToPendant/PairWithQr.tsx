@@ -1,4 +1,5 @@
 import api from 'app/api';
+import { i18n, TransKey, useAppTranslation } from 'app/i18n';
 import { Loader2 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -26,6 +27,7 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
         null,
     );
     const [error, setError] = useState<string | null>(null);
+    const { t } = useAppTranslation();
 
     useEffect(() => {
         let cancelled = false;
@@ -40,7 +42,11 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
                 setQr({ nonce: res.data.nonce, payload: res.data.payload });
                 setError(null);
             } catch {
-                if (!cancelled) setError('Could not create a pairing code');
+                if (!cancelled) {
+                    setError(
+                        i18n.t('tools:sendToPendant.pairWithQr.createFailed'),
+                    );
+                }
             }
         };
 
@@ -79,8 +85,10 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
     return (
         <div className="flex flex-col items-center gap-3 text-sm">
             <p className="text-center text-gray-600 dark:text-content-muted">
-                On the tablet, open <b>Remote File Receive</b> and tap{' '}
-                <b>Pair with desktop</b>, then point it at this code.
+                <TransKey
+                    i18nKey="tools:sendToPendant.pairWithQr.instructions"
+                    components={{ bold: <b /> }}
+                />
             </p>
             <div className="bg-white p-3 rounded-lg border border-gray-200 dark:border-outline">
                 {qr ? (
@@ -100,7 +108,7 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
             ) : (
                 <p className="flex items-center gap-2 text-xs text-gray-500 dark:text-content-muted">
                     <Loader2 className="w-3 h-3 animate-spin" />
-                    Waiting for a tablet to scan…
+                    {t('tools:sendToPendant.pairWithQr.waiting')}
                 </p>
             )}
             <div className="flex gap-4 text-xs">
@@ -109,14 +117,14 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
                     onClick={onUseCode}
                     className="font-medium text-robin-700 dark:text-robin-400 hover:underline"
                 >
-                    Use pairing code instead
+                    {t('tools:sendToPendant.pairWithQr.useCode')}
                 </button>
                 <button
                     type="button"
                     onClick={onCancel}
                     className="text-gray-500 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-primary"
                 >
-                    Back
+                    {t('common:actions.back')}
                 </button>
             </div>
         </div>

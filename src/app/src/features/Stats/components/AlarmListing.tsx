@@ -3,6 +3,7 @@ import {
     type FirmwareEvent,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
+import { TransKey, useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import { useContext } from 'react';
 import { IoIosWarning } from 'react-icons/io';
@@ -18,6 +19,7 @@ type AlarmItemProps = {
 };
 
 function AlarmItem({ alarm }: AlarmItemProps) {
+    const { t } = useAppTranslation();
     const dateString = new Date(alarm.time).toLocaleString('en-US');
 
     const isAlarm = alarm.type === 'ALARM';
@@ -45,16 +47,26 @@ function AlarmItem({ alarm }: AlarmItemProps) {
                     'text-orange-500': !isAlarm,
                 })}
             >
-                {alarm.type} {alarm.CODE} - {alarm.source}
+                {t('stats:alarms.heading', {
+                    type: isAlarm
+                        ? t('stats:alarms.eventType.alarm')
+                        : t('stats:alarms.eventType.error'),
+                    code: alarm.CODE,
+                    source: alarm.source,
+                })}
             </h3>
             <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-content-muted">
-                {`at ${dateString}`}
+                {t('stats:alarms.at', { date: dateString })}
             </time>
             <p className="text-base font-normal text-gray-600 dark:text-content-secondary">
-                {alarm.MESSAGE || 'No associated message'}
+                {alarm.MESSAGE || t('stats:alarms.noMessage')}
             </p>
             <p className="text-base font-normal text-gray-600">
-                Line: <b>{alarm.line}</b>
+                <TransKey
+                    i18nKey="stats:alarms.line"
+                    values={{ line: alarm.line }}
+                    components={{ bold: <b /> }}
+                />
             </p>
         </li>
     );
