@@ -99,7 +99,7 @@ export function ToolNameInput({
     return (
         <div className="text-xs text-muted w-full relative">
             <Input
-                className="w-full h-7 bg-white bg-opacity-100 dark:border-outline ring-1 ring-gray-300 rounded-md px-2 py-1 text-xs text-gray-700"
+                className="w-full h-9 bg-white bg-opacity-100 dark:border-outline ring-1 ring-gray-300 rounded-md px-2 py-1 text-sm text-gray-700"
                 type="text"
                 value={name}
                 onChange={handleNameRemap}

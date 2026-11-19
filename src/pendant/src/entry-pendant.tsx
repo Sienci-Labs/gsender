@@ -30,17 +30,19 @@ async function bootstrap() {
     await initI18n(store.get('workspace.language', 'system'));
     watchLanguagePreference(store);
 
+    // Must load before sagas: redux/index <-> sagas/controllerSagas form an
+    // import cycle, and entering it via sagas hits sagaMiddleware in its TDZ.
+    const { store: reduxStore } = await import('app/store/redux');
+
     const [
         { Provider: ReduxProvider },
         { FocusTrappingProvider },
-        { store: reduxStore },
         { sagaMiddleware },
         { default: PendantShell },
         pendantSagas,
     ] = await Promise.all([
         import('react-redux'),
         import('app/lib/focus-trapping'),
-        import('app/store/redux'),
         import('app/store/redux/sagas'),
         import('./PendantShell'),
         import('./pendant-sagas'),
@@ -64,4 +66,6 @@ async function bootstrap() {
     );
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+    console.error('Pendant bootstrap failed', err);
+});

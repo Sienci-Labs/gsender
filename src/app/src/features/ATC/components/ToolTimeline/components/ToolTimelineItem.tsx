@@ -29,6 +29,8 @@ interface ToolTimelineItemProps {
     remapDisabled?: boolean;
     showProbeStatus?: boolean;
     handleRemap?: (number) => void;
+    /** 'below' puts the nickname on its own full-width line at the bottom. */
+    nicknamePlacement?: 'inline' | 'below';
 }
 
 export function ToolTimelineItem({
@@ -44,11 +46,14 @@ export function ToolTimelineItem({
     canRemap = false,
     remapDisabled = false,
     showProbeStatus = true,
+    nicknamePlacement = 'inline',
 }: ToolTimelineItemProps) {
     const { t } = useAppTranslation();
     const [label, setLabel] = useState('');
 
     const hasNickname = label !== '-' && Boolean(label);
+    const nicknameText = hasNickname ? label : tool.comment;
+    const nicknameBelow = nicknamePlacement === 'below';
     const currentToolLabel = tool.label || `T${tool.toolNumber}`;
     const mappedToolLabel =
         remapValue !== undefined ? `T${remapValue}` : currentToolLabel;
@@ -60,12 +65,18 @@ export function ToolTimelineItem({
     }, [tool, isRemapped, remapValue]);
 
     useEffect(() => {
-        const token = pubsub.subscribe('toolmap:updated', () => {
+        const refresh = () => {
             const toolLookup = isRemapped ? remapValue : tool.toolNumber;
             setLabel(lookupToolName(toolLookup));
-        });
+        };
+        // toolmap:updated fires for renames in this client; repopulate fires
+        // when another client's settings (including renames) are applied.
+        const tokens = [
+            pubsub.subscribe('toolmap:updated', refresh),
+            pubsub.subscribe('repopulate', refresh),
+        ];
         return () => {
-            pubsub.unsubscribe(token);
+            tokens.forEach((token) => pubsub.unsubscribe(token));
         };
     }, [tool, isRemapped, remapValue]);
 
@@ -74,6 +85,7 @@ export function ToolTimelineItem({
             <div
                 className={cn(
                     'group relative flex w-full items-center gap-3 rounded-lg px-3 py-3 transition-colors border border-l-0 overflow-hidden',
+                    nicknameBelow && 'flex-wrap',
                     isActive
                         ? 'bg-gray-50/80 border-2 dark:bg-surface-raised/80'
                         : 'bg-gray-50/80 border-gray-200 dark:bg-surface-raised/80 dark:border-outline hover:bg-gray-100/80 dark:hover:bg-surface-hover/80',
@@ -120,7 +132,7 @@ export function ToolTimelineItem({
                                 {currentToolLabel}
                             </span>
                         )}
-                        {hasNickname && (
+                        {!nicknameBelow && hasNickname && (
                             <>
                                 <span className="text-gray-600 dark:text-content-muted">
                                     ·
@@ -132,7 +144,7 @@ export function ToolTimelineItem({
                                 </Tooltip>
                             </>
                         )}
-                        {!hasNickname && tool.comment && (
+                        {!nicknameBelow && !hasNickname && tool.comment && (
                             <>
                                 <span className="text-gray-600 dark:text-content-muted">
                                     ·
@@ -188,6 +200,12 @@ export function ToolTimelineItem({
                         </Button>
                     )}
                 </div>
+
+                {nicknameBelow && nicknameText && (
+                    <div className="basis-full pl-11 text-xs text-gray-600 dark:text-content-muted break-words">
+                        {nicknameText}
+                    </div>
+                )}
             </div>
 
             {!isLast && (

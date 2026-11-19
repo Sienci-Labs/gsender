@@ -49,6 +49,7 @@ function buildToolArray(
                 label: `T${value.T}`,
                 color: `#${legendColor.getHexString()}`,
                 index: count + 1,
+                ...(value.comment ? { comment: value.comment } : {}),
             });
             count++;
         }
@@ -345,6 +346,7 @@ function ATCContent({ mode }: { mode: DrawerMode }) {
                                             probeState={probeState}
                                             canRemap={allowManualBadge}
                                             remapDisabled={remapDisabled}
+                                            nicknamePlacement="below"
                                         />
                                     </div>
                                 );

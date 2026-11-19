@@ -93,15 +93,17 @@ const ToolSection = ({
                 <div className="mt-2">
                     <Table>
                         <TableHeader>
-                            <TableRow className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[2fr_1fr_1fr]">
-                                <TableHead>{t('atc:toolTable.tool')}</TableHead>
-                                <TableHead className={'portrait:hidden'}>
+                            <TableRow className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[minmax(0,1fr)_8.5rem_9.25rem]">
+                                <TableHead className="portrait:px-2">
+                                    {t('atc:toolTable.tool')}
+                                </TableHead>
+                                <TableHead className="portrait:hidden">
                                     {t('atc:toolTable.zOffset')}
                                 </TableHead>
-                                <TableHead>
+                                <TableHead className="portrait:px-2">
                                     {t('atc:toolTable.status')}
                                 </TableHead>
-                                <TableHead>
+                                <TableHead className="portrait:px-2">
                                     {defaultOpen ? (
                                         <Button
                                             size="sm"
@@ -122,10 +124,10 @@ const ToolSection = ({
                             {tools.map((tool) => (
                                 <TableRow
                                     key={tool.id}
-                                    className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[2fr_1fr_1fr] items-center [&>td]:flex [&>td]:items-center"
+                                    className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[minmax(0,1fr)_8.5rem_9.25rem] items-center"
                                 >
-                                    <TableCell className="font-mono w-full">
-                                        <div className="flex flex-col w-full">
+                                    <TableCell className="flex items-center font-mono w-full min-w-0 portrait:px-2">
+                                        <div className="flex flex-col gap-1 w-full">
                                             <span className="font-semibold">
                                                 T{tool.id}
                                             </span>
@@ -135,8 +137,10 @@ const ToolSection = ({
                                             />
                                         </div>
                                     </TableCell>
-                                    <TableCell className="portrait:flex portrait:flex-col portrait:gap-2 portrait:items-center">
-                                        <div className="portrait:block hidden">
+                                    {/* In portrait this cell also carries the status badge,
+                                        since the Status column is hidden */}
+                                    <TableCell className="flex items-center portrait:flex-col portrait:gap-2 portrait:px-2">
+                                        <div className="hidden portrait:block">
                                             <ToolStatusBadges
                                                 probeState={tool.status}
                                                 isManual={
@@ -150,7 +154,7 @@ const ToolSection = ({
                                             {tool.toolOffsets.z.toFixed(3)}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="portrait:hidden">
+                                    <TableCell className="flex items-center portrait:hidden">
                                         <ToolStatusBadges
                                             probeState={tool.status}
                                             isManual={
@@ -160,7 +164,7 @@ const ToolSection = ({
                                             size="sm"
                                         />
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="flex items-center portrait:px-2">
                                         <ProbeButton
                                             onProbe={() =>
                                                 probeRackTool(tool.id)
