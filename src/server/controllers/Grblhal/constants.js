@@ -69,7 +69,11 @@ export const GRBL_HAL_MODAL_GROUPS = [
 			mode === "G3" ? [mode, "G5"] : [mode],
 		),
 	},
-	MODAL_GROUPS.wcs,
+	{
+		// grblHAL supports nine work coordinate systems (classic Grbl: six)
+		...MODAL_GROUPS.wcs,
+		modes: [...MODAL_GROUPS.wcs.modes, "G59.1", "G59.2", "G59.3"],
+	},
 	{
 		// Lathe Mode
 		group: "lathe",
