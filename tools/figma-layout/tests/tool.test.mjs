@@ -279,7 +279,7 @@ test('every combination mode puts app state controls in the matrix too', () => {
 
 test('machine states parse from a list or "all", in a fixed order', async () => {
     const { parseModes, applyModeScript, RESTORE_SCRIPT } = await import('../capture/modes.mjs');
-    assert.deepEqual(parseModes('all'), ['idle', 'running', 'hold', 'alarm', 'disconnected']);
+    assert.deepEqual(parseModes('all'), ['idle', 'ready', 'running', 'hold', 'alarm', 'disconnected']);
     assert.deepEqual(parseModes('alarm, Idle'), ['idle', 'alarm']);
     assert.deepEqual(parseModes(undefined), []);
     assert.throws(() => parseModes('idle,flying'), /flying/);

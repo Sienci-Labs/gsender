@@ -401,7 +401,11 @@ let liveServing = false;
 async function main() {
     fs.mkdirSync(OUT, { recursive: true });
     try {
-        await serveCaptures(OUT, opts['serve-port']);
+        // A Screens + Storybook run writes its files minutes apart; the
+        // plugin waits until the run is over before importing them.
+        await serveCaptures(OUT, opts['serve-port'], {
+            busy: () => !!job && job.exit === null && job.mode !== 'live',
+        });
         liveServing = true;
     } catch (e) {
         console.log(

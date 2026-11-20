@@ -71,7 +71,16 @@ function sfTracking(size) {
     return 0;
 }
 
+// Dev Mode is read-only: a plugin can open there but can't create layers.
+const DEV_MODE_TEXT =
+    'Figma is in Dev Mode, which is read-only, so nothing can be imported. Switch to Design Mode (Shift+D, or the Dev Mode toggle in the toolbar), then run Layout Importer again.';
+if (figma.editorType === 'dev') figma.ui.postMessage({ type: 'error', text: DEV_MODE_TEXT });
+
 figma.ui.onmessage = async (msg) => {
+    if (figma.editorType === 'dev' && msg.type !== 'save-options') {
+        figma.ui.postMessage({ type: 'error', text: DEV_MODE_TEXT });
+        return;
+    }
     if (msg.type === 'save-options') {
         await figma.clientStorage.setAsync('options', msg.options);
         return;
@@ -148,6 +157,11 @@ figma.ui.onmessage = async (msg) => {
                 page.selection.some((sel) => sel === n || isInside(sel, n)),
             );
             const targets = picked.length ? picked : all;
+            const repaired = await repairModeBars();
+            if (!targets.length && repaired) {
+                figma.ui.postMessage({ type: 'done', text: `Machine state bar fixed: ${repaired} button links. Select the playground screen and press Present (⌥⌘↵).` });
+                return;
+            }
             if (!targets.length)
                 throw new Error(
                     'There are no captured screens on this page. Open the page with your imported screens (or import one), then try again.',
@@ -155,6 +169,7 @@ figma.ui.onmessage = async (msg) => {
             const { placed, results } = await playgroundize(targets, []);
             figma.currentPage.selection = placed;
             figma.viewport.scrollAndZoomIntoView(placed);
+            reportSettled();
             figma.ui.postMessage({ type: 'done', text: playgroundSummary(results).trim() });
         } catch (e) {
             console.error(e);
@@ -175,6 +190,8 @@ figma.ui.onmessage = async (msg) => {
         const fontsUsed = {};
         let components = 0;
         let variants = 0;
+        sharedTabs.clear();
+        sharedPopovers.clear();
         // Playground mode builds on its own page; see placePlayground.
         const play = !!msg.options.playground;
         const partsSections = [];
@@ -214,6 +231,7 @@ figma.ui.onmessage = async (msg) => {
                 texts,
                 fontsUsed,
             );
+            progress(`Finishing ${doc.root.name}${doc.modeLabel ? ` · ${doc.modeLabel}` : ''}…`);
             frame.x = x;
             frame.y = 0;
             x += frame.width + 200;
@@ -309,6 +327,7 @@ figma.ui.onmessage = async (msg) => {
             .sort((a, b) => tally[b] - tally[a])
             .map((k) => `${k} ×${tally[k]}`)
             .join(', ');
+        reportSettled();
         figma.ui.postMessage({
             type: 'done',
             text: `${msg.note ? `${msg.note} ` : ''}Imported ${parts.join(', ')}.${linked}${stories}${fonts ? ` Fonts: ${fonts}.` : ''}${failedFonts.length ? ` Couldn't load: ${failedFonts.splice(0).join(', ')}.` : ''}`,
@@ -324,6 +343,23 @@ figma.ui.onmessage = async (msg) => {
 
 function progress(text) {
     figma.ui.postMessage({ type: 'progress', text });
+}
+
+// After an import Figma goes on drawing and saving what was made, and the
+// plugin's timers fire late while it does. Once a few in a row are on time
+// it has caught up; the UI says so.
+function reportSettled() {
+    let calm = 0;
+    let last = Date.now();
+    const started = last;
+    const tick = () => {
+        const now = Date.now();
+        calm = now - last < 400 ? calm + 1 : 0;
+        last = now;
+        if (calm >= 4 || now - started > 10 * 60000) figma.ui.postMessage({ type: 'settled' });
+        else setTimeout(tick, 250);
+    };
+    setTimeout(tick, 250);
 }
 
 function nextFreeX() {
@@ -343,12 +379,15 @@ async function importDoc(doc, options, texts, fontsUsed) {
     const states = options.states === false ? [] : doc.states || [];
     const stateRoots = [];
     for (const st of states) {
-        if (st.kind === 'tabs') {
+        if (st.kind === 'tabs' || st.kind === 'sections') {
+            // Shared with an earlier machine state: nothing to build.
+            if (st.sameAs) continue;
             for (const o of st.options) {
                 o.node = prep(o.node);
                 stateRoots.push(o.node);
             }
         } else {
+            if (st.sameAs) continue;
             st.node = prep(st.node);
             stateRoots.push(st.node);
         }
@@ -386,6 +425,7 @@ async function importDoc(doc, options, texts, fontsUsed) {
         section.setPluginData('statesFor', frame.id);
         frame.setPluginData('statesSection', section.id);
     }
+    if (state.sharedPopovers) frame.setPluginData('sharedPopovers', JSON.stringify(state.sharedPopovers));
     if (state.colorVars) {
         for (const n of section ? [frame, section] : [frame]) {
             try {
@@ -1174,11 +1214,24 @@ function layoutFit(screenLayout, setLayout) {
 
 // Every Storybook component set in the file, by key (see setKeys in
 // shared/match.cjs).
-async function storySetIndex() {
-    await figma.loadAllPagesAsync();
+// `pages` limits the search; otherwise every page is loaded, which in a big
+// file (whole Storybook captures on other pages) takes a minute.
+async function storySetIndex(pages) {
+    let sets;
+    if (pages) {
+        sets = [];
+        for (const p of pages) {
+            if (!p) continue;
+            if ('loadAsync' in p) await p.loadAsync();
+            sets.push(...p.findAllWithCriteria({ types: ['COMPONENT_SET'] }));
+        }
+    } else {
+        await figma.loadAllPagesAsync();
+        sets = figma.root.findAllWithCriteria({ types: ['COMPONENT_SET'] });
+    }
     const index = {};
     let count = 0;
-    for (const set of figma.root.findAllWithCriteria({ types: ['COMPONENT_SET'] })) {
+    for (const set of sets) {
         if (!set.getPluginData('storyFile') && !set.getPluginData('storyComponent'))
             continue;
         count++;
@@ -1211,10 +1264,11 @@ function pickSet(entries, layout) {
 
 // The Storybook components a screen shows: walks its layers and records,
 // for each component set, the outermost layers rendered by its component.
-async function componentsIn(screen, index) {
+// `seenMains` can be shared between screens (the machine states of one
+// screen use the same tab components), so each is walked once.
+async function componentsIn(screen, index, seenMains = new Set()) {
     const layout = screen.getPluginData('layout') || 'desktop';
     const found = new Map(); // set id → { set, layers }
-    const seenMains = new Set();
     const walk = async (node, active) => {
         let inside = active;
         if (node.type === 'FRAME' || node.type === 'INSTANCE' || node.type === 'COMPONENT') {
@@ -1497,6 +1551,22 @@ function overlap(a, b) {
     return both / (a.w * a.h + b.w * b.h - both);
 }
 
+// Every layer under `root`, not looking inside instances. In Figma a
+// search also walks each instance's copy of its component, which on the
+// Configuration page is ~10,000 layers per screen; nothing a playground
+// wires up is inside one.
+function ownLayers(root) {
+    const out = [];
+    const walk = (n) => {
+        for (const c of n.children || []) {
+            out.push(c);
+            if (c.type !== 'INSTANCE' && 'children' in c) walk(c);
+        }
+    };
+    if ('children' in root) walk(root);
+    return out;
+}
+
 // Each tab of each variant changes to that tab's variant on click.
 async function wireTabs(tabs) {
     const { st, components } = tabs;
@@ -1505,13 +1575,17 @@ async function wireTabs(tabs) {
     const norm = (t) => String(t).trim().toLowerCase();
     st.options.forEach((o, i) => (byValue[norm(o.value)] = components[i]));
     let wired = 0;
+    const labels = new Set(Object.keys(byValue));
     for (const comp of components) {
-        for (const label of Object.keys(byValue)) {
+        if (!comp) continue;
+        const layers = ownLayers(comp);
+        const labelled = layers.filter((n) => n.type === 'TEXT' && labels.has(norm(n.characters)));
+        for (const label of labels) {
             const to = byValue[label];
             if (!to || to === comp) continue;
             // The tab strip is above the panel, so the topmost label is the tab.
-            const texts = comp
-                .findAll((n) => n.type === 'TEXT' && norm(n.characters) === label)
+            const texts = labelled
+                .filter((n) => norm(n.characters) === label)
                 .map((n) => ({ n, b: boxIn(n, comp) }))
                 .filter((t) => t.b)
                 .sort((a, b) => a.b.y - b.b.y);
@@ -1535,7 +1609,7 @@ async function wireTabs(tabs) {
         ];
         for (const [pattern, to] of step) {
             if (!to) continue;
-            const arrow = comp.findOne((n) => n.type === 'FRAME' && pattern.test(n.name));
+            const arrow = layers.find((n) => n.type === 'FRAME' && pattern.test(n.name));
             if (!arrow || arrow.reactions.length) continue;
             try {
                 await arrow.setReactionsAsync(click([changeTo(to)]));
@@ -1550,12 +1624,9 @@ async function wireTabs(tabs) {
 
 // The layer in the screen a menu was opened from: the one whose box best
 // covers where the capture clicked, outermost on a near tie.
-function triggerLayer(frame, rect) {
+function triggerLayer(frame, rect, boxes) {
     let best = null;
-    for (const n of frame.findAll(() => true)) {
-        if (inInstance(n) || !('setReactionsAsync' in n)) continue;
-        const b = boxIn(n, frame);
-        if (!b) continue;
+    for (const { n, b } of boxes) {
         const score = overlap(b, rect);
         if (score < 0.4) continue;
         if (!best || score > best.score + 0.05 || (Math.abs(score - best.score) <= 0.05 && b.w * b.h > best.area))
@@ -1567,11 +1638,24 @@ function triggerLayer(frame, rect) {
 // A menu opens as an overlay the size of the screen, with the menu where
 // the app shows it; a click anywhere closes it. (Figma centres overlays and
 // plugins can't change that, so the overlay fills the screen instead.)
-async function wireMenu(frame, pop, holder) {
+async function wireMenu(frame, pop, holder, boxes) {
     const { info, comp } = pop;
     const rect = info.trigger;
-    const trigger = triggerLayer(frame, rect);
+    const trigger = triggerLayer(frame, rect, boxes);
     if (!trigger) return null;
+    // A menu shared by several machine states opens the same overlay.
+    const reuse = holder.byMenu && holder.byMenu.get(comp.id);
+    if (reuse) {
+        try {
+            await trigger.setReactionsAsync(
+                click([{ type: 'NODE', destinationId: reuse.id, navigation: 'OVERLAY', transition: null, resetVideoPosition: false }]),
+            );
+            return { overlay: reuse, trigger };
+        } catch (e) {
+            console.warn('menu not wired', info.name, e);
+            return null;
+        }
+    }
     const overlay = figma.createFrame();
     overlay.name = `Menu — ${info.name}`;
     overlay.fills = [];
@@ -1582,6 +1666,7 @@ async function wireMenu(frame, pop, holder) {
     inst.x = info.at.x;
     inst.y = info.at.y;
     holder.appendChild(overlay);
+    if (holder.byMenu) holder.byMenu.set(comp.id, overlay);
     try {
         await overlay.setReactionsAsync(click([{ type: 'CLOSE' }]));
         await trigger.setReactionsAsync(
@@ -1757,11 +1842,21 @@ async function builtFrom(frame) {
     let section = id ? await figma.getNodeByIdAsync(id) : null;
     if (!section) {
         const page = pageOf(frame);
-        section = page && page.findOne((n) => n.type === 'SECTION' && n.name === `${frame.name} — tabs & menus`);
+        section = page && page.findAllWithCriteria({ types: ['SECTION'] }).find((n) => n.name === `${frame.name} — tabs & menus`);
     }
+    // Menus shared with another machine state live in that state's section.
+    try {
+        for (const pid of JSON.parse(frame.getPluginData('sharedPopovers') || '[]')) {
+            const comp = await figma.getNodeByIdAsync(pid);
+            const info = comp && JSON.parse(comp.getPluginData('popover') || 'null');
+            if (info) built.popovers.push({ info, comp });
+        }
+    } catch (e) {}
     if (!section) return built;
     built.section = section;
     for (const n of section.children) {
+        // Section menus link themselves when they're built.
+        if (n.type === 'COMPONENT_SET' && / — sections$/.test(n.name)) continue;
         if (n.type === 'COMPONENT_SET') {
             const variants = n.children.filter((c) => c.type === 'COMPONENT');
             let info = null;
@@ -1800,31 +1895,99 @@ function frameTheme(frame) {
     return m ? m[1] : '';
 }
 
+// Menu overlays waiting to be placed. They stay directly on the page (then
+// go directly into a section): Figma rejects an overlay link to a frame
+// nested in another frame ("Reaction at index 0 was invalid").
+// The menus a playground opens, out of the way in a section of their own:
+// each is an overlay the size of the screen (Figma opens overlays centred,
+// so the menu sits where the app shows it inside a screen-sized frame), in
+// a labelled grid. They have to stay on this page for Present mode.
+function menuSection(overlays) {
+    if (!overlays.length) return null;
+    progress(`Placing ${overlays.length} menu(s)…`);
+    const section = figma.createSection();
+    section.name = 'Menus the playground opens (keep; used in Present mode)';
+    const cols = 4;
+    const w = overlays[0].width;
+    const h = overlays[0].height;
+    let row = 0;
+    overlays.forEach((o, i) => {
+        const col = i % cols;
+        row = Math.floor(i / cols);
+        const x = SECTION_PADDING + col * (w + 120);
+        const y = SECTION_PADDING + row * (h + 160);
+        const label = caption(o.name.replace(/^Menu — /, ''), 28, true);
+        if (label) {
+            section.appendChild(label);
+            label.x = x;
+            label.y = y;
+        }
+        section.appendChild(o);
+        o.x = x;
+        o.y = y + 56;
+    });
+    const cnt = Math.min(cols, overlays.length);
+    section.resizeWithoutConstraints(
+        SECTION_PADDING * 2 + cnt * w + (cnt - 1) * 120,
+        SECTION_PADDING * 2 + (row + 1) * (h + 160) - 104,
+    );
+    return section;
+}
+
+function menuList() {
+    return {
+        children: [],
+        byMenu: new Map(),
+        appendChild(n) {
+            if (!this.children.includes(n)) this.children.push(n);
+        },
+        remove() {},
+    };
+}
+
 // Wires one screen up. `holder` takes new menu overlays; `again` is set for
 // a screen that is already a playground, whose menus are already wired and
 // which only needs its tabs and components redone.
 async function makePlayground(frame, built, holder, ctx, again) {
     const r = { tabs: 0, menus: [], components: [], menusUnknown: false };
     for (const t of built.tabs) if (await wireTabs(t)) r.tabs++;
-    if (!again) {
+    // The screen's own layers and where they are, looked up once.
+    const layers = ownLayers(frame);
+    r.sections = layers.some((n) => n.type === 'INSTANCE' && / \(sections\)$/.test(n.name));
+    if (!again && built.popovers.length) {
+        const boxes = [];
+        for (const n of layers) {
+            if (!('setReactionsAsync' in n)) continue;
+            const b = boxIn(n, frame);
+            if (b && b.w > 0 && b.h > 0) boxes.push({ n, b });
+        }
         for (const p of built.popovers) {
-            const m = await wireMenu(frame, p, holder);
+            const m = await wireMenu(frame, p, holder, boxes);
             if (m) r.menus.push(p.info.name);
         }
         if (!built.popovers.length && built.section && built.section.children.some((n) => n.type === 'COMPONENT' && /^Popover/.test(n.name)))
             r.menusUnknown = true;
     }
     // Layers that open a menu stay as they are.
-    const triggers = frame.findAll(
+    const triggers = layers.filter(
         (n) => n.reactions && n.reactions.some((x) => (x.actions || [x.action]).some((a) => a && a.navigation === 'OVERLAY')),
     );
 
-    const { index, count } = await storySetIndex();
-    if (!count) r.noStorybook = true;
+    if (!ctx.stories)
+        ctx.stories = await storySetIndex([
+            figma.currentPage,
+            figma.root.children.find((p) => p.name === PARTS_PAGE),
+        ]);
+    const { index, count } = ctx.stories;
+    if (!count) {
+        // Nothing to swap in: don't walk the screen for components.
+        r.noStorybook = true;
+        return r;
+    }
     const theme = frameTheme(frame);
     const cache = ctx.looks;
     const holds = (layer) => triggers.some((t) => t === layer || isInside(t, layer));
-    for (const { set, layers } of await componentsIn(frame, index)) {
+    for (const { set, layers } of await componentsIn(frame, index, ctx.seenMains)) {
         const setTheme = set.parent && set.parent.getPluginData ? set.parent.getPluginData('theme') : '';
         if (theme && setTheme && theme.toLowerCase() !== setTheme.toLowerCase()) {
             r.otherTheme = setTheme;
@@ -1875,6 +2038,7 @@ function playgroundGuide(frame, r) {
             r.modes
                 ? `• Switch the machine state with the bar under the screen (${r.modes.join(', ')}): everything that depends on it changes at once.`
                 : '',
+            r.sections ? `• Click a section in the side menu to open it and jump the list to it, as in the app. (Once there, sections above it are reached by clicking them, not by scrolling up.)` : '',
             r.tabs ? `• Click a tab to switch to it (${r.tabs} tab group${r.tabs === 1 ? '' : 's'}).` : '',
             r.menus.length ? `• Click a menu button to open it, and anywhere to close it: ${r.menus.join(', ')}.` : '',
             r.components.length
@@ -1930,6 +2094,12 @@ function expandModes(doc) {
 
 const BAR_HEIGHT = 64;
 
+// Tab groups built for one machine state, reused by the states that show the
+// same: `${modeGroup}|${mode}|${state key}` → { st, set, components }.
+const sharedTabs = new Map();
+// The same for menus: `${modeGroup}|${mode}|${state key}` → component.
+const sharedPopovers = new Map();
+
 // The bar under a playground screen: one button per machine state, this
 // one highlighted. Returns the bar and its buttons.
 function modeBar(labels, current, width) {
@@ -1972,10 +2142,45 @@ function modeBar(labels, current, width) {
     return { bar, buttons };
 }
 
+// Each button of each variant's Machine state bar changes to the variant
+// with that state. Returns how many buttons were wired.
+async function wireModeBar(set) {
+    const variants = set.children.filter((c) => c.type === 'COMPONENT');
+    let wired = 0;
+    for (const v of variants) {
+        // The bar is a direct child of each state.
+        const bar = v.children.find((n) => n.name === 'Machine state' && n.type === 'FRAME');
+        if (!bar) continue;
+        for (const b of bar.children) {
+            if (b.type !== 'FRAME') continue;
+            const to = variants.find((c) => variantProps(c)['Machine state'] === b.name);
+            if (!to || to === v) continue;
+            try {
+                await b.setReactionsAsync(click([changeTo(to)]));
+                wired++;
+            } catch (e) {
+                console.warn('machine state button not wired', b.name, e);
+            }
+        }
+    }
+    return wired;
+}
+
+// Machine-state screens imported before the bar was wired correctly.
+async function repairModeBars() {
+    await figma.loadAllPagesAsync();
+    let wired = 0;
+    for (const set of figma.root.findAllWithCriteria({ types: ['COMPONENT_SET'] }))
+        if (set.getPluginData('machineStates') === '1' || / — machine states$/.test(set.name))
+            wired += await wireModeBar(set);
+    return wired;
+}
+
 // Several machine states of one screen, already playgrounds each, become
 // one component with a "Machine state" property and a bar of buttons
 // under the screen that switch it. Returns what placePlayground needs.
 async function combineModes(group, parts) {
+    progress(`Combining ${group.length} machine states into one screen…`);
     group.sort((a, b) => Number(a.frame.getPluginData('modeOrder')) - Number(b.frame.getPluginData('modeOrder')));
     const labels = group.map((e) => e.frame.getPluginData('modeLabel') || e.frame.name);
     const first = group[0].frame;
@@ -1984,7 +2189,6 @@ async function combineModes(group, parts) {
     const section = figma.createSection();
     section.name = `Playground — machine states of ${first.name.replace(/ · [^·]+$/, '')}`;
     const comps = [];
-    const bars = [];
     for (let i = 0; i < group.length; i++) {
         const wrap = figma.createFrame();
         wrap.name = `Machine state=${labels[i]}`;
@@ -1995,29 +2199,23 @@ async function combineModes(group, parts) {
         wrap.appendChild(group[i].frame);
         group[i].frame.x = 0;
         group[i].frame.y = 0;
-        const { bar, buttons } = modeBar(labels, i, w);
+        const { bar } = modeBar(labels, i, w);
         wrap.appendChild(bar);
         bar.x = 0;
         bar.y = h;
         comps.push(figma.createComponentFromNode(wrap));
-        bars.push(buttons);
     }
-    for (let i = 0; i < comps.length; i++)
-        for (let j = 0; j < comps.length; j++)
-            if (i !== j) {
-                try {
-                    await bars[i][j].setReactionsAsync(click([changeTo(comps[j])]));
-                } catch (e) {
-                    console.warn('machine state button not wired', e);
-                }
-            }
     const set = figma.combineAsVariants(comps, section);
     set.name = `${first.name.replace(/ · [^·]+$/, '')} — machine states`;
+    set.setPluginData('machineStates', '1');
+    // Only now: Figma takes "Change to" between variants of one set only.
+    await wireModeBar(set);
     layoutVariants(set, comps);
     section.resizeWithoutConstraints(set.width + SECTION_PADDING * 2, set.height + SECTION_PADDING * 2);
     set.x = SECTION_PADDING;
     set.y = SECTION_PADDING;
-    parts.push(section);
+    // Kept on the Playground page, below the playground: the menus its
+    // screens open are there, and links between pages are not to be trusted.
 
     // What gets presented: an instance of the first state.
     const play = figma.createFrame();
@@ -2032,13 +2230,19 @@ async function combineModes(group, parts) {
         for (const o of [...e.holder.children]) holder.appendChild(o);
         e.holder.remove();
     }
+    // A menu that differs between states has an overlay per state; say which.
+    const names = {};
+    for (const o of holder.children) names[o.name] = (names[o.name] || 0) + 1;
     group.forEach((e, i) => {
-        for (const o of holder.children) if (!/\)$/.test(o.name) && e.menuIds && e.menuIds.includes(o.id)) o.name += ` (${labels[i]})`;
+        for (const o of holder.children)
+            if (names[o.name.replace(/ \([^)]*\)$/, '')] > 1 && !/\)$/.test(o.name) && e.menuIds && e.menuIds.includes(o.id))
+                o.name += ` (${labels[i]})`;
     });
     const merged = { tabs: 0, menus: [], components: [], modes: labels };
     const seen = new Set();
     for (const e of group) {
         merged.tabs = Math.max(merged.tabs, e.result.tabs);
+        merged.sections = merged.sections || e.result.sections;
         for (const m of e.result.menus) if (!merged.menus.includes(m)) merged.menus.push(m);
         for (const c of e.result.components)
             if (!seen.has(c.name)) {
@@ -2056,7 +2260,7 @@ async function combineModes(group, parts) {
         e.frame.setPluginData('modeLabels', JSON.stringify(labels));
         e.frame.setPluginData('guide', guide.id);
     }
-    return { frame: play, guide, holder };
+    return { frame: play, guide, holder, statesSection: section };
 }
 
 // Moves what an import made into place: screens and their menus on the
@@ -2071,6 +2275,7 @@ async function placePlayground(given, partsSections) {
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push(e);
     }
+    progress('Placing the playground…');
     const entries = [];
     for (const group of groups.values())
         entries.push(group.length > 1 ? await combineModes(group, partsSections) : group[0]);
@@ -2084,12 +2289,15 @@ async function placePlayground(given, partsSections) {
     }
     // Right of what was on the page before this import.
     const moving = new Set();
-    for (const e of entries) for (const n of [e.frame, e.guide, e.holder]) moving.add(n.id);
+    for (const e of entries) {
+        for (const n of [e.frame, e.guide]) moving.add(n.id);
+        for (const o of e.holder.children) moving.add(o.id);
+    }
     let x = 0;
     for (const n of page.children)
         if (!moving.has(n.id)) x = Math.max(x, n.x + n.width + 400);
     const placed = [];
-    for (const { frame, guide, holder } of entries) {
+    for (const { frame, guide, holder, statesSection } of entries) {
         const section = figma.createSection();
         section.name = `Playground — ${frame.name}`;
         page.appendChild(section);
@@ -2101,31 +2309,28 @@ async function placePlayground(given, partsSections) {
         frame.y = SECTION_PADDING;
         let w = frame.x + frame.width;
         let h = Math.max(guide.y + guide.height, frame.y + frame.height);
-        if (holder.children.length) {
-            // Menus have to be on this page to open; they sit under the screen.
-            const label = caption('Menus the screen opens in Present mode (keep them here)', 14, true);
-            let y = h + 120;
-            if (label) {
-                section.appendChild(label);
-                label.x = frame.x;
-                label.y = y;
-                y += label.height + 24;
-            }
-            let mx = frame.x;
-            for (const o of [...holder.children]) {
-                section.appendChild(o);
-                o.x = mx;
-                o.y = y;
-                mx += o.width + 80;
-                w = Math.max(w, o.x + o.width);
-                h = Math.max(h, o.y + o.height);
-            }
-        }
         holder.remove();
         section.resizeWithoutConstraints(w + SECTION_PADDING, h + SECTION_PADDING);
         section.x = x;
         section.y = 0;
-        x += section.width + 400;
+        let below = section.height + 600;
+        let widest = section.width;
+        if (statesSection) {
+            page.appendChild(statesSection);
+            statesSection.name = 'Machine states (used by the playground above; keep)';
+            statesSection.x = x;
+            statesSection.y = below;
+            below += statesSection.height + 600;
+            widest = Math.max(widest, statesSection.width);
+        }
+        const menus = menuSection(holder.children);
+        if (menus) {
+            page.appendChild(menus);
+            menus.x = x;
+            menus.y = below;
+            widest = Math.max(widest, menus.width);
+        }
+        x += widest + 400;
         placed.push(section);
         try {
             page.flowStartingPoints = page.flowStartingPoints
@@ -2144,14 +2349,21 @@ function playgroundScreens() {
     // Machine-state screens live in their component on the parts page.
     return figma.root.children
         .filter((p) => p.name === PLAYGROUND_PAGE || p.name === PARTS_PAGE)
-        .reduce((all, p) => all.concat(p.findAll((n) => n.type === 'FRAME' && n.getPluginData('playground') === '1')), []);
+        .reduce(
+            (all, p) =>
+                all.concat(
+                    p
+                        .findAllWithCriteria({ types: ['FRAME'], pluginData: { keys: ['playground'] } })
+                        .filter((n) => n.getPluginData('playground') === '1'),
+                ),
+            [],
+        );
 }
 
 // Swaps a playground's note for a new one, in the same place.
-function replaceGuide(frame, guide) {
+async function replaceGuide(frame, guide) {
     const id = frame.getPluginData('guide');
-    let old = null;
-    if (id) for (const p of figma.root.children) if (!old) old = p.findOne((n) => n.id === id);
+    let old = id ? await figma.getNodeByIdAsync(id) : null;
     if (!old && frame.parent) old = frame.parent.children.find((n) => n.name === 'How to use this playground');
     if (!old || !old.parent) {
         guide.remove();
@@ -2180,15 +2392,16 @@ function replaceGuide(frame, guide) {
 // move to the parts page.
 async function playgroundize(frames, parts) {
     await storyFonts();
-    const ctx = { pieces: new Map(), looks: new Map(), section: null };
+    const ctx = { pieces: new Map(), looks: new Map(), section: null, seenMains: new Set() };
     const fresh = [];
     const results = [];
     for (const frame of frames) {
         progress(`Making ${frame.name} interactive…`);
         const again = frame.getPluginData('playground') === '1';
         const built = await builtFrom(frame);
-        const holder = again ? null : figma.createFrame();
-        if (holder) holder.name = 'menus';
+        const holder = again ? null : menuList();
+        // One overlay per distinct menu, whichever machine state opens it.
+        if (holder) holder.byMenu = ctx.overlays || (ctx.overlays = new Map());
         const r = await makePlayground(frame, built, holder, ctx, again);
         r.group = frame.getPluginData('modeGroup') || frame.id;
         r.hasModes = !!frame.getPluginData('modeGroup');
@@ -2199,7 +2412,7 @@ async function playgroundize(frames, parts) {
                 const modes = JSON.parse(frame.getPluginData('modeLabels') || 'null');
                 if (modes) r.modes = modes;
             } catch (e) {}
-            replaceGuide(frame, playgroundGuide(frame, r));
+            await replaceGuide(frame, playgroundGuide(frame, r));
         } else {
             frame.setPluginData('playMenus', JSON.stringify(r.menus));
             const guide = playgroundGuide(frame, r);
@@ -2276,9 +2489,22 @@ async function buildStates(states, frame, state) {
         width = Math.max(width, node.width);
     };
 
-    for (const st of states.filter((s) => s.kind === 'tabs')) {
+    for (const tabState of states.filter((s) => s.kind === 'tabs')) {
+        let st = tabState;
+        const doc = state.doc;
+        let components = [];
+        let set = null;
+        // A machine state whose tabs look just like an earlier state's (the
+        // plugin UI marks them) uses that state's component set, so a big
+        // tab group (the Configuration page's) is built once, not six times.
+        const shared = st.sameAs && sharedTabs.get(`${doc.modeGroup}|${st.sameAs}|${st.key}`);
+        if (st.sameAs && !shared) continue;
+        if (shared) {
+            ({ st, set, components } = shared);
+            sharedTabs.set(`${doc.modeGroup}|${doc.mode}|${st.key}`, shared);
+        }
+        if (!shared) {
         progress(`Building ${st.name} variants…`);
-        const components = [];
         for (const o of st.options) {
             const built = await build(o.node, state);
             applyBackdrop(built, o.node, state);
@@ -2286,7 +2512,7 @@ async function buildStates(states, frame, state) {
             comp.name = `${st.property}=${variantValue(o.value)}`;
             components.push(comp);
         }
-        const set = figma.combineAsVariants(components, section);
+        set = figma.combineAsVariants(components, section);
         set.name = st.name;
         set.setPluginData(
             'tabs',
@@ -2303,6 +2529,8 @@ async function buildStates(states, frame, state) {
             set.paddingLeft =
                 40;
         place(set);
+        if (doc.modeGroup) sharedTabs.set(`${doc.modeGroup}|${doc.mode}|${st.key}`, { st, set, components });
+        }
 
         // Swap the static copy in the screen for a switchable instance.
         const original = state.stateNodes[st.key];
@@ -2320,6 +2548,8 @@ async function buildStates(states, frame, state) {
                 view.name = original.name;
                 view.fills = [];
                 view.clipsContent = true;
+                // The panel scrolled in the app, so it scrolls in Present mode.
+                view.overflowDirection = 'VERTICAL';
                 view.resize(inst.width, shownHeight);
                 view.appendChild(inst);
                 inst.x = 0;
@@ -2349,10 +2579,25 @@ async function buildStates(states, frame, state) {
                 view.y = original.y - (grown ? grown.y : 0);
             }
             original.remove();
+            // A scrolling list a section menu can jump through.
+            if (view !== inst) (state.scrollViews = state.scrollViews || []).push({ placed, view, inst });
         }
     }
 
+    for (const st of states.filter((s) => s.kind === 'sections')) await buildSections(st, frame, state, place);
+
+    const sharedHere = [];
     for (const st of states.filter((s) => s.kind === 'popover')) {
+        const doc = state.doc;
+        if (st.sameAs) {
+            // Built for an earlier machine state; this screen opens that one.
+            const shared = sharedPopovers.get(`${doc.modeGroup}|${st.sameAs}|${st.sameKey}`);
+            if (shared) {
+                sharedPopovers.set(`${doc.modeGroup}|${doc.mode}|${st.key}`, shared);
+                sharedHere.push(shared.id);
+            }
+            continue;
+        }
         progress(`Building ${st.name}…`);
         const built = await build(st.node, state);
         applyBackdrop(built, st.node, state);
@@ -2372,14 +2617,136 @@ async function buildStates(states, frame, state) {
                 }),
             );
         state.built.popovers.push({ st, comp });
+        if (doc.modeGroup) sharedPopovers.set(`${doc.modeGroup}|${doc.mode}|${st.key}`, comp);
         place(comp);
     }
+    if (sharedHere.length) state.sharedPopovers = sharedHere;
 
     section.resizeWithoutConstraints(
         width + SECTION_PADDING * 2,
         Math.max(y - STATE_GAP + SECTION_PADDING, 1),
     );
     return section;
+}
+
+// A side menu that opens one section at a time (gSender's Configuration
+// page). It becomes a component with a variant per section: the menu as the
+// capture recorded it with that section open, beside the scrolling list
+// moved to that section's heading. Clicking an item changes to its variant,
+// the way the app opens it and scrolls there. (Figma can't scroll to a
+// layer inside a component copy, so the list is moved instead: in a
+// section's variant the sections above it are out of reach until another
+// item is clicked.)
+async function buildSections(st, frame, state, place) {
+    const doc = state.doc;
+    const menu = state.stateNodes[st.key];
+    if (!menu || !menu.parent) return;
+    const mb = boxIn(menu, frame);
+    // The list it scrolls: the scrolling list to its right.
+    const list = (state.scrollViews || [])
+        .map((v) => ({ v, b: boxIn(v.placed, frame) }))
+        .filter((x) => x.b && x.b.x >= mb.x + mb.w - 4)
+        .sort((a, b) => a.b.x - b.b.x)[0];
+    let set;
+    let components;
+    const shared = st.sameAs && sharedTabs.get(`${doc.modeGroup}|${st.sameAs}|${st.key}`);
+    if (st.sameAs && !shared) return;
+    const u = list
+        ? {
+              x: Math.min(mb.x, list.b.x),
+              y: Math.min(mb.y, list.b.y),
+              r: Math.max(mb.x + mb.w, list.b.x + list.b.w),
+              b: Math.max(mb.y + mb.h, list.b.y + list.b.h),
+          }
+        : { x: mb.x, y: mb.y, r: mb.x + mb.w, b: mb.y + mb.h };
+    if (shared) {
+        ({ set, components } = shared);
+        st = shared.st;
+    } else {
+        progress(`Building ${st.name} sections…`);
+        // Headings in the list, to move it to.
+        let heads = new Map();
+        if (list) {
+            const main = await list.v.inst.getMainComponentAsync();
+            const texts = main ? ownLayers(main).filter((n) => n.type === 'TEXT' && typeof n.fontSize === 'number') : [];
+            const biggest = texts.reduce((m, t) => Math.max(m, t.fontSize), 0);
+            for (const t of texts) {
+                if (t.fontSize < Math.max(18, biggest * 0.75)) continue;
+                const b = boxIn(t, main);
+                const k = t.characters.trim().toLowerCase();
+                if (b && k && !heads.has(k)) heads.set(k, b.y);
+            }
+        }
+        components = [];
+        for (const [k, o] of st.options.entries()) {
+            progress(`Building ${st.name} sections (${k + 1}/${st.options.length}: ${o.value})…`);
+            const wrap = figma.createFrame();
+            wrap.name = `${st.property}=${variantValue(o.value)}`;
+            wrap.fills = [];
+            wrap.clipsContent = true;
+            wrap.resize(Math.max(1, u.r - u.x), Math.max(1, u.b - u.y));
+            const built = await build(o.node, state);
+            applyBackdrop(built, o.node, state);
+            wrap.appendChild(built);
+            built.x = mb.x - u.x;
+            built.y = mb.y - u.y;
+            if (list) {
+                const copy = list.v.placed.clone();
+                wrap.appendChild(copy);
+                copy.x = list.b.x - u.x;
+                copy.y = list.b.y - u.y;
+                const head = heads.get(String(o.value).trim().toLowerCase());
+                const view = copy.type === 'FRAME' && copy.overflowDirection === 'VERTICAL'
+                    ? copy
+                    : copy.findOne((n) => n.type === 'FRAME' && n.overflowDirection === 'VERTICAL');
+                const inst = view && view.children.find((c) => c.type === 'INSTANCE');
+                if (inst && head !== undefined) inst.y = -Math.max(0, head - 16);
+            }
+            components.push(figma.createComponentFromNode(wrap));
+        }
+        set = figma.combineAsVariants(components, figma.currentPage);
+        set.name = `${st.name} — sections`;
+        set.layoutMode = 'VERTICAL';
+        set.primaryAxisSizingMode = 'AUTO';
+        set.counterAxisSizingMode = 'AUTO';
+        set.itemSpacing = 80;
+        set.paddingTop = set.paddingRight = set.paddingBottom = set.paddingLeft = 40;
+        place(set);
+        // Each item changes to its section's variant.
+        const norm = (t) => String(t).trim().toLowerCase();
+        for (const comp of components) {
+            const menuPart = comp.children[0];
+            const texts = ownLayers(menuPart).filter((n) => n.type === 'TEXT');
+            for (let j = 0; j < st.options.length; j++) {
+                const to = components[j];
+                if (to === comp) continue;
+                const text = texts.find((t) => norm(t.characters) === norm(st.options[j].value));
+                if (!text) continue;
+                // The whole menu row, not just its word.
+                let target = text;
+                for (let p = text.parent; p && p !== menuPart; p = p.parent) if (p.type === 'FRAME' && p.height < 60) target = p;
+                try {
+                    await target.setReactionsAsync(click([changeTo(to)]));
+                } catch (e) {
+                    console.warn('section not wired', st.options[j].value, e);
+                }
+            }
+        }
+        if (doc.modeGroup) sharedTabs.set(`${doc.modeGroup}|${doc.mode}|${st.key}`, { st, set, components });
+    }
+    if (shared && doc.modeGroup) sharedTabs.set(`${doc.modeGroup}|${doc.mode}|${st.key}`, shared);
+    // In the screen: an instance of the open section, over the menu and the
+    // list, which stay (invisibly) so the layout around them doesn't move.
+    const selected = Math.max(0, st.options.findIndex((o) => o.selected));
+    const inst = components[selected].createInstance();
+    inst.name = `${st.name} (sections)`;
+    frame.appendChild(inst);
+    if (frame.layoutMode && frame.layoutMode !== 'NONE') inst.layoutPositioning = 'ABSOLUTE';
+    inst.x = u.x;
+    inst.y = u.y;
+    menu.opacity = 0;
+    if (list) list.v.placed.opacity = 0;
+    (state.sectionsBuilt = state.sectionsBuilt || []).push(st.options.length);
 }
 
 // A tab panel or menu with no background of its own shows the colour of the

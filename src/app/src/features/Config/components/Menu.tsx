@@ -58,6 +58,9 @@ function MenuItem({
                 },
             )}
             onClick={onClick}
+            // Lets the Figma capture tool (tools/figma-layout) click through the sections
+            data-figma-section-item=""
+            data-figma-active={active ? 'true' : undefined}
         >
             <span
                 className={cn(
@@ -125,6 +128,7 @@ export function Menu({
 
     return (
         <div
+            data-figma-section-menu=""
             className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white max-sm:hidden dark:bg-surface-raised dark:border-outline dark:text-content-primary"
             style={
                 {

@@ -431,22 +431,51 @@ To use it, select the screen and press **Present** (▶ at the top right, or
 
 **Machine states.** Tick **Every machine state** in the launcher (or pass
 `--modes all`, or a list such as `--modes idle,alarm`) and each screen is
-captured five times: Idle, Running, Hold, Alarm and Disconnected. gSender is
+captured six times: Idle (connected, no file), File loaded (connected, a job
+ready to start), Running, Hold, Alarm and Disconnected. gSender is
 put into each state the way the Storybook presets do it, through its Redux
 store plus the controller events the connection button and status pill
 listen for. What the real machine reports is held back meanwhile and
-restored afterwards. Running and Hold show a job 30% done (`sign-carving.nc`)
-when no file is loaded; Alarm is a hard-limit alarm (code 1). It needs the
+restored afterwards. File loaded, Running and Hold load `sign-carving.nc` when
+no file is loaded (Running and Hold 30% of the way through it); Alarm is a hard-limit alarm (code 1). It needs the
 dev build (`yarn vite:dev`), and adds about a minute per screen.
 
 In a playground the states become one screen with a **Machine state** bar
-under it. Clicking Idle, Running, Hold, Alarm or Disconnected switches the
+under it. Clicking any of them switches the
 whole screen at once (status pill, unlock prompt, job controls, connection
 button, menus), because each state is its own capture. Tabs and menus work in
 every state. Storybook components whose click would change the machine state
 aren't swapped in on these screens, so a widget can't disagree with the bar.
-Without the playground the states import as five screens side by side, named
+A tab group that looks the same in several states is built once and shared:
+the plugin compares them before import. That matters on the Configuration
+page, whose two tabs hold the whole settings page (~10,000 layers); Idle,
+File loaded, Running, Hold and Alarm share one copy and only Disconnected gets
+its own, instead of six copies that Figma runs out of memory on.
+
+If the bar's buttons don't respond in a playground imported before 20 Nov
+2026, click **Make playground from this page** on the Playground page; it
+re-links them.
+Without the playground the states import as six screens side by side, named
 `… · Alarm` and so on.
+
+- **Scrolling lists** (each Configuration tab, captured in full) scroll.
+- **Section menus** (the Configuration sub-nav) work as in the app: clicking
+  **Motors** opens it, showing its X/Y/Z-axis items, and moves the list to
+  the Motors heading. The capture clicks each item and records the menu as it
+  then shows; in Figma that becomes a component with a variant per section
+  (the menu opened there, beside the list moved to its heading). Figma can't
+  scroll to a layer inside a component copy, so the list is moved instead:
+  in a section's variant, the sections above it are reached by clicking them
+  rather than scrolling up. The capture finds the menu by the
+  `data-figma-section-menu` / `data-figma-section-item` attributes in
+  `src/app/src/features/Config/components/Menu.tsx`; another menu can opt in
+  the same way.
+
+The menus a playground opens are kept in their own section below it, **Menus
+the playground opens**: each is a transparent frame the size of the screen
+with the menu where the app shows it (Figma opens overlays centred, and a
+plugin can't change that). A menu that looks the same in several machine
+states is kept once.
 
 Outside Present mode, ⌘-click a component in the screen and set its controls
 in the right-hand panel to show a particular state; tab groups have a
@@ -564,6 +593,24 @@ a capture that has states without them.
 Layers are named after the React component that rendered them (dev builds),
 falling back to the tag plus `id`/`data-testid`/`aria-label`. The element's
 full `className` is stored as plugin data (`classes`) on each frame.
+
+### While an import runs
+
+The plugin pins a progress panel to the top of its window: the stage
+(building screen 3 of 6, laying out text, making the playground), the layer
+count, a progress bar and the time so far. After **done**, Figma still has to
+draw and save what was made; on a big import (a Configuration playground) it
+can be slow or look broken for a minute or two. The panel says **Figma is
+finishing up…** until the plugin's timers run on time again, then reports how
+long the import and the catch-up took.
+
+### When Figma freezes during an import
+
+While the launcher is running, the plugin reports each import step to it,
+and it appends them, with how long each took, to
+`figma-captures/.plugin-log.txt`. The file survives Figma being force-quit,
+so its last lines show which step an import died on. (Restart
+`yarn figma:ui` after updating the tool so the launcher accepts them.)
 
 ## How it works
 

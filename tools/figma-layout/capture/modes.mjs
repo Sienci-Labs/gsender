@@ -20,17 +20,19 @@ const SENDER = {
     remainingTime: 14 * 60,
 };
 
-// label, connection, controller activeState, workflow, job in progress,
-// extra status fields
+// label, connection, controller activeState, workflow, a file loaded, a
+// job in progress (which loads the file too), extra status fields
 export const MODES = {
     idle: { label: 'Idle', connected: true, active: 'Idle', workflow: 'idle' },
+    // Connected with a job ready: Start, Outline and the file controls on.
+    ready: { label: 'File loaded', connected: true, active: 'Idle', workflow: 'idle', file: true },
     running: { label: 'Running', connected: true, active: 'Run', workflow: 'running', job: true },
     hold: { label: 'Hold', connected: true, active: 'Hold', workflow: 'paused', job: true, status: { subState: 0 } },
     alarm: { label: 'Alarm', connected: true, active: 'Alarm', workflow: 'idle', status: { alarmCode: 1 } },
     disconnected: { label: 'Disconnected', connected: false, active: '', workflow: 'idle' },
 };
 
-export const MODE_ORDER = ['idle', 'running', 'hold', 'alarm', 'disconnected'];
+export const MODE_ORDER = ['idle', 'ready', 'running', 'hold', 'alarm', 'disconnected'];
 
 // "all" or a comma list → known mode names, in MODE_ORDER.
 export function parseModes(value) {
@@ -102,9 +104,13 @@ export function applyModeScript(mode) {
     }
     const { real, base } = window.__l2fModes;
     const send = (type, payload) => real({ type, payload });
-    const m = ${JSON.stringify({ ...m, file: FILE, sender: SENDER })};
+    const m = ${JSON.stringify({ ...m, loadFile: !!(m.file || m.job), file: FILE, sender: SENDER })};
     const c = base.controller || {};
     const prev = (c.state && c.state.status) || {};
+    // Connected states open a port, as .storybook/machine-state.js does;
+    // some controls check the port rather than the flag.
+    if (m.connected) send('connection/openConnection', { port: (base.connection && base.connection.port) || 'COM3', baudrate: '115200', isConnected: true });
+    else send('connection/closeConnection');
     send('connection/setConnectionState', { isConnected: m.connected });
     // The full shape the server reports, as .storybook/machine-state.js
     // gives it: components read pinState, positions and SD unguarded.
@@ -124,15 +130,16 @@ export function applyModeScript(mode) {
     });
     send('controller/updateWorkflowState', { state: m.workflow });
     const hadFile = base.fileInfo && base.fileInfo.fileLoaded;
-    if (m.job && !hadFile) send('fileInfo/updateFileInfo', m.file);
-    if (!m.job && !hadFile) send('fileInfo/unloadFileInfo');
+    if (m.loadFile && !hadFile) send('fileInfo/updateFileInfo', m.file);
+    if (!m.loadFile && !hadFile) send('fileInfo/unloadFileInfo');
     send('controller/updateSenderStatus', { status: m.job ? Object.assign({ startTime: Date.now() - m.sender.elapsedTime }, m.sender) : null });
     const ctl = window.__l2fModes.ctl;
     if (ctl) {
         const now = store.getState().controller;
         if (m.connected) {
             if (!ctl.port) ctl.port = 'COM3';
-            fire(ctl, 'serialport:openController', ctl.port);
+            // The server sends the firmware type with this event.
+            fire(ctl, 'serialport:openController', now.type);
             ctl.type = now.type;
             ctl.state = Object.assign({}, now.state);
             fire(ctl, 'controller:state', now.type, ctl.state);
@@ -152,6 +159,8 @@ export const RESTORE_SCRIPT = `(async () => {${CONTROLLER}
     store.dispatch = s.real;
     const b = s.base;
     const send = (type, payload) => s.real({ type, payload });
+    if (b.connection && b.connection.port) send('connection/openConnection', { port: b.connection.port, baudrate: b.connection.baudrate, isConnected: b.connection.isConnected });
+    else send('connection/closeConnection');
     send('connection/setConnectionState', { isConnected: !!(b.connection && b.connection.isConnected) });
     if (b.controller) {
         send('controller/updateControllerState', { type: b.controller.type, state: b.controller.state });
@@ -162,7 +171,7 @@ export const RESTORE_SCRIPT = `(async () => {${CONTROLLER}
     if (s.ctl) {
         s.ctl.port = s.port;
         if (b.connection && b.connection.isConnected) {
-            fire(s.ctl, 'serialport:openController', s.port);
+            fire(s.ctl, 'serialport:openController', b.controller.type);
             fire(s.ctl, 'controller:state', b.controller.type, b.controller.state);
         } else fire(s.ctl, 'serialport:close', { port: s.port });
     }

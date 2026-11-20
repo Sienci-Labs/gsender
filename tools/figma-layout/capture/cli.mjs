@@ -23,6 +23,7 @@ import {
     sleep,
     stamp,
     waitFor,
+    writeCapture,
     waitForStableDom,
 } from './lib.mjs';
 import { applyModeScript, MODES, parseModes, RESTORE_SCRIPT } from './modes.mjs';
@@ -67,7 +68,7 @@ Options
       --no-states          Don't click through tabs or open menus/popovers to
                            capture their other states
       --modes <list|all>   Capture the screen once per machine state instead
-                           of as it is: idle, running, hold, alarm,
+                           of as it is: idle, ready (file loaded), running, hold, alarm,
                            disconnected (comma-separated, or all). gSender is
                            put into each through its Redux store, as the
                            Storybook presets do; the plugin's playground
@@ -297,7 +298,7 @@ async function main() {
                     opts.out,
                     (opts.stamp ? `${stamp()}-` : '') + fileName(doc, used),
                 );
-                fs.writeFileSync(file, JSON.stringify(doc));
+                writeCapture(file, doc);
                 const kb = Math.round(fs.statSync(file).size / 1024);
                 console.log(
                     `${file} (${kb} KB, ${Object.keys(doc.tokens.colors).length} colour tokens)`,

@@ -29,6 +29,7 @@ import {
     sleep,
     stamp,
     waitForStableDom,
+    writeCapture,
 } from './lib.mjs';
 import { displayTitle, nameVariants, planVariations } from './variants.mjs';
 
@@ -710,7 +711,7 @@ async function main() {
                 opts.out,
                 `${opts.stamp ? `${stamp()}-` : ''}${base}.figma-layout.json`,
             );
-            fs.writeFileSync(file, JSON.stringify(doc));
+            writeCapture(file, doc);
             const states = doc.components.reduce(
                 (n, c) => n + c.variants.length,
                 0,

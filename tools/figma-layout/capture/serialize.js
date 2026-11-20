@@ -1610,6 +1610,7 @@
         for (const attr of [
             'data-l2f-state',
             'data-l2f-tab',
+            'data-l2f-section',
             'data-l2f-trigger',
             'data-l2f-popover',
         ]) {
@@ -1658,6 +1659,24 @@
                 })),
             });
         }
+        // A side menu of sections that opens one at a time (gSender's
+        // Configuration page marks its menu with data-figma-section-menu):
+        // each item is clicked and the menu recorded as it then shows.
+        for (const menu of document.querySelectorAll('[data-figma-section-menu]')) {
+            if (!isShown(menu) || !inScope(menu)) continue;
+            const items = [...menu.querySelectorAll('[data-figma-section-item]')].filter(isShown);
+            if (items.length < 2) continue;
+            const active = items.find((i) => i.getAttribute('data-figma-active') === 'true') || items[0];
+            const key = 's' + k++;
+            menu.setAttribute('data-l2f-state', key);
+            items.forEach((item, i) => item.setAttribute('data-l2f-section', `${key}:${i}`));
+            states.push({
+                key,
+                kind: 'sections',
+                name: reactComponentName(menu) || 'Sections',
+                tabs: items.map((item) => ({ label: labelOf(item), selected: item === active })),
+            });
+        }
         const triggers = [...document.querySelectorAll(POPUP_TRIGGERS)].filter(
             (t) =>
                 isShown(t) &&
@@ -1694,6 +1713,28 @@
         const tab = document.querySelector(`[data-l2f-tab="${key}:${index}"]`);
         if (!tab) return false;
         tab.click();
+        return true;
+    }
+
+    // Found again by the app's own attributes: recording the tab group
+    // first can rebuild the menu, dropping the marks findStates left.
+    function sectionMenu() {
+        return [...document.querySelectorAll('[data-figma-section-menu]')].find(isShown) || null;
+    }
+    function clickSection(key, index) {
+        let item = document.querySelector(`[data-l2f-section="${key}:${index}"]`);
+        if (!item) {
+            const menu = sectionMenu();
+            item = menu && [...menu.querySelectorAll('[data-figma-section-item]')].filter(isShown)[index];
+        }
+        if (!item) return false;
+        item.click();
+        return true;
+    }
+    function markSectionMenu(key) {
+        const menu = sectionMenu();
+        if (!menu) return false;
+        menu.setAttribute('data-l2f-state', key);
         return true;
     }
 
@@ -2084,6 +2125,8 @@
         download,
         findStates,
         clickTab,
+        clickSection,
+        markSectionMenu,
         preparePopover,
         isExpanded,
         markPopover,

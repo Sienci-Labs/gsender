@@ -553,6 +553,34 @@ async function captureStates(cdp, doc, found, raster, onProgress) {
                 options,
             });
     }
+    for (const st of found.filter((s) => s.kind === 'sections')) {
+        const original = Math.max(0, st.tabs.findIndex((t) => t.selected));
+        const options = [];
+        const pick = async (i) => {
+            await cdp.evaluate(`${api}.clickSection(${JSON.stringify(st.key)}, ${i})`);
+            await settle(cdp);
+            // Sub-items open with a CSS transition, which the DOM watch
+            // doesn't see.
+            await sleep(700);
+            await cdp.evaluate(`${api}.markSectionMenu(${JSON.stringify(st.key)})`);
+        };
+        for (let i = 0; i < st.tabs.length; i++) {
+            onProgress(`${st.name}: ${st.tabs[i].label}`);
+            await pick(i);
+            const node = await captureSubtree(
+                cdp,
+                doc,
+                `[data-l2f-state="${st.key}"]`,
+                `${st.key}x${i}n`,
+                raster,
+                false,
+            );
+            if (node) options.push({ value: st.tabs[i].label, selected: i === original, node });
+        }
+        await pick(original);
+        if (options.length > 1)
+            out.push({ key: st.key, kind: 'sections', name: st.name, property: 'Section', options });
+    }
     for (const st of found
         .filter((s) => s.kind === 'popover')
         .slice(0, MAX_POPOVERS)) {
@@ -685,8 +713,18 @@ export function listCaptures(dir) {
         .sort((a, b) => b.mtimeMs - a.mtimeMs);
 }
 
-// Serves a captures folder to the Figma plugin's Live panel.
-export function serveCaptures(dir, port) {
+// Writes a capture under a temporary name and renames it into place, so the
+// Live panel never lists (or imports) a file that is still being written.
+export function writeCapture(file, doc) {
+    const tmp = `${file}.part`;
+    fs.writeFileSync(tmp, JSON.stringify(doc));
+    fs.renameSync(tmp, file);
+}
+
+// Serves a captures folder to the Figma plugin's Live panel. `busy` says
+// whether a capture run is still going (the launcher's), so the plugin can
+// wait for all of its files before importing any.
+export function serveCaptures(dir, port, { busy = () => false } = {}) {
     const server = http.createServer((req, res) => {
         // The plugin UI runs in a sandboxed iframe with a null origin, and
         // Chrome's Private Network Access preflights requests to localhost.
@@ -700,6 +738,30 @@ export function serveCaptures(dir, port) {
             return;
         }
         const url = new URL(req.url, 'http://localhost');
+        // The plugin reports each import step here, so if Figma dies
+        // mid-import the last lines say where.
+        if (url.pathname === '/log' && req.method === 'POST') {
+            let body = '';
+            req.on('data', (d) => {
+                if (body.length < 4000) body += d;
+            });
+            req.on('end', () => {
+                try {
+                    fs.appendFileSync(
+                        path.join(dir, '.plugin-log.txt'),
+                        `${new Date().toISOString()} ${body.replace(/\s+/g, ' ').slice(0, 2000)}\n`,
+                    );
+                } catch (e) {}
+                res.statusCode = 204;
+                res.end();
+            });
+            return;
+        }
+        if (url.pathname === '/status') {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ busy: !!busy() }));
+            return;
+        }
         if (url.pathname === '/captures') {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(listCaptures(dir)));

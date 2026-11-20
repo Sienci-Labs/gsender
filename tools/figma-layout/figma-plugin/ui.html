@@ -79,8 +79,29 @@
     #baselineList li { display: flex; gap: 6px; }
     #baselineList li span { flex: 1; overflow: hidden; text-overflow: ellipsis; }
     #status { margin-top: 8px; min-height: 1.4em; color: var(--muted); }
+    /* Import progress: pinned to the top so it shows wherever the panel is scrolled. */
+    #busy { position: sticky; top: 0; z-index: 5; margin: -12px -12px 10px; padding: 10px 12px; background: var(--bg); border-bottom: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+    #busy[hidden] { display: none; }
+    #busy .head { display: flex; align-items: center; gap: 8px; }
+    #busy .head b { flex: 1; }
+    #busy .time { color: var(--muted); font-variant-numeric: tabular-nums; }
+    #busy .bar { height: 6px; margin: 8px 0 6px; border-radius: 3px; background: var(--border); overflow: hidden; position: relative; }
+    #busy .bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); border-radius: 3px; transition: width .3s; }
+    #busy.indeterminate .bar i { width: 30% !important; animation: slide 1.2s ease-in-out infinite; }
+    @keyframes slide { from { left: -30%; } to { left: 100%; } }
+    #busy small { color: var(--muted); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #busy small.wrap { white-space: normal; }
+    .spin { width: 12px; height: 12px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; flex: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spin, #busy.indeterminate .bar i { animation-duration: 3s; } }
     #status.error { color: var(--danger); }
 </style>
+
+<div id="busy" hidden role="status" aria-live="polite">
+    <div class="head"><span class="spin"></span><b id="busyStage">Importing…</b><span class="time" id="busyTime">0:00</span></div>
+    <div class="bar"><i id="busyBar"></i></div>
+    <small id="busyDetail"></small>
+</div>
 
 <section class="live">
     <div class="live-head">
@@ -115,7 +136,7 @@
     <div class="row" style="margin-top: 6px">
         <button class="secondary" id="makePlayground">Make playground from this page</button>
     </div>
-    <small class="hint">Uses screens already imported: the selected ones, or every captured screen on this page. To use it: open the Playground page, select a screen, press Present (⌥⌘↵).</small>
+    <small class="hint">Uses screens already imported: the selected ones, or every captured screen on this page. Also fixes the Machine state bar of playgrounds imported before it worked. To use it: open the Playground page, select a screen, press Present (⌥⌘↵).</small>
 </section>
 
 <section>
@@ -240,6 +261,23 @@
         status.className = '';
         status.textContent = 'Starting…';
         let batch = queue.shift();
+        if (batch && batch.live) {
+            const name = batch.live;
+            status.textContent = `Fetching ${name}…`;
+            fetchLive(name).then(
+                (doc) => {
+                    importing = false;
+                    queue.unshift([doc]);
+                    pump();
+                },
+                (e) => {
+                    status.className = 'error';
+                    status.textContent = `Could not fetch ${name}: ${e.message}`;
+                    finished();
+                },
+            );
+            return;
+        }
         if (batch === ATTACH) {
             status.textContent = 'Placing Storybook states…';
             parent.postMessage({ pluginMessage: { type: 'attach-states', options: readOptions() } }, '*');
@@ -264,8 +302,119 @@
             finished();
             return;
         }
-        parent.postMessage({ pluginMessage: { type: 'import', docs: batch, note, options: readOptions() } }, '*');
+        batch = batch.map(shareModeStates);
+        const o = readOptions();
+        log(`import start: ${batch.map((d) => (d.kind === 'storybook' ? `Storybook ${d.components.length} components` : `${d.root.name}${d.modes ? ` ×${d.modes.length} machine states` : ''}`)).join(', ')}${o.playground ? ' [playground]' : ''}`);
+        startBusy(batch);
+        parent.postMessage({ pluginMessage: { type: 'import', docs: batch, note, options: o } }, '*');
     }
+
+    /* Import progress ---------------------------------------------------- */
+
+    // Stages and how much of the bar each gets: building the screens is most
+    // of the work, then text, then the playground. After "done" Figma keeps
+    // drawing and saving what was made, which on a big import leaves it
+    // sluggish for a while; the panel says so until the plugin hears back.
+    let busy = null;
+    function fmt(ms) {
+        const s = Math.round(ms / 1000);
+        return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    }
+    function startBusy(batch) {
+        clearInterval(busy && busy.timer);
+        busy = { start: Date.now(), screen: 0, screens: batch.reduce((n, d) => n + (d.modes ? d.modes.length : 1), 0), frac: 0 };
+        $('busy').hidden = false;
+        $('busy').classList.remove('indeterminate');
+        busyShow('Starting the import…', '', 0.01);
+        busy.timer = setInterval(() => ($('busyTime').textContent = fmt(Date.now() - busy.start)), 1000);
+    }
+    function busyShow(stage, detail, frac) {
+        if (!busy) return;
+        if (stage) $('busyStage').textContent = stage;
+        $('busyDetail').textContent = detail || '';
+        $('busyDetail').classList.remove('wrap');
+        if (frac !== undefined) {
+            busy.frac = Math.max(busy.frac, Math.min(1, frac));
+            $('busyBar').style.width = `${Math.round(busy.frac * 100)}%`;
+        }
+    }
+    function busyProgress(text) {
+        if (!busy) return;
+        let m;
+        const per = 0.8 / Math.max(1, busy.screens);
+        if ((m = /^Importing (\d+)\/(\d+): (.*)$/.exec(text))) {
+            busy.screen = Number(m[1]);
+            busy.screens = Math.max(busy.screens, Number(m[2]));
+            busyShow(`Building screen ${m[1]} of ${m[2]}`, m[3], (busy.screen - 1) * (0.8 / busy.screens));
+        } else if ((m = /^Building (\d+)\/(\d+) layers/.exec(text))) {
+            busyShow(null, `${m[1]} of ${m[2]} layers`, (Math.max(1, busy.screen) - 1) * per + (Number(m[1]) / Number(m[2])) * per);
+        } else if (/^Building /.test(text)) {
+            busyShow(null, text.replace(/…$/, ''));
+        } else if ((m = /^Laying out text(?: \((\d+)\/(\d+)\))?/.exec(text))) {
+            busyShow('Laying out text', m[1] ? `${m[1]} of ${m[2]} text layers` : '', 0.8 + (m[1] ? (Number(m[1]) / Number(m[2])) * 0.05 : 0));
+        } else if ((m = /^Making (.*) interactive/.exec(text))) {
+            busyShow('Making the playground', m[1].replace(/^.* · /, 'Machine state: '), Math.max(busy.frac, 0.86) + 0.015);
+        } else if (/^(Combining|Placing|Linking|Finishing)/.test(text)) {
+            busyShow(null, text.replace(/…$/, ''), Math.max(busy.frac, 0.95));
+        } else {
+            busyShow(null, text.replace(/…$/, ''));
+        }
+    }
+    function busyDone(ok) {
+        if (!busy) return;
+        if (!ok) return busyEnd();
+        busy.doneAt = Date.now();
+        busyShow('Figma is finishing up…', '', 1);
+        $('busy').classList.add('indeterminate');
+        $('busyDetail').textContent = 'Drawing and saving the new layers. On a big import Figma can be slow or look broken for a minute or two; this goes away when it has caught up.';
+        $('busyDetail').classList.add('wrap');
+    }
+    function busyEnd() {
+        if (!busy) return;
+        clearInterval(busy.timer);
+        $('busy').hidden = true;
+        busy = null;
+    }
+    // A capture of every machine state repeats each tab group six times, and
+    // on the Configuration page one is ~10,000 layers: too much for Figma.
+    // Where a state's tab group looks just like an earlier state's, it is
+    // sent as "same as" that state and Figma reuses what it built.
+    function shareModeStates(doc) {
+        if (!doc.modes || doc.modes.length < 2) return doc;
+        const seen = {}; // state key → [{ mode, sig }]
+        const tabOwner = {}; // mode → which mode's tab groups it uses
+        const modes = doc.modes.map((m) => {
+            const states = (m.states || []).map((st) => {
+                // A menu that looks the same, opened from the same place, as
+                // in an earlier state is shared too.
+                if (st.kind === 'popover' && st.node && st.trigger) {
+                    const where = `${st.name}@${Math.round(st.trigger.x)},${Math.round(st.trigger.y)}`;
+                    const sig = `${where}:${Math.round(st.node.x)},${Math.round(st.node.y)}:${L2FDiff.signature(st.node)}`;
+                    const earlier = (seen[where] || []).find((e) => e.sig === sig);
+                    if (earlier) return { kind: 'popover', key: st.key, name: st.name, trigger: st.trigger, sameAs: earlier.mode, sameKey: earlier.key };
+                    (seen[where] = seen[where] || []).push({ mode: m.name, sig, key: st.key });
+                    return st;
+                }
+                if ((st.kind !== 'tabs' && st.kind !== 'sections') || !st.options) return st;
+                const sig = st.options
+                    .map((o) => `${o.value}:${o.selected ? 1 : 0}:${L2FDiff.signature(o.node)}`)
+                    .join('|');
+                // A section menu holds a copy of the list beside it, so it is
+                // only shared between states that share that list too.
+                const owner = st.kind === 'sections' ? tabOwner[m.name] || m.name : '';
+                const earlier = (seen[st.key] || []).find(
+                    (e) => e.sig === sig && (st.kind !== 'sections' || (tabOwner[e.mode] || e.mode) === owner),
+                );
+                if (st.kind === 'tabs') tabOwner[m.name] = earlier ? tabOwner[earlier.mode] || earlier.mode : m.name;
+                if (earlier) return { kind: st.kind, key: st.key, name: st.name, property: st.property, sameAs: earlier.mode };
+                (seen[st.key] = seen[st.key] || []).push({ mode: m.name, sig });
+                return st;
+            });
+            return Object.assign({}, m, { states });
+        });
+        return Object.assign({}, doc, { modes });
+    }
+
     function finished() {
         importing = false;
         go.disabled = !docs.length;
@@ -833,13 +982,28 @@
 
     let seen = null; // capture names that existed when we first connected
 
-    async function importLive(name) {
+    // Captures are fetched when their turn in the import queue comes, not
+    // when they appear: a big one (Storybook) held in memory while another
+    // import runs is enough to crash Figma.
+    function importLive(name) {
+        enqueue({ live: name });
+    }
+    async function fetchLive(name) {
+        const res = await fetch(`${LIVE_URL}/captures/${encodeURIComponent(name)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
+
+    // New captures from a launcher run wait until the run is over (a
+    // Screens + Storybook run writes its files minutes apart), then import
+    // one after another, Storybook first.
+    let waiting = [];
+    async function runBusy() {
         try {
-            const res = await fetch(`${LIVE_URL}/captures/${encodeURIComponent(name)}`);
-            enqueue([await res.json()]);
+            const res = await fetch(`${LIVE_URL}/status`, { cache: 'no-store' });
+            return res.ok ? !!(await res.json()).busy : false;
         } catch (e) {
-            status.className = 'error';
-            status.textContent = `Could not fetch ${name}: ${e.message}`;
+            return false;
         }
     }
 
@@ -890,15 +1054,30 @@
             const fresh = list.filter((c) => !seen.has(c.name)).reverse();
             for (const c of fresh) {
                 seen.add(c.name);
-                if ($('autoImport').checked) importLive(c.name);
+                if ($('autoImport').checked) waiting.push(c);
             }
             renderLive(list);
+            if (waiting.length) {
+                if (await runBusy()) {
+                    if (!importing) {
+                        status.className = '';
+                        status.textContent = `Waiting for the capture to finish before importing ${waiting.length} new capture(s)…`;
+                    }
+                } else {
+                    const batch = waiting
+                        .filter((c) => c.kind === 'storybook')
+                        .concat(waiting.filter((c) => c.kind !== 'storybook'));
+                    waiting = [];
+                    for (const c of batch) importLive(c.name);
+                }
+            }
         } catch (e) {
             $('liveDot').classList.remove('on');
             $('liveHint').innerHTML =
                 'Not running. Start <code>yarn figma:ui</code> (or <code>yarn figma:live</code>) to see captures here.';
             $('liveList').innerHTML = '';
             seen = null;
+            waiting = [];
         }
         setTimeout(poll, 1500);
     }
@@ -906,20 +1085,47 @@
 
     /* Messages from the plugin ------------------------------------------- */
 
+    // Every step goes to the launcher's log too (figma-captures/.plugin-log.txt),
+    // which outlives Figma if an import takes it down.
+    let lastLog = 0;
+    function log(text) {
+        const now = Date.now();
+        const gap = lastLog ? ` (+${((now - lastLog) / 1000).toFixed(1)}s)` : '';
+        lastLog = now;
+        try {
+            fetch(`${LIVE_URL}/log`, { method: 'POST', body: `${text}${gap}`, keepalive: true }).catch(() => {});
+        } catch (e) {}
+    }
+
     window.onmessage = (e) => {
         const msg = e.data.pluginMessage;
         if (!msg) return;
+        if (msg.type === 'progress' || msg.type === 'done' || msg.type === 'error') log(`${msg.type}: ${msg.text}`);
         if (msg.type === 'options') applyOptions(msg.options);
         if (msg.type === 'master') showMaster(msg);
-        if (msg.type === 'progress') status.textContent = msg.text;
+        if (msg.type === 'progress') {
+            status.textContent = msg.text;
+            busyProgress(msg.text);
+        }
         if (msg.type === 'done') {
             status.className = '';
             status.textContent = msg.text;
+            busyDone(true);
             finished();
+        }
+        if (msg.type === 'settled') {
+            if (busy && busy.doneAt) {
+                const took = fmt(busy.doneAt - busy.start);
+                const extra = fmt(Date.now() - busy.doneAt);
+                status.textContent = `${status.textContent} Ready: imported in ${took}, then ${extra} for Figma to catch up.`;
+                log(`settled: Figma caught up ${extra} after done`);
+            }
+            busyEnd();
         }
         if (msg.type === 'error') {
             status.className = 'error';
             status.textContent = msg.text;
+            busyDone(false);
             finished();
         }
     };

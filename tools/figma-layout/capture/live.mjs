@@ -27,6 +27,7 @@ import {
     sleep,
     stamp,
     waitForStableDom,
+    writeCapture,
 } from './lib.mjs';
 
 const HELP = `
@@ -207,7 +208,7 @@ async function capture(cdp) {
         });
         doc.layout = opts.layout;
         const name = `${stamp()}-${fileName(doc)}`;
-        fs.writeFileSync(path.join(OUT, name), JSON.stringify(doc));
+        writeCapture(path.join(OUT, name), doc);
         const secs = ((Date.now() - started) / 1000).toFixed(1);
         console.log(`✔ ${name} (${secs}s)`);
         await toast('Saved. It will appear in the Figma plugin’s Live panel.');
