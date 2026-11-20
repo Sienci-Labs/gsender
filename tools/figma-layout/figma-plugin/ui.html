@@ -106,6 +106,19 @@
 </section>
 
 <section>
+    <h2>Interactive playground</h2>
+    <small class="hint">Imports screens as a clickable version of the app instead of a breakdown: tabs switch, menus open, and Storybook components that match the screen change state when clicked. Everything goes on a <b>Playground</b> page with a note beside each screen saying what to try; the parts it uses go on a <b>Playground components</b> page.</small>
+    <label style="margin-top: 6px">
+        <input type="checkbox" id="playground" />
+        <span>Import as a playground<small>Screens imported with this on become playgrounds. A Storybook capture imported later is added to the playgrounds already made.</small></span>
+    </label>
+    <div class="row" style="margin-top: 6px">
+        <button class="secondary" id="makePlayground">Make playground from this page</button>
+    </div>
+    <small class="hint">Uses screens already imported: the selected ones, or every captured screen on this page. To use it: open the Playground page, select a screen, press Present (⌥⌘↵).</small>
+</section>
+
+<section>
     <h2>Storybook states</h2>
     <small class="hint">Import a Storybook capture into this file, and each screen gets the states of the components it shows (buttons, widgets, panels) laid out beneath it, found by component name.</small>
     <label style="margin-top: 6px">
@@ -187,7 +200,7 @@
 
     /* Options, remembered between runs via figma.clientStorage ---------- */
 
-    const DEFAULTS = { autoLayout: true, variables: true, states: true, backdrops: true, simplify: true, font: 'Inter', autoImport: true, linkProto: true, storyStates: true };
+    const DEFAULTS = { autoLayout: true, variables: true, states: true, backdrops: true, simplify: true, font: 'Inter', autoImport: true, linkProto: true, storyStates: true, playground: false };
     const OPTION_IDS = Object.keys(DEFAULTS);
 
     function readOptions() {
@@ -213,6 +226,7 @@
 
     const queue = [];
     const ATTACH = 'attach-states';
+    const PLAYGROUND = 'make-playground';
     let importing = false;
 
     function enqueue(docsToImport) {
@@ -229,6 +243,11 @@
         if (batch === ATTACH) {
             status.textContent = 'Placing Storybook states…';
             parent.postMessage({ pluginMessage: { type: 'attach-states', options: readOptions() } }, '*');
+            return;
+        }
+        if (batch === PLAYGROUND) {
+            status.textContent = 'Making the playground…';
+            parent.postMessage({ pluginMessage: { type: 'make-playground', options: readOptions() } }, '*');
             return;
         }
         let note = '';
@@ -755,6 +774,7 @@
     /* Prototype ------------------------------------------------------------ */
 
     $('attachStates').addEventListener('click', () => enqueue(ATTACH));
+    $('makePlayground').addEventListener('click', () => enqueue(PLAYGROUND));
 
     const send = (type) => parent.postMessage({ pluginMessage: { type } }, '*');
     $('markMaster').addEventListener('click', () => send('mark-master'));

@@ -399,6 +399,50 @@ Options (remembered between runs):
 - **Flatten wrappers**: drops `<div>`s that paint nothing, and wrappers that
   only pass a single same-sized child through.
 
+### Interactive playground
+
+Tick **Import as a playground** in the plugin to import screens as a
+clickable version of the app instead of a breakdown. Nothing is exploded out:
+each screen goes on a **Playground** page, in its own section, with a note
+beside it saying how to use it and what on that screen can be clicked.
+
+Screens already in the file can be made into playgrounds too: open their
+page, select some (or none, for all) and click **Make playground from this
+page**. A Storybook capture imported with the playground on is added to the
+playgrounds already made, so screens and Storybook can come in either order.
+Screens imported before this feature existed get their tabs but not their
+menus; import those captures again to get both.
+
+To use it, select the screen and press **Present** (▶ at the top right, or
+⌥⌘↵). Then:
+
+- **Tabs** switch when clicked. Where the strip has scroll arrows (the
+  Carve panel's widget tabs), the arrows step to the next or previous tab, so
+  the tabs scrolled out of view can be reached too.
+- **Menus and popovers** open where the app shows them when you click the
+  button that opened them in the capture, and close when you click anywhere.
+- **Storybook components** that show exactly what one of their Storybook
+  states shows are swapped in, and a click changes their state (see
+  [click-to-toggle](#storybook)). Machine components such as MachineStatus
+  cycle through the machine's states. Components showing other text or data
+  than any Storybook state (DROs, labels, most buttons) stay as captured.
+  The Storybook capture has to be in the file (import it before or with the
+  screens) and in the same theme as the screen.
+
+Outside Present mode, ⌘-click a component in the screen and set its controls
+in the right-hand panel to show a particular state; tab groups have a
+**Tab** control.
+
+What the playground uses goes on a **Playground components** page: the
+Storybook sets, each screen's tabs & menus, and **components as they
+appear in screens**. Those last are the swapped-in parts, cut from every
+Storybook state at the same place without the story's background and
+padding, with the same controls. Menus have to be on the same page as the
+screen to open, so they sit under it, labelled. Keep both pages.
+
+Each playground screen is also added as a prototype flow, so it shows in
+Present mode's flow list. Linking to a master prototype still applies.
+
 ### Only import differences
 
 To bring in just what changed since an earlier capture, give the plugin

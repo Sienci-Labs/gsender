@@ -140,6 +140,28 @@ figma.ui.onmessage = async (msg) => {
         }
         return;
     }
+    if (msg.type === 'make-playground') {
+        try {
+            const page = figma.currentPage;
+            const all = capturedScreens(page);
+            const picked = all.filter((n) =>
+                page.selection.some((sel) => sel === n || isInside(sel, n)),
+            );
+            const targets = picked.length ? picked : all;
+            if (!targets.length)
+                throw new Error(
+                    'There are no captured screens on this page. Open the page with your imported screens (or import one), then try again.',
+                );
+            const { placed, results } = await playgroundize(targets, []);
+            figma.currentPage.selection = placed;
+            figma.viewport.scrollAndZoomIntoView(placed);
+            figma.ui.postMessage({ type: 'done', text: playgroundSummary(results).trim() });
+        } catch (e) {
+            console.error(e);
+            figma.ui.postMessage({ type: 'error', text: String((e && e.message) || e) });
+        }
+        return;
+    }
     if (msg.type !== 'import') return;
     try {
         // Storybook first, so the screens in the same batch can use it.
@@ -152,6 +174,13 @@ figma.ui.onmessage = async (msg) => {
         const fontsUsed = {};
         let components = 0;
         let variants = 0;
+        // Playground mode builds on its own page; see placePlayground.
+        const play = !!msg.options.playground;
+        const partsSections = [];
+        if (play) {
+            const page = await pageNamed(PLAYGROUND_PAGE);
+            if (figma.currentPage !== page) await figma.setCurrentPageAsync(page);
+        }
         let x = nextFreeX();
         for (let i = 0; i < msg.docs.length; i++) {
             const doc = msg.docs[i];
@@ -168,7 +197,8 @@ figma.ui.onmessage = async (msg) => {
                 section.x = x;
                 section.y = 0;
                 x += section.width + 200;
-                created.push(section);
+                if (play) partsSections.push(section);
+                else created.push(section);
                 components += doc.components.length;
                 variants += doc.components.reduce(
                     (n, c) => n + c.variants.length,
@@ -179,7 +209,7 @@ figma.ui.onmessage = async (msg) => {
             progress(`Importing ${i + 1}/${msg.docs.length}: ${doc.root.name}`);
             const { frame, section } = await importDoc(
                 doc,
-                msg.options,
+                play ? Object.assign({}, msg.options, { states: true }) : msg.options,
                 texts,
                 fontsUsed,
             );
@@ -219,7 +249,21 @@ figma.ui.onmessage = async (msg) => {
         // A new Storybook capture applies to every screen on the page; new
         // screens use whatever Storybook capture the file already has.
         let stories = '';
-        if (msg.options.storyStates !== false) {
+        if (play) {
+            // New screens, and (with a new Storybook capture) the playgrounds
+            // already in the file, so their components can be swapped in.
+            const targets = screens.concat(
+                components ? playgroundScreens().filter((f) => !screens.includes(f)) : [],
+            );
+            const { placed, results } = await playgroundize(targets, partsSections);
+            created.splice(0, created.length, ...placed);
+            if (!targets.length && partsSections.length) {
+                stories = ` The Storybook components are on the "${PARTS_PAGE}" page. To use them, import screens with the playground on, or open the page with your screens and click "Make playground from this page".`;
+                const parts = figma.root.children.find((p) => p.name === PARTS_PAGE);
+                if (parts && figma.currentPage !== parts) await figma.setCurrentPageAsync(parts);
+                created.splice(0, created.length, ...partsSections);
+            } else stories = playgroundSummary(results);
+        } else if (msg.options.storyStates !== false) {
             const targets = components
                 ? capturedScreens(figma.currentPage)
                 : screens;
@@ -319,15 +363,21 @@ async function importDoc(doc, options, texts, fontsUsed) {
         colorVars: options.variables ? await colorVariables(doc) : null,
         imageHashes: {},
         stateNodes: {},
+        built: { tabs: [], popovers: [] },
     };
     const frame = await build(root, state);
     frame.name = `${doc.root.name} — ${layoutLabel(doc)}${doc.viewport.width}×${doc.viewport.height} ${doc.theme}`;
     frame.setPluginData('sourceUrl', doc.source.url);
     frame.setPluginData('layout', doc.layout || 'desktop');
     frame.setPluginData('capturedAt', doc.source.capturedAt);
+    frame.setPluginData('theme', doc.theme || '');
     const section = states.length
         ? await buildStates(states, frame, state)
         : null;
+    if (section) {
+        section.setPluginData('statesFor', frame.id);
+        frame.setPluginData('statesSection', section.id);
+    }
     if (state.colorVars) {
         for (const n of section ? [frame, section] : [frame]) {
             try {
@@ -340,7 +390,7 @@ async function importDoc(doc, options, texts, fontsUsed) {
             }
         }
     }
-    return { frame, section };
+    return { frame, section, built: state.built };
 }
 
 /* -------------------------------------------------------------------- */
@@ -379,6 +429,7 @@ async function importStorybook(doc, options, texts, fontsUsed) {
     section.name = `Storybook — ${layoutLabel(doc)}${doc.viewport.width}×${doc.viewport.height} ${doc.theme}${doc.mask ? ' (changes)' : ''}`;
     section.setPluginData('layout', doc.layout || 'desktop');
     section.setPluginData('capturedAt', doc.source.capturedAt);
+    section.setPluginData('theme', doc.theme || '');
     let x = SECTION_PADDING;
     let y = SECTION_PADDING;
     let columnWidth = 0;
@@ -474,12 +525,17 @@ function layoutVariants(set, variants) {
 // first; any other on/off control after them.
 const TOGGLE_FIRST = /^(checked|active|selected|open|opened|expanded|on|enabled|toggled|pressed|value|is[A-Z_].*)$/;
 
+// Then a control that changes the whole look: the machine's state for
+// feature stories, a button's variant.
+const CYCLE_FIRST = ['machinePreset', 'variant', 'status', 'state'];
+
 function variantProps(variant) {
     return variant.variantProperties || {};
 }
 
-// Which property a click changes: an on/off control if there is one,
-// otherwise the first other control, otherwise the story.
+// Which property a click changes: an obvious on/off control, then one of
+// CYCLE_FIRST, then any on/off control, then the first other control, then
+// the story.
 function clickProperty(set) {
     let defs = {};
     try {
@@ -497,6 +553,7 @@ function clickProperty(set) {
     const bools = variants.filter(isBool);
     const pick =
         bools.find((k) => TOGGLE_FIRST.test(k)) ||
+        CYCLE_FIRST.map((n) => variants.find((k) => k === n)).find(Boolean) ||
         bools[0] ||
         variants.find((k) => k !== 'Story' && k !== 'Interaction') ||
         variants.find((k) => k === 'Story');
@@ -1379,6 +1436,608 @@ async function attachStoryStates(targets) {
     return result;
 }
 
+/* -------------------------------------------------------------------- */
+/* Interactive playground                                               */
+/* -------------------------------------------------------------------- */
+
+// A playground is the screen made usable in Present mode: tabs switch,
+// menus open over it, and Storybook components that look the same as the
+// screen's are swapped in so a click changes their state. The parts it
+// needs (component sets, menus) go on a page of their own, out of the way.
+
+const PLAYGROUND_PAGE = 'Playground';
+const PARTS_PAGE = 'Playground components';
+
+async function pageNamed(name) {
+    let page = figma.root.children.find((p) => p.name === name);
+    if (!page) {
+        page = figma.createPage();
+        page.name = name;
+    }
+    if ('loadAsync' in page) await page.loadAsync();
+    return page;
+}
+
+const click = (actions) => [{ trigger: { type: 'ON_CLICK' }, actions }];
+const changeTo = (node) => ({
+    type: 'NODE',
+    destinationId: node.id,
+    navigation: 'CHANGE_TO',
+    transition: null,
+    resetVideoPosition: false,
+});
+
+function inInstance(node) {
+    for (let p = node.parent; p && p.type !== 'PAGE'; p = p.parent)
+        if (p.type === 'INSTANCE') return true;
+    return false;
+}
+
+// Where `node` is, relative to `frame`'s top-left.
+function boxIn(node, frame) {
+    const a = node.absoluteBoundingBox;
+    const f = frame.absoluteBoundingBox;
+    if (!a || !f) return null;
+    return { x: a.x - f.x, y: a.y - f.y, w: a.width, h: a.height };
+}
+
+function overlap(a, b) {
+    const w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+    const h = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+    if (w <= 0 || h <= 0) return 0;
+    const both = w * h;
+    return both / (a.w * a.h + b.w * b.h - both);
+}
+
+// Each tab of each variant changes to that tab's variant on click.
+async function wireTabs(tabs) {
+    const { st, components } = tabs;
+    const byValue = {};
+    // Values can be upper-cased by CSS while the text isn't, so ignore case.
+    const norm = (t) => String(t).trim().toLowerCase();
+    st.options.forEach((o, i) => (byValue[norm(o.value)] = components[i]));
+    let wired = 0;
+    for (const comp of components) {
+        for (const label of Object.keys(byValue)) {
+            const to = byValue[label];
+            if (!to || to === comp) continue;
+            // The tab strip is above the panel, so the topmost label is the tab.
+            const texts = comp
+                .findAll((n) => n.type === 'TEXT' && norm(n.characters) === label)
+                .map((n) => ({ n, b: boxIn(n, comp) }))
+                .filter((t) => t.b)
+                .sort((a, b) => a.b.y - b.b.y);
+            if (!texts.length) continue;
+            const text = texts[0].n;
+            const p = text.parent;
+            const target = p && p !== comp && p.type === 'FRAME' && p.height < 80 ? p : text;
+            try {
+                await target.setReactionsAsync(click([changeTo(to)]));
+                wired++;
+            } catch (e) {
+                console.warn('tab not wired', label, e);
+            }
+        }
+        // A strip too narrow for every tab has scroll arrows; they step to
+        // the next or previous tab, so the hidden ones can be reached.
+        const i = components.indexOf(comp);
+        const step = [
+            [/scroll.*(right|next)|next tab/i, components[i + 1]],
+            [/scroll.*(left|prev)|previous tab/i, components[i - 1]],
+        ];
+        for (const [pattern, to] of step) {
+            if (!to) continue;
+            const arrow = comp.findOne((n) => n.type === 'FRAME' && pattern.test(n.name));
+            if (!arrow || arrow.reactions.length) continue;
+            try {
+                await arrow.setReactionsAsync(click([changeTo(to)]));
+                wired++;
+            } catch (e) {
+                console.warn('tab arrow not wired', e);
+            }
+        }
+    }
+    return wired;
+}
+
+// The layer in the screen a menu was opened from: the one whose box best
+// covers where the capture clicked, outermost on a near tie.
+function triggerLayer(frame, rect) {
+    let best = null;
+    for (const n of frame.findAll(() => true)) {
+        if (inInstance(n) || !('setReactionsAsync' in n)) continue;
+        const b = boxIn(n, frame);
+        if (!b) continue;
+        const score = overlap(b, rect);
+        if (score < 0.4) continue;
+        if (!best || score > best.score + 0.05 || (Math.abs(score - best.score) <= 0.05 && b.w * b.h > best.area))
+            best = { node: n, score, area: b.w * b.h };
+    }
+    return best && best.node;
+}
+
+// A menu opens as an overlay the size of the screen, with the menu where
+// the app shows it; a click anywhere closes it. (Figma centres overlays and
+// plugins can't change that, so the overlay fills the screen instead.)
+async function wireMenu(frame, pop, holder) {
+    const { info, comp } = pop;
+    const rect = info.trigger;
+    const trigger = triggerLayer(frame, rect);
+    if (!trigger) return null;
+    const overlay = figma.createFrame();
+    overlay.name = `Menu — ${info.name}`;
+    overlay.fills = [];
+    overlay.clipsContent = false;
+    overlay.resize(frame.width, frame.height);
+    const inst = comp.createInstance();
+    overlay.appendChild(inst);
+    inst.x = info.at.x;
+    inst.y = info.at.y;
+    holder.appendChild(overlay);
+    try {
+        await overlay.setReactionsAsync(click([{ type: 'CLOSE' }]));
+        await trigger.setReactionsAsync(
+            click([
+                {
+                    type: 'NODE',
+                    destinationId: overlay.id,
+                    navigation: 'OVERLAY',
+                    transition: null,
+                    resetVideoPosition: false,
+                },
+            ]),
+        );
+    } catch (e) {
+        console.warn('menu not wired', info.name, e);
+        overlay.remove();
+        return null;
+    }
+    return { overlay, trigger };
+}
+
+// What a layer looks like, close enough to tell whether a Storybook state
+// is the same thing: its text, and each layer's kind, place, size and colour.
+function looks(node) {
+    const root = node.absoluteBoundingBox;
+    const r2 = (v) => Math.round(v / 2) * 2;
+    const parts = [];
+    const walk = (n) => {
+        if (n.visible === false) return;
+        const b = n.absoluteBoundingBox;
+        let fill = '';
+        const fills = n.fills;
+        if (Array.isArray(fills)) {
+            const solid = fills.find((f) => f.type === 'SOLID' && f.visible !== false);
+            if (solid)
+                fill = ['r', 'g', 'b'].map((k) => Math.round(solid.color[k] * 15).toString(16)).join('');
+        }
+        if (b && root)
+            parts.push(
+                `${n.type === 'INSTANCE' || n.type === 'COMPONENT' ? 'FRAME' : n.type}:${r2(b.x - root.x)},${r2(b.y - root.y)},${r2(b.width)}x${r2(b.height)}:${fill}:${n.type === 'TEXT' ? n.characters : ''}`,
+            );
+        if ('children' in n) for (const c of n.children) walk(c);
+    };
+    walk(node);
+    return parts.sort().join('|');
+}
+
+// The part of one of `set`'s states that looks just like `layer`, if any.
+// A state is the whole story (backdrop and padding included), so the match
+// is usually a layer somewhere inside it.
+function sameState(set, layer, cache) {
+    const w = layer.width;
+    const h = layer.height;
+    let mine = null;
+    for (const v of set.children) {
+        if (v.type !== 'COMPONENT') continue;
+        if (v.width < w - 2 || v.height < h - 2) continue;
+        const near = (n) => Math.abs(n.width - w) <= 2 && Math.abs(n.height - h) <= 2;
+        const candidates = (near(v) ? [v] : []).concat(
+            v.findAll((n) => n.type === 'FRAME' && near(n)),
+        );
+        for (const node of candidates) {
+            if (!cache.has(node.id)) cache.set(node.id, looks(node));
+            if (mine === null) mine = looks(layer);
+            if (cache.get(node.id) === mine) return { variant: v, node };
+        }
+    }
+    return null;
+}
+
+function pathTo(root, node) {
+    const path = [];
+    for (let n = node; n !== root; n = n.parent) path.unshift(n.parent.children.indexOf(n));
+    return path;
+}
+
+function atPath(root, path) {
+    let n = root;
+    for (const i of path) {
+        if (!('children' in n) || !n.children[i]) return null;
+        n = n.children[i];
+    }
+    return n;
+}
+
+// A component set of just that part, cut from every state of `set` at the
+// same place, with the same variant properties and click states. One per
+// set and part, shared by every screen layer that matches it.
+async function pieceSet(match, set, ctx) {
+    const path = pathTo(match.variant, match.node);
+    const key = `${set.id}:${path.join('.')}`;
+    if (!ctx.pieces.size) {
+        // Ones earlier imports made are reused.
+        for (const old of figma.root.findAllWithCriteria({ types: ['COMPONENT_SET'] })) {
+            const k = old.getPluginData('pieceKey');
+            if (!k) continue;
+            const byVariant = {};
+            for (const c of old.children) {
+                const from = c.getPluginData('pieceFrom');
+                if (from) byVariant[from] = c;
+            }
+            ctx.pieces.set(k, { set: old, byVariant });
+        }
+        ctx.pieces.set('', null);
+    }
+    if (ctx.pieces.has(key)) return ctx.pieces.get(key);
+    if (!ctx.section) {
+        ctx.section = figma.createSection();
+        ctx.section.name = 'Playground — components as they appear in screens';
+        ctx.y = SECTION_PADDING;
+        ctx.width = 0;
+    }
+    const comps = [];
+    const byVariant = {};
+    for (const v of set.children) {
+        if (v.type !== 'COMPONENT') continue;
+        const part = v === match.variant ? match.node : atPath(v, path);
+        if (!part || part.type !== match.node.type || part.name !== match.node.name) continue;
+        const copy = part.clone();
+        ctx.section.appendChild(copy);
+        const c = figma.createComponentFromNode(copy);
+        c.name = v.name;
+        c.setPluginData('pieceFrom', v.id);
+        comps.push(c);
+        byVariant[v.id] = c;
+    }
+    let piece = null;
+    if (comps.length) {
+        const pset = figma.combineAsVariants(comps, ctx.section);
+        pset.name = `${set.name} (in screen)`;
+        pset.setPluginData('pieceOf', set.id);
+        pset.setPluginData('pieceKey', key);
+        pset.setPluginData('clickProperty', '');
+        layoutVariants(pset, comps);
+        await addClickStates(pset);
+        pset.x = SECTION_PADDING;
+        pset.y = ctx.y;
+        ctx.y += pset.height + SET_GAP;
+        ctx.width = Math.max(ctx.width, pset.width);
+        ctx.section.resizeWithoutConstraints(ctx.width + SECTION_PADDING * 2, ctx.y - SET_GAP + SECTION_PADDING);
+        piece = { set: pset, byVariant };
+    }
+    ctx.pieces.set(key, piece);
+    return piece;
+}
+
+function swapIn(original, node) {
+    const parent = original.parent;
+    const absolute = original.layoutPositioning === 'ABSOLUTE';
+    const flow = parent.layoutMode && parent.layoutMode !== 'NONE';
+    parent.insertChild(parent.children.indexOf(original), node);
+    if (flow) {
+        if (absolute) node.layoutPositioning = 'ABSOLUTE';
+        node.layoutAlign = original.layoutAlign;
+        node.layoutGrow = original.layoutGrow;
+    }
+    if (!flow || absolute) {
+        node.x = original.x;
+        node.y = original.y;
+    }
+    node.name = original.name;
+    const react = original.getPluginData('react');
+    if (react) node.setPluginData('react', react);
+    original.remove();
+}
+
+// What a screen's tabs & menus section holds, as a playground needs it.
+// Screens imported before this was stored still give their tab groups
+// (from the variant names); their menus can't be placed.
+async function builtFrom(frame) {
+    const built = { tabs: [], popovers: [] };
+    const id = frame.getPluginData('statesSection');
+    let section = id ? await figma.getNodeByIdAsync(id) : null;
+    if (!section) {
+        const page = pageOf(frame);
+        section = page && page.findOne((n) => n.type === 'SECTION' && n.name === `${frame.name} — tabs & menus`);
+    }
+    if (!section) return built;
+    built.section = section;
+    for (const n of section.children) {
+        if (n.type === 'COMPONENT_SET') {
+            const variants = n.children.filter((c) => c.type === 'COMPONENT');
+            let info = null;
+            try {
+                info = JSON.parse(n.getPluginData('tabs') || 'null');
+            } catch (e) {}
+            if (!info) {
+                const props = Object.keys(variantProps(variants[0] || {}));
+                if (props.length !== 1) continue;
+                info = { property: props[0], values: variants.map((v) => variantProps(v)[props[0]]) };
+            }
+            const components = info.values.map((v) =>
+                variants.find((c) => variantProps(c)[info.property] === v),
+            );
+            built.tabs.push({ st: { options: info.values.map((value) => ({ value })) }, set: n, components });
+        } else if (n.type === 'COMPONENT') {
+            try {
+                const info = JSON.parse(n.getPluginData('popover') || 'null');
+                if (info) built.popovers.push({ info, comp: n });
+            } catch (e) {}
+        }
+    }
+    return built;
+}
+
+function pageOf(node) {
+    let n = node;
+    while (n && n.type !== 'PAGE') n = n.parent;
+    return n;
+}
+
+function frameTheme(frame) {
+    const t = frame.getPluginData('theme');
+    if (t) return t;
+    const m = / (light|dark)$/i.exec(frame.name);
+    return m ? m[1] : '';
+}
+
+// Wires one screen up. `holder` takes new menu overlays; `again` is set for
+// a screen that is already a playground, whose menus are already wired and
+// which only needs its tabs and components redone.
+async function makePlayground(frame, built, holder, ctx, again) {
+    const r = { tabs: 0, menus: [], components: [], menusUnknown: false };
+    for (const t of built.tabs) if (await wireTabs(t)) r.tabs++;
+    if (!again) {
+        for (const p of built.popovers) {
+            const m = await wireMenu(frame, p, holder);
+            if (m) r.menus.push(p.info.name);
+        }
+        if (!built.popovers.length && built.section && built.section.children.some((n) => n.type === 'COMPONENT' && /^Popover/.test(n.name)))
+            r.menusUnknown = true;
+    }
+    // Layers that open a menu stay as they are.
+    const triggers = frame.findAll(
+        (n) => n.reactions && n.reactions.some((x) => (x.actions || [x.action]).some((a) => a && a.navigation === 'OVERLAY')),
+    );
+
+    const { index, count } = await storySetIndex();
+    if (!count) r.noStorybook = true;
+    const theme = frameTheme(frame);
+    const cache = ctx.looks;
+    const holds = (layer) => triggers.some((t) => t === layer || isInside(t, layer));
+    for (const { set, layers } of await componentsIn(frame, index)) {
+        const setTheme = set.parent && set.parent.getPluginData ? set.parent.getPluginData('theme') : '';
+        if (theme && setTheme && theme.toLowerCase() !== setTheme.toLowerCase()) {
+            r.otherTheme = setTheme;
+            continue;
+        }
+        let swapped = 0;
+        let click = '';
+        for (const layer of layers) {
+            if (layer.removed || layer === frame || !layer.parent || inInstance(layer)) continue;
+            if (layer.type !== 'FRAME' || holds(layer)) continue;
+            const match = sameState(set, layer, cache);
+            if (!match) continue;
+            const piece = await pieceSet(match, set, ctx);
+            const comp = piece && piece.byVariant[match.variant.id];
+            if (!comp) continue;
+            swapIn(layer, comp.createInstance());
+            swapped++;
+            click = piece.set.getPluginData('clickProperty');
+        }
+        if (swapped) r.components.push({ name: set.name, count: swapped, click });
+    }
+    return r;
+}
+
+function playgroundGuide(frame, r) {
+    const box = hugFrame('How to use this playground', 'VERTICAL', 14);
+    box.paddingTop = box.paddingBottom = box.paddingLeft = box.paddingRight = 32;
+    box.fills = [{ type: 'SOLID', color: { r: 1, g: 0.98, b: 0.9 } }];
+    box.strokes = [{ type: 'SOLID', color: { r: 0.9, g: 0.8, b: 0.5 } }];
+    box.cornerRadius = 12;
+    const add = (text, size, bold) => {
+        const t = caption(text, size, bold);
+        if (!t) return;
+        box.appendChild(t);
+        t.resize(456, t.height);
+        t.textAutoResize = 'HEIGHT';
+    };
+    add('How to use this playground', 24, true);
+    add('1. Click the screen to the right so it is selected.', 14, false);
+    add('2. Press Present: the ▶ button at the top right of Figma, or ⌥⌘↵ (Ctrl+Alt+Enter on Windows).', 14, false);
+    add('3. Use it like the app:', 14, false);
+    add(
+        [
+            r.tabs ? `• Click a tab to switch to it (${r.tabs} tab group${r.tabs === 1 ? '' : 's'}).` : '',
+            r.menus.length ? `• Click a menu button to open it, and anywhere to close it: ${r.menus.join(', ')}.` : '',
+            r.components.length
+                ? `• Click these to change their state: ${r.components
+                      .map((c) => (c.click ? `${c.name.split('/').pop()} (${c.click})` : c.name.split('/').pop()))
+                      .join(', ')}.`
+                : '',
+        ]
+            .filter(Boolean)
+            .join('\n') || '• Nothing on this screen could be made clickable.',
+        14,
+        false,
+    );
+    if (r.menusUnknown)
+        add('This screen was imported before menus could be placed; import its capture again with the playground on to make its menus open.', 12, false);
+    if (r.noStorybook)
+        add('Import a Storybook capture too (Storybook in the launcher), and components here that look the same as one of its states become clickable.', 12, false);
+    else if (r.otherTheme && !r.components.length)
+        add(`The Storybook capture in this file is ${r.otherTheme.toLowerCase()} and this screen isn't, so its components weren't swapped in. Capture Storybook in the same theme to add them.`, 12, false);
+    else
+        add('Only components showing exactly what a Storybook state shows can be swapped in; ones with other text or data (DROs, labels) stay as captured.', 12, false);
+    add('Showing a particular state', 16, true);
+    add(
+        'Leave Present mode (Esc). ⌘-click (Ctrl-click) a component in the screen to select it, then set its controls in the right-hand panel. Tab groups have a Tab control.',
+        14,
+        false,
+    );
+    add('Keep the "Playground components" page: the components and menus here come from it.', 12, false);
+    return box;
+}
+
+// Moves what an import made into place: screens and their menus on the
+// Playground page, component sets on the parts page.
+async function placePlayground(entries, partsSections) {
+    const page = await pageNamed(PLAYGROUND_PAGE);
+    const parts = await pageNamed(PARTS_PAGE);
+    let px = 0;
+    for (const n of parts.children) px = Math.max(px, n.x + n.width + 200);
+    for (const s of partsSections) {
+        parts.appendChild(s);
+        s.x = px;
+        s.y = 0;
+        px += s.width + 200;
+    }
+    // Right of what was on the page before this import.
+    const moving = new Set();
+    for (const e of entries) for (const n of [e.frame, e.guide, e.holder]) moving.add(n.id);
+    let x = 0;
+    for (const n of page.children)
+        if (!moving.has(n.id)) x = Math.max(x, n.x + n.width + 400);
+    const placed = [];
+    for (const { frame, guide, holder } of entries) {
+        const section = figma.createSection();
+        section.name = `Playground — ${frame.name}`;
+        page.appendChild(section);
+        section.appendChild(guide);
+        section.appendChild(frame);
+        guide.x = SECTION_PADDING;
+        guide.y = SECTION_PADDING;
+        frame.x = guide.x + guide.width + 80;
+        frame.y = SECTION_PADDING;
+        let w = frame.x + frame.width;
+        let h = Math.max(guide.y + guide.height, frame.y + frame.height);
+        if (holder.children.length) {
+            // Menus have to be on this page to open; they sit under the screen.
+            const label = caption('Menus the screen opens in Present mode (keep them here)', 14, true);
+            let y = h + 120;
+            if (label) {
+                section.appendChild(label);
+                label.x = frame.x;
+                label.y = y;
+                y += label.height + 24;
+            }
+            let mx = frame.x;
+            for (const o of [...holder.children]) {
+                section.appendChild(o);
+                o.x = mx;
+                o.y = y;
+                mx += o.width + 80;
+                w = Math.max(w, o.x + o.width);
+                h = Math.max(h, o.y + o.height);
+            }
+        }
+        holder.remove();
+        section.resizeWithoutConstraints(w + SECTION_PADDING, h + SECTION_PADDING);
+        section.x = x;
+        section.y = 0;
+        x += section.width + 400;
+        placed.push(section);
+        try {
+            page.flowStartingPoints = page.flowStartingPoints
+                .filter((f) => f.nodeId !== frame.id)
+                .concat([{ nodeId: frame.id, name: frame.name }]);
+        } catch (e) {
+            console.warn('flow not added', e);
+        }
+    }
+    if (figma.currentPage !== page) await figma.setCurrentPageAsync(page);
+    return placed;
+}
+
+// Screens already made into playgrounds.
+function playgroundScreens() {
+    const page = figma.root.children.find((p) => p.name === PLAYGROUND_PAGE);
+    if (!page) return [];
+    return page.findAll((n) => n.type === 'FRAME' && n.getPluginData('playground') === '1');
+}
+
+// Swaps a playground's note for a new one, in the same place.
+function replaceGuide(frame, guide) {
+    const section = frame.parent;
+    const old = section && section.children.find((n) => n.name === 'How to use this playground');
+    if (!old) {
+        guide.remove();
+        return;
+    }
+    section.insertChild(section.children.indexOf(old), guide);
+    guide.x = old.x;
+    guide.y = old.y;
+    old.remove();
+    if (section.type === 'SECTION') {
+        let w = 0;
+        let h = 0;
+        for (const n of section.children) {
+            w = Math.max(w, n.x + n.width);
+            h = Math.max(h, n.y + n.height);
+        }
+        section.resizeWithoutConstraints(w + SECTION_PADDING, h + SECTION_PADDING);
+    }
+}
+
+// Makes playgrounds of `frames`: new ones move to the Playground page with
+// their tabs & menus; ones that already are get their tabs and components
+// redone (after a newer Storybook import, say). `parts` are sections to
+// move to the parts page.
+async function playgroundize(frames, parts) {
+    await storyFonts();
+    const ctx = { pieces: new Map(), looks: new Map(), section: null };
+    const fresh = [];
+    const results = [];
+    for (const frame of frames) {
+        progress(`Making ${frame.name} interactive…`);
+        const again = frame.getPluginData('playground') === '1';
+        const built = await builtFrom(frame);
+        const holder = again ? null : figma.createFrame();
+        if (holder) holder.name = 'menus';
+        const r = await makePlayground(frame, built, holder, ctx, again);
+        frame.setPluginData('playground', '1');
+        if (again) {
+            try {
+                r.menus = JSON.parse(frame.getPluginData('playMenus') || '[]');
+            } catch (e) {}
+            replaceGuide(frame, playgroundGuide(frame, r));
+        } else {
+            frame.setPluginData('playMenus', JSON.stringify(r.menus));
+            fresh.push({ frame, guide: playgroundGuide(frame, r), holder });
+            if (built.section && pageOf(built.section) && pageOf(built.section).name !== PARTS_PAGE)
+                parts.push(built.section);
+        }
+        results.push(r);
+    }
+    if (ctx.section) parts.push(ctx.section);
+    const placed = await placePlayground(fresh, parts);
+    if (!placed.length && frames.length) {
+        const page = pageOf(frames[0]);
+        if (page && figma.currentPage !== page) await figma.setCurrentPageAsync(page);
+        placed.push(...frames.map((f) => f.parent));
+    }
+    return { placed, results };
+}
+
+function playgroundSummary(results) {
+    const t = results.reduce((n, r) => n + r.tabs, 0);
+    const m = results.reduce((n, r) => n + r.menus.length, 0);
+    const c = results.reduce((n, r) => n + r.components.reduce((k, x) => k + x.count, 0), 0);
+    return ` Playground: ${t} tab group(s), ${m} menu(s) and ${c} component(s) clickable. Select the screen and press Present (⌥⌘↵); the note beside it says what to try.`;
+}
+
 function storySummary(r) {
     if (!r.inFile)
         return 'No Storybook capture in this file yet. Capture one (Storybook in the launcher) and import it; its states then show up beside the screens that use those components.';
@@ -1423,6 +2082,11 @@ async function buildStates(states, frame, state) {
         }
         const set = figma.combineAsVariants(components, section);
         set.name = st.name;
+        set.setPluginData(
+            'tabs',
+            JSON.stringify({ property: st.property, values: st.options.map((o) => variantValue(o.value)) }),
+        );
+        state.built.tabs.push({ st, set, components });
         set.layoutMode = 'VERTICAL';
         set.primaryAxisSizingMode = 'AUTO';
         set.counterAxisSizingMode = 'AUTO';
@@ -1488,6 +2152,20 @@ async function buildStates(states, frame, state) {
         applyBackdrop(built, st.node, state);
         const comp = figma.createComponentFromNode(built);
         comp.name = `Popover / ${st.name}`;
+        // Where it opened from and where it showed, relative to the screen,
+        // so a playground can be made from this screen later.
+        const ox = state.doc.root.x || 0;
+        const oy = state.doc.root.y || 0;
+        if (st.trigger)
+            comp.setPluginData(
+                'popover',
+                JSON.stringify({
+                    name: st.name,
+                    trigger: { x: st.trigger.x - ox, y: st.trigger.y - oy, w: st.trigger.w, h: st.trigger.h },
+                    at: { x: st.node.x - ox, y: st.node.y - oy },
+                }),
+            );
+        state.built.popovers.push({ st, comp });
         place(comp);
     }
 
