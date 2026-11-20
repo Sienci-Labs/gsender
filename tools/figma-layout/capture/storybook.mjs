@@ -64,7 +64,12 @@ Options
                            every story (slow).
       --interaction-states Also capture hover, focus and pressed for stories
                            that show a single button or input
-      --max-variants <n>   Most states to keep per component (default: 60)
+      --combinations       Capture every combination of a story's control
+                           values (app state controls included), so any mix
+                           picked in Figma's properties panel exists. Up to
+                           --max-variants states; slower.
+      --max-variants <n>   Most states to keep per component (default: 60,
+                           or 200 with --combinations)
       --stamp              Put the time in the file name instead of
                            overwriting the previous capture
       --no-raster          Don't screenshot canvases/native widgets
@@ -86,7 +91,8 @@ const { values: opts } = parseArgs({
         stories: { type: 'string', multiple: true, default: [] },
         controls: { type: 'string', default: 'primary' },
         'interaction-states': { type: 'boolean', default: false },
-        'max-variants': { type: 'string', default: '60' },
+        combinations: { type: 'boolean', default: false },
+        'max-variants': { type: 'string' },
         stamp: { type: 'boolean', default: false },
         'no-raster': { type: 'boolean', default: false },
         chrome: { type: 'string' },
@@ -109,7 +115,8 @@ if (opts.layout && opts.layout !== 'all' && !LAYOUTS[opts.layout]) {
 }
 
 const BASE = opts.url.replace(/\/+$/, '');
-const MAX_VARIANTS = Number(opts['max-variants']) || 60;
+const MAX_VARIANTS =
+    Number(opts['max-variants']) || (opts.combinations ? 200 : 60);
 const RENDER_TIMEOUT = 20000;
 // Changing args re-renders in place; if nothing changed there is no render
 // to wait for, so don't wait long.
@@ -521,7 +528,9 @@ async function captureComponent(cdp, doc, group, index, theme) {
                 });
         }
 
-        const plans = planVariations(info.controls);
+        const plans = opts.combinations
+            ? planVariations(info.controls, MAX_VARIANTS - 1, true)
+            : planVariations(info.controls);
         for (let v = 0; v < plans.length; v++) {
             if (component.variants.length >= MAX_VARIANTS) break;
             const res = await call(cdp, 'setArgs', entry.id, plans[v], ARGS_TIMEOUT);

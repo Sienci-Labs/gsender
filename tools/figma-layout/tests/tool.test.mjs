@@ -263,6 +263,20 @@ test('too many prop combinations fall back to one at a time', () => {
     assert.ok(plans.every((p) => Object.keys(p).length === 1));
 });
 
+test('every combination mode puts app state controls in the matrix too', () => {
+    const controls = [
+        { name: 'variant', target: null, values: ['primary', 'ghost'], current: 'primary' },
+        { name: 'machinePreset', target: 'machine', values: ['idle', 'run', 'alarm'], current: 'idle' },
+    ];
+    const plans = planVariations(controls, 199, true);
+    // 2×3 combinations, less the story's own
+    assert.equal(plans.length, 5);
+    assert.ok(plans.every((p) => Object.keys(p).length === 2));
+    assert.ok(plans.some((p) => p.variant === 'ghost' && p.machinePreset === 'alarm'));
+    // Past the limit it falls back to one control at a time
+    assert.equal(planVariations(controls, 4, true).length, 3);
+});
+
 test('states are named by story plus only the controls that differ', () => {
     const component = {
         variants: [
@@ -313,6 +327,10 @@ test('the launcher builds start.mjs arguments from its options', () => {
     assert.deepEqual(both.args, ['--pendant', '--stamp']);
     assert.deepEqual(both.next, ['--storybook', '--pendant', '--stamp', '--controls', 'primary']);
     assert.equal(buildArgs({ mode: 'live', withStories: true }).next, undefined);
+    assert.deepEqual(
+        buildArgs({ withStories: true, combinations: true }).next,
+        ['--storybook', '--stamp', '--controls', 'primary', '--combinations'],
+    );
 });
 
 test('the launcher reads progress from the capture output', () => {

@@ -374,6 +374,7 @@ async function importStorybook(doc, options, texts, fontsUsed) {
         imageHashes: {},
         stateNodes: {},
     };
+    await storyFonts();
     const section = figma.createSection();
     section.name = `Storybook — ${layoutLabel(doc)}${doc.viewport.width}×${doc.viewport.height} ${doc.theme}${doc.mask ? ' (changes)' : ''}`;
     section.setPluginData('layout', doc.layout || 'desktop');
@@ -399,10 +400,20 @@ async function importStorybook(doc, options, texts, fontsUsed) {
         if (comp.importPath) set.setPluginData('storyFile', comp.importPath);
         set.setPluginData('storyComponent', comp.componentName || '');
         layoutVariants(set, variants);
-        if (y > SECTION_PADDING && y + set.height > SET_COLUMN_HEIGHT) {
+        if (options.clickStates !== false) await addClickStates(set);
+        const play = options.playgrounds !== false ? playground(set, set.width) : null;
+        if (play) section.appendChild(play);
+        const height = (play ? play.height + 24 : 0) + set.height;
+        if (y > SECTION_PADDING && y + height > SET_COLUMN_HEIGHT) {
             x += columnWidth + SET_GAP;
             y = SECTION_PADDING;
             columnWidth = 0;
+        }
+        if (play) {
+            play.x = x;
+            play.y = y;
+            y += play.height + 24;
+            columnWidth = Math.max(columnWidth, play.width);
         }
         set.x = x;
         set.y = y;
@@ -453,6 +464,137 @@ function layoutVariants(set, variants) {
         set.primaryAxisSizingMode = 'AUTO';
         set.counterAxisSizingMode = 'AUTO';
     }
+}
+
+/* -------------------------------------------------------------------- */
+/* Playgrounds and click-to-toggle                                      */
+/* -------------------------------------------------------------------- */
+
+// Controls whose click is the obvious thing to try in Present mode come
+// first; any other on/off control after them.
+const TOGGLE_FIRST = /^(checked|active|selected|open|opened|expanded|on|enabled|toggled|pressed|value|is[A-Z_].*)$/;
+
+function variantProps(variant) {
+    return variant.variantProperties || {};
+}
+
+// Which property a click changes: an on/off control if there is one,
+// otherwise the first other control, otherwise the story.
+function clickProperty(set) {
+    let defs = {};
+    try {
+        defs = set.componentPropertyDefinitions || {};
+    } catch (e) {
+        return null;
+    }
+    const variants = Object.keys(defs).filter(
+        (k) => defs[k].type === 'VARIANT' && (defs[k].variantOptions || []).length > 1,
+    );
+    const isBool = (k) => {
+        const o = defs[k].variantOptions.slice().sort();
+        return o.length === 2 && o[0] === 'false' && o[1] === 'true';
+    };
+    const bools = variants.filter(isBool);
+    const pick =
+        bools.find((k) => TOGGLE_FIRST.test(k)) ||
+        bools[0] ||
+        variants.find((k) => k !== 'Story' && k !== 'Interaction') ||
+        variants.find((k) => k === 'Story');
+    if (!pick) return null;
+    return { name: pick, options: defs[pick].variantOptions, toggle: isBool(pick) };
+}
+
+// The variant a click on `from` changes to: `prop` moved to its next value,
+// everything else kept where it can be.
+function clickTarget(variants, from, prop) {
+    const props = variantProps(from);
+    const options = prop.options;
+    const next = options[(options.indexOf(props[prop.name]) + 1) % options.length];
+    let best = null;
+    let bestScore = -1;
+    for (const v of variants) {
+        if (v === from) continue;
+        const vp = variantProps(v);
+        if (vp[prop.name] !== next) continue;
+        // Keeping the other controls matters more than keeping the story:
+        // a click on an "Off" switch should land on "On", not move it.
+        let score = 0;
+        for (const k of Object.keys(props))
+            if (k !== prop.name && vp[k] === props[k]) score += k === 'Story' ? 0.5 : 1;
+        if (score > bestScore) {
+            best = v;
+            bestScore = score;
+        }
+    }
+    return best;
+}
+
+// Makes the set an interactive component: in Present mode a click on any
+// instance changes it to the state with the click property moved on.
+// Returns the property's name, or null if nothing could be wired.
+async function addClickStates(set) {
+    const prop = clickProperty(set);
+    if (!prop) return null;
+    const variants = set.children.filter((c) => c.type === 'COMPONENT');
+    let wired = 0;
+    for (const v of variants) {
+        if (!('setReactionsAsync' in v)) break;
+        const to = clickTarget(variants, v, prop);
+        if (!to) continue;
+        try {
+            await v.setReactionsAsync([
+                {
+                    trigger: { type: 'ON_CLICK' },
+                    actions: [
+                        {
+                            type: 'NODE',
+                            destinationId: to.id,
+                            navigation: 'CHANGE_TO',
+                            transition: null,
+                            resetVideoPosition: false,
+                        },
+                    ],
+                },
+            ]);
+            wired++;
+        } catch (e) {
+            console.warn('click state not added', v.name, e);
+            break;
+        }
+    }
+    if (!wired) return null;
+    set.setPluginData('clickProperty', prop.name);
+    return prop.name;
+}
+
+function clickHint(set) {
+    const prop = set.getPluginData('clickProperty');
+    return prop ? ` · in Present mode, click it to change ${prop}` : '';
+}
+
+// One instance to play with: pick control values in the right-hand panel
+// and it shows that captured state.
+function playground(set, width) {
+    const frame = hugFrame(`Playground — ${set.name}`, 'VERTICAL', 8);
+    const text = caption(
+        `Playground: select it and set the controls in the right-hand panel${clickHint(set)}`,
+        11,
+        false,
+    );
+    if (text) {
+        frame.appendChild(text);
+        if (width && text.width > width) {
+            // resize() fixes the box; let it grow downwards after.
+            text.resize(Math.max(200, width), text.height);
+            text.textAutoResize = 'HEIGHT';
+        }
+    }
+    const def = set.defaultVariant || set.children.find((c) => c.type === 'COMPONENT');
+    const inst = def.createInstance();
+    inst.name = `${set.name} (playground)`;
+    frame.appendChild(inst);
+    frame.setPluginData('playgroundFor', set.id);
+    return frame;
 }
 
 /* -------------------------------------------------------------------- */
@@ -1108,6 +1250,9 @@ async function stateGroup(set, layers) {
         false,
     );
     if (sub) group.appendChild(sub);
+    // Sets imported before click states existed get them now.
+    if (!set.getPluginData('clickProperty')) await addClickStates(set);
+    group.appendChild(playground(set));
 
     const cells = [];
     for (const variant of set.children) {

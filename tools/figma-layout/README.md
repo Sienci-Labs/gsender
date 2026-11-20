@@ -280,6 +280,31 @@ Story=Idle, machinePreset=alarm
 Story=Primary, variant=outline, disabled=true
 ```
 
+**Playing with the states.** Above each set the plugin puts a
+**Playground**, an instance of its first state. Select it and change the
+controls in the right-hand panel, and it shows the captured state for those
+values. Each screen's [Storybook states](#storybook-states-beside-screens)
+section has a playground per component too.
+
+The sets are also interactive components, so in Present mode a click on any
+instance changes it to the next state of one control:
+
+- an on/off control, preferring `checked`, `active`, `selected`, `open`,
+  `expanded` and the like over `disabled`;
+- otherwise the first other control, cycling its values (`variant`,
+  `machinePreset`);
+- otherwise the story.
+
+The other controls stay as they are where a state with those values exists.
+The playground's caption says which control a click changes.
+
+Without `--combinations` only some mixes of control values are captured,
+so picking one that wasn't makes Figma jump to the nearest state it has.
+With `--combinations` (**Every combination of controls** in the launcher),
+every mix of a story's controls is captured, machine state controls
+included, up to `--max-variants` (200 in this mode). This is slower; past
+the limit it falls back to one control at a time.
+
 | Option | |
 | --- | --- |
 | `--stories <text>` | Only components whose title, id or file contains this. Repeatable: `--stories components/Button --stories Jogging`. |
@@ -287,7 +312,8 @@ Story=Primary, variant=outline, disabled=true
 | `--interaction-states` | Also force hover, focus and pressed on stories that show a single button or input, as an `Interaction` property. |
 | `--layout desktop\|pendant\|android\|all` | Which stories and at what size. `android` takes the pendant's stories at 1280×800 with touch emulation. Default: desktop and pendant. |
 | `--theme light\|dark\|both` | Toggle the `dark` class before capturing. |
-| `--max-variants <n>` | Most states per component (default 60). |
+| `--combinations` | Capture every mix of a story's control values, machine state included, so any choice in Figma's properties panel exists. Slower. |
+| `--max-variants <n>` | Most states per component (default 60, or 200 with `--combinations`). |
 | `--stamp` | Keep earlier captures (time in the file name). |
 
 A full run is a few hundred renders and takes several minutes. Stories that

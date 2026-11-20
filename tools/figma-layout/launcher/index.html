@@ -279,6 +279,10 @@
                 <input type="checkbox" name="interaction" />
                 <span>Hover, focus and pressed<small>For stories that show a single button or input</small></span>
             </label>
+            <label class="check">
+                <input type="checkbox" name="combinations" />
+                <span>Every combination of controls<small>So any mix you pick in Figma's properties panel was captured; slower</small></span>
+            </label>
             <label class="field" id="storyFilterField">
                 <span>Only these components (one per line; blank for all)</span>
                 <textarea name="stories" placeholder="components/Button&#10;features/Jogging"></textarea>
@@ -470,6 +474,7 @@
             withStories: field('withStories').checked,
             controls: field('controls').value,
             interaction: field('interaction').checked,
+            combinations: field('combinations').checked,
             stories: lines(field('stories').value),
             stamp: field('stamp').checked,
             keep: field('keep').checked,

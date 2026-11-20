@@ -14,9 +14,11 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // The arg sets to try for one story beyond its own. `controls` is
 // [{ name, target, values, current }]; `target` is set for controls that
 // drive app state (machine, workspace) rather than component props.
-export function planVariations(controls, matrixMax = MATRIX_MAX) {
-    const props = controls.filter((c) => !c.target);
-    const state = controls.filter((c) => c.target);
+// With `everyCombination`, app state controls join the matrix too, so any
+// mix of values picked in Figma has a captured state behind it.
+export function planVariations(controls, matrixMax = MATRIX_MAX, everyCombination = false) {
+    const props = controls.filter((c) => everyCombination || !c.target);
+    const state = controls.filter((c) => !everyCombination && c.target);
     const plans = [];
     const oneAtATime = (list) => {
         for (const c of list)

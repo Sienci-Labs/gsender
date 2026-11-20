@@ -129,6 +129,7 @@ export function buildArgs(o = {}) {
     if (mode === 'storybook') {
         args.push('--controls', oneOf(o.controls, ['none', 'primary', 'all'], 'primary'));
         if (o.interaction) args.push('--interaction-states');
+        if (o.combinations) args.push('--combinations');
         for (const s of [].concat(o.stories || [])) {
             const text = String(s).trim();
             if (!text) continue;
