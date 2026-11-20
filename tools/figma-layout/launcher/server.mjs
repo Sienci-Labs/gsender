@@ -157,6 +157,7 @@ export function buildArgs(o = {}) {
     }
 
     if (mode === 'capture') {
+        if (o.machineStates) args.push('--modes', 'all');
         for (const u of [].concat(o.urls || [])) {
             const text = String(u).trim();
             if (!text) continue;

@@ -167,7 +167,8 @@ figma.ui.onmessage = async (msg) => {
         // Storybook first, so the screens in the same batch can use it.
         msg.docs = msg.docs
             .filter((d) => d.kind === 'storybook')
-            .concat(msg.docs.filter((d) => d.kind !== 'storybook'));
+            .concat(msg.docs.filter((d) => d.kind !== 'storybook'))
+            .reduce((all, d) => all.concat(expandModes(d)), []);
         const created = [];
         const screens = [];
         const texts = [];
@@ -371,6 +372,13 @@ async function importDoc(doc, options, texts, fontsUsed) {
     frame.setPluginData('layout', doc.layout || 'desktop');
     frame.setPluginData('capturedAt', doc.source.capturedAt);
     frame.setPluginData('theme', doc.theme || '');
+    if (doc.mode) {
+        frame.name += ` · ${doc.modeLabel}`;
+        frame.setPluginData('mode', doc.mode);
+        frame.setPluginData('modeLabel', doc.modeLabel);
+        frame.setPluginData('modeGroup', doc.modeGroup);
+        frame.setPluginData('modeOrder', String(doc.modeOrder));
+    }
     const section = states.length
         ? await buildStates(states, frame, state)
         : null;
@@ -1832,6 +1840,10 @@ async function makePlayground(frame, built, holder, ctx, again) {
             const piece = await pieceSet(match, set, ctx);
             const comp = piece && piece.byVariant[match.variant.id];
             if (!comp) continue;
+            // With machine states captured, the bar under the screen changes
+            // the machine for everything; one widget doing it alone would
+            // contradict the rest of the screen.
+            if (frame.getPluginData('modeGroup') && /^machine/.test(piece.set.getPluginData('clickProperty'))) continue;
             swapIn(layer, comp.createInstance());
             swapped++;
             click = piece.set.getPluginData('clickProperty');
@@ -1860,6 +1872,9 @@ function playgroundGuide(frame, r) {
     add('3. Use it like the app:', 14, false);
     add(
         [
+            r.modes
+                ? `• Switch the machine state with the bar under the screen (${r.modes.join(', ')}): everything that depends on it changes at once.`
+                : '',
             r.tabs ? `• Click a tab to switch to it (${r.tabs} tab group${r.tabs === 1 ? '' : 's'}).` : '',
             r.menus.length ? `• Click a menu button to open it, and anywhere to close it: ${r.menus.join(', ')}.` : '',
             r.components.length
@@ -1891,11 +1906,174 @@ function playgroundGuide(frame, r) {
     return box;
 }
 
+/* -------------------------------------------------------------------- */
+/* Machine states                                                       */
+/* -------------------------------------------------------------------- */
+
+// A capture taken with --modes holds the screen once per machine state.
+// Each becomes a screen of its own; a playground combines them again.
+function expandModes(doc) {
+    if (!doc.modes || doc.modes.length < 2) return [doc];
+    const group = `${doc.source.url} ${doc.source.capturedAt}`;
+    return doc.modes.map((m, i) =>
+        Object.assign({}, doc, {
+            root: m.root,
+            states: m.states || [],
+            modes: undefined,
+            mode: m.name,
+            modeLabel: m.label,
+            modeGroup: group,
+            modeOrder: i,
+        }),
+    );
+}
+
+const BAR_HEIGHT = 64;
+
+// The bar under a playground screen: one button per machine state, this
+// one highlighted. Returns the bar and its buttons.
+function modeBar(labels, current, width) {
+    const bar = figma.createFrame();
+    bar.name = 'Machine state';
+    bar.layoutMode = 'HORIZONTAL';
+    bar.primaryAxisSizingMode = 'FIXED';
+    bar.counterAxisSizingMode = 'FIXED';
+    bar.counterAxisAlignItems = 'CENTER';
+    bar.itemSpacing = 8;
+    bar.paddingLeft = bar.paddingRight = 16;
+    bar.fills = [{ type: 'SOLID', color: { r: 0.12, g: 0.13, b: 0.16 } }];
+    bar.resize(width, BAR_HEIGHT);
+    const title = caption('Machine state', 13, true);
+    if (title) {
+        title.fills = [{ type: 'SOLID', color: { r: 0.75, g: 0.77, b: 0.8 } }];
+        bar.appendChild(title);
+    }
+    const buttons = labels.map((label, i) => {
+        const b = figma.createFrame();
+        b.name = label;
+        b.layoutMode = 'HORIZONTAL';
+        b.primaryAxisSizingMode = 'AUTO';
+        b.counterAxisSizingMode = 'AUTO';
+        b.paddingLeft = b.paddingRight = 14;
+        b.paddingTop = b.paddingBottom = 8;
+        b.cornerRadius = 6;
+        const on = i === current;
+        b.fills = on ? [{ type: 'SOLID', color: { r: 0.15, g: 0.45, b: 0.95 } }] : [];
+        b.strokes = [{ type: 'SOLID', color: on ? { r: 0.15, g: 0.45, b: 0.95 } : { r: 0.4, g: 0.42, b: 0.46 } }];
+        b.strokeWeight = 1;
+        const t = caption(label, 13, on);
+        if (t) {
+            t.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+            b.appendChild(t);
+        }
+        bar.appendChild(b);
+        return b;
+    });
+    return { bar, buttons };
+}
+
+// Several machine states of one screen, already playgrounds each, become
+// one component with a "Machine state" property and a bar of buttons
+// under the screen that switch it. Returns what placePlayground needs.
+async function combineModes(group, parts) {
+    group.sort((a, b) => Number(a.frame.getPluginData('modeOrder')) - Number(b.frame.getPluginData('modeOrder')));
+    const labels = group.map((e) => e.frame.getPluginData('modeLabel') || e.frame.name);
+    const first = group[0].frame;
+    const w = first.width;
+    const h = first.height;
+    const section = figma.createSection();
+    section.name = `Playground — machine states of ${first.name.replace(/ · [^·]+$/, '')}`;
+    const comps = [];
+    const bars = [];
+    for (let i = 0; i < group.length; i++) {
+        const wrap = figma.createFrame();
+        wrap.name = `Machine state=${labels[i]}`;
+        wrap.fills = [];
+        wrap.clipsContent = true;
+        wrap.resize(w, h + BAR_HEIGHT);
+        section.appendChild(wrap);
+        wrap.appendChild(group[i].frame);
+        group[i].frame.x = 0;
+        group[i].frame.y = 0;
+        const { bar, buttons } = modeBar(labels, i, w);
+        wrap.appendChild(bar);
+        bar.x = 0;
+        bar.y = h;
+        comps.push(figma.createComponentFromNode(wrap));
+        bars.push(buttons);
+    }
+    for (let i = 0; i < comps.length; i++)
+        for (let j = 0; j < comps.length; j++)
+            if (i !== j) {
+                try {
+                    await bars[i][j].setReactionsAsync(click([changeTo(comps[j])]));
+                } catch (e) {
+                    console.warn('machine state button not wired', e);
+                }
+            }
+    const set = figma.combineAsVariants(comps, section);
+    set.name = `${first.name.replace(/ · [^·]+$/, '')} — machine states`;
+    layoutVariants(set, comps);
+    section.resizeWithoutConstraints(set.width + SECTION_PADDING * 2, set.height + SECTION_PADDING * 2);
+    set.x = SECTION_PADDING;
+    set.y = SECTION_PADDING;
+    parts.push(section);
+
+    // What gets presented: an instance of the first state.
+    const play = figma.createFrame();
+    play.name = `${first.name.replace(/ · [^·]+$/, '')} — playground`;
+    play.fills = [];
+    play.resize(w, h + BAR_HEIGHT);
+    play.appendChild(set.defaultVariant.createInstance());
+
+    // One note and one set of menus for all the states.
+    const holder = group[0].holder;
+    for (const e of group.slice(1)) {
+        for (const o of [...e.holder.children]) holder.appendChild(o);
+        e.holder.remove();
+    }
+    group.forEach((e, i) => {
+        for (const o of holder.children) if (!/\)$/.test(o.name) && e.menuIds && e.menuIds.includes(o.id)) o.name += ` (${labels[i]})`;
+    });
+    const merged = { tabs: 0, menus: [], components: [], modes: labels };
+    const seen = new Set();
+    for (const e of group) {
+        merged.tabs = Math.max(merged.tabs, e.result.tabs);
+        for (const m of e.result.menus) if (!merged.menus.includes(m)) merged.menus.push(m);
+        for (const c of e.result.components)
+            if (!seen.has(c.name)) {
+                seen.add(c.name);
+                merged.components.push(c);
+            }
+        merged.noStorybook = merged.noStorybook || e.result.noStorybook;
+        merged.otherTheme = merged.otherTheme || e.result.otherTheme;
+        merged.menusUnknown = merged.menusUnknown || e.result.menusUnknown;
+        e.guide.remove();
+    }
+    const guide = playgroundGuide(play, merged);
+    for (const e of group) {
+        e.frame.setPluginData('playMenus', JSON.stringify(merged.menus));
+        e.frame.setPluginData('modeLabels', JSON.stringify(labels));
+        e.frame.setPluginData('guide', guide.id);
+    }
+    return { frame: play, guide, holder };
+}
+
 // Moves what an import made into place: screens and their menus on the
 // Playground page, component sets on the parts page.
-async function placePlayground(entries, partsSections) {
+async function placePlayground(given, partsSections) {
     const page = await pageNamed(PLAYGROUND_PAGE);
     const parts = await pageNamed(PARTS_PAGE);
+    // Machine states of one screen are combined into one playground.
+    const groups = new Map();
+    for (const e of given) {
+        const key = e.frame.getPluginData('modeGroup') || e.frame.id;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(e);
+    }
+    const entries = [];
+    for (const group of groups.values())
+        entries.push(group.length > 1 ? await combineModes(group, partsSections) : group[0]);
     let px = 0;
     for (const n of parts.children) px = Math.max(px, n.x + n.width + 200);
     for (const s of partsSections) {
@@ -1963,19 +2141,24 @@ async function placePlayground(entries, partsSections) {
 
 // Screens already made into playgrounds.
 function playgroundScreens() {
-    const page = figma.root.children.find((p) => p.name === PLAYGROUND_PAGE);
-    if (!page) return [];
-    return page.findAll((n) => n.type === 'FRAME' && n.getPluginData('playground') === '1');
+    // Machine-state screens live in their component on the parts page.
+    return figma.root.children
+        .filter((p) => p.name === PLAYGROUND_PAGE || p.name === PARTS_PAGE)
+        .reduce((all, p) => all.concat(p.findAll((n) => n.type === 'FRAME' && n.getPluginData('playground') === '1')), []);
 }
 
 // Swaps a playground's note for a new one, in the same place.
 function replaceGuide(frame, guide) {
-    const section = frame.parent;
-    const old = section && section.children.find((n) => n.name === 'How to use this playground');
-    if (!old) {
+    const id = frame.getPluginData('guide');
+    let old = null;
+    if (id) for (const p of figma.root.children) if (!old) old = p.findOne((n) => n.id === id);
+    if (!old && frame.parent) old = frame.parent.children.find((n) => n.name === 'How to use this playground');
+    if (!old || !old.parent) {
         guide.remove();
         return;
     }
+    const section = old.parent;
+    frame.setPluginData('guide', guide.id);
     section.insertChild(section.children.indexOf(old), guide);
     guide.x = old.x;
     guide.y = old.y;
@@ -2007,15 +2190,21 @@ async function playgroundize(frames, parts) {
         const holder = again ? null : figma.createFrame();
         if (holder) holder.name = 'menus';
         const r = await makePlayground(frame, built, holder, ctx, again);
+        r.group = frame.getPluginData('modeGroup') || frame.id;
+        r.hasModes = !!frame.getPluginData('modeGroup');
         frame.setPluginData('playground', '1');
         if (again) {
             try {
                 r.menus = JSON.parse(frame.getPluginData('playMenus') || '[]');
+                const modes = JSON.parse(frame.getPluginData('modeLabels') || 'null');
+                if (modes) r.modes = modes;
             } catch (e) {}
             replaceGuide(frame, playgroundGuide(frame, r));
         } else {
             frame.setPluginData('playMenus', JSON.stringify(r.menus));
-            fresh.push({ frame, guide: playgroundGuide(frame, r), holder });
+            const guide = playgroundGuide(frame, r);
+            frame.setPluginData('guide', guide.id);
+            fresh.push({ frame, guide, holder, result: r, menuIds: holder.children.map((o) => o.id) });
             if (built.section && pageOf(built.section) && pageOf(built.section).name !== PARTS_PAGE)
                 parts.push(built.section);
         }
@@ -2032,10 +2221,27 @@ async function playgroundize(frames, parts) {
 }
 
 function playgroundSummary(results) {
-    const t = results.reduce((n, r) => n + r.tabs, 0);
-    const m = results.reduce((n, r) => n + r.menus.length, 0);
-    const c = results.reduce((n, r) => n + r.components.reduce((k, x) => k + x.count, 0), 0);
-    return ` Playground: ${t} tab group(s), ${m} menu(s) and ${c} component(s) clickable. Select the screen and press Present (⌥⌘↵); the note beside it says what to try.`;
+    // The machine states of one screen count once.
+    const screens = new Map();
+    for (const r of results) {
+        const s = screens.get(r.group) || { tabs: 0, menus: new Set(), components: new Map(), modes: r.hasModes };
+        s.tabs = Math.max(s.tabs, r.tabs);
+        r.menus.forEach((m) => s.menus.add(m));
+        r.components.forEach((c) => s.components.set(c.name, Math.max(s.components.get(c.name) || 0, c.count)));
+        screens.set(r.group, s);
+    }
+    let t = 0;
+    let m = 0;
+    let c = 0;
+    let modes = 0;
+    for (const s of screens.values()) {
+        t += s.tabs;
+        m += s.menus.size;
+        for (const n of s.components.values()) c += n;
+        if (s.modes) modes++;
+    }
+    const states = modes ? ` (${modes} with a machine-state bar)` : '';
+    return ` Playground: ${screens.size} screen(s)${states}, ${t} tab group(s), ${m} menu(s) and ${c} component(s) clickable. Open the Playground page, select a screen and press Present (⌥⌘↵); the note beside it says what to try.`;
 }
 
 function storySummary(r) {

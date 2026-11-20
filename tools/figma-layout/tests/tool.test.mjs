@@ -277,6 +277,17 @@ test('every combination mode puts app state controls in the matrix too', () => {
     assert.equal(planVariations(controls, 4, true).length, 3);
 });
 
+test('machine states parse from a list or "all", in a fixed order', async () => {
+    const { parseModes, applyModeScript, RESTORE_SCRIPT } = await import('../capture/modes.mjs');
+    assert.deepEqual(parseModes('all'), ['idle', 'running', 'hold', 'alarm', 'disconnected']);
+    assert.deepEqual(parseModes('alarm, Idle'), ['idle', 'alarm']);
+    assert.deepEqual(parseModes(undefined), []);
+    assert.throws(() => parseModes('idle,flying'), /flying/);
+    // The page scripts are valid JavaScript
+    for (const m of parseModes('all')) new Function(applyModeScript(m));
+    new Function(RESTORE_SCRIPT);
+});
+
 test('states are named by story plus only the controls that differ', () => {
     const component = {
         variants: [
@@ -327,6 +338,10 @@ test('the launcher builds start.mjs arguments from its options', () => {
     assert.deepEqual(both.args, ['--pendant', '--stamp']);
     assert.deepEqual(both.next, ['--storybook', '--pendant', '--stamp', '--controls', 'primary']);
     assert.equal(buildArgs({ mode: 'live', withStories: true }).next, undefined);
+    // Machine states are a screen capture option, not passed on to Storybook
+    const modes = buildArgs({ machineStates: true, withStories: true });
+    assert.deepEqual(modes.args, ['--stamp', '--modes', 'all']);
+    assert.ok(!modes.next.includes('--modes'));
     assert.deepEqual(
         buildArgs({ withStories: true, combinations: true }).next,
         ['--storybook', '--stamp', '--controls', 'primary', '--combinations'],

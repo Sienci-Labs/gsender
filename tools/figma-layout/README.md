@@ -429,6 +429,25 @@ To use it, select the screen and press **Present** (▶ at the top right, or
   The Storybook capture has to be in the file (import it before or with the
   screens) and in the same theme as the screen.
 
+**Machine states.** Tick **Every machine state** in the launcher (or pass
+`--modes all`, or a list such as `--modes idle,alarm`) and each screen is
+captured five times: Idle, Running, Hold, Alarm and Disconnected. gSender is
+put into each state the way the Storybook presets do it, through its Redux
+store plus the controller events the connection button and status pill
+listen for. What the real machine reports is held back meanwhile and
+restored afterwards. Running and Hold show a job 30% done (`sign-carving.nc`)
+when no file is loaded; Alarm is a hard-limit alarm (code 1). It needs the
+dev build (`yarn vite:dev`), and adds about a minute per screen.
+
+In a playground the states become one screen with a **Machine state** bar
+under it. Clicking Idle, Running, Hold, Alarm or Disconnected switches the
+whole screen at once (status pill, unlock prompt, job controls, connection
+button, menus), because each state is its own capture. Tabs and menus work in
+every state. Storybook components whose click would change the machine state
+aren't swapped in on these screens, so a widget can't disagree with the bar.
+Without the playground the states import as five screens side by side, named
+`… · Alarm` and so on.
+
 Outside Present mode, ⌘-click a component in the screen and set its controls
 in the right-hand panel to show a particular state; tab groups have a
 **Tab** control.

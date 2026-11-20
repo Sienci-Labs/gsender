@@ -25,6 +25,7 @@ import {
     waitFor,
     waitForStableDom,
 } from './lib.mjs';
+import { applyModeScript, MODES, parseModes, RESTORE_SCRIPT } from './modes.mjs';
 
 // A --setup script (connecting to the machine) must not hang the capture.
 const SETUP_TIMEOUT = 60000;
@@ -65,6 +66,12 @@ Options
       --no-raster          Don't screenshot canvases/native widgets
       --no-states          Don't click through tabs or open menus/popovers to
                            capture their other states
+      --modes <list|all>   Capture the screen once per machine state instead
+                           of as it is: idle, running, hold, alarm,
+                           disconnected (comma-separated, or all). gSender is
+                           put into each through its Redux store, as the
+                           Storybook presets do; the plugin's playground
+                           switches the whole screen between them.
       --states-in <css>    Only break out tabs/menus inside elements matching
                            this selector (e.g. "main")
       --states-skip <css>  Don't break out tabs/menus inside elements matching
@@ -111,6 +118,7 @@ const { values: opts, positionals: urls } = parseArgs({
         'no-states': { type: 'boolean', default: false },
         'states-in': { type: 'string' },
         'states-skip': { type: 'string' },
+        modes: { type: 'string' },
         connect: { type: 'string' },
         target: { type: 'string' },
         chrome: { type: 'string' },
@@ -125,6 +133,13 @@ if (opts.help) {
 }
 if (!LAYOUTS[opts.layout]) {
     console.error('--layout takes desktop, pendant or android.');
+    process.exit(1);
+}
+let modes = [];
+try {
+    modes = parseModes(opts.modes);
+} catch (e) {
+    console.error(e.message);
     process.exit(1);
 }
 if (typeof WebSocket === 'undefined') {
@@ -182,13 +197,42 @@ async function capturePage(cdp, { url, setup, theme }) {
     // asynchronously; let it settle again.
     if (scripts.length) await waitForStableDom(cdp);
     await sleep(Number(opts.delay));
-    const doc = await serializePage(cdp, {
-        fullPage: opts['full-page'],
-        raster: !opts['no-raster'],
-        states: !opts['no-states'],
-        statesIn: opts['states-in'],
-        statesSkip: opts['states-skip'],
-    });
+    const serialize = () =>
+        serializePage(cdp, {
+            fullPage: opts['full-page'],
+            raster: !opts['no-raster'],
+            states: !opts['no-states'],
+            statesIn: opts['states-in'],
+            statesSkip: opts['states-skip'],
+        });
+    if (!modes.length) {
+        const doc = await serialize();
+        doc.layout = opts.layout;
+        return doc;
+    }
+    // One file holding every machine state; root and states are the first's,
+    // so tools that don't know about modes still get a normal screen.
+    let doc = null;
+    try {
+        for (const mode of modes) {
+            const ok = await cdp.evaluate(applyModeScript(mode));
+            if (!ok)
+                throw new Error(
+                    "Couldn't find the app's Redux store, so machine states can't be set. --modes works with gSender's dev build.",
+                );
+            await waitForStableDom(cdp, 15000, 600);
+            await sleep(600);
+            const d = await serialize();
+            process.stdout.write(`${MODES[mode].label} `);
+            if (!doc) {
+                doc = d;
+                doc.modes = [];
+            } else Object.assign(doc.tokens.colors, d.tokens.colors);
+            doc.modes.push({ name: mode, label: MODES[mode].label, root: d.root, states: d.states || [] });
+        }
+    } finally {
+        await cdp.evaluate(RESTORE_SCRIPT).catch(() => {});
+    }
     doc.layout = opts.layout;
     return doc;
 }

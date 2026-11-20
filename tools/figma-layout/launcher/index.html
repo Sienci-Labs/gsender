@@ -259,6 +259,10 @@
                 <span>Machine address</span>
                 <input type="text" name="machine" placeholder="192.168.5.1:23" />
             </label>
+            <label class="check" id="modesField">
+                <input type="checkbox" name="machineStates" />
+                <span>Every machine state<small>Captures each screen as Idle, Running, Hold, Alarm and Disconnected, so the Figma playground can switch the whole screen between them. About a minute more per screen.</small></span>
+            </label>
             <label class="field" id="urlField">
                 <span>Screens (one URL per line; blank for the main screen)</span>
                 <textarea name="urls" placeholder="http://localhost:5173/#/configuration"></textarea>
@@ -449,6 +453,7 @@
         $('nextStories').hidden = !story && !withStories;
         if (!form.classList.contains('busy')) $('run').textContent = runLabel();
         $('urlField').hidden = mode !== 'capture';
+        $('modesField').hidden = mode !== 'capture';
         $('themeField').hidden = mode === 'live';
         $('stampField').hidden = mode === 'live';
         $('orientationField').hidden = layout === 'desktop' || layout === 'all';
@@ -469,6 +474,7 @@
             height: field('height').value,
             theme: field('theme').value,
             states: field('states').value,
+            machineStates: field('machineStates').checked,
             machine: choice === 'custom' ? field('machine').value : choice,
             urls: lines(field('urls').value),
             withStories: field('withStories').checked,
