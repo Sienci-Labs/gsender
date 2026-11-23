@@ -22,6 +22,7 @@ import {
     calculateAngle,
     calculateHypotenuse,
     determineEEPROMAdjustment,
+    isValidTriangle,
 } from '../utils';
 
 const FM_LOWER_OFFSET_THRESHOLD =
@@ -33,6 +34,7 @@ const ResultsStep = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     const { units } = useWorkspaceState();
 
+    const hasValidMeasurements = isValidTriangle(triangle);
     const calculatedHypotenuse = calculateHypotenuse(triangle);
     const hypotenuseDiff = Math.abs(calculatedHypotenuse - triangle.c).toFixed(
         2,
@@ -69,6 +71,18 @@ const ResultsStep = () => {
     };
 
     const renderResult = () => {
+        // Sides that can't form a triangle (usually a typo)
+        if (!hasValidMeasurements) {
+            return (
+                <div className="text-red-950 bg-red-100 p-4 rounded-lg space-y-2 dark:bg-red-950 dark:text-content-primary">
+                    <p className="font-bold text-lg">
+                        {t('tools:squaring.results.invalid.title')}
+                    </p>
+                    <p>{t('tools:squaring.results.invalid.body')}</p>
+                </div>
+            );
+        }
+
         // Machine is square if angle deviation is less than 0.1 degrees
         if (isSquare) {
             return (
@@ -185,14 +199,16 @@ const ResultsStep = () => {
                                     )}
                                 </div>
                                 <div className="text-xl font-bold">
-                                    {angle.toFixed(2)}°
+                                    {hasValidMeasurements
+                                        ? `${angle.toFixed(2)}°`
+                                        : '—'}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {needsEEPROMAdjustment && (
+                {needsEEPROMAdjustment && hasValidMeasurements && (
                     <div className="flex flex-col justify-center items-start space-y-1">
                         <h3 className="text-lg font-semibold dark:text-content-primary">
                             {t('tools:squaring.eeprom.title')}

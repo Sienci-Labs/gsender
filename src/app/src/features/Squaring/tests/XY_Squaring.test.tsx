@@ -8,6 +8,7 @@ import {
     calculateAngle,
     calculateHypotenuse,
     determineEEPROMAdjustment,
+    isValidTriangle,
 } from 'app/features/Squaring/utils';
 
 jest.mock('app/store/redux', () => {
@@ -97,6 +98,35 @@ describe('calculateHypotenuse', () => {
 });
 
 // ───────────────────────────────────────────
+describe('isValidTriangle', () => {
+    it('accepts a real triangle', () => {
+        expect(isValidTriangle({ a: 3, b: 4, c: 5 })).toBe(true);
+    });
+
+    it('rejects a diagonal equal to a + b', () => {
+        expect(isValidTriangle({ a: 3, b: 4, c: 7 })).toBe(false);
+    });
+
+    it('rejects a diagonal longer than a + b', () => {
+        expect(isValidTriangle({ a: 300, b: 300, c: 700 })).toBe(false);
+    });
+
+    it('rejects a diagonal shorter than |a - b|', () => {
+        expect(isValidTriangle({ a: 100, b: 400, c: 200 })).toBe(false);
+    });
+
+    it('rejects zero or missing sides', () => {
+        expect(isValidTriangle({ a: 0, b: 4, c: 4 })).toBe(false);
+        expect(isValidTriangle({ a: null, b: 4, c: 5 } as any)).toBe(false);
+    });
+
+    it('makes calculateAngle NaN exactly when invalid', () => {
+        const bad = { a: 300, b: 300, c: 700 };
+        expect(isValidTriangle(bad)).toBe(false);
+        expect(Number.isNaN(calculateAngle(bad))).toBe(true);
+    });
+});
+
 // Calculate angle - how far the machine deviates from a perfect 90° angle
 // formula: Law of Cosines - cosC = (a² + b² - c²) / (2ab)
 // ─────────────────────────────────────────────

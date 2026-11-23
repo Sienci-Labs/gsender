@@ -218,6 +218,10 @@
         "title": "Your machine needs adjustment",
         "offBy": "The machine is off by {{angle}}° or <bold>{{diff}}{{units}}</bold> on the diagonal.",
         "adjust": "You can move your either the right y-axis rail forward by <bold>{{diff}}{{units}}</bold> or the left y-axis rail backward by <bold>{{diff}}{{units}}</bold>."
+      },
+      "invalid": {
+        "title": "These measurements aren't possible",
+        "body": "The diagonal (1-3) must be shorter than the bottom and right edges added together, and longer than the difference between them. Please check your measurements for a typo and restart the wizard to measure again."
       }
     },
     "measured": {
