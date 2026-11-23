@@ -10,6 +10,17 @@ export const calculateAngle = (triangle: SquaringContextType['triangle']) => {
     return 90 - angleInDegrees;
 };
 
+// using the triangle inequality theorem to see if the triangle is valid
+export const isValidTriangle = (triangle: SquaringContextType['triangle']) => {
+    const { a, b, c } = triangle;
+    return (
+        [a, b, c].every((side) => Number.isFinite(side) && side > 0) &&
+        c < a + b &&
+        a + c > b &&
+        b + c > a
+    );
+};
+
 // Calculate the hypotenuse using the Pythagorean theorem
 export const calculateHypotenuse = (
     triangle: SquaringContextType['triangle'],
