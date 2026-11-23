@@ -253,6 +253,11 @@
         "title": "Outil actuel non palpé",
         "description": "Le fichier ne contient aucune commande de changement d'outil (M6) : l'outil présent dans la broche sera utilisé. Cependant, cet outil n'a pas de décalage."
       },
+      "firstToolNotProbed": {
+        "title": "Loaded Tool Not Probed",
+        "description": "The first tool in this file (T{{tool}}) is loaded and has not been probed (offset 0.000). You need to probe this tool before running the file.",
+        "hint": "Select <bold>\"Probe\"</bold> in the ATC tab to probe this tool, then run the file again."
+      },
       "noTool": {
         "title": "Aucun outil actuel",
         "description": "Ce fichier ne contient aucune commande de changement d'outil (M6) et aucun outil n'est présent dans la broche.",
