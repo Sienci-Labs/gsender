@@ -224,7 +224,7 @@ export interface Actions {
         toFreeView: () => void;
     };
     armMoveToHere: () => void;
-    disarmMoveToHere: () => void;
+    disarmMoveToHere: (opts?: { keepView?: boolean }) => void;
     toggleMoveToHere: () => void;
     moveToHereMachineReady: () => boolean;
     handleMoveToHerePick: (p: {

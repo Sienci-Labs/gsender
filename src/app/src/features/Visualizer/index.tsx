@@ -730,8 +730,8 @@ class Visualizer extends Component {
             handle.armPick('hold', this.actions.handleMoveToHerePick);
             this.setState({ moveToHere: true });
         },
-        disarmMoveToHere: () => {
-            visualizerBridge.get()?.disarmPick();
+        disarmMoveToHere: ({ keepView = false } = {}) => {
+            visualizerBridge.get()?.disarmPick({ keepView });
             this.setState({ moveToHere: false });
         },
         toggleMoveToHere: () => {
@@ -782,8 +782,9 @@ class Visualizer extends Component {
                 },
             );
 
-            // Auto-disarm after a successful move.
-            this.actions.disarmMoveToHere();
+            // Auto-disarm after a successful move, staying in top view so a
+            // nearby point can be picked without re-framing the camera.
+            this.actions.disarmMoveToHere({ keepView: true });
         },
         handleLiteModeToggle: () => {
             const { liteMode, liteOption } = this.state;

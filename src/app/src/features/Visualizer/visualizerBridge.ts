@@ -50,7 +50,9 @@ export interface VisualizerBridgeHandle {
         }) => void,
         onHoldProgress?: (t: number) => void,
     ): void;
-    disarmPick(): void;
+    // keepView: leave the camera where the pick left it instead of restoring
+    // the view that was active before a hold pick armed.
+    disarmPick(opts?: { keepView?: boolean }): void;
     setOverlay(markers: OverlayMarker[]): void;
 }
 
