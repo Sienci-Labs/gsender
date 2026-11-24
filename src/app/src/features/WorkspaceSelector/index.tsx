@@ -8,7 +8,11 @@ import {
     SelectValue,
 } from 'app/components/shadcn/Select';
 import Tooltip from 'app/components/Tooltip';
-import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import {
+    GRBL_ACTIVE_STATE_RUN,
+    GRBLHAL,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 import { useAppTranslation } from 'app/i18n';
 import controller from 'app/lib/controller.ts';
 import type { RootState } from 'app/store/redux';
@@ -24,7 +28,23 @@ const availableWorkspaces = {
     G59: 'P6',
 };
 
-export type GrblWorkspace = 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59';
+// grblHAL only
+const grblHalWorkspaces = {
+    'G59.1': 'P7',
+    'G59.2': 'P8',
+    'G59.3': 'P9',
+};
+
+export type GrblWorkspace =
+    | 'G54'
+    | 'G55'
+    | 'G56'
+    | 'G57'
+    | 'G58'
+    | 'G59'
+    | 'G59.1'
+    | 'G59.2'
+    | 'G59.3';
 
 // Matches the pendant's per-workspace accent colors (see
 // src/pendant/src/components/WorkspaceSelector.tsx) so the two apps read
@@ -36,6 +56,9 @@ const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
     G57: 'text-violet-600 dark:text-violet-400',
     G58: 'text-rose-600 dark:text-rose-400',
     G59: 'text-cyan-600 dark:text-cyan-400',
+    'G59.1': 'text-pink-600 dark:text-pink-400',
+    'G59.2': 'text-lime-600 dark:text-lime-400',
+    'G59.3': 'text-orange-600 dark:text-orange-400',
 };
 
 export function WorkspaceSelector() {
@@ -56,11 +79,20 @@ export function WorkspaceSelector() {
         (state: RootState) => state.controller.workflow.state,
     );
 
-    const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
+    const controllerType = useSelector(
+        (state: RootState) => state.controller.type,
+    );
+
+    const workspaces: Record<string, string> =
+        controllerType === GRBLHAL
+            ? { ...availableWorkspaces, ...grblHalWorkspaces }
+            : availableWorkspaces;
+
+    const [workspace, setWorkspace] = useState<string>(activeWorkspace ?? '');
 
     // Update selected workspace if it changes elsewhere
     useEffect(() => {
-        setWorkspace(activeWorkspace);
+        setWorkspace(activeWorkspace ?? '');
     }, [activeWorkspace]);
 
     function onWorkspaceSelect(value: GrblWorkspace) {
@@ -68,6 +100,9 @@ export function WorkspaceSelector() {
         controller.command('gcode', value);
         posthog?.capture('workspace_selected', { workspace: value });
     }
+
+    // unrecognized wcs will use placeholder
+    const selectedValue = workspace in workspaces ? workspace : '';
 
     const disabled =
         !isConnected ||
@@ -86,20 +121,24 @@ export function WorkspaceSelector() {
                 <div>
                     <Select
                         onValueChange={onWorkspaceSelect}
-                        value={workspace}
+                        value={selectedValue}
                         disabled={disabled}
                     >
                         <SelectTrigger
-                            className="workspace-select-trigger max-w-24 h-7 bg-white dark:bg-surface-elevated dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline focus:ring-0 focus:ring-offset-0"
+                            className="workspace-select-trigger max-w-32 h-7 bg-white dark:bg-surface-elevated dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline focus:ring-0 focus:ring-offset-0"
                             aria-label={t(
                                 'workspace:workspaceSelector.ariaLabel',
                             )}
                         >
-                            <SelectValue placeholder="G54" />
+                            <SelectValue
+                                placeholder={t(
+                                    'workspace:workspaceSelector.unknown',
+                                )}
+                            />
                         </SelectTrigger>
-                        <SelectContent className="flex-1 bg-white dark:bg-surface-raised dark:border-outline">
+                        <SelectContent className="flex-1 w-auto bg-white dark:bg-surface-raised dark:border-outline">
                             <SelectGroup className="bg-white dark:bg-surface-raised">
-                                {Object.entries(availableWorkspaces).map(
+                                {Object.entries(workspaces).map(
                                     (option, _index) => {
                                         const [key, value] = option as [
                                             GrblWorkspace,

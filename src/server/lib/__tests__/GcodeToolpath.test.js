@@ -24,3 +24,22 @@ describe("GcodeToolpath - M6 vs bare T tracking", () => {
 		expect(toolpath.hasSeenM6()).toBe(true);
 	});
 });
+
+describe('GcodeToolpath - WCS tracking', () => {
+    it.each(['G54', 'G55', 'G56', 'G57', 'G58', 'G59', 'G59.1', 'G59.2', 'G59.3'])(
+        'tracks %s as the active WCS',
+        (wcs) => {
+            const toolpath = new GcodeToolpath();
+            toolpath.loadFromStringSync(`${wcs}\nG1 X1 F100`);
+
+            expect(toolpath.getModal().wcs).toBe(wcs);
+        },
+    );
+
+    it('switches back to G54 after G59.1', () => {
+        const toolpath = new GcodeToolpath();
+        toolpath.loadFromStringSync('G59.1\nG1 X1 F100\nG54\nG1 X2');
+
+        expect(toolpath.getModal().wcs).toBe('G54');
+    });
+});

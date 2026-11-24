@@ -114,6 +114,7 @@ describe.each(FIRMWARES)(
 			c.command("gcode:start", 5, 10, 3);
 			expect(queued()).toEqual([
 				"%global.state.workspace=modal.wcs",
+				"G54",
 				"G0 G90 G21 Z13",
 				firmware === "Grbl" ? "G21 M3 F300 S12000" : "M3 S12000",
 				"G0 G90 G21 X20.000 Y20.000",
@@ -140,6 +141,18 @@ describe.each(FIRMWARES)(
 			expect(queued()).toContain(`${units} F${feed}`);
 			if (firmware === "grblHAL") expect(queued()).toContain(`F${feed}`);
 			expect(queued()).toContain("G0 G90 G21 Z20");
+		});
+
+		test("start-from-line selects the file's workspace before any motion", () => {
+			c.state.parserstate.modal.wcs = "G54";
+			c.sender.load("job.nc", "G55\nG0 X10 Y10\nG1 X20 F100\nG1 X30");
+			c.feeder.hold();
+			c.command("gcode:start", 3, 10);
+			const lines = queued();
+			const wcsIdx = lines.indexOf("G55");
+			const firstMoveIdx = lines.findIndex((l) => l.startsWith("G0 G90 G21"));
+			expect(wcsIdx).toBeGreaterThan(-1);
+			expect(wcsIdx).toBeLessThan(firstMoveIdx);
 		});
 
 		test.each(["G54", "G56"])(

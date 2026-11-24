@@ -104,7 +104,7 @@ class GcodeToolpath {
 		motion: "G0",
 
 		// Coordinate System Select
-		// G54, G55, G56, G57, G58, G59
+		// G54, G55, G56, G57, G58, G59, G59.1, G59.2, G59.3
 		wcs: "G54",
 
 		// Plane Select
@@ -521,7 +521,22 @@ class GcodeToolpath {
 		G59: () => {
 			if (this.modal.wcs !== "G59") {
 				this.setModal({ wcs: "G59" });
-			}
+            }
+        },
+        'G59.1': () => {
+            if (this.modal.wcs !== "G59.1") {
+                this.setModal({ wcs: "G59.1" });
+            }
+        },
+        'G59.2': () => {
+            if (this.modal.wcs !== "G59.2") {
+                this.setModal({ wcs: "G59.2" });
+            }
+        },
+        'G59.3': () => {
+            if (this.modal.wcs !== "G59.3") {
+                this.setModal({ wcs: "G59.3" });
+            }
 		},
 		// G80: Cancel Canned Cycle
 		G80: () => {

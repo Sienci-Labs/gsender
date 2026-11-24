@@ -5,7 +5,16 @@ import type { BasicPosition, UNITS_GCODE } from 'app/definitions/general';
 // Motion Mode
 export type MOTION = 'G0' | 'G1' | 'G2' | 'G3' | 'G80';
 // Coordinate System Select
-export type WCS = 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59';
+export type WCS =
+    | 'G54'
+    | 'G55'
+    | 'G56'
+    | 'G57'
+    | 'G58'
+    | 'G59'
+    | 'G59.1'
+    | 'G59.2'
+    | 'G59.3';
 // Plane Select
 // G17: XY-plane, G18: ZX-plane, G19: YZ-plane
 export type PLANE = 'G17' | 'G18' | 'G19';
