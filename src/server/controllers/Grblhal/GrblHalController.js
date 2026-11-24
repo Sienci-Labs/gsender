@@ -858,7 +858,9 @@ class GrblHalController {
 			}
 		});
 
-		this.runner = new GrblHalRunner();
+		this.runner = new GrblHalRunner({
+			getWorkflowState: () => this.workflow?.state,
+		});
 
 		// Plugin-defined parsers. Fed from "raw", which fires for every line
 		// before any built-in parsing, so a plugin can see lines that never make

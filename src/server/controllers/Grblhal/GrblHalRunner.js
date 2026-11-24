@@ -30,6 +30,7 @@ import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineP
 import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
 import decimalPlaces from "../../lib/decimal-places";
 import logger from "../../lib/logger";
+import { WORKFLOW_STATE_IDLE } from "../../lib/Workflow";
 import {
 	GRBL_HAL_ACTIVE_STATE_ALARM,
 	GRBL_HAL_ACTIVE_STATE_CHECK,
@@ -130,6 +131,16 @@ class GrblHalRunner extends events.EventEmitter {
 	};
 
 	parser = new GrblHalLineParser();
+
+	/**
+	 * @param {{ getWorkflowState?: () => string }} [options]
+	 *   getWorkflowState - current sender workflow state, used to tell whether
+	 *   a job is active (PRB only updates tool offsets mid-job).
+	 */
+	constructor({ getWorkflowState } = {}) {
+		super();
+		this.getWorkflowState = getWorkflowState ?? (() => WORKFLOW_STATE_IDLE);
+	}
 
 	parse(data) {
 		data = ("" + data).replace(/\s+$/, "");
@@ -337,19 +348,27 @@ class GrblHalRunner extends events.EventEmitter {
 			// This is necessary in order to update offsets mid tool change or toolpath
 			// Ignore prb output for tool 0 (empty) since nothing to update
 			// Ignore PRB if no success on probe
+			// Only while a job is active (running, or paused for an M6): outside a
+			// job, $# reports tool offsets before PRB, so a stale PRB would
+			// overwrite the just-reported offsets for the current tool. Out of job,
+			// the [T:] lines in $# are the source of truth.
 			const currentTool = this.state.status.currentTool;
+			const isJobActive =
+				(this.getWorkflowState() ?? WORKFLOW_STATE_IDLE) !==
+				WORKFLOW_STATE_IDLE;
 			const isProbeSuccess = name === "PRB" && value.result === 1;
+			const isJobProbeSuccess = isJobActive && isProbeSuccess;
 			const isCurrentToolSet = currentTool > 0;
 			const toolTable = _.get(this.settings, "toolTable", {});
 			const isToolTablePopulated = !_.isEmpty(toolTable);
 			const hasCurrentToolEntry = _.has(toolTable, currentTool);
 			const shouldUpdateToolOffsets =
-				isProbeSuccess &&
+				isJobProbeSuccess &&
 				isCurrentToolSet &&
 				isToolTablePopulated &&
 				hasCurrentToolEntry;
 
-			if (isProbeSuccess && isCurrentToolSet && !shouldUpdateToolOffsets) {
+			if (isJobProbeSuccess && isCurrentToolSet && !shouldUpdateToolOffsets) {
 				log.warn(
 					`[PRB] Skipping tool offset update for current tool T${currentTool}. ` +
 						`isToolTablePopulated=${isToolTablePopulated}, ` +
