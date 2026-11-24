@@ -87,25 +87,6 @@ export default function JogArea({ className }: { className?: string }) {
 
     return (
         <div className={cn('flex flex-col min-h-0', className)}>
-            <div className="flex gap-1.5 shrink-0 mb-2">
-                {PRESET_META.map(({ id, label, icon: Icon }) => (
-                    <button
-                        key={id}
-                        type="button"
-                        onClick={() => setStepPreset(id)}
-                        className={cn(
-                            'flex-1 h-12 flex items-center justify-center gap-2 rounded-lg border font-mono text-xs font-bold tracking-[0.03em] uppercase transition-colors',
-                            stepPreset === id
-                                ? 'bg-robin-500 border-robin-500 text-white'
-                                : 'bg-surface-raised border-outline-subtle text-content-muted',
-                        )}
-                    >
-                        <Icon className="w-5 h-5 shrink-0" />
-                        {label}
-                    </button>
-                ))}
-            </div>
-
             <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-3 gap-1.5">
                 {renderXY(0)}
                 {renderXY(1)}
@@ -211,6 +192,25 @@ export default function JogArea({ className }: { className?: string }) {
                         {() => 'A−'}
                     </JogActionButton>
                 </div>
+            </div>
+
+            <div className="flex gap-1.5 shrink-0 mt-3">
+                {PRESET_META.map(({ id, label, icon: Icon }) => (
+                    <button
+                        key={id}
+                        type="button"
+                        onClick={() => setStepPreset(id)}
+                        className={cn(
+                            'flex-1 h-12 flex items-center justify-center gap-2 rounded-lg border font-mono text-xs font-bold tracking-[0.03em] uppercase transition-colors',
+                            stepPreset === id
+                                ? 'bg-robin-500 border-robin-500 text-white'
+                                : 'bg-surface-raised border-outline-subtle text-content-muted',
+                        )}
+                    >
+                        <Icon className="w-5 h-5 shrink-0" />
+                        {label}
+                    </button>
+                ))}
             </div>
         </div>
     );

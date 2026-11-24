@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useJobProgress } from '../../../hooks/useJobProgress';
 import { formatClock } from '../../../utils/format';
 import ReadOnlyConsole from './ReadOnlyConsole';
+import RunEStop from './RunEStop';
 
 /** Seconds since the job was paused; resets whenever it resumes. */
 function usePausedSeconds(paused: boolean) {
@@ -98,6 +99,7 @@ export default function RunRight() {
                     </span>
                 </div>
             </div>
+            <RunEStop className="mb-[9px]" />
             <ReadOnlyConsole />
         </div>
     );

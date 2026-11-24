@@ -1,27 +1,15 @@
 import { homeMachine } from 'app/features/DRO/utils/DRO';
-import { cancelJog } from 'app/features/Jogging/utils/Jogging';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
 import { useDroGating } from '../../../hooks/useDroGating';
+import { useEStop } from '../../../hooks/useEStop';
 import IncomingFilePill from '../../IncomingFilePill';
 import type { CarveMode } from '../carveMode';
 import StatusBadge from './StatusBadge';
 import TopBarClock from './TopBarClock';
 
 export default function CarveTopBar({ mode }: { mode: CarveMode }) {
-    const { isConnected, canHome } = useDroGating();
-    const activeState = useTypedSelector(
-        (s: RootState) => s.controller.state.status?.activeState ?? '',
-    );
-    const controllerType = useTypedSelector(
-        (s: RootState) => s.controller.type,
-    );
-
-    const handleEStop = () => {
-        if (!isConnected) return;
-        cancelJog(activeState as any, controllerType);
-    };
+    const { canHome } = useDroGating();
+    const { isConnected, eStop: handleEStop } = useEStop();
 
     return (
         <header className="relative flex items-center justify-between h-14 px-2.5 border-b border-outline-subtle bg-surface-base shrink-0 select-none drag-region">
