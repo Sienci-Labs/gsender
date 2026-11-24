@@ -239,6 +239,13 @@ const migrateStore = (): void => {
         return;
     }
 
+    // If you want to retire a shortcut, use this:
+    //   if (semver.lt(cnc.version, '<release that removes it>')) {
+    //       const keys = { ...store.get('commandKeys', {}) };
+    //       delete keys.RETIRED_CMD_ID;
+    //       store.replace('commandKeys', keys);
+    //   }
+
     if (semver.lt(cnc.version, '1.6.4')) {
         store.set(
             'widgets.probe.direction',
@@ -674,7 +681,6 @@ const fetchWithRetry = async (): Promise<StoreData> => {
         }
     }
 };
-
 
 const reportLoadFailure = (err: unknown): void => {
     log.error('Unable to load preferences from the server', err);

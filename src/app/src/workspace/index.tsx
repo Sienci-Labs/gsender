@@ -393,7 +393,7 @@ const Workspace = () => {
 
     useShuttleEvents(shuttleControlEvents);
     useEffect(() => {
-        useKeybinding(shuttleControlEvents);
+        useKeybinding(shuttleControlEvents, true);
     }, []);
 
     return (
