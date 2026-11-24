@@ -18,18 +18,18 @@
       "resume": "Fortsetzen"
     },
     "toolchangeConfig": {
-      "title": "",
-      "intro": "",
-      "question": "",
-      "enablePassthrough": "",
-      "updateSettings": "",
-      "keepSettings": ""
+      "title": "Controller is set up to handle tool changes",
+      "intro": "Your controller reported an ATC, but gSender's tool change settings will stop the ATC macros from running:",
+      "question": "Update gSender's tool change settings?",
+      "enablePassthrough": "Enable passthrough",
+      "updateSettings": "Update settings",
+      "keepSettings": "Keep current settings"
     },
     "keepout": {
-      "title": "",
-      "description": "",
-      "toggleLabel": "",
-      "resource": ""
+      "title": "Jogging inside keepout area",
+      "description": "You are attempting to jog inside the keepout area. Disable keepout using the switch below, then re-enable it to continue.",
+      "toggleLabel": "Keepout",
+      "resource": "Keepout areas"
     }
   },
   "connection": {
@@ -80,7 +80,7 @@
       "title": "4-Achsen-Datei geladen",
       "content": "Der G-Code enthält simultane 4-Achsen-Befehle, die derzeit nicht unterstützt werden und nicht ausgeführt werden können."
     },
-    "rejectedLine": ""
+    "rejectedLine": "The controller rejected this line:"
   },
   "diagnostics": {
     "downloaded": "Diagnosedatei erfolgreich heruntergeladen!",
@@ -183,19 +183,19 @@
       "content": "Möchten Sie gSender wirklich beenden?",
       "confirm": "Beenden"
     },
-    "paired": "",
-    "unsupportedFileType": "",
-    "couldNotReachAddress": "",
-    "pairingFieldsRequired": "",
-    "noFiles": "",
-    "chooseTablet": "",
-    "noLongerPaired": "",
-    "timedOut": "",
-    "couldNotReachTablet": "",
-    "partialSend": "",
-    "sentAndLoaded": "",
-    "sentToLibrary_one": "",
-    "sentToLibrary_other": ""
+    "paired": "Paired with {{name}}",
+    "unsupportedFileType": "{{fileName}}: Unsupported file type",
+    "couldNotReachAddress": "Could not reach the tablet at {{ip}}:{{port}}",
+    "pairingFieldsRequired": "Tablet IP, port and pairing code are required",
+    "noFiles": "Add at least one file to send",
+    "chooseTablet": "Choose a paired tablet to send to",
+    "noLongerPaired": "{{name}} is no longer paired with this computer. Pair it again to send.",
+    "timedOut": "Timed out reaching the tablet",
+    "couldNotReachTablet": "Could not reach {{name}} at {{host}}:{{port}}. Make sure Remote File Receive is turned on.",
+    "partialSend": "Sent {{sent}} of {{total}} files before the error",
+    "sentAndLoaded": "Added to the library and loaded on {{name}}",
+    "sentToLibrary_one": "Sent to {{name}}'s file library",
+    "sentToLibrary_other": "Sent {{count}} files to {{name}}'s file library"
   },
   "plugins": {
     "removed": "{{name}} wurde entfernt.",
@@ -251,7 +251,7 @@
       "title": "Datei löschen",
       "content": "Möchten Sie {{fileName}} wirklich löschen?"
     },
-    "fileError": ""
+    "fileError": "{{fileName}}: {{error}}"
   },
   "settings": {
     "restored": "Einstellungen wiederhergestellt",
@@ -274,12 +274,12 @@
       "content": "Möchten Sie die Zeiten aller Wartungsaufgaben wirklich zurücksetzen?"
     },
     "deleteTask": {
-      "title": "",
-      "content": ""
+      "title": "Delete Task",
+      "content": "Are you sure you want to delete {{name}}?"
     },
     "resetTaskTimer": {
-      "title": "",
-      "content": ""
+      "title": "Reset Maintenance Timer",
+      "content": "Are you sure you want to reset the maintenance timer for {{name}}? Only do this if you have just performed this maintenance task."
     }
   },
   "toolchange": {
@@ -319,23 +319,23 @@
     "modeSetRotary": "Arbeitsbereichsmodus auf Rotation gesetzt"
   },
   "remoteFileReceive": {
-    "turnOnBeforePairing": "",
-    "pairingFailed": "",
-    "invalidQrCode": "",
-    "forgetFailed": "",
-    "turnedOn": "",
-    "turnedOff": "",
-    "updateFailed": "",
-    "codeRegenerated": "",
-    "regenerateFailed": "",
-    "openFailed": "",
+    "turnOnBeforePairing": "Turn on Remote File Receive before pairing",
+    "pairingFailed": "Could not start pairing",
+    "invalidQrCode": "That QR code isn't a gSender pairing code",
+    "forgetFailed": "Could not forget {{name}}",
+    "turnedOn": "Remote file receive turned on",
+    "turnedOff": "Remote file receive turned off",
+    "updateFailed": "Failed to update remote file receive settings",
+    "codeRegenerated": "Pairing code regenerated",
+    "regenerateFailed": "Failed to regenerate the pairing code",
+    "openFailed": "Could not open {{name}}",
     "deleteFiles": {
-      "title": "",
-      "content_one": "",
-      "content_other": ""
+      "title": "Delete files?",
+      "content_one": "Delete {{count}} file from this tablet? This can't be undone.",
+      "content_other": "Delete {{count}} files from this tablet? This can't be undone."
     },
-    "deleted_one": "",
-    "deleted_other": "",
-    "deleteFailed": ""
+    "deleted_one": "Deleted {{count}} file",
+    "deleted_other": "Deleted {{count}} files",
+    "deleteFailed": "Failed to delete the selected files"
   }
 }

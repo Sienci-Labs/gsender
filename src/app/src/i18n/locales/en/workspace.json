@@ -40,7 +40,8 @@
   "workspaceSelector": {
     "label": "Workspace:",
     "tooltip": "Select a workspace",
-    "ariaLabel": "Select workspace"
+    "ariaLabel": "Select workspace",
+    "unknown": "Unknown"
   },
   "machineInfo": {
     "title": "Machine Information",

@@ -1,167 +1,167 @@
 {
   "startValidation": {
-    "title": "",
-    "runJob": ""
+    "title": "ATC - {{title}}",
+    "runJob": "Run job"
   },
   "unavailable": {
-    "heading": "",
+    "heading": "ATC Unavailable",
     "notConnected": {
-      "title": "",
-      "message": ""
+      "title": "Machine Not Connected",
+      "message": "You must be connected to a device with ATC support to use this feature."
     },
     "noAtcFlag": {
-      "title": "",
-      "message": "",
-      "additionalInfo": ""
+      "title": "No ATC Flag",
+      "message": "Firmware did not report ATC=1 on startup.",
+      "additionalInfo": "Ensure the SD card is installed and mounted correctly, a TC.macro file exists, and the firmware has ATC support compiled in."
     }
   },
   "advancedOptions": {
-    "load": "",
-    "unload": ""
+    "load": "Load",
+    "unload": "Unload"
   },
   "config": {
     "tabs": {
-      "config": "",
-      "templates": ""
+      "config": "ATC Config",
+      "templates": "Templates"
     },
     "toolRack": {
-      "title": "",
-      "goToSetup": "",
-      "description": ""
+      "title": "Tool Rack",
+      "goToSetup": "Go to ATC Setup",
+      "description": "Tool rack configuration is managed through the ATC setup process. Re-run setup to reconfigure your rack."
     },
     "toolLengthSensor": {
-      "title": "",
-      "sensorPosition": "",
-      "positionLabel": ""
+      "title": "Tool Length Sensor",
+      "sensorPosition": "Sensor Position",
+      "positionLabel": "Tool Length Sensor Position"
     },
-    "setManually": "",
+    "setManually": "Set Manually",
     "advanced": {
-      "title": "",
-      "offsetManagement": "",
-      "whenLoadingFromRack": "",
-      "whenLoadingManually": "",
-      "manualChangePosition": "",
-      "manualChangePositionLabel": "",
-      "advanced": "",
-      "retainToolTable": "",
-      "safetyChecks": "",
-      "pressureSensor": "",
-      "pressureSensorDescription": "",
-      "toolStudSensor": "",
-      "toolStudSensorDescription": "",
-      "other": "",
-      "forkSpacing": "",
-      "forkSpacingDescription": ""
+      "title": "Advanced Settings",
+      "offsetManagement": "Offset Management",
+      "whenLoadingFromRack": "When loading from tool rack:",
+      "whenLoadingManually": "When loading manually:",
+      "manualChangePosition": "Manual Change Position",
+      "manualChangePositionLabel": "Manual Tool Change Position",
+      "advanced": "Advanced",
+      "retainToolTable": "Retain tool table settings when rack removed",
+      "safetyChecks": "Safety Checks",
+      "pressureSensor": "Pressure Sensor",
+      "pressureSensorDescription": "Check pressure before tool change",
+      "toolStudSensor": "Tool-stud Sensor",
+      "toolStudSensorDescription": "Check tool collision before tool unload",
+      "other": "Other",
+      "forkSpacing": "Tool Fork Spacing (mm)",
+      "forkSpacingDescription": "Distance between each fork."
     },
-    "applying": "",
+    "applying": "Applying...",
     "offsetMode": {
-      "placeholder": "",
-      "probeNew": "",
-      "useTableWithoutVerify": "",
-      "useTableAndVerify": ""
+      "placeholder": "Select mode",
+      "probeNew": "Probe new offset after loading",
+      "useTableWithoutVerify": "Use Tool Table without verification",
+      "useTableAndVerify": "Use Tool Table and probe to verify"
     },
     "positionInput": {
-      "zeroWarningXYZ": "",
-      "zeroWarningXY": "",
-      "axis": "",
-      "setPosition": ""
+      "zeroWarningXYZ": "X, Y, and Z should not be 0. Verify the offsets are correct.",
+      "zeroWarningXY": "X and Y should not be 0. Verify the offsets are correct.",
+      "axis": "{{axis}}:",
+      "setPosition": "Set Position"
     },
     "status": {
-      "applying": "",
-      "applied": ""
+      "applying": "Applying configuration...",
+      "applied": "Configuration applied successfully!"
     }
   },
   "templates": {
-    "invalidFileType": "",
-    "invalidStructure": "",
+    "invalidFileType": "Please select a valid JSON file",
+    "invalidStructure": "Invalid JSON file or incorrect structure",
     "sync": {
-      "controllerOutdated": "",
-      "localOutdated": "",
-      "inSync": "",
-      "unavailable": ""
+      "controllerOutdated": "Controller outdated",
+      "localOutdated": "Local outdated",
+      "inSync": "In sync",
+      "unavailable": "Controller version unavailable"
     },
-    "localTemplates": "",
-    "controllerTemplates": "",
-    "status": "",
-    "upload": "",
-    "content": "",
-    "selectMacro": "",
-    "macros": ""
+    "localTemplates": "Local Templates:",
+    "controllerTemplates": "Controller Templates:",
+    "status": "Status:",
+    "upload": "Upload JSON Template File",
+    "content": "Content",
+    "selectMacro": "Select a macro to view its contents",
+    "macros": "Macros ({{total}})"
   },
   "toolState": {
-    "empty": "",
-    "manualTitle": "",
-    "manualAriaLabel": "",
-    "probed": "",
-    "unprobed": "",
-    "current": "",
-    "error": "",
-    "needsRemap": "",
-    "manual": ""
+    "empty": "Empty",
+    "manualTitle": "Manual (off-rack)",
+    "manualAriaLabel": "Manual tool (off-rack)",
+    "probed": "Probed",
+    "unprobed": "Unprobed",
+    "current": "Current",
+    "error": "Error",
+    "needsRemap": "Needs Remap",
+    "manual": "Manual"
   },
   "currentTool": {
-    "rack": "",
-    "manual": "",
-    "probe": ""
+    "rack": "Rack",
+    "manual": "Manual",
+    "probe": "Probe"
   },
   "loadTool": {
     "status": {
       "probed": {
-        "title": "",
-        "description": ""
+        "title": "Probed",
+        "description": "Offset found for selected tool."
       },
       "unprobed": {
-        "title": "",
-        "description": ""
+        "title": "Unprobed Tool",
+        "description": "Offset not found for selected tool."
       }
     },
     "title": {
-      "load": "",
-      "manual": "",
-      "unload": "",
-      "loadAndSave": ""
+      "load": "Load Tool",
+      "manual": "Manual Load Tool",
+      "unload": "Unload Tool Manually",
+      "loadAndSave": "Load and Save Tool"
     },
-    "loading": "",
-    "load": ""
+    "loading": "Loading...",
+    "load": "Load"
   },
   "tcStatus": {
     "noOffset": {
-      "label": "",
-      "description": ""
+      "label": "Offset not found",
+      "description": "Make sure the tool is in the rack before proceeding."
     },
     "offRack": {
-      "label": "",
-      "description": ""
+      "label": "Off Rack",
+      "description": "Off Rack tool selected."
     },
     "ready": {
-      "label": "",
-      "description": ""
+      "label": "Ready",
+      "description": "Tool is ready to be loaded."
     },
     "empty": {
-      "description": ""
+      "description": "Tool is empty."
     }
   },
   "toolTable": {
-    "openButton": "",
-    "tool": "",
-    "zOffset": "",
-    "status": "",
-    "probeAll": "",
-    "actions": "",
-    "rackLoadedTools": "",
-    "manuallyLoadedTools": "",
-    "probeTool": ""
+    "openButton": "Tools",
+    "tool": "Tool",
+    "zOffset": "Z Offset",
+    "status": "Status",
+    "probeAll": "Probe All",
+    "actions": "Actions",
+    "rackLoadedTools": "Rack Loaded Tools",
+    "manuallyLoadedTools": "Manually Loaded Tools",
+    "probeTool": "Probe Tool"
   },
   "timeline": {
     "remap": {
-      "title": "",
-      "description": "",
-      "newToolNumber": "",
-      "selectTool": "",
-      "confirm": ""
+      "title": "Remap Tool T{{tool}}",
+      "description": "Select a new tool number to remap T{{tool}}. Unavailable tools are shown but disabled.",
+      "newToolNumber": "New Tool Number",
+      "selectTool": "Select a tool",
+      "confirm": "Confirm Remap"
     },
     "item": {
-      "exceedsTableSize": ""
+      "exceedsTableSize": "T{{tool}} exceeds tool table size — remap required"
     }
   }
 }

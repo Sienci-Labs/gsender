@@ -672,7 +672,8 @@
   "workspaceSelector": {
     "label": "Рабочая СК:",
     "tooltip": "Выберите рабочую систему координат",
-    "ariaLabel": "Выбрать рабочую систему координат"
+    "ariaLabel": "Выбрать рабочую систему координат",
+    "unknown": "Unknown"
   },
   "alerts": {
     "jobEnd": {

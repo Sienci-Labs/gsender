@@ -51,8 +51,10 @@ the right**. Never change the keys on the left.
 
 1. Open the file for your language on GitHub, e.g.
    `src/app/src/i18n/locales/fr/config.json`, and click the ✏️ edit button.
-2. Change the text. An empty value (`""`) means "not translated yet", so
-   gSender shows the English text there instead.
+2. Change the text. Strings that haven't been translated yet contain the
+   English text as a placeholder, so you can see what to translate — replace
+   it with your translation. (`yarn i18n:status` warns about values that are
+   still identical to English.)
 3. Commit to a new branch and open a pull request. Add the `translation`
    label if you can.
 
@@ -94,8 +96,7 @@ doesn't match the English text.
 ### Adding a new language
 
 1. Copy `src/app/src/i18n/locales/en/` to a folder named after the language
-   code (`pt-BR`, `nl`, `ja`…). Empty every value (`""`), or ask a maintainer to
-   run `yarn i18n:extract`, which does that for you.
+   code (`pt-BR`, `nl`, `ja`…), then translate the English text in place.
 2. Add the language to `SUPPORTED_LANGUAGES` in
    `src/app/src/i18n/languages.ts`, using its own name (`Nederlands`, not
    `Dutch`).
@@ -189,7 +190,8 @@ languages' files.
 ### Workflow
 
 ```bash
-yarn i18n:extract   # add keys used in code to the locale files (other languages get "")
+yarn i18n:extract   # add keys used in code to the locale files (other languages get the English text)
+yarn i18n:fill      # copy English into any blank ("") values in other languages
 yarn i18n:status    # coverage per language and namespace
 yarn i18n:unused    # keys no longer used in code (never deleted automatically)
 yarn i18n:lint      # hardcoded JSX text and placeholder mismatches

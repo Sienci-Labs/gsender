@@ -803,6 +803,7 @@ const main = () => {
                         additionalOptions.defaultPath = prevDirectory;
                     }
                     const file = await dialog.showOpenDialog(gSenderWindow, {
+                        ...additionalOptions,
                         properties: ['openFile'],
                         filters: [
                             {

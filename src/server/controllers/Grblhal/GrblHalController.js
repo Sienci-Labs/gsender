@@ -2415,6 +2415,8 @@ class GrblHalController {
 
 					// Move up and then to cut start position
 					modalGCode.push(this.event.getEventCode(PROGRAM_START));
+					// switch to file wcs before getting into the start position
+					modalGCode.push(modalWcs);
 					modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
 					// ATCI - add M6 before spindles turned on to get correct tool to spin up
 					// Only insert if an M6 was actually parsed - a bare T word with no M6

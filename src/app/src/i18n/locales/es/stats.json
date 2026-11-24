@@ -1,178 +1,178 @@
 {
   "dataCollection": {
-    "title": "",
-    "subtitle": "",
+    "title": "Anonymous usage information",
+    "subtitle": "Help us make gSender better",
     "badges": {
-      "anonymous": "",
-      "optional": "",
-      "changeAnytime": ""
+      "anonymous": "Anonymous",
+      "optional": "Optional",
+      "changeAnytime": "Change anytime in Settings"
     },
-    "description": "",
-    "decline": "",
-    "accept": ""
+    "description": "We'd like a clearer picture of how many people use gSender, which CNCs and computers it runs on, and general app usage, so we can focus improvements where they matter most.<br/><br/>Nothing is collected without your permission, and you can opt in or out whenever you like from the settings screen.",
+    "decline": "Decline",
+    "accept": "Accept"
   },
   "about": {
     "team": {
-      "leadDev": "",
-      "devManager": "",
-      "dev": "",
-      "qa": "",
-      "docs": "",
-      "iconDesign": "",
-      "uxUiDev": "",
-      "title": ""
+      "leadDev": "Lead Dev",
+      "devManager": "Dev Manager",
+      "dev": "Dev",
+      "qa": "QA",
+      "docs": "Docs",
+      "iconDesign": "Icon Design",
+      "uxUiDev": "UX/UI Dev",
+      "title": "gSender Team"
     },
     "releaseNotes": {
-      "loadError": "",
-      "retry": "",
-      "empty": "",
-      "title": "",
-      "seeAll": ""
+      "loadError": "There was a problem loading the release notes. Please try again.",
+      "retry": "Retry",
+      "empty": "No release notes found",
+      "title": "Release Notes",
+      "seeAll": "See all latest updates made"
     },
-    "logoAlt": "",
-    "byline": "",
-    "version": "",
-    "copyright": "",
-    "madeInCanada": "",
-    "canadaFlagAlt": "",
-    "description": ""
+    "logoAlt": "gSender Logo",
+    "byline": "By Sienci Labs",
+    "version": "Version {{version}}",
+    "copyright": "Copyright © {{year}} Sienci Labs Inc.",
+    "madeInCanada": "Made in Canada",
+    "canadaFlagAlt": "Canada Flag",
+    "description": "gSender is a free and feature-packed CNC control software, designed to be clean and easy to learn while retaining a depth of capabilities for advanced users. Many thousands of people trust gSender to control their grbl and grblHAL-based CNCs every day, and they keep coming back for its ease of use, engaged community, and reliability."
   },
   "alarms": {
-    "title": "",
+    "title": "Alarms & Errors",
     "clear": {
-      "title": "",
-      "description": ""
+      "title": "Clear Alarms & Errors",
+      "description": "Clear all prior alarms and errors. This action cannot be undone."
     },
-    "heading": "",
+    "heading": "{{type}} {{code}} - {{source}}",
     "eventType": {
-      "alarm": "",
-      "error": ""
+      "alarm": "ALARM",
+      "error": "ERROR"
     },
-    "at": "",
-    "noMessage": "",
-    "viewAll": "",
-    "preview": "",
-    "on": "",
-    "empty": ""
+    "at": "at {{date}}",
+    "noMessage": "No associated message",
+    "viewAll": "View all",
+    "preview": "{{type}} {{code}}",
+    "on": "on {{time}}",
+    "empty": "No Alarms or Errors recorded. Hooray!"
   },
   "diagnostic": {
-    "title": "",
-    "description": ""
+    "title": "Diagnostic File",
+    "description": "Share this file with our customer support or community so others can help you better. It contains your machine errors, profile, settings, and more."
   },
   "chart": {
-    "noData": "",
-    "complete": "",
-    "incomplete": "",
-    "jobs": "",
-    "hoursPerPort": "",
-    "hoursTooltip": ""
+    "noData": "No data to display",
+    "complete": "Complete",
+    "incomplete": "Incomplete",
+    "jobs": "Jobs",
+    "hoursPerPort": "Hours per port",
+    "hoursTooltip": "{{hours}} hours"
   },
   "jobs": {
     "columns": {
-      "fileName": "",
-      "duration": "",
-      "lines": "",
-      "startTime": "",
-      "status": ""
+      "fileName": "File Name",
+      "duration": "Duration",
+      "lines": "# Lines",
+      "startTime": "Start Time",
+      "status": "Status"
     },
-    "history": "",
-    "clear": "",
-    "searchPlaceholder": "",
-    "jobsPerCnc": "",
-    "runTimePerCnc": "",
+    "history": "Job History",
+    "clear": "Clear",
+    "searchPlaceholder": "Search past jobs...",
+    "jobsPerCnc": "Jobs per CNC",
+    "runTimePerCnc": "Run Time per CNC",
     "status": {
-      "finished": "",
-      "stopped": ""
+      "finished": "Finished",
+      "stopped": "Stopped"
     },
-    "empty": ""
+    "empty": "No Jobs recorded. Get carving!"
   },
   "maintenance": {
-    "title": "",
-    "upcoming": "",
-    "add": "",
-    "editTask": "",
+    "title": "Maintenance",
+    "upcoming": "Upcoming Maintenance",
+    "add": "Add",
+    "editTask": "Edit Task",
     "status": {
-      "urgent": "",
-      "due": "",
-      "soon": "",
-      "low": ""
+      "urgent": "Urgent!",
+      "due": "Due",
+      "soon": "Soon",
+      "low": "Low"
     },
-    "hours": "",
-    "resetTimerLabel": "",
-    "editTaskLabel": "",
-    "searchPlaceholder": "",
-    "hoursShort": "",
+    "hours": "{{time}} Hrs",
+    "resetTimerLabel": "Reset maintenance timer for {{name}}",
+    "editTaskLabel": "Edit maintenance task for {{name}}",
+    "searchPlaceholder": "Search Tasks...",
+    "hoursShort": "{{time}} hrs",
     "form": {
       "errors": {
-        "nameRequired": "",
-        "startInvalid": "",
-        "endInvalid": "",
-        "endBeforeStart": ""
+        "nameRequired": "Task name is required",
+        "startInvalid": "Start range must be a valid number",
+        "endInvalid": "End range must be a valid number",
+        "endBeforeStart": "End range must be greater than start range"
       },
-      "taskName": "",
-      "taskNamePlaceholder": "",
-      "taskNameHint": "",
-      "startRange": "",
-      "endRange": "",
-      "description": "",
-      "descriptionPlaceholder": ""
+      "taskName": "Task Name",
+      "taskNamePlaceholder": "New Task",
+      "taskNameHint": "Keeping these unique makes it easier for you to remember what it is you need to do.",
+      "startRange": "Task Start Range (Hrs)",
+      "endRange": "Task End Range (Hrs)",
+      "description": "Task Description",
+      "descriptionPlaceholder": "What do I want to do"
     }
   },
   "configuration": {
-    "enabled": "",
-    "disabled": "",
-    "connection": "",
-    "axes": "",
-    "softLimits": "",
-    "homing": "",
-    "homeLocation": "",
-    "reportInches": ""
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "connection": "Connection",
+    "axes": "Axes",
+    "softLimits": "Soft limits",
+    "homing": "Homing",
+    "homeLocation": "Home location",
+    "reportInches": "Report inches"
   },
   "update": {
-    "info": "",
-    "available": "",
-    "willUpdate": "",
-    "backupRecommended": "",
-    "readDocs": "",
-    "updateNow": "",
-    "downloading": "",
-    "whatsNew": "",
-    "seeAllReleases": ""
+    "info": "Info",
+    "available": "gSender v{{version}} available to download!",
+    "willUpdate": "Clicking the below button will update gSender to version {{version}}.",
+    "backupRecommended": "It is recommended you backup your EEPROM values and settings before updating.",
+    "readDocs": "Read our documentation on updating to learn more.",
+    "updateNow": "Update to v{{version}} now!",
+    "downloading": "Downloading ({{percent}}%)",
+    "whatsNew": "What's new in v{{version}}",
+    "seeAllReleases": "See all recent releases"
   },
   "menu": {
-    "overview": "",
-    "jobs": "",
-    "maintenance": "",
-    "alarms": "",
-    "about": ""
+    "overview": "Overview",
+    "jobs": "Jobs",
+    "maintenance": "Maintenance",
+    "alarms": "Alarms",
+    "about": "About"
   },
   "overview": {
     "totals": {
-      "jobsRun": "",
-      "cuttingTime": "",
-      "averageJobTime": "",
-      "longestJob": ""
+      "jobsRun": "Total jobs run",
+      "cuttingTime": "Total cutting time",
+      "averageJobTime": "Average job time",
+      "longestJob": "Longest job"
     },
-    "yourMachine": "",
-    "stats": "",
-    "more": "",
-    "recentJobs": "",
-    "manage": "",
-    "change": "",
-    "configuration": "",
-    "getHelp": "",
+    "yourMachine": "Your Machine",
+    "stats": "Stats",
+    "more": "More",
+    "recentJobs": "Recent Jobs",
+    "manage": "Manage",
+    "change": "Change",
+    "configuration": "Configuration",
+    "getHelp": "Get Help",
     "links": {
       "resources": {
-        "title": "",
-        "description": ""
+        "title": "Resources",
+        "description": "Learn about starting with gSender and how to use specific features"
       },
       "community": {
-        "title": "",
-        "description": ""
+        "title": "Community",
+        "description": "Have conversations with our friendly and helpful community"
       },
       "github": {
-        "title": "",
-        "description": ""
+        "title": "Github",
+        "description": "Submit issues or grab the latest version of gSender"
       }
     }
   }
