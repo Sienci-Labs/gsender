@@ -1988,6 +1988,8 @@ class GrblController {
 
 					// Move up and then to cut start position
 					modalGCode.push(this.event.getEventCode(PROGRAM_START));
+                    // switch to file wcs before getting into the start position
+					modalGCode.push(modalWcs);
 					modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
 					if (hasSpindle) {
 						modalGCode.push(
