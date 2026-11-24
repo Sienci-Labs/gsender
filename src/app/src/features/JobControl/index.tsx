@@ -4,6 +4,7 @@ import type {
     GRBL_ACTIVE_STATES_T,
 } from 'app/definitions/general';
 import {
+    getFirstToolChange,
     getOutOfRangeTools,
     getRackConfig,
     isToolProbed,
@@ -45,7 +46,8 @@ interface JobControlProps {
     currentTool: number;
     spindleToolEvents: {
         [key: string]: {
-            M: number;
+            M?: number;
+            T?: number | string;
         };
     };
     toolOffsets: {
@@ -134,9 +136,6 @@ const JobControl: React.FC<JobControlProps> = ({
             body: JSX.Element;
         },
     ] => {
-        let hasTC = false;
-        let toolEvent = null;
-
         // No ATC, always return a fine validation
         if (!atcEnabled) {
             return [false, null];
@@ -184,18 +183,53 @@ const JobControl: React.FC<JobControlProps> = ({
         }
 
         if (!spindleToolEvents) {
-            return;
+            return [false, null];
         }
 
-        for (const [eventKey] of Object.entries(spindleToolEvents)) {
-            toolEvent = spindleToolEvents[eventKey];
-            if (Object.hasOwn(toolEvent, 'M') && toolEvent['M'] === 6) {
-                hasTC = true;
-                break;
+        const { hasToolChange, tool: firstTool } = getFirstToolChange(
+            spindleToolEvents,
+            toolSet,
+        );
+        if (hasToolChange) {
+            // Tool changes probe the tool they load, but a tool that is already
+            // loaded is skipped - so an unprobed current tool that is also the
+            // first tool in the file would never get probed.
+            const currentZ = get(
+                toolOffsets?.[Number(currentTool)],
+                'toolOffsets.z',
+                0,
+            );
+            if (
+                currentTool > 0 &&
+                firstTool === Number(currentTool) &&
+                !isToolProbed(currentZ)
+            ) {
+                return [
+                    true,
+                    {
+                        type: 'error',
+                        title: t(
+                            'workspace:jobControl.atcValidation.firstToolNotProbed.title',
+                        ),
+                        body: (
+                            <>
+                                <p>
+                                    {t(
+                                        'workspace:jobControl.atcValidation.firstToolNotProbed.description',
+                                        { tool: currentTool },
+                                    )}
+                                </p>
+                                <p>
+                                    <TransKey
+                                        i18nKey="workspace:jobControl.atcValidation.firstToolNotProbed.hint"
+                                        components={{ bold: <b /> }}
+                                    />
+                                </p>
+                            </>
+                        ),
+                    },
+                ];
             }
-        }
-        // early return if we see a M6 in the file - no need to prompt
-        if (hasTC) {
             return [false, null];
         }
         // No tool change in file - prompt based on current tool and offsets

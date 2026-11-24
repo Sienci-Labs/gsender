@@ -253,6 +253,11 @@
         "title": "Herramienta actual sin sondear",
         "description": "El archivo no contiene comandos de cambio de herramienta (M6) y se usará la herramienta que está en el husillo. Sin embargo, la herramienta del husillo no tiene un offset."
       },
+      "firstToolNotProbed": {
+        "title": "Loaded Tool Not Probed",
+        "description": "The first tool in this file (T{{tool}}) is loaded and has not been probed (offset 0.000). You need to probe this tool before running the file.",
+        "hint": "Select <bold>\"Probe\"</bold> in the ATC tab to probe this tool, then run the file again."
+      },
       "noTool": {
         "title": "No hay herramienta actual",
         "description": "Este archivo no contiene comandos de cambio de herramienta (M6) y no hay ninguna herramienta en el husillo.",

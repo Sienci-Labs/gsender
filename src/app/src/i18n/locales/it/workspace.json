@@ -253,6 +253,11 @@
         "title": "Utensile attuale non tastato",
         "description": "Il file non contiene comandi di cambio utensile (M6) e verrà usato l'utensile nel mandrino. Tuttavia, l'utensile nel mandrino non ha un offset."
       },
+      "firstToolNotProbed": {
+        "title": "Loaded Tool Not Probed",
+        "description": "The first tool in this file (T{{tool}}) is loaded and has not been probed (offset 0.000). You need to probe this tool before running the file.",
+        "hint": "Select <bold>\"Probe\"</bold> in the ATC tab to probe this tool, then run the file again."
+      },
       "noTool": {
         "title": "Nessun utensile attuale",
         "description": "Questo file non contiene comandi di cambio utensile (M6) e non c'è alcun utensile nel mandrino.",

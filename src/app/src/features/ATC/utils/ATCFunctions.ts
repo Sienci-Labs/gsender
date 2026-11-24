@@ -53,6 +53,40 @@ export function isToolProbed(zOffset: number): boolean {
     return Number.isFinite(offset) && offset !== 0;
 }
 
+/**
+ * Finds the tool selected by the first M6 in a file.
+ * Handles `T2 M6` on one line as well as `T2` and `M6` on separate lines.
+ * Falls back to the first tool in toolSet if the T word can't be resolved.
+ * Returns hasToolChange=false when the file has no M6.
+ */
+export function getFirstToolChange(
+    spindleToolEvents: Record<string, { M?: number; T?: number | string }>,
+    toolSet: (string | number)[] = [],
+): { hasToolChange: boolean; tool: number | null } {
+    const keys = Object.keys(spindleToolEvents || {}).sort(
+        (a, b) => Number(a) - Number(b),
+    );
+    let lastT: number | null = null;
+    for (const key of keys) {
+        const event = spindleToolEvents[key];
+        if (!event) {
+            continue;
+        }
+        if (event.T !== undefined && Number.isFinite(Number(event.T))) {
+            lastT = Number(event.T);
+        }
+        if (event.M === 6) {
+            let tool = lastT;
+            if (tool === null && toolSet?.length) {
+                const fallback = Number(String(toolSet[0]).replace(/^T/i, ''));
+                tool = Number.isFinite(fallback) ? fallback : null;
+            }
+            return { hasToolChange: true, tool };
+        }
+    }
+    return { hasToolChange: false, tool: null };
+}
+
 export function getToolFlags(
     toolNumber: number,
     rackSize: number,
