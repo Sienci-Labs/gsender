@@ -153,6 +153,19 @@ describe('GrblHalController tool change window', () => {
         expect(controller.toolChangeLine).toBeNull();
     });
 
+    it('echoes [T:] tool lines to the console', () => {
+        const line = '[T:1|0.000,0.000,-12.345,0.000|0.000]';
+        const emitted = [];
+        controller.emit = (...args) => emitted.push(args);
+
+        controller.runner.parse(line);
+
+        expect(emitted).toContainEqual(['serialport:read', line]);
+        expect(controller.runner.settings.toolTable[1].toolOffsets.z).toBe(
+            -12.345,
+        );
+    });
+
     it('does not re-read the tool table on an ordinary startup', () => {
         controller.runner.parse("GrblHAL 1.1f ['$' or '$HELP' for help]");
 
