@@ -1,11 +1,12 @@
 import { JOB_STATUS } from 'app/constants';
 import type { Job, JobStats } from 'app/features/Stats/utils/StatContext.tsx';
+import { t } from 'i18next';
 
 export function truncatePort(port: string) {
     if (!port) {
-        return;
+        return t('stats:jobs.unknownPort');
     }
-    return port.slice(-6);
+    return port.slice(-Math.min(6, port.length)); // use min in case the port name is short
 }
 
 export function filterJobsByPort(jobs: Job[] = [], port: string) {
