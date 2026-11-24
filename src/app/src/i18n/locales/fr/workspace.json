@@ -660,7 +660,8 @@
   "workspaceSelector": {
     "label": "Espace de travail :",
     "tooltip": "Sélectionner un espace de travail",
-    "ariaLabel": "Sélectionner l'espace de travail"
+    "ariaLabel": "Sélectionner l'espace de travail",
+    "unknown": "Unknown"
   },
   "alerts": {
     "jobEnd": {

@@ -1,83 +1,83 @@
 {
   "manualToolchange": {
-    "title": "",
+    "title": "Standard Re-zero Tool Change",
     "safetyFirst": {
-      "description": ""
+      "description": "Jog your machine to a place you can reach using the jog controls and ensure that your router/spindle is turned off and has fully stopped spinning."
     },
     "changeBit": {
-      "title": "",
-      "description": ""
+      "title": "Change Bit",
+      "description": "Change over to the next tool ({{tool}})"
     },
     "resetZ": {
-      "title": "",
-      "description": "",
-      "probeZ": "",
-      "setZ0": ""
+      "title": "Reset the Z",
+      "description": "Use jogging or X and Y gotos to bring your CNC back over to where you initially set the project zero. If you used a touch plate be sure to place the tool over the plate and attach the magnet.",
+      "probeZ": "Probe Z (touch plate)",
+      "setZ0": "Set Z0 (paper method)"
     }
   },
   "semiautoToolchange": {
-    "title": "",
+    "title": "Flexible Re-zero Tool Change",
     "setupProbe": {
-      "title": ""
+      "title": "Setup Probe"
     },
     "checkOffset": {
-      "title": "",
-      "description": ""
+      "title": "Check Offset",
+      "description": "Position the current cutting tool about {{amount}} above the probe location, attach the magnet, and prepare to probe."
     },
     "safetyFirst": {
-      "descriptionProbeLocation": "",
-      "descriptionToolChangeLocation": ""
+      "descriptionProbeLocation": "Ensure that your router/spindle is turned off and has fully stopped spinning then jog your machine to your probe location using the jog controls.",
+      "descriptionToolChangeLocation": "Ensure that your router/spindle is turned off and has fully stopped spinning then jog your machine to your tool change location using the jog controls."
     },
     "changeTool": {
-      "descriptionFirst": "",
-      "description": ""
+      "descriptionFirst": "Jog your machine to a place you can reach using the jog controls and change over to the next tool ({{tool}}). Once ready, jog to {{amount}} above the probe location, attach the magnet, and prepare to probe",
+      "description": "Change over to the next tool ({{tool}}). Once ready, jog to {{amount}} above the probe location, attach the magnet, and prepare to probe"
     }
   },
   "automaticToolchange": {
-    "title": "",
+    "title": "Fixed Tool Sensor Tool Change",
     "safetyFirst": {
-      "description": ""
+      "description": "Ensure that your router/spindle is turned off and has fully stopped spinning and prepare to check the length of the current, initial cutting tool."
     },
     "changeTool": {
-      "description": "",
-      "moveToLocation": ""
+      "description": "Ensure that your router/spindle is turned off and has fully stopped spinning, and prepare to change over to the next tool ({{tool}}).",
+      "moveToLocation": "Move to Tool Change Location"
     },
     "prepareNewTool": {
-      "title": ""
+      "title": "Prepare New Tool"
     },
     "measureNewTool": {
-      "title": "",
-      "description": "",
-      "descriptionWithSafety": ""
+      "title": "Measure New Tool",
+      "description": "After you've switched to the new tool ({{tool}}), click the button below to automatically probe and set the new tool's length offset.",
+      "descriptionWithSafety": "Ensure that your router/spindle is turned off and has fully stopped spinning. After you've switched to the new tool ({{tool}}), click the button below to automatically probe and set the new tool's length offset."
     },
     "resumeJob": {
-      "description": ""
+      "description": "If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Turn on your router if you have one."
     }
   },
   "toolchange": {
-    "startingOff": "",
-    "safetyFirst": "",
-    "probeInitialTool": "",
-    "changeTool": "",
-    "intro": "",
-    "probeChangedTool": "",
-    "resumeJob": "",
-    "resumeCutting": "",
-    "probeNewTool": "",
-    "resumeJobDescription": ""
+    "startingOff": "Starting Off",
+    "safetyFirst": "Safety First",
+    "probeInitialTool": "Probe Initial Tool",
+    "changeTool": "Change Tool",
+    "intro": "Tool Change detected, stay clear of the machine! Wait until initial movements are complete!",
+    "probeChangedTool": "Probe Changed Tool",
+    "resumeJob": "Resume Job",
+    "resumeCutting": "Resume Cutting",
+    "probeNewTool": "Probe New Tool",
+    "resumeJobDescription": "If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Remove the touch plate magnet and turn on your router if you have them."
   },
   "probeToolLength": {
-    "intro": "",
+    "intro": "Prepare to probe the initial tool length. Ensure your router/spindle is turned off and has fully stopped spinning.",
     "measureToolLength": {
-      "title": "",
-      "description": "",
-      "action": ""
+      "title": "Measure Tool Length",
+      "description": "Ensure that your router/spindle is turned off and has fully stopped spinning. Click the button below to probe the length of the current tool.",
+      "action": "Probe Tool Length"
     },
     "resume": {
-      "title": "",
-      "substepTitle": "",
-      "description": "",
-      "action": ""
+      "title": "Resume",
+      "substepTitle": "Resume Operation",
+      "description": "Tool length has been probed and set. Click the button below to continue with your operation. Turn on your router if you have one.",
+      "action": "Resume"
     }
   }
 }

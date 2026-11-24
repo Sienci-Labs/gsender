@@ -24,7 +24,9 @@ export default {
         indentation: 2,
         sort: false,
         primaryLanguage: 'en',
-        // Untranslated strings stay empty and fall back to English at runtime.
+        // New keys start empty; `yarn i18n:extract` then runs
+        // scripts/i18n-fill-english.js to copy the English text into them
+        // so translators have context.
         defaultValue: '',
         // Never delete keys automatically; `yarn i18n:unused` lists candidates.
         removeUnusedKeys: false,

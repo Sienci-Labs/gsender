@@ -648,7 +648,8 @@
   "workspaceSelector": {
     "label": "Arbeitsbereich:",
     "tooltip": "Arbeitsbereich auswählen",
-    "ariaLabel": "Arbeitsbereich auswählen"
+    "ariaLabel": "Arbeitsbereich auswählen",
+    "unknown": "Unknown"
   },
   "alerts": {
     "jobEnd": {
