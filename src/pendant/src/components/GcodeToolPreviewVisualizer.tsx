@@ -1,11 +1,13 @@
 import type { GCodeViewerHandle, GCodeViewerOptions } from '@sienci/gviewer/viewer';
 import { GCodeVisualizer } from '@sienci/gviewer/react';
+import { METRIC_UNITS } from 'app/constants';
 import { buildMachineBedOptions } from 'app/features/Visualizer/viewerOptions';
 import {
     buildViewerTheme,
     currentViewerThemeName,
 } from 'app/features/Visualizer/viewerTheme';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useEffect, useMemo, useRef } from 'react';
 import { computeGcodePreviewGeometry } from '../utils/gcodeProcessing';
 import {
@@ -32,10 +34,12 @@ export default function GcodeToolPreviewVisualizer({ gcode }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const pendingFocusRef = useRef(false);
     const machineBedKey = useTypedSelector(selectMachineBedKey);
+    const { units } = useWorkspaceState();
 
     const options = useMemo<Partial<GCodeViewerOptions>>(
         () => ({
             ...BASE_OPTIONS,
+            units: units === METRIC_UNITS ? 'mm' : 'in',
             // No live machine position to show here, so the crosshair bit stays off.
             bit: { ...BASE_OPTIONS.bit, enabled: false },
             machineBed: buildMachineBedOptions({ ignoreUserToggle: true }),
@@ -47,7 +51,7 @@ export default function GcodeToolPreviewVisualizer({ gcode }: Props) {
         }),
         // buildMachineBedOptions reads the store; the key tracks its inputs.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [machineBedKey],
+        [machineBedKey, units],
     );
 
     const withViewer = (fn: (viewer: GCodeViewerHandle) => void) => {

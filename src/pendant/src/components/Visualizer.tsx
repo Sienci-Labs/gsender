@@ -61,11 +61,12 @@ const RING_C = 2 * Math.PI * RING_R;
 type MoveHold = { x: number; y: number; progress: number };
 
 // Pendant mode: gviewer's WebGL renderer locked top-down (orthographic, no
-// view cube, no grid), fed the worker's Z-deduped 2D segment groups. The
-// crosshair and origin dot are sized in screen pixels.
+// view cube, no machine grid), fed the worker's Z-deduped 2D segment groups.
+// The crosshair and origin dot are sized in screen pixels. `units` is set per
+// workspace; it only drives the toolpath grid's 10mm/1in labelling, world
+// coordinates stay mm.
 export const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
     viewMode: 'pendant',
-    units: 'mm',
     bit: {
         enabled: true,
         type: 'crosshair',
@@ -79,6 +80,7 @@ export const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
     },
     originMarker: { visible: true, color: '#ffffff', sizePx: 9 },
     boundingBox: { visible: false, labels: false },
+    toolpathGrid: { visible: true, labelSizePx: 13 },
     camera: {
         projection: 'orthographic',
         fov: 45,
@@ -163,6 +165,7 @@ function VisualizerImpl(
     const options = useMemo<Partial<GCodeViewerOptions>>(
         () => ({
             ...BASE_OPTIONS,
+            units: units === METRIC_UNITS ? 'mm' : 'in',
             machineBed: buildMachineBedOptions({ ignoreUserToggle: true }),
             render: {
                 ...PENDANT_RENDER_OPTIONS,
@@ -172,7 +175,7 @@ function VisualizerImpl(
         }),
         // buildMachineBedOptions reads the store; the key tracks its inputs.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [machineBedKey],
+        [machineBedKey, units],
     );
 
     // The gviewer handle throws until its viewer exists.
