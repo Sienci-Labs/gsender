@@ -3,7 +3,7 @@ import type { Job, JobStats } from 'app/features/Stats/utils/StatContext.tsx';
 import { t } from 'i18next';
 
 export function truncatePort(port: string) {
-    if (!port) {
+    if (!port || port === t('stats:jobs.unknownPort')) {
         return t('stats:jobs.unknownPort');
     }
     return port.slice(-Math.min(6, port.length)); // use min in case the port name is short

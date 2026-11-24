@@ -6,6 +6,7 @@ import {
 import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 import { useAppTranslation } from 'app/i18n';
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
+import { t } from 'i18next';
 import { useContext } from 'react';
 import { Pie } from 'react-chartjs-2';
 
@@ -15,7 +16,7 @@ function aggregatePortInfo(jobs: Job[]): [string[], number[]] {
     const jobAggregate: JobAggregate = {};
     jobs.forEach((job) => {
         if (!Object.hasOwn(jobAggregate, job.port)) {
-            jobAggregate[job.port] = 1;
+            jobAggregate[job.port ?? t('stats:jobs.unknownPort')] = 1;
             return;
         }
         jobAggregate[job.port] = jobAggregate[job.port] + 1;
