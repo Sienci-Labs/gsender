@@ -21,7 +21,7 @@
  *
  */
 
-import { IMPERIAL_UNITS } from 'app/constants';
+import { GRBL_ACTIVE_STATE_ALARM, IMPERIAL_UNITS } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
@@ -46,8 +46,16 @@ const SoftLimitsWarningArea = () => {
         (state) => selectSoftLimitViolations(state, enabled),
         isEqual,
     );
+    // The alarm status dropdown sits in the same spot, so step aside while
+    // alarmed. The violations are derived live, so the warning comes back on
+    // its own once the alarm clears if the file is still out of bounds.
+    const isAlarm = useTypedSelector(
+        (state) =>
+            state.controller.state?.status?.activeState ===
+            GRBL_ACTIVE_STATE_ALARM,
+    );
 
-    if (violations.length === 0) {
+    if (isAlarm || violations.length === 0) {
         return null;
     }
 
