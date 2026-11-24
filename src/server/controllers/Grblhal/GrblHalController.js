@@ -256,6 +256,15 @@ class GrblHalController {
 	// Toolchange
 	toolChanger = null;
 
+	// Sender line number of an M6 passed through to the firmware that has not
+	// been acked yet. While set, the firmware is running its tool change macro,
+	// so a PRB is that macro's tool length probe (see GrblHalRunner).
+	toolChangeLine = null;
+
+	// Re-read the firmware tool table ($#) on the next startup message - set
+	// when a job is force-stopped, since a reply sent mid-reset would be lost.
+	pendingToolTableResync = false;
+
 	// Rotary
 	isInRotaryMode = false;
 
@@ -671,6 +680,10 @@ class GrblHalController {
 					);
 					if (!passthroughM6 || toolChangeOption === "Code") {
 						line = line.replace(/M0*6(?!\d)/i, "(M6)");
+					} else {
+						// M6 goes to the firmware; its ok only arrives once the tool
+						// change macro has finished.
+						this.toolChangeLine = sent + 1;
 					}
 					//line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
 				}
@@ -755,6 +768,7 @@ class GrblHalController {
 		});
 		this.workflow.on("stop", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
+			this.toolChangeLine = null;
 			this.feeder.reset();
 			this.sender.rewind();
 		});
@@ -859,7 +873,7 @@ class GrblHalController {
 		});
 
 		this.runner = new GrblHalRunner({
-			getWorkflowState: () => this.workflow?.state,
+			isToolChangeActive: () => this.toolChangeLine !== null,
 		});
 
 		// Plugin-defined parsers. Fed from "raw", which fires for every line
@@ -1014,6 +1028,7 @@ class GrblHalController {
 					this.sender.unhold();
 				}
 				this.sender.ack();
+				this.clearToolChangeWindowIfAcked();
 				this.sender.next({ isOk: true });
 				return;
 			}
@@ -1029,6 +1044,7 @@ class GrblHalController {
 					);
 				}
 				this.sender.ack();
+				this.clearToolChangeWindowIfAcked();
 				this.sender.next({ isOk: true });
 				return;
 			}
@@ -1145,6 +1161,7 @@ class GrblHalController {
 					this.emit("serialport:read", res.raw);
 				}
 				this.sender.ack();
+				this.clearToolChangeWindowIfAcked();
 				this.sender.next({ isOk: true });
 
 				return;
@@ -1307,12 +1324,19 @@ class GrblHalController {
 
 			// Rewind any files in the sender
 			this.workflow.stop();
+			this.toolChangeLine = null;
 
 			// Only initialize when we have a firmware version (triggered by $I / [VER:] response).
 			// The bare startup greeting fires without semver and should not trigger startup commands.
 			if (!this.initialized && semver !== undefined) {
 				this.initialized = true;
+				this.pendingToolTableResync = false; // startup sequence sends $#
 				this.initController(semver);
+			} else if (this.pendingToolTableResync) {
+				// Job was force-stopped (soft reset): re-read the firmware tool
+				// table now that it is back, replacing any PRB-derived estimates.
+				this.pendingToolTableResync = false;
+				this.command("gcode", "$#");
 			}
 		});
 
@@ -2501,6 +2525,10 @@ class GrblHalController {
 				if (force) {
 					let activeState;
 
+					// The soft reset below would swallow a $# reply; the startup
+					// handler sends it once the firmware is back.
+					this.pendingToolTableResync = true;
+
 					activeState = _.get(this.state, "status.activeState", "");
 					this.write("\x19");
 					if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
@@ -2517,6 +2545,12 @@ class GrblHalController {
 				}
 				// Moved this to end so it triggers AFTER the reset on force stop
 				this.event.trigger(PROGRAM_END);
+
+				// Re-read the firmware tool table: mid-job offsets were estimated
+				// from PRB reports, and $# is the source of truth.
+				if (!force) {
+					this.command("gcode", "$#");
+				}
 			},
 			"gcode:pause": async () => {
 				if (this.event.hasEnabledEvent(PROGRAM_PAUSE)) {
@@ -2931,6 +2965,19 @@ class GrblHalController {
 		block.push(POSTHOOK_COMPLETE);
 
 		this.command("gcode", block);
+	}
+
+	// Close the tool change window once the passed-through M6 has been acked
+	// (ok or error) - the firmware only replies after its macro finishes.
+	// Call after sender.ack() and before sender.next(), so a following M6
+	// opened by next() is not cleared.
+	clearToolChangeWindowIfAcked() {
+		if (
+			this.toolChangeLine !== null &&
+			this.sender.state.received >= this.toolChangeLine
+		) {
+			this.toolChangeLine = null;
+		}
 	}
 
 	setSenderTimeout() {

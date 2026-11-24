@@ -30,7 +30,6 @@ import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineP
 import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
 import decimalPlaces from "../../lib/decimal-places";
 import logger from "../../lib/logger";
-import { WORKFLOW_STATE_IDLE } from "../../lib/Workflow";
 import {
 	GRBL_HAL_ACTIVE_STATE_ALARM,
 	GRBL_HAL_ACTIVE_STATE_CHECK,
@@ -133,13 +132,14 @@ class GrblHalRunner extends events.EventEmitter {
 	parser = new GrblHalLineParser();
 
 	/**
-	 * @param {{ getWorkflowState?: () => string }} [options]
-	 *   getWorkflowState - current sender workflow state, used to tell whether
-	 *   a job is active (PRB only updates tool offsets mid-job).
+	 * @param {{ isToolChangeActive?: () => boolean }} [options]
+	 *   isToolChangeActive - true while the firmware is executing a
+	 *   passed-through M6 (its tool change macro). PRB only updates tool
+	 *   offsets inside that window.
 	 */
-	constructor({ getWorkflowState } = {}) {
+	constructor({ isToolChangeActive } = {}) {
 		super();
-		this.getWorkflowState = getWorkflowState ?? (() => WORKFLOW_STATE_IDLE);
+		this.isToolChangeActive = isToolChangeActive ?? (() => false);
 	}
 
 	parse(data) {
@@ -348,27 +348,30 @@ class GrblHalRunner extends events.EventEmitter {
 			// This is necessary in order to update offsets mid tool change or toolpath
 			// Ignore prb output for tool 0 (empty) since nothing to update
 			// Ignore PRB if no success on probe
-			// Only while a job is active (running, or paused for an M6): outside a
-			// job, $# reports tool offsets before PRB, so a stale PRB would
-			// overwrite the just-reported offsets for the current tool. Out of job,
-			// the [T:] lines in $# are the source of truth.
+			// Only while the firmware runs a passed-through M6: that probe is the
+			// tool length measurement. Any other PRB (a $# dump, where [T:] lines
+			// precede PRB, or a G38 touch-off in the program) must not touch the
+			// tool table - there, the [T:] lines in $# are the source of truth.
+			// Only Z is updated; the TC macro writes Z alone (G10 L1 P<t> Z...).
 			const currentTool = this.state.status.currentTool;
-			const isJobActive =
-				(this.getWorkflowState() ?? WORKFLOW_STATE_IDLE) !==
-				WORKFLOW_STATE_IDLE;
 			const isProbeSuccess = name === "PRB" && value.result === 1;
-			const isJobProbeSuccess = isJobActive && isProbeSuccess;
+			const isToolChangeProbeSuccess =
+				isProbeSuccess && Boolean(this.isToolChangeActive());
 			const isCurrentToolSet = currentTool > 0;
 			const toolTable = _.get(this.settings, "toolTable", {});
 			const isToolTablePopulated = !_.isEmpty(toolTable);
 			const hasCurrentToolEntry = _.has(toolTable, currentTool);
 			const shouldUpdateToolOffsets =
-				isJobProbeSuccess &&
+				isToolChangeProbeSuccess &&
 				isCurrentToolSet &&
 				isToolTablePopulated &&
 				hasCurrentToolEntry;
 
-			if (isJobProbeSuccess && isCurrentToolSet && !shouldUpdateToolOffsets) {
+			if (
+				isToolChangeProbeSuccess &&
+				isCurrentToolSet &&
+				!shouldUpdateToolOffsets
+			) {
 				log.warn(
 					`[PRB] Skipping tool offset update for current tool T${currentTool}. ` +
 						`isToolTablePopulated=${isToolTablePopulated}, ` +
@@ -389,8 +392,6 @@ class GrblHalRunner extends events.EventEmitter {
 							...currentToolData,
 							toolOffsets: {
 								...currentToolOffsets,
-								x: Number(value.x),
-								y: Number(value.y),
 								z: Number(value.z),
 							},
 						},
