@@ -10,6 +10,7 @@ import cn from 'classnames';
 import { ArrowRight, Crosshair, MoveUpRight } from 'lucide-react';
 import { useState } from 'react';
 import { useDroGating } from '../../../hooks/useDroGating';
+import HomeCTA from '../../HomeCTA';
 import ProbePanel from '../../ProbePanel';
 import HoldButton from './HoldButton';
 import Segmented from './Segmented';
@@ -141,6 +142,11 @@ export default function PositionTab() {
 
     return (
         <div className="flex flex-col flex-1 min-h-0 gap-[7px] px-2.5 py-[9px] overflow-auto">
+            {/* Hidden once the controller reports the machine as homed */}
+            <HomeCTA
+                className="shrink-0 w-full h-16 text-[16px]"
+                iconClassName="w-6 h-6"
+            />
             <Segmented
                 value={method}
                 onChange={setMethod}

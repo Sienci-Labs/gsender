@@ -1,37 +1,24 @@
-import { homeMachine } from 'app/features/DRO/utils/DRO';
 import cn from 'classnames';
-import { useDroGating } from '../../../hooks/useDroGating';
 import { useEStop } from '../../../hooks/useEStop';
+import HomeCTA from '../../HomeCTA';
 import IncomingFilePill from '../../IncomingFilePill';
 import type { CarveMode } from '../carveMode';
 import StatusBadge from './StatusBadge';
 import TopBarClock from './TopBarClock';
 
 export default function CarveTopBar({ mode }: { mode: CarveMode }) {
-    const { canHome } = useDroGating();
     const { isConnected, eStop: handleEStop } = useEStop();
 
     return (
         <header className="relative flex items-center justify-between h-14 px-2.5 border-b border-outline-subtle bg-surface-base shrink-0 select-none drag-region">
             <div className="flex items-center gap-1.5 no-drag">
                 <StatusBadge mode={mode} />
+                {/* Left side, well away from E-STOP */}
+                <HomeCTA className="h-[38px] px-4 text-[12px] ml-1.5" />
             </div>
             <TopBarClock mode={mode} />
             <div className="flex items-center gap-1.5 no-drag">
                 <IncomingFilePill />
-                <button
-                    type="button"
-                    onClick={homeMachine}
-                    disabled={!canHome}
-                    className={cn(
-                        'h-[30px] px-2.5 rounded-md border font-mono text-[9.5px] font-semibold tracking-[0.06em] uppercase transition-colors',
-                        canHome
-                            ? 'bg-blue-600 border-transparent text-white active:bg-blue-700'
-                            : 'bg-transparent border-outline-strong text-content-disabled',
-                    )}
-                >
-                    Home
-                </button>
                 <button
                     type="button"
                     onClick={handleEStop}

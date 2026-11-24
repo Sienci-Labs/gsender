@@ -232,14 +232,30 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
                 disabled={!api.clickable}
                 tone={laser ? 'laser' : 'robin'}
                 options={
+                    // Starting is hold-to-confirm; Off stays an instant tap
                     laser
                         ? [
-                              { value: 'on', label: 'On' },
+                              {
+                                  value: 'on',
+                                  label: 'On',
+                                  hold: true,
+                                  holdHint: 'Hold to turn laser on',
+                              },
                               { value: 'off', label: 'Off' },
                           ]
                         : [
-                              { value: 'cw', label: 'CW' },
-                              { value: 'ccw', label: 'CCW' },
+                              {
+                                  value: 'cw',
+                                  label: 'CW',
+                                  hold: true,
+                                  holdHint: 'Hold to start spindle CW',
+                              },
+                              {
+                                  value: 'ccw',
+                                  label: 'CCW',
+                                  hold: true,
+                                  holdHint: 'Hold to start spindle CCW',
+                              },
                               { value: 'off', label: 'Off' },
                           ]
                 }
@@ -248,30 +264,46 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
     );
 }
 
+/** Coolant toggle: turning on needs a hold, turning off is an instant tap
+ * (same rule as spindle start vs. Off). */
 function Chip({
     label,
     on,
     disabled,
-    onClick,
+    onToggle,
 }: {
     label: string;
     on: boolean;
     disabled: boolean;
-    onClick: () => void;
+    onToggle: () => void;
 }) {
+    const { progress, hintNode, bind } = useHoldToActivate(onToggle, {
+        disabled: disabled || on,
+        hint: `Hold to turn on ${label.toLowerCase()}`,
+    });
+
     return (
         <button
             type="button"
             disabled={disabled}
-            onClick={onClick}
+            {...(on ? { onClick: onToggle } : bind)}
+            aria-label={on ? `Turn off ${label}` : `Hold to turn on ${label}`}
             className={cn(
-                'shrink-0 font-mono text-[8.5px] tracking-[0.03em] uppercase px-[9px] py-[5px] rounded-sm border disabled:opacity-40',
+                'relative overflow-hidden shrink-0 font-mono text-[8.5px] tracking-[0.03em] uppercase px-[9px] py-[5px] rounded-sm border select-none touch-none disabled:opacity-40',
                 on
                     ? 'bg-robin-600/20 text-robin-400 border-robin-500'
                     : 'bg-surface-elevated text-content-muted border-outline-subtle',
             )}
         >
-            {label}
+            {!on && (
+                <span
+                    aria-hidden
+                    className="absolute inset-y-0 left-0 pointer-events-none bg-robin-500/35"
+                    style={{ width: `${progress * 100}%` }}
+                />
+            )}
+            <span className="relative">{label}</span>
+            {hintNode}
         </button>
     );
 }
@@ -297,7 +329,7 @@ function CoolantRow({ laser }: { laser: boolean }) {
                         label="Air assist"
                         on={mistOn}
                         disabled={!clickable}
-                        onClick={toggleMist}
+                        onToggle={toggleMist}
                     />
                 ) : (
                     <>
@@ -305,13 +337,13 @@ function CoolantRow({ laser }: { laser: boolean }) {
                             label="Mist"
                             on={mistOn}
                             disabled={!clickable}
-                            onClick={toggleMist}
+                            onToggle={toggleMist}
                         />
                         <Chip
                             label="Flood"
                             on={floodOn}
                             disabled={!clickable}
-                            onClick={toggleFlood}
+                            onToggle={toggleFlood}
                         />
                     </>
                 )}

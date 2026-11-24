@@ -36,6 +36,20 @@ export function useDroGating() {
             activeState === GRBL_ACTIVE_STATE_JOG);
     const canGoTo = canZero;
     const canHome = (canGoTo && homingEnabled) || isHomingAlarm;
+    const hasHomed = useTypedSelector(
+        (s: RootState) => !!s.controller.hasHomed,
+    );
+    // Homing is the once-per-connect call to action: shown until the
+    // controller reports the machine as homed
+    const needsHoming = isConnected && homingEnabled && !hasHomed;
 
-    return { isConnected, canZero, canGoTo, canHome, isHomingAlarm };
+    return {
+        needsHoming,
+        isConnected,
+        canZero,
+        canGoTo,
+        canHome,
+        homingEnabled,
+        isHomingAlarm,
+    };
 }
