@@ -41,6 +41,10 @@ import type { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import controller from 'app/lib/controller';
 import { isLaserMode } from 'app/lib/laserMode';
 import { getZUpTravel } from 'app/lib/SoftLimits.js';
+import {
+    isSoftLimitWarningEnabled,
+    selectSoftLimitViolations,
+} from 'app/lib/softLimitState';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
@@ -82,6 +86,9 @@ import {
 // a placement.
 const PICK_HOLD_MS = 500;
 const PICK_CANCEL_PX = 8;
+
+// Job bounding box color while the file would cross a soft limit (red.600).
+const SOFT_LIMIT_BBOX_COLOR = '#dc2626';
 
 // Default marker color when an overlay marker doesn't specify one.
 const OVERLAY_DEFAULT_COLOR = 'rgba(14, 246, 174, 0.95)';
@@ -150,6 +157,11 @@ class GcodeViewer extends Component<Props> {
     lastMachineBedKey = '';
 
     lastGridKey = '';
+
+    // True while the loaded file would cross a soft limit (and the warning
+    // setting is on): the job bounding box is forced visible and drawn in
+    // SOFT_LIMIT_BBOX_COLOR so the overrun is obvious in the scene.
+    softLimitExceeded = false;
 
     lastCameraFollow = false;
 
@@ -350,7 +362,23 @@ class GcodeViewer extends Component<Props> {
     }
 
     buildTheme(themeName?: string): GCodeViewerTheme {
-        return buildViewerTheme(themeName);
+        const theme = buildViewerTheme(themeName);
+        if (!this.softLimitExceeded) {
+            return theme;
+        }
+        return {
+            ...theme,
+            colors: { ...theme.colors, boundingBox: SOFT_LIMIT_BBOX_COLOR },
+        };
+    }
+
+    computeSoftLimitExceeded(): boolean {
+        return (
+            selectSoftLimitViolations(
+                reduxStore.getState(),
+                isSoftLimitWarningEnabled(),
+            ).length > 0
+        );
     }
 
     buildOptions(): Partial<GCodeViewerOptions> {
@@ -391,10 +419,12 @@ class GcodeViewer extends Component<Props> {
                 ),
             },
             boundingBox: {
-                visible: store.get(
-                    'widgets.visualizer.objects.limits.visible',
-                    false,
-                ),
+                visible:
+                    this.softLimitExceeded ||
+                    store.get(
+                        'widgets.visualizer.objects.limits.visible',
+                        false,
+                    ),
                 labels: store.get(
                     'widgets.visualizer.boundingBoxLabels',
                     false,
@@ -1167,6 +1197,15 @@ class GcodeViewer extends Component<Props> {
                 this.viewer3d?.setOptions({
                     machineBed: buildMachineBedOptions(),
                 });
+            }
+
+            // Soft-limit overrun: recolor/force-show the job bounding box.
+            // setOptions only rebuilds what changed, so this just refreshes
+            // the bbox group when the flag flips.
+            const softLimitExceeded = this.computeSoftLimitExceeded();
+            if (softLimitExceeded !== this.softLimitExceeded) {
+                this.softLimitExceeded = softLimitExceeded;
+                this.applyOptionsFromState();
             }
 
             // Grid quadrant (and, when "trim grid to bed" is on, its bounds)

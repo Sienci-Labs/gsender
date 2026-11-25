@@ -646,6 +646,7 @@
     "placeholderAlt": "Segnaposto con Louis il cane",
     "rendering": "Rendering",
     "softLimitsWarning": "Attenzione: il taglio supererà i limiti software!",
+    "softLimitsAxisExceeded": "",
     "cycleStart": "Avvio ciclo",
     "unlockMachine": "Sblocca macchina",
     "disableLiteMode": "Disattiva modalità leggera",
