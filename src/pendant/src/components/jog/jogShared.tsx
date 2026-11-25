@@ -25,6 +25,7 @@ import type { RootState } from 'app/store/redux';
 import { Rabbit, Rocket, Turtle } from 'lucide-react';
 import {
     type ComponentType,
+    type PointerEvent,
     type ReactNode,
     useEffect,
     useMemo,
@@ -78,6 +79,10 @@ type JogActionButtonProps = {
 
 const QUICK_PRESS_MS = 110;
 const DEFAULT_THRESHOLD = 250;
+// How far (px, per axis) a held finger may drift before the press ends. Big
+// enough to absorb wobble and rolling the finger on a touchscreen, small
+// enough that deliberately sliding well away still stops the jog.
+const JOG_MOVE_TOLERANCE_PX = 64;
 
 export const PRESET_META: {
     id: JogPresetId;
@@ -204,13 +209,21 @@ export function JogActionButton({
         }, QUICK_PRESS_MS);
     };
 
+    // True from press start until the library reports finish/cancel.
+    const pressingRef = useRef(false);
+    // Set when the browser cancelled the gesture, so it isn't taken as a tap.
+    const cancelledRef = useRef(false);
+
     const longPressBind = useLongPress(
         () => {
             onLongPress();
         },
         {
             threshold,
-            cancelOnMovement: true,
+            cancelOnMovement: JOG_MOVE_TOLERANCE_PX,
+            // The pointer is captured on press (below), so leaving the button
+            // doesn't end the hold, and the release still comes back here.
+            cancelOutsideElement: false,
             filterEvents: (event) => {
                 if (disabled) {
                     return false;
@@ -221,12 +234,17 @@ export function JogActionButton({
                 return true;
             },
             onStart: () => {
+                pressingRef.current = true;
+                cancelledRef.current = false;
                 clearQuickReleaseTimer();
                 setActive(true);
             },
             onCancel: (_event, meta) => {
+                pressingRef.current = false;
                 if (
-                    meta.reason === LongPressCallbackReason.CancelledByRelease
+                    meta.reason ===
+                        LongPressCallbackReason.CancelledByRelease &&
+                    !cancelledRef.current
                 ) {
                     onShortPress();
                     setActiveWithFlash();
@@ -235,11 +253,38 @@ export function JogActionButton({
                 setActive(false);
             },
             onFinish: () => {
+                pressingRef.current = false;
                 stopContinuousJog();
                 setActive(false);
             },
         },
     )();
+
+    const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
+        longPressBind.onPointerDown(event);
+        if (!pressingRef.current) {
+            return;
+        }
+        // Capture so the release reaches this button wherever the pointer ends
+        // up — otherwise a mouse released outside would leave the jog running.
+        try {
+            event.currentTarget.setPointerCapture(event.pointerId);
+        } catch {
+            // Pointer already gone; pointercancel/lostpointercapture handle it.
+        }
+    };
+
+    // The browser cancelled the gesture or capture was lost mid-press. Treat it
+    // as a release so the library ends the hold (onFinish stops a running jog)
+    // and resets, but never as a tap. After a normal release the press is
+    // already over and this is a no-op, so it can't cut off a step jog.
+    const handlePointerAbort = (event: PointerEvent<HTMLButtonElement>) => {
+        if (!pressingRef.current) {
+            return;
+        }
+        cancelledRef.current = true;
+        longPressBind.onPointerUp(event);
+    };
 
     const resolvedClassName =
         typeof className === 'function' ? className(active) : className;
@@ -250,9 +295,14 @@ export function JogActionButton({
             type="button"
             disabled={disabled}
             aria-label={ariaLabel}
-            className={`${resolvedClassName} ${active ? 'jog-btn-active' : ''} ${disabled ? 'cursor-default' : ''}`}
+            // touch-none: stop the browser claiming a moving touch as a pan,
+            // which would cancel the pointer mid-jog.
+            className={`${resolvedClassName} touch-none select-none ${active ? 'jog-btn-active' : ''} ${disabled ? 'cursor-default' : ''}`}
             onContextMenu={(event) => event.preventDefault()}
             {...longPressBind}
+            onPointerDown={handlePointerDown}
+            onPointerCancel={handlePointerAbort}
+            onLostPointerCapture={handlePointerAbort}
         >
             {children(active)}
         </button>
