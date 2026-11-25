@@ -646,6 +646,7 @@
     "placeholderAlt": "Image de Louis le chien",
     "rendering": "Rendu",
     "softLimitsWarning": "Attention : l'usinage dépassera les limites logicielles !",
+    "softLimitsAxisExceeded": "",
     "cycleStart": "Départ cycle",
     "unlockMachine": "Déverrouiller la machine",
     "disableLiteMode": "Désactiver le mode allégé",

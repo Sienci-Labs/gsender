@@ -634,6 +634,7 @@
     "placeholderAlt": "Platzhalterbild: Hund Louis",
     "rendering": "Wird gerendert",
     "softLimitsWarning": "Warnung: Fräsbahn verlässt die Software-Endlagen!",
+    "softLimitsAxisExceeded": "",
     "cycleStart": "Zyklusstart",
     "unlockMachine": "Maschine entsperren",
     "disableLiteMode": "Leichtmodus deaktivieren",

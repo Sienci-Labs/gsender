@@ -658,6 +658,7 @@
     "placeholderAlt": "Заглушка с собакой Луи",
     "rendering": "Отрисовка",
     "softLimitsWarning": "Внимание: обработка выйдет за программные ограничения!",
+    "softLimitsAxisExceeded": "",
     "cycleStart": "Пуск цикла",
     "unlockMachine": "Разблокировать станок",
     "disableLiteMode": "Отключить облегчённый режим",

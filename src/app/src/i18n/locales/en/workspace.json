@@ -325,6 +325,7 @@
     "rendering": "Rendering",
     "placeholderAlt": "Louis the dog placeholder",
     "softLimitsWarning": "Warning: Cut will leave soft limits!",
+    "softLimitsAxisExceeded": "{{axis}}{{direction}} exceeds limit by {{distance}} {{units}}",
     "cycleStart": "Cycle Start",
     "unlockMachine": "Unlock Machine",
     "disableLiteMode": "Disable lightweight mode",

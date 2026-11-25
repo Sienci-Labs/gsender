@@ -1225,7 +1225,6 @@ export function* initialize(): Generator<null, void, unknown> {
 
     controller.addListener('homing:flag', (flag: boolean) => {
         reduxStore.dispatch(updateHomingFlag({ homingFlag: flag }));
-        pubsub.publish('softlimits:check');
     });
 
     controller.addListener('homing:has-homed', (hasHomed: boolean) => {

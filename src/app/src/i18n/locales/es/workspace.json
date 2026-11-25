@@ -646,6 +646,7 @@
     "placeholderAlt": "Imagen de Louis, el perro",
     "rendering": "Renderizando",
     "softLimitsWarning": "Advertencia: ¡el corte sobrepasará los límites por software!",
+    "softLimitsAxisExceeded": "",
     "cycleStart": "Inicio de ciclo",
     "unlockMachine": "Desbloquear máquina",
     "disableLiteMode": "Desactivar modo ligero",
