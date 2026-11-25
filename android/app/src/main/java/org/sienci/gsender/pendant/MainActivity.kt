@@ -11,12 +11,17 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
+import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
@@ -446,29 +451,92 @@ class MainActivity : Activity() {
 
         /**
          * Plays a haptic pattern of comma-separated milliseconds, alternating
-         * on/off ("30", "70,90,70"). Clamped so a page can't run the motor for
+         * on/off ("50", "70,90,70"). Clamped so a page can't run the motor for
          * long: each step 1-500ms, at most 8 steps, never repeating.
+         *
+         * [kind] picks the vibration usage Android filters by: "alarm" plays as
+         * an alarm; anything else as hardware feedback (a physical-button feel).
+         * Without a usage the effect is "unknown", which Android 13+ can mute
+         * via the Vibration & haptics settings or power saving.
          */
         @JavascriptInterface
-        fun vibrate(pattern: String) {
+        fun vibrate(pattern: String, kind: String) {
             val timings = pattern.split(',')
                 .mapNotNull { it.trim().toLongOrNull() }
                 .take(MAX_VIBRATE_STEPS)
                 .map { it.coerceIn(1L, MAX_VIBRATE_STEP_MS) }
             if (timings.isEmpty()) return
-            val vibrator = vibrator() ?: return
-            if (!vibrator.hasVibrator()) return
+            val vibrator = vibrator()
+            if (vibrator == null || !vibrator.hasVibrator()) {
+                Log.i(HAPTICS_TAG, "skip kind=$kind: no vibrator")
+                return
+            }
             val effect = if (timings.size == 1) {
                 VibrationEffect.createOneShot(timings[0], VibrationEffect.DEFAULT_AMPLITUDE)
             } else {
                 // Leading 0 = start immediately; -1 = play once.
                 VibrationEffect.createWaveform(longArrayOf(0L, *timings.toLongArray()), -1)
             }
+            val isAlarm = kind == "alarm"
             try {
-                vibrator.vibrate(effect)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val usage = if (isAlarm) {
+                        VibrationAttributes.USAGE_ALARM
+                    } else {
+                        VibrationAttributes.USAGE_HARDWARE_FEEDBACK
+                    }
+                    vibrator.vibrate(effect, VibrationAttributes.createForUsage(usage))
+                } else {
+                    val usage = if (isAlarm) {
+                        AudioAttributes.USAGE_ALARM
+                    } else {
+                        AudioAttributes.USAGE_ASSISTANCE_SONIFICATION
+                    }
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(effect, AudioAttributes.Builder().setUsage(usage).build())
+                }
+                Log.i(HAPTICS_TAG, "vibrate kind=$kind timings=$timings")
             } catch (e: Exception) {
-                Log.w(ServerRuntime.TAG, "vibrate failed", e)
+                Log.w(HAPTICS_TAG, "vibrate failed kind=$kind", e)
             }
+        }
+
+        /**
+         * Diagnostics for "the tablet doesn't buzz": run
+         * `GSenderAndroid.hapticsStatus()` from chrome://inspect.
+         */
+        @JavascriptInterface
+        fun hapticsStatus(): String {
+            val vibrator = vibrator()
+            val power = getSystemService(PowerManager::class.java)
+            val audio = getSystemService(AudioManager::class.java)
+            return JSONObject().apply {
+                put("sdk", Build.VERSION.SDK_INT)
+                put("device", "${Build.MANUFACTURER} ${Build.MODEL}")
+                put("hasVibrator", vibrator?.hasVibrator() ?: false)
+                put("hasAmplitudeControl", vibrator?.hasAmplitudeControl() ?: false)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    put(
+                        "vibratorIds",
+                        getSystemService(VibratorManager::class.java)?.vibratorIds?.size ?: 0,
+                    )
+                }
+                put(
+                    "vibratePermission",
+                    checkSelfPermission(Manifest.permission.VIBRATE) ==
+                        PackageManager.PERMISSION_GRANTED,
+                )
+                put("powerSaveMode", power?.isPowerSaveMode ?: false)
+                put("ringerMode", audio?.ringerMode ?: -1)
+                put(
+                    "touchFeedbackSetting",
+                    Settings.System.getInt(
+                        contentResolver,
+                        Settings.System.HAPTIC_FEEDBACK_ENABLED,
+                        -1,
+                    ),
+                )
+            }.toString()
         }
     }
 
@@ -609,6 +677,7 @@ class MainActivity : Activity() {
         private const val PAIR_SCHEME = "gsender-pendant"
         private const val WEB_LOG_TAG = "GSenderPendant-web"
         private const val BRIDGE_NAME = "GSenderAndroid"
+        private const val HAPTICS_TAG = "GSenderPendant-haptics"
         private const val MAX_VIBRATE_STEPS = 8
         private const val MAX_VIBRATE_STEP_MS = 500L
 
