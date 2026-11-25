@@ -14,12 +14,9 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 function aggregateRunTime(jobs: Job[]): [string[], number[]] {
     const aggregate: JobAggregate = {};
-    jobs.map((job) => {
-        if (!Object.hasOwn(aggregate, job.port)) {
-            aggregate[job.port ?? t('stats:jobs.unknownPort')] = job.duration;
-            return;
-        }
-        aggregate[job.port] += job.duration;
+    jobs.forEach((job) => {
+        const port = job.port ?? t('stats:jobs.unknownPort');
+        aggregate[port] = (aggregate[port] ?? 0) + job.duration;
     });
 
     return [Object.keys(aggregate), Object.values(aggregate)];

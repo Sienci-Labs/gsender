@@ -15,11 +15,8 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 function aggregatePortInfo(jobs: Job[]): [string[], number[]] {
     const jobAggregate: JobAggregate = {};
     jobs.forEach((job) => {
-        if (!Object.hasOwn(jobAggregate, job.port)) {
-            jobAggregate[job.port ?? t('stats:jobs.unknownPort')] = 1;
-            return;
-        }
-        jobAggregate[job.port] = jobAggregate[job.port] + 1;
+        const port = job.port ?? t('stats:jobs.unknownPort');
+        jobAggregate[port] = (jobAggregate[port] ?? 0) + 1;
     });
 
     return [Object.keys(jobAggregate), Object.values(jobAggregate)];
