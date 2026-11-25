@@ -6,20 +6,24 @@ import {
     zPlusJog,
 } from 'app/features/Jogging/utils/Jogging';
 import cn from 'classnames';
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import {
+    AxisLabel,
     JogActionButton,
     type JogTone,
     PRESET_META,
     useJogControls,
 } from '../../jog/jogShared';
+import { JogAMinus, JogAPlus, JogZDown, JogZUp } from '../../jog/jogIcons';
 
+// Axis buttons rest on a light tint of their axis colour so they read as
+// "moves the machine" (desktop uses a solid fill); pressing goes solid.
 const TONE: Record<JogTone, string> = {
-    neutral: 'border-outline-subtle text-content-muted',
-    x: 'border-axis-x text-axis-x',
-    y: 'border-axis-y text-axis-y',
-    z: 'border-axis-z text-axis-z',
-    a: 'border-axis-a text-axis-a',
+    neutral: 'bg-surface-raised border-outline-subtle text-content-muted',
+    x: 'bg-axis-x/[0.07] hover:bg-axis-x/[0.13] border-axis-x text-axis-x',
+    y: 'bg-axis-y/[0.07] hover:bg-axis-y/[0.13] border-axis-y text-axis-y',
+    z: 'bg-axis-z/[0.07] hover:bg-axis-z/[0.13] border-axis-z text-axis-z',
+    a: 'bg-axis-a/[0.07] hover:bg-axis-a/[0.13] border-axis-a text-axis-a',
 };
 
 const TONE_ACTIVE: Record<JogTone, string> = {
@@ -34,10 +38,47 @@ const jogClass =
     (tone: JogTone, extra = '') =>
     (active: boolean) =>
         cn(
-            'jog-btn relative flex items-center justify-center rounded-xl border font-mono font-bold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-robin-500',
-            active ? TONE_ACTIVE[tone] : cn('bg-surface-raised', TONE[tone]),
+            'jog-btn relative flex items-center justify-center rounded-xl font-mono font-bold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-robin-500',
+            tone === 'neutral' ? 'border' : 'border-2',
+            active ? TONE_ACTIVE[tone] : TONE[tone],
             extra,
         );
+
+/** Icon stacked over the axis label (X+, Z−, …). */
+function AxisContent({
+    icon: Icon,
+    label,
+    textClass,
+    inline = false,
+}: {
+    icon?: ComponentType<{ className?: string }>;
+    label: string;
+    textClass: string;
+    /** Icon beside the label — for the short Z/A buttons. */
+    inline?: boolean;
+}) {
+    return (
+        <span
+            className={cn(
+                'flex items-center justify-center leading-none',
+                inline ? 'flex-row gap-1.5' : 'flex-col gap-0.5',
+            )}
+        >
+            {Icon && (
+                <Icon
+                    className={cn('shrink-0', inline ? 'w-8 h-8' : 'w-9 h-9')}
+                />
+            )}
+            {inline ? (
+                <span className={textClass}>{label}</span>
+            ) : (
+                <AxisLabel label={label} className={textClass} />
+            )}
+        </span>
+    );
+}
+
+const Z_A_TEXT = 'text-[22px]';
 
 /** Precise / Normal / Rapid presets, the XY pad and a Z / A pad, on
  * JoggingCard's own jog logic. */
@@ -60,14 +101,15 @@ export default function JogArea({ className }: { className?: string }) {
         const Icon = button.icon;
         let content: ReactNode;
         if (button.label) {
-            // Typographic minus, matching the mockup's X− / Y−
             content = (
-                <span className="text-[15px]">
-                    {button.label.replace('-', '−')}
-                </span>
+                <AxisContent
+                    icon={Icon}
+                    label={button.label}
+                    textClass="text-[20px]"
+                />
             );
         } else if (Icon) {
-            content = <Icon className="w-[15px] h-[15px]" />;
+            content = <Icon className="w-7 h-7" />;
         }
         return (
             <JogActionButton
@@ -134,9 +176,16 @@ export default function JogArea({ className }: { className?: string }) {
                         onLongPress={() =>
                             continuousJogAxis({ Z: 1 }, feedrate)
                         }
-                        className={jogClass('z', 'h-[58px] text-[17px]')}
+                        className={jogClass('z', 'h-[58px]')}
                     >
-                        {() => 'Z+'}
+                        {() => (
+                            <AxisContent
+                                icon={JogZUp}
+                                label="Z+"
+                                textClass={Z_A_TEXT}
+                                inline
+                            />
+                        )}
                     </JogActionButton>
                     <JogActionButton
                         id="z-minus"
@@ -149,9 +198,16 @@ export default function JogArea({ className }: { className?: string }) {
                         onLongPress={() =>
                             continuousJogAxis({ Z: -1 }, feedrate)
                         }
-                        className={jogClass('z', 'h-[58px] text-[17px]')}
+                        className={jogClass('z', 'h-[58px]')}
                     >
-                        {() => 'Z−'}
+                        {() => (
+                            <AxisContent
+                                icon={JogZDown}
+                                label="Z−"
+                                textClass={Z_A_TEXT}
+                                inline
+                            />
+                        )}
                     </JogActionButton>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -169,9 +225,16 @@ export default function JogArea({ className }: { className?: string }) {
                                 feedrate,
                             )
                         }
-                        className={jogClass('a', 'h-[58px] text-[17px]')}
+                        className={jogClass('a', 'h-[58px]')}
                     >
-                        {() => 'A+'}
+                        {() => (
+                            <AxisContent
+                                icon={JogAPlus}
+                                label="A+"
+                                textClass={Z_A_TEXT}
+                                inline
+                            />
+                        )}
                     </JogActionButton>
                     <JogActionButton
                         id="a-minus"
@@ -187,9 +250,16 @@ export default function JogArea({ className }: { className?: string }) {
                                 feedrate,
                             )
                         }
-                        className={jogClass('a', 'h-[58px] text-[17px]')}
+                        className={jogClass('a', 'h-[58px]')}
                     >
-                        {() => 'A−'}
+                        {() => (
+                            <AxisContent
+                                icon={JogAMinus}
+                                label="A−"
+                                textClass={Z_A_TEXT}
+                                inline
+                            />
+                        )}
                     </JogActionButton>
                 </div>
             </div>

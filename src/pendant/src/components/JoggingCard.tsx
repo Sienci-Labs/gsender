@@ -5,14 +5,10 @@ import {
     zMinusJog,
     zPlusJog,
 } from 'app/features/Jogging/utils/Jogging';
+import { Move } from 'lucide-react';
+import { JogAMinus, JogAPlus, JogZDown, JogZUp } from './jog/jogIcons';
 import {
-    ChevronDown,
-    ChevronUp,
-    Move,
-    RotateCcw,
-    RotateCw,
-} from 'lucide-react';
-import {
+    AxisLabel,
     JogActionButton,
     type JogTone,
     PRESET_META,
@@ -39,10 +35,10 @@ export default function JoggingCard() {
     const toneClasses: Record<JogTone, string> = {
         neutral:
             'bg-white border-gray-400 text-gray-600 shadow-sm dark:bg-surface-raised dark:border-outline dark:text-content-muted dark:shadow-none',
-        x: 'bg-white border-red-600 text-red-700 shadow-sm dark:bg-surface-raised dark:border-red-400 dark:text-red-400 dark:shadow-none',
-        y: 'bg-white border-green-600 text-green-700 shadow-sm dark:bg-surface-raised dark:border-green-400 dark:text-green-400 dark:shadow-none',
-        z: 'bg-white border-blue-600 text-blue-700 shadow-sm dark:bg-surface-raised dark:border-blue-400 dark:text-blue-400 dark:shadow-none',
-        a: 'bg-white border-purple-500 text-purple-700 shadow-sm dark:bg-surface-raised dark:border-purple-400 dark:text-purple-400 dark:shadow-none',
+        x: 'bg-red-600/[0.07] border-red-600 text-red-700 shadow-sm dark:bg-red-500/[0.10] dark:border-red-400 dark:text-red-400 dark:shadow-none',
+        y: 'bg-green-600/[0.07] border-green-600 text-green-700 shadow-sm dark:bg-green-500/[0.10] dark:border-green-400 dark:text-green-400 dark:shadow-none',
+        z: 'bg-blue-600/[0.07] border-blue-600 text-blue-700 shadow-sm dark:bg-blue-500/[0.10] dark:border-blue-400 dark:text-blue-400 dark:shadow-none',
+        a: 'bg-purple-600/[0.07] border-purple-500 text-purple-700 shadow-sm dark:bg-purple-500/[0.10] dark:border-purple-400 dark:text-purple-400 dark:shadow-none',
     };
 
     const activeClasses: Record<JogTone, string> = {
@@ -57,10 +53,10 @@ export default function JoggingCard() {
     const hoverToneClasses: Record<JogTone, string> = {
         neutral:
             'hover:border-gray-500 hover:bg-gray-50 dark:hover:border-gray-500 dark:hover:bg-dark-lighter',
-        x: 'hover:border-red-700 hover:bg-gray-50 dark:hover:border-red-300 dark:hover:bg-dark-lighter',
-        y: 'hover:border-green-700 hover:bg-gray-50 dark:hover:border-green-300 dark:hover:bg-dark-lighter',
-        z: 'hover:border-blue-700 hover:bg-gray-50 dark:hover:border-blue-300 dark:hover:bg-dark-lighter',
-        a: 'hover:border-purple-600 hover:bg-gray-50 dark:hover:border-purple-300 dark:hover:bg-dark-lighter',
+        x: 'hover:border-red-700 hover:bg-red-600/[0.13] dark:hover:border-red-300 dark:hover:bg-red-500/[0.16]',
+        y: 'hover:border-green-700 hover:bg-green-600/[0.13] dark:hover:border-green-300 dark:hover:bg-green-500/[0.16]',
+        z: 'hover:border-blue-700 hover:bg-blue-600/[0.13] dark:hover:border-blue-300 dark:hover:bg-blue-500/[0.16]',
+        a: 'hover:border-purple-600 hover:bg-purple-600/[0.13] dark:hover:border-purple-300 dark:hover:bg-purple-500/[0.16]',
     };
 
     const axisPanel = 'p-0';
@@ -103,8 +99,8 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[0].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
                                 </div>
                             );
                         }}
@@ -128,11 +124,12 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[1].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
-                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">
-                                        {xyButtons[1].label}
-                                    </span>
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
+                                    <AxisLabel
+                                        label={xyButtons[1].label!}
+                                        className="text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none"
+                                    />
                                 </div>
                             );
                         }}
@@ -156,8 +153,8 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[2].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
                                 </div>
                             );
                         }}
@@ -181,11 +178,12 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[3].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
-                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">
-                                        {xyButtons[3].label}
-                                    </span>
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
+                                    <AxisLabel
+                                        label={xyButtons[3].label!}
+                                        className="text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none"
+                                    />
                                 </div>
                             );
                         }}
@@ -216,11 +214,12 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[4].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
-                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">
-                                        {xyButtons[4].label}
-                                    </span>
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
+                                    <AxisLabel
+                                        label={xyButtons[4].label!}
+                                        className="text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none"
+                                    />
                                 </div>
                             );
                         }}
@@ -244,8 +243,8 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[5].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
                                 </div>
                             );
                         }}
@@ -269,11 +268,12 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[6].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
-                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">
-                                        {xyButtons[6].label}
-                                    </span>
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
+                                    <AxisLabel
+                                        label={xyButtons[6].label!}
+                                        className="text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none"
+                                    />
                                 </div>
                             );
                         }}
@@ -297,8 +297,8 @@ export default function JoggingCard() {
                         {(active) => {
                             const Icon = xyButtons[7].icon!;
                             return (
-                                <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
+                                    <Icon className="w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)]" />
                                 </div>
                             );
                         }}
@@ -329,14 +329,13 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <ChevronUp
-                                            className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        <JogZUp
+                                            className={`w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)] ${active ? 'text-white' : canJog ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
                                         />
-                                        <span
-                                            className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
-                                        >
-                                            Z+
-                                        </span>
+                                        <AxisLabel
+                                            label="Z+"
+                                            className={`text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        />
                                     </div>
                                 )}
                             </JogActionButton>
@@ -361,14 +360,13 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <ChevronDown
-                                            className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        <JogZDown
+                                            className={`w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)] ${active ? 'text-white' : canJog ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
                                         />
-                                        <span
-                                            className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
-                                        >
-                                            Z-
-                                        </span>
+                                        <AxisLabel
+                                            label="Z-"
+                                            className={`text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        />
                                     </div>
                                 )}
                             </JogActionButton>
@@ -408,14 +406,13 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <RotateCw
-                                            className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        <JogAPlus
+                                            className={`w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)] ${active ? 'text-white' : canJog ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
                                         />
-                                        <span
-                                            className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
-                                        >
-                                            A+
-                                        </span>
+                                        <AxisLabel
+                                            label="A+"
+                                            className={`text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        />
                                     </div>
                                 )}
                             </JogActionButton>
@@ -450,14 +447,13 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <RotateCcw
-                                            className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        <JogAMinus
+                                            className={`w-[clamp(1.25rem,3.25vh,2rem)] h-[clamp(1.25rem,3.25vh,2rem)] ${active ? 'text-white' : canJog ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
                                         />
-                                        <span
-                                            className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
-                                        >
-                                            A-
-                                        </span>
+                                        <AxisLabel
+                                            label="A-"
+                                            className={`text-[clamp(1rem,2.6vh,1.5rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-400' : 'text-gray-400 dark:text-content-muted'}`}
+                                        />
                                     </div>
                                 )}
                             </JogActionButton>

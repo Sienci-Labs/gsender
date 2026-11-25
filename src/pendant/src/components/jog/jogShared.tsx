@@ -22,19 +22,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import store from 'app/store';
 import type { RootState } from 'app/store/redux';
-import {
-    ArrowDownLeft,
-    ArrowDownRight,
-    ArrowUpLeft,
-    ArrowUpRight,
-    ChevronDown,
-    ChevronLeft,
-    ChevronRight,
-    ChevronUp,
-    Rabbit,
-    Rocket,
-    Turtle,
-} from 'lucide-react';
+import { Rabbit, Rocket, Turtle } from 'lucide-react';
 import {
     type ComponentType,
     type ReactNode,
@@ -44,6 +32,16 @@ import {
     useState,
 } from 'react';
 import { LongPressCallbackReason, useLongPress } from 'use-long-press';
+import {
+    JogArrowDown,
+    JogArrowDownLeft,
+    JogArrowDownRight,
+    JogArrowLeft,
+    JogArrowRight,
+    JogArrowUp,
+    JogArrowUpLeft,
+    JogArrowUpRight,
+} from './jogIcons';
 
 // Shared by JoggingCard and the carve screen's JogArea.
 
@@ -144,6 +142,30 @@ function readJogConfigs(units: string): Record<JogPresetId, JogConfig> {
         normal: getPresetFromStore('normal', units),
         rapid: getPresetFromStore('rapid', units),
     };
+}
+
+/**
+ * Axis label (e.g. "Y+") with the letter centred and the sign hung off its
+ * right edge, so the letter sits directly under the jog arrow above it.
+ * Centring the whole "Y+" string puts the letter visibly left of the arrow.
+ */
+export function AxisLabel({
+    label,
+    className,
+}: {
+    label: string;
+    className?: string;
+}) {
+    const letter = label.slice(0, -1);
+    const sign = label.slice(-1).replace('-', '\u2212');
+    return (
+        <span className={`relative inline-block ${className ?? ''}`}>
+            {letter}
+            <span aria-hidden className="absolute left-full top-0">
+                {sign}
+            </span>
+        </span>
+    );
 }
 
 export function JogActionButton({
@@ -289,7 +311,7 @@ export function useJogControls() {
         () => [
             {
                 id: 'xy-up-left',
-                icon: ArrowUpLeft,
+                icon: JogArrowUpLeft,
                 tone: 'neutral',
                 shortPress: () => xMinusYPlus(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ X: -1, Y: 1 }, feedrate),
@@ -298,7 +320,7 @@ export function useJogControls() {
             {
                 id: 'xy-y-plus',
                 label: 'Y+',
-                icon: ChevronUp,
+                icon: JogArrowUp,
                 tone: 'y',
                 shortPress: () => yPlusJog(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ Y: 1 }, feedrate),
@@ -306,7 +328,7 @@ export function useJogControls() {
             },
             {
                 id: 'xy-up-right',
-                icon: ArrowUpRight,
+                icon: JogArrowUpRight,
                 tone: 'neutral',
                 shortPress: () => xPlusYPlus(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ X: 1, Y: 1 }, feedrate),
@@ -315,7 +337,7 @@ export function useJogControls() {
             {
                 id: 'xy-x-minus',
                 label: 'X-',
-                icon: ChevronLeft,
+                icon: JogArrowLeft,
                 tone: 'x',
                 shortPress: () => xMinusJog(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ X: -1 }, feedrate),
@@ -324,7 +346,7 @@ export function useJogControls() {
             {
                 id: 'xy-x-plus',
                 label: 'X+',
-                icon: ChevronRight,
+                icon: JogArrowRight,
                 tone: 'x',
                 shortPress: () => xPlusJog(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ X: 1 }, feedrate),
@@ -332,7 +354,7 @@ export function useJogControls() {
             },
             {
                 id: 'xy-down-left',
-                icon: ArrowDownLeft,
+                icon: JogArrowDownLeft,
                 tone: 'neutral',
                 shortPress: () => xMinusYMinus(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ X: -1, Y: -1 }, feedrate),
@@ -341,7 +363,7 @@ export function useJogControls() {
             {
                 id: 'xy-y-minus',
                 label: 'Y-',
-                icon: ChevronDown,
+                icon: JogArrowDown,
                 tone: 'y',
                 shortPress: () => yMinusJog(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ Y: -1 }, feedrate),
@@ -349,7 +371,7 @@ export function useJogControls() {
             },
             {
                 id: 'xy-down-right',
-                icon: ArrowDownRight,
+                icon: JogArrowDownRight,
                 tone: 'neutral',
                 shortPress: () => xPlusYMinus(xyDistance, feedrate, false),
                 longPress: () => continuousJogAxis({ X: 1, Y: -1 }, feedrate),
