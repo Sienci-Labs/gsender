@@ -33,6 +33,7 @@ import {
     useState,
 } from 'react';
 import { LongPressCallbackReason, useLongPress } from 'use-long-press';
+import { haptic } from '../../lib/haptics';
 import {
     JogArrowDown,
     JogArrowDownLeft,
@@ -217,6 +218,7 @@ export function JogActionButton({
     const longPressBind = useLongPress(
         () => {
             onLongPress();
+            haptic('jog'); // continuous jog has started
         },
         {
             threshold,
@@ -247,6 +249,7 @@ export function JogActionButton({
                     !cancelledRef.current
                 ) {
                     onShortPress();
+                    haptic('jog'); // step jog sent
                     setActiveWithFlash();
                     return;
                 }

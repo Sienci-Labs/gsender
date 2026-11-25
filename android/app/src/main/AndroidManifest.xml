@@ -26,6 +26,10 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- Haptic feedback on jog start and alarm, through WebBridge.vibrate.
+         Normal-level permission: granted at install, no prompt. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"

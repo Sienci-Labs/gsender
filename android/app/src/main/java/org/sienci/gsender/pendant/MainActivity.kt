@@ -13,6 +13,9 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -426,9 +429,10 @@ class MainActivity : Activity() {
     }
 
     /**
-     * Exposed to the page as `window.GSenderAndroid` (src/app/src/lib/restartApp.ts).
-     * Plugin iframes are same-origin and can see it too, so it only offers a
-     * server restart - what plugin install/enable/remove need to remount routes.
+     * Exposed to the page as `window.GSenderAndroid` (src/app/src/lib/restartApp.ts,
+     * src/pendant/src/lib/haptics.ts). Plugin iframes are same-origin and can
+     * see it too, so it only offers a server restart - what plugin
+     * install/enable/remove need to remount routes - and short, bounded haptics.
      */
     private inner class WebBridge {
         @JavascriptInterface
@@ -439,7 +443,42 @@ class MainActivity : Activity() {
                 NodeService.start(this@MainActivity, restart = true)
             }
         }
+
+        /**
+         * Plays a haptic pattern of comma-separated milliseconds, alternating
+         * on/off ("30", "70,90,70"). Clamped so a page can't run the motor for
+         * long: each step 1-500ms, at most 8 steps, never repeating.
+         */
+        @JavascriptInterface
+        fun vibrate(pattern: String) {
+            val timings = pattern.split(',')
+                .mapNotNull { it.trim().toLongOrNull() }
+                .take(MAX_VIBRATE_STEPS)
+                .map { it.coerceIn(1L, MAX_VIBRATE_STEP_MS) }
+            if (timings.isEmpty()) return
+            val vibrator = vibrator() ?: return
+            if (!vibrator.hasVibrator()) return
+            val effect = if (timings.size == 1) {
+                VibrationEffect.createOneShot(timings[0], VibrationEffect.DEFAULT_AMPLITUDE)
+            } else {
+                // Leading 0 = start immediately; -1 = play once.
+                VibrationEffect.createWaveform(longArrayOf(0L, *timings.toLongArray()), -1)
+            }
+            try {
+                vibrator.vibrate(effect)
+            } catch (e: Exception) {
+                Log.w(ServerRuntime.TAG, "vibrate failed", e)
+            }
+        }
     }
+
+    private fun vibrator(): Vibrator? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            getSystemService(VibratorManager::class.java)?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Vibrator::class.java)
+        }
 
     @Deprecated("Activity result API needs AndroidX; this app has no dependencies.")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -570,6 +609,8 @@ class MainActivity : Activity() {
         private const val PAIR_SCHEME = "gsender-pendant"
         private const val WEB_LOG_TAG = "GSenderPendant-web"
         private const val BRIDGE_NAME = "GSenderAndroid"
+        private const val MAX_VIBRATE_STEPS = 8
+        private const val MAX_VIBRATE_STEP_MS = 500L
 
         // Rocket heights for each startup stage (see RocketLaunchView).
         private const val STAGE_WAITING = 0.1f
