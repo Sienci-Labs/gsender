@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { OctagonX } from 'lucide-react';
 import { useEStop } from '../../../hooks/useEStop';
 import HomeCTA from '../../HomeCTA';
 import IncomingFilePill from '../../IncomingFilePill';
@@ -24,12 +25,14 @@ export default function CarveTopBar({ mode }: { mode: CarveMode }) {
                     onClick={handleEStop}
                     disabled={!isConnected}
                     className={cn(
-                        'h-[38px] px-[13px] rounded-md font-mono text-[10.5px] font-semibold tracking-[0.07em] uppercase flex items-center justify-center transition-colors',
+                        'h-11 min-w-[120px] px-4 gap-2 rounded-md font-mono text-[14px] font-bold tracking-[0.07em] uppercase flex items-center justify-center transition-[colors,transform] duration-75',
                         isConnected
-                            ? 'bg-action-stop text-white active:brightness-90'
+                            ? 'bg-action-stop text-white ring-1 ring-red-400/40 shadow-[0_2px_8px_rgba(220,38,38,0.35)] active:brightness-90 active:scale-[0.97]'
                             : 'bg-surface-disabled text-content-disabled',
                     )}
+                    aria-label="Emergency stop"
                 >
+                    <OctagonX className="w-5 h-5 shrink-0" strokeWidth={2.25} />
                     E-STOP
                 </button>
             </div>

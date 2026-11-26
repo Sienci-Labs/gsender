@@ -13,6 +13,7 @@ import {
 } from 'app/store/redux/slices/fileInfo.slice';
 import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
+import { setToolTimeline } from '../hooks/useToolTimeline';
 import {
     getPendantWorkerTheme,
     PENDANT_RAPID_OPACITY,
@@ -464,6 +465,10 @@ const applyWorkerResult = (
     pubsub.publish('file:load', geometry);
     reduxStore.dispatch(
         updateFileInfo(mapWorkerInfoToFileState(payload, geometry.info)),
+    );
+    setToolTimeline(
+        geometry.info.spindleToolEvents ?? {},
+        geometry.info.total ?? 0,
     );
     pubsub.publish('file:toolchanges', {
         toolEvents: geometry.info.spindleToolEvents ?? {},
