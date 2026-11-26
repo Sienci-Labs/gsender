@@ -104,6 +104,32 @@ describe('resolveCarveMode', () => {
         );
     });
 
+    it('is running during start-from-line setup moves', () => {
+        expect(resolveCarveMode({ ...base, startingFromLine: true })).toBe(
+            'running',
+        );
+        expect(
+            resolveCarveMode({
+                ...base,
+                activeState: 'Run',
+                startingFromLine: true,
+            }),
+        ).toBe('running');
+    });
+
+    it('lets alarm, tool change and hold win over start-from-line setup', () => {
+        const starting = { ...base, startingFromLine: true };
+        expect(resolveCarveMode({ ...starting, activeState: 'Alarm' })).toBe(
+            'alarm',
+        );
+        expect(resolveCarveMode({ ...starting, activeState: 'Tool' })).toBe(
+            'toolchange',
+        );
+        expect(resolveCarveMode({ ...starting, activeState: 'Hold' })).toBe(
+            'holdIdle',
+        );
+    });
+
     it('is setup otherwise', () => {
         expect(resolveCarveMode(base)).toBe('setup');
         expect(resolveCarveMode({ ...base, activeState: 'Jog' })).toBe('setup');

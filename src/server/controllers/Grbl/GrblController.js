@@ -1909,6 +1909,7 @@ class GrblController {
 				this.emit(
 					"job:start",
 					Boolean(lineToStartFrom && lineToStartFrom <= totalLines),
+					lineToStartFrom,
 				);
 
 				this.command("gcode", "%global.state.workspace=modal.wcs");

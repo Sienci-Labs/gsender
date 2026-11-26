@@ -11,7 +11,8 @@ import AlarmHelperCard, { AlarmResource } from './locked/AlarmHelperCard';
 import HoldCard from './locked/HoldCard';
 import LockedNotice from './locked/LockedNotice';
 import RunLeft from './run/RunLeft';
-import RunRight from './run/RunRight';
+import ReadOnlyConsole from './run/ReadOnlyConsole';
+import RunProgress from './run/RunProgress';
 import JogArea from './setup/JogArea';
 import SetupTabs, { type SetupTab } from './setup/SetupTabs';
 import TcLeft from './toolchange/TcLeft';
@@ -88,6 +89,9 @@ export default function CarveScreen({
 
             <VizStage mode={mode} onOpenTool={onOpenTool} />
 
+            {/* Full-width progress; overrides and console sit below */}
+            {isRun && <RunProgress />}
+
             <div className="relative flex flex-1 min-h-0">
                 <div className="flex flex-col basis-[44%] shrink-0 min-w-0 min-h-0 border-r border-outline-subtle">
                     {/* Setup tabs stay mounted through a job so the chosen
@@ -121,7 +125,11 @@ export default function CarveScreen({
 
                 <div className="flex flex-col flex-1 min-w-0 min-h-0">
                     {isSetup && <JogArea className="flex-1 p-2.5" />}
-                    {isRun && <RunRight />}
+                    {isRun && (
+                        <div className="flex flex-col flex-1 min-h-0 p-2.5">
+                            <ReadOnlyConsole />
+                        </div>
+                    )}
                     {mode === 'alarm' && (
                         <div className="flex flex-col flex-1 min-h-0 p-2.5">
                             <AlarmHelperCard />

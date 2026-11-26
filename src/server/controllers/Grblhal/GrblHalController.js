@@ -2328,6 +2328,7 @@ class GrblHalController {
 				this.emit(
 					"job:start",
 					Boolean(lineToStartFrom && lineToStartFrom <= totalLines),
+					lineToStartFrom,
 				);
 
 				const atci = _.get(this.settings, "info.NEWOPT.ATC", "0") === "1";

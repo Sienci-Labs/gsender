@@ -295,7 +295,7 @@
   "src/pendant/src/components/carve/run/RapidPresets.tsx": {
     "hardcoded: Rapid": 1
   },
-  "src/pendant/src/components/carve/run/RunRight.tsx": {
+  "src/pendant/src/components/carve/run/RunProgress.tsx": {
     "hardcoded: Lines sent": 1,
     "hardcoded: Remaining": 1
   },

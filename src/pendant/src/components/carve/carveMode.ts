@@ -21,6 +21,9 @@ export interface CarveModeInputs {
     workflowState: string;
     activeState: string;
     wizardVisible: boolean;
+    /** Start from line has been sent and the machine is running its setup
+     * moves (spindle, position, modals) before the job proper begins. */
+    startingFromLine?: boolean;
 }
 
 const isHoldState = (activeState: string) =>
@@ -33,6 +36,7 @@ export function resolveCarveMode({
     workflowState,
     activeState,
     wizardVisible,
+    startingFromLine = false,
 }: CarveModeInputs): CarveMode {
     if (!isConnected) return 'disconnected';
     if (wizardVisible || activeState === GRBL_ACTIVE_STATE_TOOL) {
@@ -46,7 +50,10 @@ export function resolveCarveMode({
         return 'holdJob';
     }
     if (workflowState === WORKFLOW_STATE_RUNNING) return 'running';
+    // A hold during the setup moves stays holdIdle: the job hasn't started,
+    // so a Resume there must not re-send gcode:start
     if (isHoldState(activeState)) return 'holdIdle';
+    if (startingFromLine) return 'running';
     return 'setup';
 }
 

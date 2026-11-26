@@ -254,6 +254,23 @@ button.jog-btn:disabled:hover span {
     );
 }
 
+/* Hatching over the not-yet-sent part of the segmented tool timeline */
+.pendant-progress-unsent {
+    background-image: repeating-linear-gradient(
+        -62deg,
+        rgba(0, 0, 0, 0.14) 0 2px,
+        rgba(0, 0, 0, 0) 2px 8px
+    );
+}
+
+.dark .pendant-progress-unsent {
+    background-image: repeating-linear-gradient(
+        -62deg,
+        rgba(255, 255, 255, 0.16) 0 2px,
+        rgba(255, 255, 255, 0) 2px 8px
+    );
+}
+
 .drag-region {
     -webkit-app-region: drag;
 }
