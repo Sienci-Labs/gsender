@@ -13,7 +13,8 @@ import type { RootState } from 'app/store/redux';
 import cx from 'classnames';
 import get from 'lodash/get';
 import { ScanLine } from 'lucide-react';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
+import HoldButton from '../setup/HoldButton';
 import type { CarveMode } from '../carveMode';
 
 // Same stub JobControls.tsx passes today
@@ -23,6 +24,23 @@ const validateATC = (): [
 ] => [false, { type: '', title: '', body: <span /> }];
 
 const onStop = () => {};
+
+// Starting a job is hold-to-confirm, like spindle start and file loads
+function HoldToStartButton(props: {
+    onActivate: () => void;
+    disabled?: boolean;
+    className?: string;
+    children: ReactNode;
+}) {
+    return (
+        <HoldButton
+            {...props}
+            aria-label="Hold to start job"
+            holdingClassName="ring-2 ring-white/70"
+            fillClassName="bg-white/30"
+        />
+    );
+}
 
 /** One job slot (Start / Pause / Resume) next to a constant Stop. */
 export default function VizJobControls({ mode }: { mode: CarveMode }) {
@@ -76,18 +94,21 @@ export default function VizJobControls({ mode }: { mode: CarveMode }) {
                 key={slotType}
                 type={slotType}
                 labelOverride={slotLabel}
+                ButtonComponent={
+                    slotLabel === 'Start' ? HoldToStartButton : undefined
+                }
                 {...sharedProps}
             />
             <ControlButton type={STOP} {...sharedProps} />
             {showOutline && (
-                <button
-                    type="button"
+                <HoldButton
                     disabled={outlineDisabled}
+                    aria-label="Hold to trace outline"
                     // The pendant has no visualizer outline handler, so it
                     // always uses the outline worker
-                    onClick={() => runOutline(posthog, { liteMode: true })}
+                    onActivate={() => runOutline(posthog, { liteMode: true })}
                     className={cx(
-                        'flex items-center justify-center gap-2 w-[100px] h-[50px] shrink-0 rounded-md border font-mono text-[12.5px] font-bold uppercase tracking-[0.05em] transition-[colors,transform] duration-75 enabled:active:scale-[0.96]',
+                        'flex items-center justify-center gap-2 w-[100px] h-[50px] shrink-0 rounded-md border font-mono text-[12.5px] font-bold uppercase tracking-[0.05em]',
                         outlineDisabled
                             ? 'bg-surface-raised border-outline-subtle text-content-disabled cursor-not-allowed'
                             : 'bg-surface-elevated border-outline-strong text-content-primary',
@@ -95,7 +116,7 @@ export default function VizJobControls({ mode }: { mode: CarveMode }) {
                 >
                     <ScanLine className="w-[18px] h-[18px]" />
                     <span>Outline</span>
-                </button>
+                </HoldButton>
             )}
         </div>
     );
