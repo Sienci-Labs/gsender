@@ -140,7 +140,7 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
     return (
         <div
             className={cn(
-                'flex flex-col gap-2.5 px-2.5 py-2.5 rounded-md border',
+                'flex flex-col gap-2 px-2.5 py-2 rounded-md border',
                 laser
                     ? 'border-laser/55 bg-laser/10'
                     : 'border-outline-subtle bg-surface-raised',
@@ -208,13 +208,36 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
                 )}
             </div>
 
-            {/* Speed / power */}
-            <div className="flex flex-col gap-1">
-                <div className="flex items-end justify-between gap-2">
-                    <div className="flex items-baseline gap-1.5 min-w-0">
+            {/* Speed / power: slider with the live value at its end */}
+            <div className="flex items-center gap-3">
+                <div className="flex flex-col flex-1 min-w-0">
+                    <Slider
+                        value={[
+                            Math.min(api.sMax, Math.max(api.sMin, sTarget)),
+                        ]}
+                        min={api.sMin}
+                        max={api.sMax}
+                        step={api.sStep}
+                        disabled={!api.clickable || api.sMax <= api.sMin}
+                        onValueChange={([v]: number[]) => api.setSTarget(v)}
+                        className="relative flex items-center w-full h-8 touch-none select-none"
+                        trackClassName="h-3 bg-surface-sunken rounded-full relative flex-grow"
+                        rangeClassName={cn(
+                            'absolute h-full rounded-full',
+                            laser ? 'bg-laser' : 'bg-robin-500',
+                        )}
+                        thumbClassName="block w-7 h-7 rounded-full border-2 border-outline-strong bg-white outline-none disabled:bg-gray-300"
+                    />
+                    <div className="flex justify-between font-mono text-[9px] text-content-disabled tabular-nums">
+                        <span>{api.sMin}</span>
+                        <span>{api.sMax}</span>
+                    </div>
+                </div>
+                <div className="flex flex-col items-end shrink-0 min-w-[76px]">
+                    <div className="flex items-baseline gap-1">
                         <span
                             className={cn(
-                                'text-3xl font-bold leading-none tabular-nums',
+                                'text-2xl font-bold leading-none tabular-nums',
                                 laser
                                     ? 'text-purple-200'
                                     : running
@@ -228,7 +251,7 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
                                   ? Math.round(api.laserPower)
                                   : sValue.toLocaleString()}
                         </span>
-                        <span className="text-xs font-semibold text-content-muted">
+                        <span className="text-[11px] font-semibold text-content-muted">
                             {laser ? '%' : 'RPM'}
                         </span>
                     </div>
@@ -237,25 +260,6 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
                             {laser ? `S${sValue}` : `target S${sTarget}`}
                         </span>
                     )}
-                </div>
-                <Slider
-                    value={[Math.min(api.sMax, Math.max(api.sMin, sTarget))]}
-                    min={api.sMin}
-                    max={api.sMax}
-                    step={api.sStep}
-                    disabled={!api.clickable || api.sMax <= api.sMin}
-                    onValueChange={([v]: number[]) => api.setSTarget(v)}
-                    className="relative flex items-center w-full h-9 touch-none select-none"
-                    trackClassName="h-3 bg-surface-sunken rounded-full relative flex-grow"
-                    rangeClassName={cn(
-                        'absolute h-full rounded-full',
-                        laser ? 'bg-laser' : 'bg-robin-500',
-                    )}
-                    thumbClassName="block w-7 h-7 rounded-full border-2 border-outline-strong bg-white outline-none disabled:bg-gray-300"
-                />
-                <div className="flex justify-between font-mono text-[9px] text-content-disabled tabular-nums">
-                    <span>{api.sMin}</span>
-                    <span>{api.sMax}</span>
                 </div>
             </div>
 
