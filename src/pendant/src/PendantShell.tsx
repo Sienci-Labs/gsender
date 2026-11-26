@@ -22,7 +22,6 @@ import PendantConfigView from './components/PendantConfigView';
 import PendantToolsView from './components/PendantToolsView';
 import PendantTopBar from './components/PendantTopBar';
 import PendantToolHost from './components/tools/PendantToolHost';
-import { useAlarmHaptics } from './hooks/useAlarmHaptics';
 
 type NavTab = 'carve' | 'tools' | 'config';
 
@@ -90,7 +89,6 @@ export default function PendantShell() {
         setConfigVisited(true);
     }
     useDarkMode(); // syncs workspace.enableDarkMode → <html class="dark">
-    useAlarmHaptics(); // Android build: double buzz on entering Alarm
 
     useEffect(() => {
         const onChange = () => setLegacyCarve(readLegacyCarve());

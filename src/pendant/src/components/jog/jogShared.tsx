@@ -33,7 +33,6 @@ import {
     useState,
 } from 'react';
 import { LongPressCallbackReason, useLongPress } from 'use-long-press';
-import { haptic } from '../../lib/haptics';
 import {
     JogArrowDown,
     JogArrowDownLeft,
@@ -215,53 +214,45 @@ export function JogActionButton({
     // Set when the browser cancelled the gesture, so it isn't taken as a tap.
     const cancelledRef = useRef(false);
 
-    const longPressBind = useLongPress(
-        () => {
-            onLongPress();
-            haptic('jog'); // continuous jog has started
+    const longPressBind = useLongPress(() => onLongPress(), {
+        threshold,
+        cancelOnMovement: JOG_MOVE_TOLERANCE_PX,
+        // The pointer is captured on press (below), so leaving the button
+        // doesn't end the hold, and the release still comes back here.
+        cancelOutsideElement: false,
+        filterEvents: (event) => {
+            if (disabled) {
+                return false;
+            }
+            if ('button' in event && typeof event.button === 'number') {
+                return event.button === 0;
+            }
+            return true;
         },
-        {
-            threshold,
-            cancelOnMovement: JOG_MOVE_TOLERANCE_PX,
-            // The pointer is captured on press (below), so leaving the button
-            // doesn't end the hold, and the release still comes back here.
-            cancelOutsideElement: false,
-            filterEvents: (event) => {
-                if (disabled) {
-                    return false;
-                }
-                if ('button' in event && typeof event.button === 'number') {
-                    return event.button === 0;
-                }
-                return true;
-            },
-            onStart: () => {
-                pressingRef.current = true;
-                cancelledRef.current = false;
-                clearQuickReleaseTimer();
-                setActive(true);
-            },
-            onCancel: (_event, meta) => {
-                pressingRef.current = false;
-                if (
-                    meta.reason ===
-                        LongPressCallbackReason.CancelledByRelease &&
-                    !cancelledRef.current
-                ) {
-                    onShortPress();
-                    haptic('jog'); // step jog sent
-                    setActiveWithFlash();
-                    return;
-                }
-                setActive(false);
-            },
-            onFinish: () => {
-                pressingRef.current = false;
-                stopContinuousJog();
-                setActive(false);
-            },
+        onStart: () => {
+            pressingRef.current = true;
+            cancelledRef.current = false;
+            clearQuickReleaseTimer();
+            setActive(true);
         },
-    )();
+        onCancel: (_event, meta) => {
+            pressingRef.current = false;
+            if (
+                meta.reason === LongPressCallbackReason.CancelledByRelease &&
+                !cancelledRef.current
+            ) {
+                onShortPress();
+                setActiveWithFlash();
+                return;
+            }
+            setActive(false);
+        },
+        onFinish: () => {
+            pressingRef.current = false;
+            stopContinuousJog();
+            setActive(false);
+        },
+    })();
 
     const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
         longPressBind.onPointerDown(event);

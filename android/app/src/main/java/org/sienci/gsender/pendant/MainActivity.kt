@@ -3,7 +3,6 @@ package org.sienci.gsender.pendant
 import android.Manifest
 import android.app.Activity
 import android.app.ActivityManager
-import android.app.AlertDialog
 import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -23,7 +22,6 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
 import android.provider.Settings
-import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
@@ -43,7 +41,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import android.window.OnBackInvokedDispatcher
 import org.json.JSONObject
 
@@ -74,7 +71,6 @@ class MainActivity : Activity() {
     private var pageLoaded = false
     private var pageError: String? = null
     private var launching = false
-    private var hapticsDialogShown = false
 
     /** Set by [WebBridge.restartServer]: drop the page once the old server is gone. */
     private var restartPending = false
@@ -342,10 +338,6 @@ class MainActivity : Activity() {
                 Log.i(ServerRuntime.TAG, "PAGE_LOADED t=${ServerRuntime.sinceProcessStart()}")
                 render(ServerRuntime.state)
                 deliverPairLink()
-                if (HAPTICS_DEBUG && !hapticsDialogShown) {
-                    hapticsDialogShown = true
-                    showHapticsDialog()
-                }
             }
 
             override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
@@ -474,12 +466,7 @@ class MainActivity : Activity() {
                 .take(MAX_VIBRATE_STEPS)
                 .map { it.coerceIn(1L, MAX_VIBRATE_STEP_MS) }
             if (timings.isEmpty()) return
-            val result = playHaptic(timings, kind)
-            if (HAPTICS_DEBUG) {
-                runOnUiThread {
-                    Toast.makeText(this@MainActivity, "haptic $kind: $result", Toast.LENGTH_SHORT).show()
-                }
-            }
+            playHaptic(timings, kind)
         }
 
         /**
@@ -525,7 +512,7 @@ class MainActivity : Activity() {
 
     /**
      * Plays [timings] (ms, alternating on/off) and returns what happened, for
-     * the log and the debug toast. [kind] "alarm" plays as an alarm; anything
+     * the log. [kind] "alarm" plays as an alarm; anything
      * else as hardware feedback - without a usage the effect is "unknown",
      * which Android 13+ can mute via settings or power saving.
      */
@@ -565,45 +552,6 @@ class MainActivity : Activity() {
             Log.w(HAPTICS_TAG, "vibrate failed kind=$kind", e)
             "failed: ${e.javaClass.simpleName}: ${e.message}"
         }
-    }
-
-    /**
-     * Debug-only ([HAPTICS_DEBUG]): shows the vibrator status with buttons
-     * that buzz natively, bypassing the web page, plus the system haptic
-     * path. Buttons don't close the dialog, so each can be tried in turn.
-     */
-    private fun showHapticsDialog() {
-        val status = hapticsStatusJson().toString(2)
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Haptics status")
-            .setMessage(status)
-            .setPositiveButton("Buzz alarm", null)
-            .setNeutralButton("Buzz feedback", null)
-            .setNegativeButton("Close", null)
-            .create()
-        dialog.setOnShowListener {
-            fun report(result: String) {
-                dialog.setMessage("$status\n\nLast test: $result")
-            }
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                report("alarm 300ms -> " + playHaptic(listOf(300L), "alarm"))
-            }
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-                report("feedback 300ms -> " + playHaptic(listOf(300L), "jog"))
-            }
-            // Long-pressing "Buzz feedback" tries the system haptic path instead
-            // (View.performHapticFeedback), which some OEMs route differently.
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnLongClickListener { v ->
-                val ok = v.performHapticFeedback(
-                    HapticFeedbackConstants.LONG_PRESS,
-                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING,
-                )
-                report("system performHapticFeedback -> $ok")
-                true
-            }
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener { dialog.dismiss() }
-        }
-        dialog.show()
     }
 
     private fun vibrator(): Vibrator? =
@@ -746,11 +694,6 @@ class MainActivity : Activity() {
         private const val HAPTICS_TAG = "GSenderPendant-haptics"
         private const val MAX_VIBRATE_STEPS = 8
         private const val MAX_VIBRATE_STEP_MS = 500L
-
-        // TEMPORARY: haptics debugging. Shows a status dialog once the page
-        // loads and a toast for every bridge vibrate call. Set false (or
-        // remove) once haptics are confirmed working.
-        private const val HAPTICS_DEBUG = true
 
         // Rocket heights for each startup stage (see RocketLaunchView).
         private const val STAGE_WAITING = 0.1f
