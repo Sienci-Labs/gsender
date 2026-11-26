@@ -1,9 +1,22 @@
 import react from '@vitejs/plugin-react';
+import { createRequire } from 'module';
 import path from 'path';
 import type { Plugin, ViteDevServer } from 'vite';
 import { defineConfig } from 'vite';
 
 const root = path.resolve(__dirname, '../..');
+
+// Same pinning as src/app/vite.config.js (see there): shared app/ modules such
+// as src/app/src/i18n resolve bare imports by walking up from their own path,
+// so src/node_modules (the server's production install, created by CI's
+// `yarn --cwd src install`) wins over the root. webappengine pulls i18next@8
+// in there, which shadowed the root i18next while react-i18next still used
+// the root copy, crashing released pendant builds with "hasLoadedNamespace is
+// not a function". Pin these to the root copies so the two always match.
+const requireFromRoot = createRequire(path.join(root, 'package.json'));
+const rootPackageDir = (name: string) =>
+    path.dirname(requireFromRoot.resolve(`${name}/package.json`));
+const PINNED_TO_ROOT = ['i18next', 'react-i18next'];
 
 // Tailwind v3 + PostCSS only re-runs when the CSS entry file itself is touched.
 // This plugin watches all Tailwind content directories (including those outside
@@ -42,12 +55,21 @@ export default defineConfig({
     base: './',
     plugins: [react(), tailwindHmr()],
     resolve: {
-        alias: {
-            // app/ → src/app/src/ so shared features can resolve their app/* utilities
-            'app-root': root,
-            app: path.join(root, 'src/app/src'),
-            '@': path.join(root, 'src/app/src'),
-        },
+        alias: [
+            // app/ → src/app/src/ so shared features can resolve their app/* utilities.
+            // 'app-root' must stay before 'app', which would otherwise match it.
+            { find: 'app-root', replacement: root },
+            { find: 'app', replacement: path.join(root, 'src/app/src') },
+            { find: '@', replacement: path.join(root, 'src/app/src') },
+            ...PINNED_TO_ROOT.map((name) => ({
+                // Exact match only, so e.g. `i18next-http-backend` is untouched.
+                find: new RegExp(`^${name}$`),
+                replacement: rootPackageDir(name),
+            })),
+        ],
+        // src/package.json lists react too, so src/node_modules could shadow it
+        // for shared app/ files the same way.
+        dedupe: ['react', 'react-dom'],
     },
     optimizeDeps: {
         // concaveman is imported only by Outline.worker, which the dependency
