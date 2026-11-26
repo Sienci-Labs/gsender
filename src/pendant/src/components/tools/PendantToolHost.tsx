@@ -26,11 +26,11 @@ const BUILT_IN_TOOLS: Record<
 > = {
     surfacing: {
         Component: Surfacing,
-        props: { PreviewComponent: GcodeToolPreviewVisualizer },
+        props: { PreviewComponent: GcodeToolPreviewVisualizer, stacked: true },
     },
     'rotary-surfacing': {
         Component: RotarySurfacing,
-        props: { PreviewComponent: GcodeToolPreviewVisualizer },
+        props: { PreviewComponent: GcodeToolPreviewVisualizer, stacked: true },
     },
     'movement-tuning': { Component: MovementTuning },
     squaring: { Component: Squaring },
@@ -84,13 +84,29 @@ export default function PendantToolHost({
             savedName: payload.savedName || '',
         });
     };
+    // Surfacing tools' "Load to Main Visualizer": load the generated file
+    // and jump to Carve, the same way a remote file opens
+    const loadToCarve = (gcode: string, name: string) => {
+        onClose();
+        onShowCarve?.();
+        requestAnimationFrame(() => {
+            void applyGcodeFile({
+                path: '',
+                name,
+                size: new Blob([gcode]).size,
+                content: gcode,
+            });
+        });
+    };
     const extraProps =
         tool.id === 'remote-file-receive'
             ? { onOpenFile: openRemoteFile, OpenButton: HoldToLoadButton }
-            : undefined;
+            : tool.id === 'surfacing' || tool.id === 'rotary-surfacing'
+              ? { onLoadToVisualizer: loadToCarve }
+              : undefined;
 
     return (
-        <div className="flex-1 flex flex-col min-h-0 p-3">
+        <div className="pendant-tool-host flex-1 flex flex-col min-h-0 p-3">
             <div className="flex items-center justify-between mb-2">
                 <h1 className="text-xl font-bold dark:text-content-primary">
                     {tool.title}

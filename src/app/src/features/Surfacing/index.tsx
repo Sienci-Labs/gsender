@@ -41,9 +41,18 @@ const defaultSurfacingState = get(
 type SurfacingToolProps = {
     /** Pendant override: see VisualizerPreview's PreviewComponent prop. */
     PreviewComponent?: ComponentType<{ gcode?: string }>;
+    /** Pendant override: replaces the default load-to-main-visualizer
+     * behaviour (the pendant loads the file itself and switches to Carve). */
+    onLoadToVisualizer?: (gcode: string, name: string) => void;
+    /** Pendant override: preview on top, config below (single column). */
+    stacked?: boolean;
 };
 
-const SurfacingTool = ({ PreviewComponent }: SurfacingToolProps = {}) => {
+const SurfacingTool = ({
+    PreviewComponent,
+    onLoadToVisualizer,
+    stacked = false,
+}: SurfacingToolProps = {}) => {
     const { t } = useAppTranslation();
     const navigate = useNavigate();
     const surfacingConfig = new WidgetConfig('surfacing');
@@ -121,6 +130,10 @@ const SurfacingTool = ({ PreviewComponent }: SurfacingToolProps = {}) => {
 
     const loadGcode = () => {
         const name = 'gSender_Surfacing.gcode';
+        if (onLoadToVisualizer) {
+            onLoadToVisualizer(gcode, name);
+            return;
+        }
         const { size } = new File([gcode], name);
 
         pubsub.publish('gcode:surfacing', { gcode, name, size });
@@ -149,7 +162,12 @@ const SurfacingTool = ({ PreviewComponent }: SurfacingToolProps = {}) => {
 
     return (
         <div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
-            <div className="grid grid-cols-2 gap-4">
+            <div
+                className={cx(
+                    'grid gap-4',
+                    stacked ? 'grid-cols-1' : 'grid-cols-2',
+                )}
+            >
                 <div className="grid gap-4 max-xl:gap-3 xl:gap-2">
                     <p className="text-sm xl:text-base font-normal text-gray-600 dark:text-content-secondary">
                         <TransKey
@@ -487,7 +505,12 @@ const SurfacingTool = ({ PreviewComponent }: SurfacingToolProps = {}) => {
                         </div>
                     </InputArea>
                 </div>
-                <div className="flex flex-col border border-gray-200 rounded-md">
+                <div
+                    className={cx(
+                        'flex flex-col border border-gray-200 rounded-md',
+                        stacked && 'order-first h-[45vh] min-h-[260px]',
+                    )}
+                >
                     <Tabs defaultValue="visualizer-preview">
                         <TabsList className="w-full pb-0 border-b rounded-b-none">
                             <TabsTrigger

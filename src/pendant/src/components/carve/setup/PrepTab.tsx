@@ -8,14 +8,30 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
-import { ChevronDown, Wrench, Zap } from 'lucide-react';
+import {
+    Droplets,
+    Lightbulb,
+    LightbulbOff,
+    RotateCcw,
+    RotateCw,
+    Settings2,
+    Square,
+    Waves,
+    Wind,
+    Wrench,
+    Zap,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
 import { useCoolant } from '../../../hooks/useCoolant';
 import { useHoldToActivate } from '../../../hooks/useHoldToActivate';
 import SpindlePanel, { type SpindleCardApi } from '../../SpindlePanel';
 import OverrideFaders from '../run/OverrideFaders';
-import Segmented from './Segmented';
+import Segmented, {
+    HoldSegment,
+    type SegmentedOption,
+    TapSegment,
+} from './Segmented';
 import './prepTab.css';
 
 const RING_R = 15;
@@ -76,29 +92,32 @@ function ModeSwapIcon({ api }: { api: SpindleCardApi }) {
 }
 
 function PowerCard({ api }: { api: SpindleCardApi }) {
-    const [sliderOpen, setSliderOpen] = useState(false);
+    const [pickerOpen, setPickerOpen] = useState(false);
     const headerRef = useRef<HTMLDivElement>(null);
     const liveSpindle = useTypedSelector(
         (s: RootState) => (s.controller.state.status as any)?.spindle,
     );
     const laser = api.isLaserMode;
     const sTarget = Math.round(api.sTarget);
+    const running = laser
+        ? api.laserIsOn
+        : api.spindleForward || api.spindleReverse;
+    const liveS = Math.round(Number(liveSpindle) || 0);
     // Live S while running; otherwise what M3/M4 will send
-    const sValue = Math.round(Number(liveSpindle) || sTarget || 0);
-    const readout = laser
-        ? `S${sValue} · ${Math.round(api.laserPower)}%`
-        : `S${sValue}`;
+    const sValue = running && liveS ? liveS : sTarget;
+    const showTarget = running && liveS > 0 && liveS !== sTarget;
+    const canPick = api.spindleCount > 1;
 
-    // A tap anywhere outside the chip/overlay closes it
+    // A tap anywhere outside the gear/picker closes it
     useEffect(() => {
-        if (!sliderOpen) return;
+        if (!pickerOpen) return;
         const onDown = (e: PointerEvent) => {
             if (!headerRef.current?.contains(e.target as Node))
-                setSliderOpen(false);
+                setPickerOpen(false);
         };
         document.addEventListener('pointerdown', onDown);
         return () => document.removeEventListener('pointerdown', onDown);
-    }, [sliderOpen]);
+    }, [pickerOpen]);
 
     type Direction = 'cw' | 'ccw' | 'on' | 'off';
     const direction: Direction = laser
@@ -121,12 +140,13 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
     return (
         <div
             className={cn(
-                'flex flex-col gap-[7px] px-2.5 py-2 rounded-md border',
+                'flex flex-col gap-2.5 px-2.5 py-2.5 rounded-md border',
                 laser
                     ? 'border-laser/55 bg-laser/10'
                     : 'border-outline-subtle bg-surface-raised',
             )}
         >
+            {/* Header: mode, selected spindle, spindle picker */}
             <div
                 ref={headerRef}
                 className="relative flex items-center justify-between gap-1.5"
@@ -144,89 +164,103 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
                         >
                             {laser ? 'Laser' : 'Spindle'}
                         </span>
-                        <span className="font-mono text-[8.5px] text-content-disabled truncate">
-                            Hold icon to swap to {laser ? 'spindle' : 'laser'}
+                        <span className="text-[10px] text-content-muted truncate">
+                            {api.spindleLabel}
                         </span>
                     </div>
                 </div>
-                <button
-                    type="button"
-                    disabled={!api.isConnected}
-                    onClick={() => setSliderOpen((o) => !o)}
-                    aria-expanded={sliderOpen}
-                    aria-label={laser ? 'Set laser power' : 'Set spindle speed'}
-                    className={cn(
-                        'shrink-0 flex items-center gap-1 font-mono text-[10.5px] font-semibold px-2 h-7 rounded-sm border bg-surface-elevated whitespace-nowrap',
-                        laser
-                            ? 'border-laser/40 text-purple-200'
-                            : 'border-outline-subtle text-content-secondary',
-                        sliderOpen && 'ring-1 ring-robin-400/70',
-                    )}
-                >
-                    {api.isConnected ? readout : '—'}
-                    <ChevronDown
+                {canPick && (
+                    <button
+                        type="button"
+                        disabled={!api.clickable}
+                        onClick={() => setPickerOpen((o) => !o)}
+                        aria-expanded={pickerOpen}
+                        aria-label="Select spindle"
                         className={cn(
-                            'w-3 h-3 transition-transform',
-                            sliderOpen && 'rotate-180',
+                            'shrink-0 w-8 h-8 flex items-center justify-center rounded-md border bg-surface-elevated text-content-secondary disabled:opacity-40',
+                            laser ? 'border-laser/40' : 'border-outline-subtle',
+                            pickerOpen && 'ring-1 ring-robin-400/70',
                         )}
-                    />
-                </button>
+                    >
+                        <Settings2 className="w-4 h-4" />
+                    </button>
+                )}
                 {/* Floats over the rows below rather than pushing them down */}
-                {sliderOpen && api.isConnected && (
-                    <div className="absolute top-full left-0 right-0 mt-1.5 z-20 flex flex-col gap-1 px-2.5 py-2 rounded-md border border-outline-strong bg-surface-elevated shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
-                        <div className="flex items-center justify-between font-mono text-[9.5px] text-content-muted">
-                            <span>{laser ? 'Power' : 'Speed'} (S)</span>
-                            <span
-                                className={cn(
-                                    'text-[11px] font-semibold tabular-nums',
-                                    laser
-                                        ? 'text-purple-200'
-                                        : 'text-content-primary',
-                                )}
-                            >
-                                S{sTarget}
-                            </span>
-                        </div>
-                        <Slider
-                            value={[
-                                Math.min(api.sMax, Math.max(api.sMin, sTarget)),
-                            ]}
-                            min={api.sMin}
-                            max={api.sMax}
-                            step={api.sStep}
-                            disabled={!api.clickable || api.sMax <= api.sMin}
-                            onValueChange={([v]: number[]) => api.setSTarget(v)}
-                            className="relative flex items-center w-full h-8 touch-none select-none"
-                            trackClassName="h-2 bg-surface-sunken rounded-full relative flex-grow"
-                            rangeClassName={cn(
-                                'absolute h-full rounded-full',
-                                laser ? 'bg-laser' : 'bg-robin-500',
-                            )}
-                            thumbClassName="block w-6 h-6 rounded-full border-2 border-outline-strong bg-white outline-none disabled:bg-gray-300"
+                {pickerOpen && canPick && (
+                    <div className="absolute top-full left-0 right-0 mt-1.5 z-20 flex flex-col gap-1.5 px-2.5 py-2 rounded-md border border-outline-strong bg-surface-elevated shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+                        <span className="font-mono text-[9.5px] text-content-muted">
+                            Spindle
+                        </span>
+                        <Select
+                            options={api.spindleOptions}
+                            value={api.selectedOption}
+                            onChange={(opt: { value: string } | null) => {
+                                if (!opt) return;
+                                api.handleHALSpindleSelect(opt.value);
+                                setPickerOpen(false);
+                            }}
+                            placeholder="Default Spindle"
+                            isDisabled={!api.clickable}
+                            styles={api.selectStyles as any}
+                            isSearchable={false}
                         />
-                        <div className="flex justify-between font-mono text-[9px] text-content-disabled tabular-nums">
-                            <span>{api.sMin}</span>
-                            <span>{api.sMax}</span>
-                        </div>
                     </div>
                 )}
             </div>
 
-            <div className="min-w-0">
-                <Select
-                    options={api.spindleOptions}
-                    value={api.selectedOption}
-                    onChange={(opt: { value: string } | null) =>
-                        opt && api.handleHALSpindleSelect(opt.value)
-                    }
-                    placeholder="Default Spindle"
-                    isDisabled={!api.hasSpindles || !api.clickable}
-                    styles={api.selectStyles as any}
-                    isSearchable={false}
+            {/* Speed / power */}
+            <div className="flex flex-col gap-1">
+                <div className="flex items-end justify-between gap-2">
+                    <div className="flex items-baseline gap-1.5 min-w-0">
+                        <span
+                            className={cn(
+                                'text-3xl font-bold leading-none tabular-nums',
+                                laser
+                                    ? 'text-purple-200'
+                                    : running
+                                      ? 'text-robin-400'
+                                      : 'text-content-primary',
+                            )}
+                        >
+                            {!api.isConnected
+                                ? '—'
+                                : laser
+                                  ? Math.round(api.laserPower)
+                                  : sValue.toLocaleString()}
+                        </span>
+                        <span className="text-xs font-semibold text-content-muted">
+                            {laser ? '%' : 'RPM'}
+                        </span>
+                    </div>
+                    {api.isConnected && (laser || showTarget) && (
+                        <span className="font-mono text-[10px] text-content-muted tabular-nums whitespace-nowrap">
+                            {laser ? `S${sValue}` : `target S${sTarget}`}
+                        </span>
+                    )}
+                </div>
+                <Slider
+                    value={[Math.min(api.sMax, Math.max(api.sMin, sTarget))]}
+                    min={api.sMin}
+                    max={api.sMax}
+                    step={api.sStep}
+                    disabled={!api.clickable || api.sMax <= api.sMin}
+                    onValueChange={([v]: number[]) => api.setSTarget(v)}
+                    className="relative flex items-center w-full h-9 touch-none select-none"
+                    trackClassName="h-3 bg-surface-sunken rounded-full relative flex-grow"
+                    rangeClassName={cn(
+                        'absolute h-full rounded-full',
+                        laser ? 'bg-laser' : 'bg-robin-500',
+                    )}
+                    thumbClassName="block w-7 h-7 rounded-full border-2 border-outline-strong bg-white outline-none disabled:bg-gray-300"
                 />
+                <div className="flex justify-between font-mono text-[9px] text-content-disabled tabular-nums">
+                    <span>{api.sMin}</span>
+                    <span>{api.sMax}</span>
+                </div>
             </div>
 
             <Segmented<Direction>
+                size="lg"
                 value={api.isConnected ? direction : null}
                 onChange={onDirection}
                 disabled={!api.clickable}
@@ -238,25 +272,38 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
                               {
                                   value: 'on',
                                   label: 'On',
+                                  icon: Lightbulb,
                                   hold: true,
                                   holdHint: 'Hold to turn laser on',
                               },
-                              { value: 'off', label: 'Off' },
+                              {
+                                  value: 'off',
+                                  label: 'Off',
+                                  icon: LightbulbOff,
+                                  danger: true,
+                              },
                           ]
                         : [
                               {
                                   value: 'cw',
                                   label: 'CW',
+                                  icon: RotateCw,
                                   hold: true,
                                   holdHint: 'Hold to start spindle CW',
                               },
                               {
                                   value: 'ccw',
                                   label: 'CCW',
+                                  icon: RotateCcw,
                                   hold: true,
                                   holdHint: 'Hold to start spindle CCW',
                               },
-                              { value: 'off', label: 'Off' },
+                              {
+                                  value: 'off',
+                                  label: 'Stop',
+                                  icon: Square,
+                                  danger: true,
+                              },
                           ]
                 }
             />
@@ -265,46 +312,40 @@ function PowerCard({ api }: { api: SpindleCardApi }) {
 }
 
 /** Coolant toggle: turning on needs a hold, turning off is an instant tap
- * (same rule as spindle start vs. Off). */
-function Chip({
+ * (same rule as spindle start vs. Stop). */
+function CoolantButton({
     label,
+    icon,
     on,
     disabled,
     onToggle,
 }: {
     label: string;
+    icon: SegmentedOption<string>['icon'];
     on: boolean;
     disabled: boolean;
     onToggle: () => void;
 }) {
-    const { progress, hintNode, bind } = useHoldToActivate(onToggle, {
-        disabled: disabled || on,
-        hint: `Hold to turn on ${label.toLowerCase()}`,
-    });
-
-    return (
-        <button
-            type="button"
+    const option = { value: label, label, icon };
+    return on ? (
+        <TapSegment
+            option={option}
+            active
             disabled={disabled}
-            {...(on ? { onClick: onToggle } : bind)}
-            aria-label={on ? `Turn off ${label}` : `Hold to turn on ${label}`}
-            className={cn(
-                'relative overflow-hidden shrink-0 font-mono text-[8.5px] tracking-[0.03em] uppercase px-[9px] py-[5px] rounded-sm border select-none touch-none disabled:opacity-40',
-                on
-                    ? 'bg-robin-600/20 text-robin-400 border-robin-500'
-                    : 'bg-surface-elevated text-content-muted border-outline-subtle',
-            )}
-        >
-            {!on && (
-                <span
-                    aria-hidden
-                    className="absolute inset-y-0 left-0 pointer-events-none bg-robin-500/35"
-                    style={{ width: `${progress * 100}%` }}
-                />
-            )}
-            <span className="relative">{label}</span>
-            {hintNode}
-        </button>
+            tone="robin"
+            size="lg"
+            onActivate={onToggle}
+        />
+    ) : (
+        <HoldSegment
+            option={option}
+            hint={`Hold to turn on ${label.toLowerCase()}`}
+            active={false}
+            disabled={disabled}
+            tone="robin"
+            size="lg"
+            onActivate={onToggle}
+        />
     );
 }
 
@@ -312,47 +353,64 @@ function CoolantRow({ laser }: { laser: boolean }) {
     const { isConnected, mistActive, floodActive, clickable } = useCoolant();
     const mistOn = isConnected && mistActive;
     const floodOn = isConnected && floodActive;
+    const anyOn = mistOn || floodOn;
 
-    // Turning either off sends M9, which stops both; the chips follow the
+    // Turning either off sends M9, which stops both; the buttons follow the
     // modal state so both clear together
     const toggleMist = () => (mistOn ? stopCoolant() : startMist());
     const toggleFlood = () => (floodOn ? stopCoolant() : startFlood());
 
     return (
-        <div className="flex items-center justify-between gap-2.5 px-2.5 py-2 rounded-md bg-surface-raised">
-            <span className="text-[11.5px] font-semibold text-content-primary">
-                Coolant
+        <div className="flex flex-col gap-2 px-2.5 py-2.5 rounded-md border border-outline-subtle bg-surface-raised">
+            <span className="text-[12.5px] font-bold leading-tight text-content-primary">
+                {laser ? 'Air assist' : 'Coolant'}
             </span>
-            <div className="flex gap-1.5">
+            <div className="flex gap-2">
                 {laser ? (
-                    <Chip
-                        label="Air assist"
+                    <CoolantButton
+                        label="Air"
+                        icon={Wind}
                         on={mistOn}
                         disabled={!clickable}
                         onToggle={toggleMist}
                     />
                 ) : (
                     <>
-                        <Chip
+                        <CoolantButton
                             label="Mist"
+                            icon={Droplets}
                             on={mistOn}
                             disabled={!clickable}
                             onToggle={toggleMist}
                         />
-                        <Chip
+                        <CoolantButton
                             label="Flood"
+                            icon={Waves}
                             on={floodOn}
                             disabled={!clickable}
                             onToggle={toggleFlood}
                         />
                     </>
                 )}
+                <TapSegment
+                    option={{
+                        value: 'off',
+                        label: 'Off',
+                        icon: Square,
+                        danger: true,
+                    }}
+                    active={isConnected && !anyOn}
+                    disabled={!clickable}
+                    tone="robin"
+                    size="lg"
+                    onActivate={stopCoolant}
+                />
             </div>
         </div>
     );
 }
 
-/** Power source, coolant and the Feed / Spindle overrides (panels 05, 06).
+/** Power source, the Feed / Spindle overrides, then coolant (panels 05, 06).
  * The overrides grow into the spare space; see prepTab.css. */
 export default function PrepTab() {
     const { coolantFunctions = false } = useWorkspaceState();
@@ -368,11 +426,15 @@ export default function PrepTab() {
                         mode="expanded"
                         renderCard={(api) => <PowerCard api={api} />}
                     />
-                    {coolantFunctions && <CoolantRow laser={isLaserMode} />}
                 </div>
                 <div className="prep-ovr">
                     <OverrideFaders />
                 </div>
+                {coolantFunctions && (
+                    <div className="prep-coolant">
+                        <CoolantRow laser={isLaserMode} />
+                    </div>
+                )}
             </div>
         </div>
     );

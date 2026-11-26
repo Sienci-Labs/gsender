@@ -502,3 +502,15 @@ textarea,
 .conn-anim-port-glow {
     animation: conn-port-glow 2.6s ease-out infinite;
 }
+
+/* Touch feedback for buttons inside opened tools (the desktop Button has
+   hover styles only, which never show on a touchscreen) */
+.pendant-tool-host button {
+    transition:
+        transform 75ms ease-out,
+        filter 75ms ease-out;
+}
+.pendant-tool-host button:not(:disabled):active {
+    transform: scale(0.96);
+    filter: brightness(1.15);
+}

@@ -1,6 +1,4 @@
-import { usePostHog } from '@posthog/react';
 import { GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE } from 'app/constants';
-import { runOutline } from 'app/features/JobControl/OutlineButton';
 import StartFromLine from 'app/features/JobControl/StartFromLine';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
@@ -177,9 +175,7 @@ function NoFile({ actions }: { actions: FileActions }) {
 
     return (
         <>
-            <div
-                className="flex flex-col items-center gap-1.5 px-2.5 py-3 shrink-0 rounded-lg border border-outline-subtle bg-surface-raised text-content-muted"
-            >
+            <div className="flex flex-col items-center gap-1.5 px-2.5 py-3 shrink-0 rounded-lg border border-outline-subtle bg-surface-raised text-content-muted">
                 <FileText className="w-[22px] h-[22px]" strokeWidth={1.8} />
                 <span className="text-xs font-semibold text-content-secondary">
                     No file loaded
@@ -276,7 +272,6 @@ function LoadedFile({
     actions: FileActions;
     onOpenEditor: () => void;
 }) {
-    const posthog = usePostHog();
     const file = useTypedSelector((s: RootState) => s.file);
     const workflowState = useTypedSelector(
         (s: RootState) => s.controller.workflow.state,
@@ -286,7 +281,8 @@ function LoadedFile({
     );
     const total = Number(file.total) || 0;
 
-    // The desktop JobControl rule for Outline and Start From
+    // The desktop JobControl rule for Start From (Outline lives on the
+    // job-controls row over the visualizer)
     const jobToolsDisabled =
         !file.fileLoaded ||
         workflowState !== WORKFLOW_STATE_IDLE ||
@@ -332,21 +328,6 @@ function LoadedFile({
                 ))}
             </div>
             <FileDetails />
-            <InfoRow
-                title="Trace outline"
-                sub="Confirm stock fits before cutting"
-            >
-                <button
-                    type="button"
-                    className={SMALL_BTN}
-                    disabled={jobToolsDisabled}
-                    // The pendant has no visualizer outline handler, so it
-                    // always uses the outline worker
-                    onClick={() => runOutline(posthog, { liteMode: true })}
-                >
-                    Run
-                </button>
-            </InfoRow>
             <InfoRow title="Editor" sub="View or edit the raw G-code">
                 <button
                     type="button"

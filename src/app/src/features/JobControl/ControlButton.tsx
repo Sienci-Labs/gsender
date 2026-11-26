@@ -11,7 +11,13 @@ import cx from 'classnames';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import pubsub from 'pubsub-js';
-import { type JSX, useEffect, useState } from 'react';
+import {
+    type ComponentType,
+    type JSX,
+    type ReactNode,
+    useEffect,
+    useState,
+} from 'react';
 import { FiOctagon } from 'react-icons/fi';
 import { IoPlayOutline } from 'react-icons/io5';
 import { PiPause } from 'react-icons/pi';
@@ -55,6 +61,15 @@ interface ControlButtonProps {
     variant?: 'default' | 'pendantCompact';
     /** Replaces the Start/Pause/Stop label (e.g. "Resume"). */
     labelOverride?: string;
+    /** pendantCompact only: renders the button through this component
+     * instead of a plain <button> (the pendant passes a hold-to-confirm
+     * button). It receives the action as `onActivate`. */
+    ButtonComponent?: ComponentType<{
+        onActivate: () => void;
+        disabled?: boolean;
+        className?: string;
+        children: ReactNode;
+    }>;
 }
 
 interface Message {
@@ -79,6 +94,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     validateATC,
     variant = 'default',
     labelOverride,
+    ButtonComponent,
 }) => {
     const posthog = usePostHog();
     const { t } = useAppTranslation();
@@ -357,9 +373,9 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     };
 
     const compactIcons: Icons = {
-        START: <IoPlayOutline className="text-sm" />,
-        PAUSE: <PiPause className="text-sm" />,
-        STOP: <FiOctagon className="text-sm" />,
+        START: <IoPlayOutline className="text-lg" />,
+        PAUSE: <PiPause className="text-lg" />,
+        STOP: <FiOctagon className="text-lg" />,
     };
 
     const onClick: OnClick = {
@@ -369,27 +385,43 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     };
 
     if (variant === 'pendantCompact') {
+        const compactClass = cx(
+            'flex items-center justify-center gap-2 w-[100px] h-[50px] shrink-0 rounded-md border border-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.4)] font-mono text-[12.5px] font-bold uppercase tracking-[0.05em] transition-[colors,transform] duration-75 enabled:active:scale-[0.96]',
+            {
+                'bg-surface-raised text-content-disabled cursor-not-allowed':
+                    disabled,
+                'bg-state-run text-white': !disabled && type === START,
+                'bg-state-pause text-white': !disabled && type === PAUSE,
+                'bg-action-stop text-white': !disabled && type === STOP,
+            },
+        );
+        const content = (
+            <>
+                {compactIcons[type]}
+                <span>{labelOverride ?? message[type]}</span>
+            </>
+        );
+        if (ButtonComponent) {
+            return (
+                <ButtonComponent
+                    onActivate={() => onClick[type]()}
+                    disabled={disabled}
+                    className={compactClass}
+                >
+                    {content}
+                </ButtonComponent>
+            );
+        }
         return (
             <button
                 type="button"
-                className={cx(
-                    'flex items-center justify-center gap-1.5 w-[74px] h-[38px] shrink-0 rounded-md border border-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.4)] font-mono text-[10.5px] font-bold uppercase tracking-[0.05em] transition-colors',
-                    {
-                        'bg-surface-raised text-content-disabled cursor-not-allowed':
-                            disabled,
-                        'bg-state-run text-white': !disabled && type === START,
-                        'bg-state-pause text-white':
-                            !disabled && type === PAUSE,
-                        'bg-action-stop text-white': !disabled && type === STOP,
-                    },
-                )}
+                className={compactClass}
                 onClick={() => {
                     onClick[type]();
                 }}
                 disabled={disabled}
             >
-                {compactIcons[type]}
-                <span>{labelOverride ?? message[type]}</span>
+                {content}
             </button>
         );
     }

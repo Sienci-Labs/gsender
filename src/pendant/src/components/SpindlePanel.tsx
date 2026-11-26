@@ -74,6 +74,8 @@ export interface SpindleCardApi {
     laserPower: number;
     hasSpindles: boolean;
     spindleCount: number;
+    /** Name of the current spindle (falls back to 'Default Spindle'). */
+    spindleLabel: string;
     spindleOptions: { label: string; value: string }[];
     selectedOption: { label: string; value: string } | null;
     selectStyles: Record<string, unknown>;
@@ -693,9 +695,10 @@ export default function SpindlePanel({ mode, renderCard }: Props) {
         [isDark],
     );
 
-    const enabledSpindles = availableSpindles.filter((s: any) => s.enabled);
-    const hasSpindles = enabledSpindles.length > 0;
-    const spindleOptions = enabledSpindles.map((s: any) => ({
+    // `enabled` marks the current spindle, so offer every reported spindle
+    // (as the desktop selector does)
+    const hasSpindles = availableSpindles.length > 0;
+    const spindleOptions = availableSpindles.map((s: any) => ({
         label: s.capabilities ? `${s.label} (${s.capabilities})` : s.label,
         value: String(s.id),
     }));
@@ -785,7 +788,8 @@ export default function SpindlePanel({ mode, renderCard }: Props) {
                     spindleSpeed: state.spindleSpeed,
                     laserPower: state.laser.power,
                     hasSpindles,
-                    spindleCount: enabledSpindles.length,
+                    spindleCount: availableSpindles.length,
+                    spindleLabel: spindle.label,
                     spindleOptions,
                     selectedOption,
                     selectStyles,
