@@ -161,11 +161,17 @@ const SurfacingTool = ({
     const xyMin = units === IMPERIAL_UNITS ? convertToImperial(1) : 1;
 
     return (
-        <div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
+        <div
+            className={cx(
+                'bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2',
+                stacked && 'h-full',
+            )}
+        >
             <div
                 className={cx(
-                    'grid gap-4',
-                    stacked ? 'grid-cols-1' : 'grid-cols-2',
+                    stacked
+                        ? 'flex flex-col gap-3 flex-1 min-h-0'
+                        : 'grid grid-cols-2 gap-4',
                 )}
             >
                 <div className="grid gap-4 max-xl:gap-3 xl:gap-2">
@@ -508,7 +514,7 @@ const SurfacingTool = ({
                 <div
                     className={cx(
                         'flex flex-col border border-gray-200 rounded-md',
-                        stacked && 'order-first h-[45vh] min-h-[260px]',
+                        stacked && 'order-first flex-1 min-h-[160px]',
                     )}
                 >
                     <Tabs defaultValue="visualizer-preview">

@@ -190,12 +190,18 @@ const RotarySurfacing = ({
         status.activeState !== GRBL_ACTIVE_STATE_JOG;
 
     return (
-        <div>
-            <div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
+        <div className={stacked ? 'h-full' : undefined}>
+            <div
+                className={cx(
+                    'bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2',
+                    stacked && 'h-full',
+                )}
+            >
                 <div
                     className={cx(
-                        'grid gap-4',
-                        stacked ? 'grid-cols-1' : 'grid-cols-2',
+                        stacked
+                            ? 'flex flex-col gap-3 flex-1 min-h-0'
+                            : 'grid grid-cols-2 gap-4',
                     )}
                 >
                     <div className="grid gap-4 xl:gap-2">
@@ -444,7 +450,7 @@ const RotarySurfacing = ({
                     <div
                         className={cx(
                             'flex flex-col border border-gray-200 rounded-md',
-                            stacked && 'order-first h-[45vh] min-h-[260px]',
+                            stacked && 'order-first flex-1 min-h-[160px]',
                         )}
                     >
                         <Tabs defaultValue="visualizer">
