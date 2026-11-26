@@ -1,6 +1,7 @@
-/* Prep tab layout. Stacked by default, with the overrides taking whatever
-   height is left. When the tab is wide but short (landscape), the power and
-   coolant cards sit beside the overrides instead. */
+/* Prep tab layout. Stacked by default: power card, then the overrides taking
+   whatever height is left, then coolant at the bottom. When the tab is wide
+   but short (landscape), power and coolant stack on the left with the
+   overrides beside them. */
 
 .prep-tab {
     container: prep / size;
@@ -12,7 +13,8 @@
     min-height: 100%;
 }
 .prep-power,
-.prep-ovr {
+.prep-ovr,
+.prep-coolant {
     display: flex;
     flex-direction: column;
     gap: 7px;
@@ -24,11 +26,23 @@
 
 @container prep (min-width: 440px) and (max-height: 560px) {
     .prep-layout {
-        flex-direction: row;
-        gap: 9px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        column-gap: 9px;
+        row-gap: 7px;
     }
-    .prep-power,
+    .prep-power {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .prep-coolant {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: start;
+    }
     .prep-ovr {
-        flex: 1 1 0;
+        grid-column: 2;
+        grid-row: 1 / span 2;
     }
 }

@@ -35,9 +35,18 @@ import { StockTurningGenerator } from './utils/Generator';
 type RotarySurfacingProps = {
     /** Pendant override: see VisualizerPreview's PreviewComponent prop. */
     PreviewComponent?: ComponentType<{ gcode?: string }>;
+    /** Pendant override: replaces the default load-to-main-visualizer
+     * behaviour (the pendant loads the file itself and switches to Carve). */
+    onLoadToVisualizer?: (gcode: string, name: string) => void;
+    /** Pendant override: preview on top, config below (single column). */
+    stacked?: boolean;
 };
 
-const RotarySurfacing = ({ PreviewComponent }: RotarySurfacingProps = {}) => {
+const RotarySurfacing = ({
+    PreviewComponent,
+    onLoadToVisualizer,
+    stacked = false,
+}: RotarySurfacingProps = {}) => {
     const { t } = useAppTranslation();
     const navigate = useNavigate();
     const { units } = useWorkspaceState();
@@ -113,6 +122,11 @@ const RotarySurfacing = ({ PreviewComponent }: RotarySurfacingProps = {}) => {
     };
 
     const handleLoadToMainVisualizer = async () => {
+        if (onLoadToVisualizer) {
+            onLoadToVisualizer(gcode, 'gSender_Rotary_Surfacing');
+            setGcode('');
+            return;
+        }
         const file = new File([gcode], 'gSender_Rotary_Surfacing');
 
         await uploadGcodeFileToServer(
@@ -178,7 +192,12 @@ const RotarySurfacing = ({ PreviewComponent }: RotarySurfacingProps = {}) => {
     return (
         <div>
             <div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
-                <div className="grid grid-cols-2 gap-4">
+                <div
+                    className={cx(
+                        'grid gap-4',
+                        stacked ? 'grid-cols-1' : 'grid-cols-2',
+                    )}
+                >
                     <div className="grid gap-4 xl:gap-2">
                         <p className="text-sm xl:text-base font-normal text-gray-600 dark:text-content-secondary">
                             {t('tools:rotary.surfacing.intro')}
@@ -422,7 +441,12 @@ const RotarySurfacing = ({ PreviewComponent }: RotarySurfacingProps = {}) => {
                             </div>
                         </InputArea>
                     </div>
-                    <div className="flex flex-col border border-gray-200 rounded-md">
+                    <div
+                        className={cx(
+                            'flex flex-col border border-gray-200 rounded-md',
+                            stacked && 'order-first h-[45vh] min-h-[260px]',
+                        )}
+                    >
                         <Tabs defaultValue="visualizer">
                             <TabsList className="w-full pb-0 border-b rounded-b-none">
                                 <TabsTrigger
