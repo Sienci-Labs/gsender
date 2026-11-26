@@ -49,7 +49,7 @@ import {
 export type JogPresetId = 'precise' | 'normal' | 'rapid';
 export type JogTone = 'neutral' | 'x' | 'y' | 'z' | 'a';
 
-type JogConfig = {
+export type JogConfig = {
     xyStep: number;
     zStep: number;
     aStep: number;
@@ -139,6 +139,34 @@ function getPresetFromStore(preset: JogPresetId, units: string): JogConfig {
     }
 
     return jogConfig;
+}
+
+/** The saved preset in display units (inches converted when imperial). */
+export const readJogPreset = getPresetFromStore;
+
+/**
+ * Saves a preset edited in display units. The store keeps presets in mm
+ * (aStep in degrees) - the same setting desktop Config > Jogging presets
+ * edits - so this persists and syncs to other clients.
+ */
+export function saveJogPreset(
+    preset: JogPresetId,
+    config: JogConfig,
+    units: string,
+): void {
+    const toMm = (value: number) =>
+        units === IMPERIAL_UNITS ? convertValue(value, 'in', 'mm') : value;
+    const raw = store.get(`widgets.axes.jog.${preset}`, {}) as Record<
+        string,
+        unknown
+    >;
+    store.set(`widgets.axes.jog.${preset}`, {
+        ...raw,
+        xyStep: toMm(config.xyStep),
+        zStep: toMm(config.zStep),
+        aStep: config.aStep,
+        feedrate: toMm(config.feedrate),
+    });
 }
 
 function readJogConfigs(units: string): Record<JogPresetId, JogConfig> {

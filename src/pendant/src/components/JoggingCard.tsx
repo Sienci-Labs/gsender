@@ -14,6 +14,7 @@ import {
     PRESET_META,
     useJogControls,
 } from './jog/jogShared';
+import { JogPresetSettingsButton } from './jog/JogPresetDialog';
 
 export default function JoggingCard() {
     const {
@@ -77,6 +78,10 @@ export default function JoggingCard() {
                         {preset.label}
                     </button>
                 ))}
+                <JogPresetSettingsButton
+                    preset={stepPreset}
+                    className="px-2.5 py-2 rounded-lg flex items-center justify-center bg-white dark:bg-surface-raised text-gray-600 dark:text-content-muted hover:text-gray-700 dark:hover:text-content-primary border border-gray-300 dark:border-outline transition-colors"
+                />
             </div>
 
             <div className="space-y-[clamp(0.375rem,1.5vh,0.75rem)]">

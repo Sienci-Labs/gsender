@@ -26,9 +26,9 @@ export function useDroGating() {
     const alarmCode = useTypedSelector(
         (s: RootState) => s.controller.state.status?.alarmCode ?? 0,
     ) as string | number;
+    const isAlarm = activeState === GRBL_ACTIVE_STATE_ALARM;
     const isHomingAlarm =
-        activeState === GRBL_ACTIVE_STATE_ALARM &&
-        (alarmCode === 11 || alarmCode === 'Homing');
+        isAlarm && (alarmCode === 11 || alarmCode === 'Homing');
     const canZero =
         isConnected &&
         workflowState !== WORKFLOW_STATE_RUNNING &&
@@ -50,6 +50,7 @@ export function useDroGating() {
         canGoTo,
         canHome,
         homingEnabled,
+        isAlarm,
         isHomingAlarm,
     };
 }

@@ -5,8 +5,10 @@ import { useDroGating } from '../hooks/useDroGating';
 import HoldButton from './carve/setup/HoldButton';
 
 /** "Home machine" call to action. Renders nothing once the controller
- * reports the machine as homed (or homing is disabled). Hold to activate so
- * a stray tap can't start motion. */
+ * reports the machine as homed (or homing is disabled), and during any alarm
+ * other than a homing alarm - homing isn't the fix there, and the button
+ * would cover the alarm message. Hold to activate so a stray tap can't start
+ * motion. */
 export default function HomeCTA({
     className,
     iconClassName = 'w-[18px] h-[18px]',
@@ -14,8 +16,8 @@ export default function HomeCTA({
     className?: string;
     iconClassName?: string;
 }) {
-    const { needsHoming, canHome } = useDroGating();
-    if (!needsHoming) return null;
+    const { needsHoming, canHome, isAlarm, isHomingAlarm } = useDroGating();
+    if (!needsHoming || (isAlarm && !isHomingAlarm)) return null;
 
     return (
         <HoldButton

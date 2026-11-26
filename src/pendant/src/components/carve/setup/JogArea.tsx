@@ -14,6 +14,7 @@ import {
     PRESET_META,
     useJogControls,
 } from '../../jog/jogShared';
+import { JogPresetSettingsButton } from '../../jog/JogPresetDialog';
 import { JogAMinus, JogAPlus, JogZDown, JogZUp } from '../../jog/jogIcons';
 
 // Axis buttons rest on a light tint of their axis colour so they read as
@@ -281,6 +282,10 @@ export default function JogArea({ className }: { className?: string }) {
                         {label}
                     </button>
                 ))}
+                <JogPresetSettingsButton
+                    preset={stepPreset}
+                    className="w-12 h-12 shrink-0 flex items-center justify-center rounded-lg border bg-surface-raised border-outline-subtle text-content-muted transition-colors"
+                />
             </div>
         </div>
     );
