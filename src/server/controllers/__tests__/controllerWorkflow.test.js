@@ -199,7 +199,9 @@ describe.each(FIRMWARES)(
 				expect(c.workflow.state).toBe("idle");
 				expect(f.events("job:stop")).toEqual([[]]);
 				expect(trigger).toHaveBeenCalledWith(PROGRAM_END);
-				expect(f.writes()).toEqual([]);
+				// grblHAL re-reads the firmware tool table ($#) once a job ends;
+				// mid-job tool offsets are estimated from PRB reports.
+				expect(f.writes()).toEqual(firmware === "Grbl" ? [] : ["$#\n"]);
 			},
 		);
 

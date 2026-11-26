@@ -131,6 +131,17 @@ class GrblHalRunner extends events.EventEmitter {
 
 	parser = new GrblHalLineParser();
 
+	/**
+	 * @param {{ isToolChangeActive?: () => boolean }} [options]
+	 *   isToolChangeActive - true while the firmware is executing a
+	 *   passed-through M6 (its tool change macro). PRB only updates tool
+	 *   offsets inside that window.
+	 */
+	constructor({ isToolChangeActive } = {}) {
+		super();
+		this.isToolChangeActive = isToolChangeActive ?? (() => false);
+	}
+
 	parse(data) {
 		data = ("" + data).replace(/\s+$/, "");
 		if (!data) {
@@ -337,19 +348,30 @@ class GrblHalRunner extends events.EventEmitter {
 			// This is necessary in order to update offsets mid tool change or toolpath
 			// Ignore prb output for tool 0 (empty) since nothing to update
 			// Ignore PRB if no success on probe
+			// Only while the firmware runs a passed-through M6: that probe is the
+			// tool length measurement. Any other PRB (a $# dump, where [T:] lines
+			// precede PRB, or a G38 touch-off in the program) must not touch the
+			// tool table - there, the [T:] lines in $# are the source of truth.
+			// Only Z is updated; the TC macro writes Z alone (G10 L1 P<t> Z...).
 			const currentTool = this.state.status.currentTool;
 			const isProbeSuccess = name === "PRB" && value.result === 1;
+			const isToolChangeProbeSuccess =
+				isProbeSuccess && Boolean(this.isToolChangeActive());
 			const isCurrentToolSet = currentTool > 0;
 			const toolTable = _.get(this.settings, "toolTable", {});
 			const isToolTablePopulated = !_.isEmpty(toolTable);
 			const hasCurrentToolEntry = _.has(toolTable, currentTool);
 			const shouldUpdateToolOffsets =
-				isProbeSuccess &&
+				isToolChangeProbeSuccess &&
 				isCurrentToolSet &&
 				isToolTablePopulated &&
 				hasCurrentToolEntry;
 
-			if (isProbeSuccess && isCurrentToolSet && !shouldUpdateToolOffsets) {
+			if (
+				isToolChangeProbeSuccess &&
+				isCurrentToolSet &&
+				!shouldUpdateToolOffsets
+			) {
 				log.warn(
 					`[PRB] Skipping tool offset update for current tool T${currentTool}. ` +
 						`isToolTablePopulated=${isToolTablePopulated}, ` +
@@ -370,8 +392,6 @@ class GrblHalRunner extends events.EventEmitter {
 							...currentToolData,
 							toolOffsets: {
 								...currentToolOffsets,
-								x: Number(value.x),
-								y: Number(value.y),
 								z: Number(value.z),
 							},
 						},
