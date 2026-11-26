@@ -72,7 +72,8 @@
     "status": {
       "finished": "Finished",
       "stopped": "Stopped"
-    }
+    },
+    "unknownPort": "Unknown Port"
   },
   "alarms": {
     "title": "Alarms & Errors",

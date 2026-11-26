@@ -6,6 +6,7 @@ import {
 import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 import { useAppTranslation } from 'app/i18n';
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
+import { t } from 'i18next';
 import { useContext } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
@@ -13,12 +14,9 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 function aggregateRunTime(jobs: Job[]): [string[], number[]] {
     const aggregate: JobAggregate = {};
-    jobs.map((job) => {
-        if (!Object.hasOwn(aggregate, job.port)) {
-            aggregate[job.port] = job.duration;
-            return;
-        }
-        aggregate[job.port] += job.duration;
+    jobs.forEach((job) => {
+        const port = job.port ?? t('stats:jobs.unknownPort');
+        aggregate[port] = (aggregate[port] ?? 0) + job.duration;
     });
 
     return [Object.keys(aggregate), Object.values(aggregate)];
