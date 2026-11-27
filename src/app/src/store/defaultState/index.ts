@@ -410,6 +410,11 @@ const defaultState: State = {
             jobEndModal: true,
             maintenanceTaskNotifications: true,
             checkFile: false,
+            spaceMouse: {
+                enabled: true,
+                sensitivity: 100,
+                lockRotation: false,
+            },
             gcode: {
                 displayName: true,
             },

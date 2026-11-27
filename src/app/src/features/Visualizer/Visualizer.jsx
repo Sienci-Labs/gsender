@@ -58,6 +58,8 @@ import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import TrackballControls from 'app/lib/three/oldTrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
+import spaceMouse from 'app/lib/spacemouse';
+import isElectron from 'is-electron';
 
 import _ from 'lodash';
 import store from 'app/store';
@@ -101,6 +103,13 @@ const ORTHOGRAPHIC_FAR = 7000;
 const CAMERA_DISTANCE = 1900; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
+// SpaceMouse tuning, at 100% sensitivity and full cap deflection
+const SPACEMOUSE_DEADZONE = 0.04;
+const SPACEMOUSE_ROTATE_SPEED = Math.PI; // rad/s
+const SPACEMOUSE_PAN_SPEED = 1.5; // visible half-heights per second
+const SPACEMOUSE_ZOOM_SPEED = 2.0; // e-folds per second
+const SPACEMOUSE_MIN_ORTHO_ZOOM = 0.1;
+const SPACEMOUSE_MAX_ORTHO_ZOOM = 200;
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
@@ -303,6 +312,7 @@ class Visualizer extends Component {
         this.addStoreEvents();
         this.addResizeEventListener();
         window.addEventListener('keydown', this.handleKeyDown);
+        this.addSpaceMouseListeners();
 
         // Ensure the DOM element is available before creating the scene
         if (this.node) {
@@ -690,6 +700,7 @@ class Visualizer extends Component {
         this.unsubscribe();
         this.removeResizeEventListener();
         window.removeEventListener('keydown', this.handleKeyDown);
+        this.removeSpaceMouseListeners();
         this.clearScene();
 
         // Stop animation loop
@@ -3223,6 +3234,221 @@ class Visualizer extends Component {
                 this.updateScene({ forceUpdate: true });
             }, 50);
         }
+    }
+
+    // --- SpaceMouse (3Dconnexion) navigation ---
+
+    spaceMouseFrame = null;
+    spaceMouseLastTime = null;
+    spaceMouseActive = false;
+
+    // SpaceMouse is desktop-app only; remote mode (browser/mobile) is not supported
+    addSpaceMouseListeners() {
+        if (!isElectron()) {
+            return;
+        }
+        spaceMouse.init();
+        spaceMouse.on('connection', this.handleSpaceMouseConnection);
+        spaceMouse.on('button', this.handleSpaceMouseButton);
+        this.startSpaceMouseLoop();
+    }
+
+    removeSpaceMouseListeners() {
+        spaceMouse.removeListener(
+            'connection',
+            this.handleSpaceMouseConnection,
+        );
+        spaceMouse.removeListener('button', this.handleSpaceMouseButton);
+        if (this.spaceMouseFrame !== null) {
+            cancelAnimationFrame(this.spaceMouseFrame);
+            this.spaceMouseFrame = null;
+        }
+    }
+
+    getSpaceMouseSettings() {
+        return {
+            enabled: true,
+            sensitivity: 100,
+            lockRotation: false,
+            ...store.get('widgets.visualizer.spaceMouse', {}),
+        };
+    }
+
+    // Only one visualizer instance should respond, and only while gSender has focus
+    shouldHandleSpaceMouse() {
+        return (
+            this.props.show &&
+            this.camera &&
+            this.controls &&
+            this.getSpaceMouseSettings().enabled &&
+            document.hasFocus()
+        );
+    }
+
+    handleSpaceMouseConnection = () => {
+        this.startSpaceMouseLoop();
+    };
+
+    // Left button: 3D view, right button: top view
+    handleSpaceMouseButton = ({ button, pressed }) => {
+        if (!pressed || !this.shouldHandleSpaceMouse()) {
+            return;
+        }
+        if (button === 0) {
+            this.props.actions.camera.to3DView();
+        } else if (button === 1) {
+            this.props.actions.camera.toTopView();
+        }
+    };
+
+    startSpaceMouseLoop() {
+        if (this.spaceMouseFrame === null && spaceMouse.isConnected) {
+            this.spaceMouseLastTime = null;
+            this.spaceMouseFrame = requestAnimationFrame(this.spaceMouseLoop);
+        }
+    }
+
+    spaceMouseLoop = (time) => {
+        this.spaceMouseFrame = null;
+        if (!spaceMouse.isConnected) {
+            this.spaceMouseActive = false;
+            return;
+        }
+        this.spaceMouseFrame = requestAnimationFrame(this.spaceMouseLoop);
+
+        const lastTime = this.spaceMouseLastTime;
+        this.spaceMouseLastTime = time;
+        if (lastTime === null) {
+            return;
+        }
+        // Clamp dt so a stalled frame doesn't cause a big jump
+        const dt = Math.min((time - lastTime) / 1000, 0.1);
+        this.applySpaceMouseMotion(dt);
+    };
+
+    applySpaceMouseMotion(dt) {
+        if (!this.shouldHandleSpaceMouse()) {
+            this.spaceMouseActive = false;
+            return;
+        }
+
+        const { sensitivity, lockRotation } = this.getSpaceMouseSettings();
+        const gain = Math.max(Number(sensitivity) || 0, 0) / 100;
+
+        // Deadzone, rescaled so motion starts smoothly at the edge, then a
+        // squared response curve for finer control near the centre.
+        const shape = (v) => {
+            const mag = Math.abs(v);
+            if (mag < SPACEMOUSE_DEADZONE) {
+                return 0;
+            }
+            const scaled =
+                (mag - SPACEMOUSE_DEADZONE) / (1 - SPACEMOUSE_DEADZONE);
+            return Math.sign(v) * scaled * scaled;
+        };
+
+        // Convert from device frame (+X right, +Y toward user, +Z down) to
+        // screen frame (right, up, toward viewer). "Object mode": the scene
+        // moves the way the cap is pushed.
+        const axes = spaceMouse.getAxes();
+        const panX = shape(axes.tx);
+        const panY = -shape(axes.tz);
+        const zoom = shape(axes.ty);
+        const rotX = lockRotation ? 0 : shape(axes.rx);
+        const rotY = lockRotation ? 0 : -shape(axes.rz);
+        const rotZ = lockRotation ? 0 : shape(axes.ry);
+
+        if (!panX && !panY && !zoom && !rotX && !rotY && !rotZ) {
+            this.spaceMouseActive = false;
+            return;
+        }
+        if (!this.spaceMouseActive) {
+            this.spaceMouseActive = true;
+            this.props.actions.camera.toFreeView();
+        }
+
+        const camera = this.camera;
+        const target = this.controls.target;
+
+        camera.updateMatrixWorld();
+        const right = new THREE.Vector3().setFromMatrixColumn(
+            camera.matrixWorld,
+            0,
+        );
+        const up = new THREE.Vector3().setFromMatrixColumn(
+            camera.matrixWorld,
+            1,
+        );
+        const back = new THREE.Vector3().setFromMatrixColumn(
+            camera.matrixWorld,
+            2,
+        );
+        right.normalize();
+        up.normalize();
+        back.normalize();
+
+        const eye = new THREE.Vector3().subVectors(camera.position, target);
+
+        // Rotate: orbit the camera opposite to the desired object rotation
+        const rotation = new THREE.Vector3()
+            .addScaledVector(right, rotX)
+            .addScaledVector(up, rotY)
+            .addScaledVector(back, rotZ);
+        const angle = rotation.length() * SPACEMOUSE_ROTATE_SPEED * gain * dt;
+        if (angle > 0) {
+            const q = new THREE.Quaternion().setFromAxisAngle(
+                rotation.normalize(),
+                -angle,
+            );
+            eye.applyQuaternion(q);
+            camera.up.applyQuaternion(q);
+        }
+
+        // Pan: scale by the visible area so speed feels the same at any zoom
+        if (panX || panY) {
+            let halfHeight;
+            if (camera.inOrthographicMode) {
+                halfHeight =
+                    (Math.tan(degToRad(camera.fov) / 2) *
+                        ((PERSPECTIVE_NEAR + PERSPECTIVE_FAR) / 2)) /
+                    camera.zoom;
+            } else {
+                halfHeight =
+                    Math.tan(degToRad(camera.fov / camera.zoom) / 2) *
+                    eye.length();
+            }
+            const step = halfHeight * SPACEMOUSE_PAN_SPEED * gain * dt;
+            const pan = new THREE.Vector3()
+                .addScaledVector(right, -panX * step)
+                .addScaledVector(up, -panY * step);
+            target.add(pan);
+        }
+
+        // Zoom: pulling the cap toward you brings the scene closer
+        if (zoom) {
+            const factor = Math.exp(-zoom * SPACEMOUSE_ZOOM_SPEED * gain * dt);
+            if (camera.inOrthographicMode) {
+                camera.setZoom(
+                    THREE.MathUtils.clamp(
+                        camera.zoom / factor,
+                        SPACEMOUSE_MIN_ORTHO_ZOOM,
+                        SPACEMOUSE_MAX_ORTHO_ZOOM,
+                    ),
+                );
+            } else {
+                eye.setLength(
+                    THREE.MathUtils.clamp(
+                        eye.length() * factor,
+                        this.controls.minDistance,
+                        this.controls.maxDistance,
+                    ),
+                );
+            }
+        }
+
+        camera.position.addVectors(target, eye);
+        camera.lookAt(target);
+        this.updateScene();
     }
 
     isHovered = false;

@@ -42,6 +42,7 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
+import { SpaceMouseStatus } from 'app/features/Config/components/wizards/SpaceMouseStatus.tsx';
 import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
@@ -514,6 +515,59 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         wizard: GamepadLinkWizard,
                         description:
                             'Easily jog, set zeros, start jobs, and more using most common gamepads. Create your own profile or use a pre-made one.',
+                    },
+                ],
+            },
+            {
+                label: 'SpaceMouse',
+                settings: [
+                    {
+                        label: 'Device',
+                        type: 'wizard',
+                        wizard: SpaceMouseStatus,
+                        hidden: () => !isElectron(),
+                        description:
+                            'Navigate the 3D visualizer with a 3Dconnexion SpaceMouse or other compatible 6DOF controller. No extra drivers needed. Push, pull, tilt, and twist the cap to pan, zoom, and orbit. Button 1 returns to the 3D view, button 2 to the top view.',
+                    },
+                    {
+                        label: 'Enable SpaceMouse',
+                        key: 'widgets.visualizer.spaceMouse.enabled',
+                        description:
+                            'Allow a connected SpaceMouse or compatible 6DOF controller to control the 3D visualizer camera.',
+                        type: 'boolean',
+                        defaultValue: true,
+                        hidden: () => !isElectron(),
+                    },
+                    {
+                        label: 'Sensitivity',
+                        key: 'widgets.visualizer.spaceMouse.sensitivity',
+                        description:
+                            'How fast the camera moves at full cap deflection.',
+                        type: 'number',
+                        unit: '%',
+                        min: 10,
+                        max: 500,
+                        defaultValue: 100,
+                        hidden: (getPending) =>
+                            !isElectron() ||
+                            !getPending(
+                                'widgets.visualizer.spaceMouse.enabled',
+                                true,
+                            ),
+                    },
+                    {
+                        label: 'Lock rotation',
+                        key: 'widgets.visualizer.spaceMouse.lockRotation',
+                        description:
+                            'Only allow panning and zooming, so the view stays at its current angle.',
+                        type: 'boolean',
+                        defaultValue: false,
+                        hidden: (getPending) =>
+                            !isElectron() ||
+                            !getPending(
+                                'widgets.visualizer.spaceMouse.enabled',
+                                true,
+                            ),
                     },
                 ],
             },

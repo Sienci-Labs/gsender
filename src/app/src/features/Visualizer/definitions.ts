@@ -42,6 +42,11 @@ export interface Visualizer {
     jobEndModal: boolean;
     maintenanceTaskNotifications: boolean;
     checkFile: boolean;
+    spaceMouse: {
+        enabled: boolean;
+        sensitivity: number;
+        lockRotation: boolean;
+    };
     gcode: {
         displayName: boolean;
     };
