@@ -80,6 +80,36 @@ class CNCEngine {
 
     connection = null;
 
+    // An open() that is still in flight: { port, waiters: [{ socket, callback }], timer }.
+    // A Connection reports isClose() until its serial port finishes opening, so
+    // without this a second 'open' during that window would build a second
+    // Connection on the same port and orphan the first one (port held, no controller).
+    pendingOpen = null;
+
+    // Resolve every socket that asked to open the port while the first open was
+    // still in progress: on success they join as extra clients of the controller
+    // the first open created; on failure they get the same error.
+    settlePendingOpen = (err = null, controller = null, controllerType = null) => {
+        const pending = this.pendingOpen;
+        if (!pending) {
+            return;
+        }
+        this.pendingOpen = null;
+        clearTimeout(pending.timer);
+
+        pending.waiters.forEach(({ socket, callback }) => {
+            if (err || !controller || !this.connection) {
+                callback(err || new Error(`Serial port "${pending.port}" failed to open`));
+                return;
+            }
+            this.connection.addConnection(socket);
+            controller.addConnection(socket);
+            socket.join(pending.port);
+            socket.emit('serialport:openController', controllerType);
+            callback(null);
+        });
+    };
+
     listener = {
         taskStart: (...args) => {
             if (this.io) {
@@ -193,6 +223,7 @@ class CNCEngine {
                 },
                 'serialport:close': (options, received) => {
                     this.connection = null;
+                    this.settlePendingOpen(new Error('Serial port closed while opening'));
                     this.emit('serialport:close', options, received);
                 },
                 'firmwareFound': (controllerType = GRBL, options, callback = noop, refresh = false) => {
@@ -207,6 +238,7 @@ class CNCEngine {
                         const err = `Cannot initialize controller "${controllerType}" on "${port}" because the connection is no longer available`;
                         log.warn(err);
                         callback(new Error(err));
+                        this.settlePendingOpen(new Error(err));
                         return;
                     }
 
@@ -218,6 +250,7 @@ class CNCEngine {
                             const err = `Not supported controller: ${controllerType}`;
                             log.error(err);
                             callback(new Error(err));
+                            this.settlePendingOpen(new Error(err));
                             return;
                         }
 
@@ -245,6 +278,9 @@ class CNCEngine {
                     controller.open(port, baudrate, refresh, (err = null) => {
                         if (err) {
                             callback(err);
+                            if (!refresh) {
+                                this.settlePendingOpen(err);
+                            }
                             return;
                         }
 
@@ -255,6 +291,10 @@ class CNCEngine {
                         store.set(`controllers[${JSON.stringify(port)}]`, controller);
 
                         callback(null);
+
+                        if (!refresh) {
+                            this.settlePendingOpen(null, controller, controllerType);
+                        }
                     });
 
                     socket.emit('serialport:openController', controllerType);
@@ -454,6 +494,19 @@ class CNCEngine {
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
+                // An open is already in flight. Do NOT touch this.connection: it
+                // still reports isClose() until its port finishes opening, and
+                // replacing it here would orphan the half-open serial port.
+                if (this.pendingOpen) {
+                    if (this.pendingOpen.port === port) {
+                        log.warn(`Open already in progress on "${port}" - socket ${socket.id} will join when it completes`);
+                        this.pendingOpen.waiters.push({ socket, callback });
+                    } else {
+                        callback(new Error(`Cannot open "${port}" while "${this.pendingOpen.port}" is still opening`));
+                    }
+                    return;
+                }
+
                 // Remove old listeners from the existing connection before potentially replacing it
                 if (this.connection) {
                     removeConnectionListeners();
@@ -463,6 +516,14 @@ class CNCEngine {
                     // No connection or stale closed connection — start fresh
                     this.connection = new Connection(engine, port, options, callback);
                     addConnectionListeners();
+
+                    this.pendingOpen = { port, waiters: [], timer: null };
+                    // Safety net in case neither firmwareFound nor an error ever
+                    // arrives; firmware detection gives up well inside this.
+                    this.pendingOpen.timer = setTimeout(() => {
+                        log.warn(`Open on "${port}" did not complete; releasing queued clients`);
+                        this.settlePendingOpen(new Error(`Timed out opening "${port}"`));
+                    }, 15000);
                 } else {
                     // Genuinely open connection — refresh for additional client joining
                     addConnectionListeners();
@@ -484,6 +545,7 @@ class CNCEngine {
                     if (err) {
                         callback(err);
                         this.connection = null;
+                        this.settlePendingOpen(err);
                         return;
                     }
 

@@ -40,3 +40,4 @@ packages/plugin-sdk/dist
 
 /.claude
 CLAUDE.md
+android/

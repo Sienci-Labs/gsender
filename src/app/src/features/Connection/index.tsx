@@ -63,6 +63,12 @@ function Connection(props: ConnectionProps) {
     const [connectionState, setConnectionState] = useState(
         ConnectionState.DISCONNECTED,
     );
+    // attemptAutoConnect runs from closures captured on mount (setTimeout, pubsub),
+    // so it must read the live state from a ref rather than `connectionState`.
+    const connectionStateRef = useRef(connectionState);
+    useEffect(() => {
+        connectionStateRef.current = connectionState;
+    }, [connectionState]);
     const [connectionType, setConnectionType] = useState(
         ConnectionType.DISCONNECTED,
     );
@@ -119,6 +125,9 @@ function Connection(props: ConnectionProps) {
         let ethernetPort = store.get('widgets.connection.ethernetPort', 23);
 
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
+        // Update the ref synchronously so a second connect attempt issued before
+        // the next render sees we're already connecting.
+        connectionStateRef.current = ConnectionState.CONNECTING;
         setConnectionState(ConnectionState.CONNECTING);
         setConnectionType(type);
         setIsDropdownOpen(false);
@@ -219,8 +228,9 @@ function Connection(props: ConnectionProps) {
         const port = connectionConfig.get('port', null);
 
         if (
-            connectionState !== ConnectionState.DISCONNECTED ||
-            (!autoReconnect && !force)
+            connectionStateRef.current !== ConnectionState.DISCONNECTED ||
+            (!autoReconnect && !force) ||
+            !port
         ) {
             return;
         }
