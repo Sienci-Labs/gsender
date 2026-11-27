@@ -114,6 +114,10 @@ const AXS_QUERY_MAX_RETRIES = 2;
 const AXS_QUERY_RETRY_INTERVAL = 2000; // ms between retries
 const AXS_PROBE_TIMEOUT = 2000; // ms to wait for the $I reply's terminating ok
 
+// While in Alarm with no code yet, send at most this many 0x87 complete reports
+// per alarm episode before falling back to '?'.
+const ALARM_COMPLETE_REPORT_MAX_ATTEMPTS = 3;
+
 const AXS_UNKNOWN = "unknown";
 const AXS_SUPPORTED = "supported";
 const AXS_UNSUPPORTED = "unsupported";
@@ -200,6 +204,10 @@ class GrblHalController {
 	};
 
 	alarmActive = false; // state to keep track of whether we have queried for the alarm code
+
+	// 0x87 sends spent trying to learn the current alarm's code. Kept out of
+	// actionMask for the same reason as the axs* fields (see clearActionValues).
+	alarmCompleteReportAttempts = 0;
 
 	parserStateEnabled = false;
 
@@ -1278,9 +1286,23 @@ class GrblHalController {
 			if (this.isOpen()) {
 				this.actionMask.queryStatusReport = true;
 				this.actionTime.queryStatusReport = now;
-				if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
+				const needAlarmCode =
+					this.runner.isAlarm() &&
+					this.actionMask.alarmCompleteReport &&
+					!_.get(this.runner.state, "status.alarmCode", "");
+				if (
+					needAlarmCode &&
+					this.alarmCompleteReportAttempts < ALARM_COMPLETE_REPORT_MAX_ATTEMPTS
+				) {
+					this.alarmCompleteReportAttempts++;
 					this.connection.writeImmediate(Buffer.from([0x87]));
 				} else {
+					if (needAlarmCode) {
+						// Firmware isn't reporting a code even in complete reports -
+						// stop asking for this alarm and fall back to plain '?'.
+						log.debug("No alarm code after complete reports; reverting to '?'");
+						this.actionMask.alarmCompleteReport = false;
+					}
 					this.connection.writeImmediate(
 						GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT,
 					); //? or \x80
@@ -1436,7 +1458,8 @@ class GrblHalController {
 					// if this is the first alarm detection, we need a code
 					if (!this.alarmActive) {
 						this.alarmActive = true;
-						// enable full report for code get
+						// enable full report for code get - fresh budget for this alarm
+						this.alarmCompleteReportAttempts = 0;
 						this.actionMask.alarmCompleteReport = true;
 					}
 				} else {
@@ -1448,6 +1471,7 @@ class GrblHalController {
 				if (this.alarmActive) {
 					this.alarmActive = false;
 				}
+				this.alarmCompleteReportAttempts = 0;
 			}
 
 			// Check the ready flag
@@ -1868,6 +1892,7 @@ class GrblHalController {
 
 		// Fresh connection: start over on looking for [AXS:]
 		this.resetAxsProbe();
+		this.alarmCompleteReportAttempts = 0;
 
 		// Send $I to query firmware version; the startup event handler will take it from here.
 		// Also send 0x87 before $I as a raw realtime byte — this bypasses Hold state restrictions
@@ -1898,6 +1923,7 @@ class GrblHalController {
 
 		// Stop and reset any in-flight [AXS:] probe
 		this.resetAxsProbe();
+		this.alarmCompleteReportAttempts = 0;
 
 		// Reset homing runtime state
 		if (this.hasHomedSet) {
@@ -2801,7 +2827,10 @@ class GrblHalController {
 				};
 			},
 			realtime_report: () => {
-				this.write(`${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
+				// Bare realtime byte: a trailing "\n" reaches the parser as an empty
+				// line and draws a stray "ok". Still go through write() so the
+				// reply is echoed to the console (replyStatusReport).
+				this.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
 			},
 			error_clear: () => {
 				this.write("$");
