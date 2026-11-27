@@ -24,7 +24,6 @@ import get from 'lodash/get';
 import includes from 'lodash/includes';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePostHog } from '@posthog/react';
-import pubsub from 'pubsub-js';
 // import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import {
@@ -447,27 +446,17 @@ const ProbeWidget = () => {
     }, [touchplateType, units, toolDiameter, probeType]);
 
     useEffect(() => {
-        const token = pubsub.subscribe(
-            'config:saved',
-            (_, settingsToUpdate) => {
-                if ('widgets.probe.direction' in settingsToUpdate) {
-                    setDirection(Number(config.get('direction', 0)));
-                }
-            },
-        );
-
-        return () => {
-            pubsub.unsubscribe(token);
-        };
-    }, []);
-
-    useEffect(() => {
         config.set('probeCommand', probeCommand);
         config.set('useTLO', useTLO);
         config.set('probeDepth', probeDepth);
         config.set('touchPlateHeight', touchPlateHeight);
-        config.set('direction', direction);
     });
+
+    // Only persist direction when it actually changes; writing it on every render
+    // clobbered values set from Config before onStoreChange could pick them up.
+    useEffect(() => {
+        config.set('direction', direction);
+    }, [direction]);
 
     useEffect(() => {
         connectionMadeRef.current = connectionMade;
@@ -632,6 +621,7 @@ const ProbeWidget = () => {
             setXYRetract3D(config.get('xyRetract3D', 10));
             setProbeMovementSpeed(config.get('probeMovementSpeed') || 0);
             setConnectivityTest(config.get('connectivityTest'));
+            setDirection(Number(config.get('direction', 0)));
             setZRetractDistance(config.get('zRetractNormal'));
             setZRetractDistanceAuto(config.get('zRetractAuto'));
 
