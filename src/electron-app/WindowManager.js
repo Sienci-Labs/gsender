@@ -34,6 +34,37 @@ import path from 'path';
 
 const remoteMain = require('@electron/remote/main');
 
+// 6DOF controllers (3Dconnexion SpaceMouse and compatible devices) report a
+// Generic Desktop (0x01) / Multi-axis Controller (0x08) HID collection.
+// Keep in sync with app/src/lib/spacemouse.
+const isMultiAxisController = (device) =>
+    Array.isArray(device && device.collections) &&
+    device.collections.some((c) => c.usagePage === 0x01 && c.usage === 0x08);
+
+const hidConfiguredSessions = new WeakSet();
+
+// Allow the renderer to use 6DOF controllers over WebHID without a device
+// picker. Other HID devices remain denied (Electron's default).
+const configureHidPermissions = (ses) => {
+    if (hidConfiguredSessions.has(ses)) {
+        return;
+    }
+    hidConfiguredSessions.add(ses);
+
+    ses.on('select-hid-device', (event, details, callback) => {
+        event.preventDefault();
+        const device = details.deviceList.find(isMultiAxisController);
+        callback(device ? device.deviceId : '');
+    });
+
+    ses.setDevicePermissionHandler((details) => {
+        if (details.deviceType === 'hid') {
+            return isMultiAxisController(details.device);
+        }
+        return false;
+    });
+};
+
 class WindowManager {
     windows = [];
 
@@ -179,6 +210,7 @@ class WindowManager {
         // Call `ses.setProxy` to ignore proxy settings
         // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
         const ses = webContents.session;
+        configureHidPermissions(ses);
         ses.setProxy({ proxyRules: 'direct://' }).then(() => {
             window.loadURL(url);
         });
