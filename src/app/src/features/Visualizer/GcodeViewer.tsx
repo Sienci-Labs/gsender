@@ -640,7 +640,7 @@ class GcodeViewer extends Component<Props> {
         }
     }
 
-    disarmPick() {
+    disarmPick({ keepView = false }: { keepView?: boolean } = {}) {
         const dom = this.containerRef;
         if (dom) {
             dom.style.cursor = '';
@@ -654,7 +654,7 @@ class GcodeViewer extends Component<Props> {
         // Undo the camera/orbit lock a hold gesture applied.
         if (this.pickMode === 'hold') {
             this.viewer3d?.setRotateEnabled(true);
-            if (this.pickPriorView) {
+            if (this.pickPriorView && !keepView) {
                 this.restoreCameraView(this.pickPriorView);
             }
             if (this.pickPriorProjection) {
