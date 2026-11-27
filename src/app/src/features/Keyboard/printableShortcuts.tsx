@@ -22,6 +22,7 @@
  */
 
 import { useAppTranslation } from 'app/i18n';
+import { MACRO_CATEGORY } from 'app/constants';
 import type { CommandKey, ShuttleEvent } from 'app/lib/definitions/shortcuts';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
@@ -41,7 +42,12 @@ const PrintableShortcuts = React.forwardRef<HTMLDivElement>((_, ref) => {
         () =>
             shortcutsList
                 .filter(
-                    ([, shortcut]) => shortcut.isActive && shortcut.keys !== '',
+                    ([key, shortcut]) =>
+                        shortcut.isActive &&
+                        shortcut.keys !== '' &&
+                        // skip saved entries for shortcuts that no longer exist
+                        (!!allShuttleControlEvents[key] ||
+                            shortcut.category === MACRO_CATEGORY),
                 )
                 .map(([key, shortcut]) => {
                     const title = getShortcutTitle(

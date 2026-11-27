@@ -1,4 +1,3 @@
-import { MACRO_CATEGORY } from 'app/constants';
 import reduxStore from 'app/store/redux';
 import { updateShuttleStatus } from 'app/store/redux/slices/shortcuts.slice';
 import _ from 'lodash';
@@ -11,8 +10,13 @@ import type {
 } from './definitions/shortcuts';
 import shuttleEvents from './shuttleEvents';
 
-const TARGET_NUM_CALLS = 16; // this is the current number of times that useKeybinding is called throughout the program
-let numCalls = 0; // number of useKeybinding hooks that have been called
+/*
+    Never reuse a the same cmd for a different shortcut.
+    
+    The user-set `keys` and `isActive` properties from the old shortcut are
+    saved and will override the defaults for the new one. Give the new
+    shortcut a new ID and delete the retired one in a store migration.
+*/
 
 /*
     shuttleControlEvents structure:
@@ -32,7 +36,11 @@ let numCalls = 0; // number of useKeybinding hooks that have been called
         ...
     }
 */
-function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
+function useKeybinding(
+    shuttleControlEvents: ShuttleControlEvents,
+    // only the last caller of useKeybinding (workspace.index.tsx) has this set to true
+    isRoot: boolean = false,
+): void {
     // update stored shuttle control events
     shuttleEvents.updateShuttleEvents(shuttleControlEvents);
 
@@ -85,49 +93,10 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
         }
     });
 
-    numCalls++;
-    checkNumCalls();
-}
-
-// check to see if all widgets have added their keybindings
-// and call the remove function
-function checkNumCalls(): void {
-    if (numCalls === TARGET_NUM_CALLS) {
-        removeOldKeybindings();
+    if (isRoot) {
+        combokeys.reload();
         reduxStore.dispatch(updateShuttleStatus({ isFinished: true }));
     }
-}
-
-export function removeOldKeybindings(): void {
-    const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
-    const currentCommandKeys: CommandKeys = store.get('commandKeys', {});
-    const updatedCommandKeys: CommandKeys = {};
-
-    // Only keep keybindings that exist in the shuttleControlEvents arrays
-    Object.entries(currentCommandKeys).forEach(([key, keybinding]) => {
-        const event = allShuttleControlEvents[key];
-        if (event !== undefined || keybinding?.category === MACRO_CATEGORY) {
-            updatedCommandKeys[key] = keybinding;
-        }
-    });
-    store.replace('commandKeys', updatedCommandKeys);
-
-    // // do the same for gamepad shortcuts
-    // const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
-    // const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
-    //     const shortcuts = profile.shortcuts;
-    //     let updatedProfileShortcuts = shortcuts;
-    //     Object.entries(shortcuts).forEach(([key, keybinding]) => {
-    //         const event = allShuttleControlEvents[key];
-    //         if (event === undefined && (!keybinding.category || keybinding.category !== MACRO_CATEGORY)) {
-    //             delete updatedProfileShortcuts[key];
-    //         }
-    //     });
-    //     return { ...profile, shortcuts: updatedProfileShortcuts };
-    // });
-    // store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
-
-    combokeys.reload();
 }
 
 export default useKeybinding;

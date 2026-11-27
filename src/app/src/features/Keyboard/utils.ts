@@ -22,7 +22,12 @@ export const generateList = (shortcuts: CommandKeys) => {
     const shortcutsList: CommandKey[] = [];
 
     Object.keys(shortcuts).forEach((key) => {
-        if (key !== 'STOP_CONT_JOG') {
+        // saved entries for shortcuts that no longer exist stay in the store
+        // but should not be shown
+        const isKnown =
+            !!allShuttleControlEvents[key] ||
+            shortcuts[key]?.category === MACRO_CATEGORY;
+        if (key !== 'STOP_CONT_JOG' && isKnown) {
             shortcutsList.push(shortcuts[key]);
         }
     });
